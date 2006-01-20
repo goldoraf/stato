@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * Request
+ * 
+ * @package 
+ * @author goldoraf
+ * @copyright Copyright (c) 2004
+ * @version 0.5
+ * @access public
+ **/
+class Request
+{
+    const METHOD_POST = 1;
+    const METHOD_GET  = 2;
+    
+    public $uri        = Null;
+    public $module     = Null;
+    public $controller = Null;
+    public $action     = Null;
+    public $method     = Null;
+    public $params     = array();
+    
+    public function __construct()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') $this->method = self::METHOD_POST;
+        elseif ($_SERVER['REQUEST_METHOD'] == 'GET') $this->method = self::METHOD_GET;
+        
+        $this->uri = $this->extractPath();
+        
+        $this->parseUrl();
+        $this->parseParameters();
+    }
+    
+    public function isPost()
+    {
+        return $this->method == self::METHOD_POST;
+    }
+    
+    public function isGet()
+    {
+        return $this->method == self::METHOD_GET;
+    }
+    
+    private function parseUrl()
+    {
+        $options = Routes::parseUrl($this->uri);
+        $this->module     = $options['module'];
+        $this->controller = $options['controller'];
+        $this->action     = $options['action'];
+        $this->params     = $options;
+    }
+    
+    /**
+    * Request::extractPath()
+    * 
+    * @return void
+    **/
+    private function extractPath()
+    {
+        // nettoyage de la partie signifiante de l'uri
+        if (preg_match('/^'.str_replace('/','\/',BASE_DIR).'(.*)$/',$_SERVER['REQUEST_URI'],$match))
+        {
+            $requestPart = preg_replace('/^[\/]?(.*?)[\/]?$/','$1',$match[1]);
+        }
+        return $requestPart;
+    }
+    
+    /**
+    * Request::parseParameters()
+    * 
+    * @return void
+    **/
+    private function parseParameters()
+    {
+        // recup des params POST
+        $keys  = array_keys($_POST);
+        $count = sizeof($keys);
+        for ($i = 0; $i < $count; $i++)
+		{
+        	$this->params[$keys[$i]] = $_POST[$keys[$i]];
+        }
+        
+        // recup des params FILES
+		$keys  = array_keys($_FILES);
+        $count = sizeof($keys);
+        for ($i = 0; $i < $count; $i++)
+		{
+        	if (is_array($_FILES[$keys[$i]]['name']))
+        	{
+                $subkeys = array_keys($_FILES[$keys[$i]]['name']);
+                foreach($subkeys as $subkey)
+                {
+                    if ($_FILES[$keys[$i]]['error'][$subkey] != UPLOAD_ERR_NO_FILE)
+                	{
+                        $flags = array('name', 'type', 'tmp_name', 'error', 'size');
+                        foreach($flags as $flag) $file[$flag] = $_FILES[$keys[$i]][$flag][$subkey];
+                        $this->params[$keys[$i]][$subkey] = new Upload($file);
+                    }
+                    else
+                    {
+                        $this->params[$keys[$i]][$subkey] = False;
+                    }
+                }
+            }
+            else
+            {
+                if ($_FILES[$keys[$i]]['error'] != UPLOAD_ERR_NO_FILE)
+            	{
+                    $this->params[$keys[$i]] = new Upload($_FILES[$keys[$i]]);
+                }
+                else
+                {
+                    $this->params[$keys[$i]] = False;
+                }
+            }
+        }
+	}
+}
+
+?>

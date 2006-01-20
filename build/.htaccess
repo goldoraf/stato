@@ -1,0 +1,13 @@
+RewriteEngine On
+
+#for google accelerator
+#RewriteCond %{HTTP:x-moz} ^prefetch
+#RewriteRule ^/*admin/.* - [F,L]
+
+RewriteRule ^public/(.*)$ public/$1 [L]
+RewriteRule ^data/(.*)$ data/$1 [L]
+
+RewriteRule ^tests/core/(.*)$ tests/core/all_tests.php [L]
+
+RewriteRule ^(.*)$ index.php [L]
+
