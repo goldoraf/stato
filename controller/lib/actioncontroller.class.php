@@ -207,28 +207,22 @@ class ActionController
     
     protected function templatePath($module, $controller, $action)
     {
-        return $this->inclusionPath($module)."/views/$controller/$action.php";
+        return Context::inclusionPath($module)."/views/$controller/$action.php";
     }
     
     protected function requireModel($model)
     {
         if (class_exists($model)) return;
-        $file = $this->inclusionPath($this->request->module).'/models/'.strtolower($model).'.class.php';
+        $file = Context::inclusionPath().'/models/'.strtolower($model).'.class.php';
         if (!file_exists($file)) throw new Exception('Model not found : '.$model);
         require_once($file);
     }
     
     protected function requireHelper($helper)
     {
-        $file = $this->inclusionPath($this->request->module)."/helpers/{$helper}.lib.php";
+        $file = Context::inclusionPath()."/helpers/{$helper}.lib.php";
         if (!file_exists($file)) throw new Exception('Helper not found : '.$helper);
         require_once($file);
-    }
-    
-    private function inclusionPath($module)
-    {
-        if ($module == 'root') return APP_DIR;
-        return APP_DIR."/modules/$module";
     }
 }
 

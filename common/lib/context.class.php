@@ -36,6 +36,13 @@ class Context
     {
         return Locale::translate($key);
     }
+    
+    public static function inclusionPath($module = Null)
+    {
+        if ($module == Null) $module = self::$request->module;
+        if ($module == 'root') return APP_DIR;
+        return APP_DIR."/modules/$module";
+    }
 }
 
 ?>

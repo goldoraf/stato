@@ -30,7 +30,7 @@ class AssociationProxy
         $dest = $options['dest'];
         // we instanciate the dest class without associations to avoid an infinite loop
         if (!class_exists($dest))
-            require_once(MODULES_DIR.'/'.Context::$request->module.'/models/'.strtolower($dest).'.class.php');
+            require_once(Context::inclusionPath().'/models/'.strtolower($dest).'.class.php');
             
         $destInstance = new $dest(Null, True);
         
