@@ -121,7 +121,7 @@ class ActionController
         {
             $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
             if (!file_exists($layout)) throw new Exception('Layout not found');
-            $this->response['layoutContent'] = $renderer->render();
+            $this->response['layout_content'] = $renderer->render();
             $renderer = new Renderer($layout, $this->response->values);
         }
         $this->renderText($renderer->render());

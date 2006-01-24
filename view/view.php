@@ -13,5 +13,6 @@ require_once('lib/helpers/pagerhelper.lib.php');
 require_once('lib/helpers/ajaxhelper.lib.php');
 require_once('lib/helpers/entityhelper.lib.php');
 require_once('lib/helpers/navhelper.lib.php');
+require_once('lib/helpers/partialshelper.lib.php');
 
 ?>
