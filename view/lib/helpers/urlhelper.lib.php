@@ -12,7 +12,7 @@
 function link_to($label, $urlOptions=array(), $htmlOptions=array())
 {
     if (is_array($urlOptions)) $url = url_for($urlOptions);
-    else $url = BASE_DIR.'/'.$urlOptions;
+    else $url = html_escape($urlOptions);
     
     if (isset($htmlOptions['confirm']))
     {
