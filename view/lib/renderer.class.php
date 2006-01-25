@@ -35,17 +35,17 @@ class Renderer
      **/
     public function render()
     {
+        if (!is_readable($this->template))
+        {
+            throw new Exception('Template not found : '.$this->template);
+        }
+        
         if (!$this->isCompiledTemplate()) $this->compile();
         
         extract ($this->values);
         
-        if (!is_readable($this->template))
-        {
-            throw new Exception('Template not found : '.$this->template);
-        } 
-        
         ob_start ();
-        include ($this->template);
+        include ($this->compiled);
         $str = ob_get_contents();
         ob_end_clean();
         
