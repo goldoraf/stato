@@ -4,7 +4,10 @@ function render_partial($partialPath, $localAssigns = Null)
 {
     list($path, $partial) = partial_pieces($partialPath);
     $template = Context::inclusionPath()."/views/$path/_$partial.php";
-    $localAssigns = Context::$response->values;
+    
+    if ($localAssigns == Null)
+        $localAssigns = array($partial => Context::$response->values[$partial]);
+    
     $renderer = new Renderer($template, $localAssigns);
     return $renderer->render();
 }
