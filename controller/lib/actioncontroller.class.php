@@ -143,7 +143,7 @@ class ActionController
         }
         else $options = $urlOptions;
         
-        if (!isset($options['controller'])) $options['controller'] = $this->getName();
+        if (!isset($options['controller'])) $options['controller'] = $this->name();
         if (!isset($options['module'])) $options['module'] = $this->request->module;
         if (!isset($options['action'])) $options['action'] = 'index';
         
@@ -158,7 +158,7 @@ class ActionController
     
     protected function sendFile($path, $params=array())
     {
-        $fp = fopen($path, "rb");
+        $fp = @fopen($path, "rb");
         if ($fp)
         {
             if (isset($params['type'])) 
@@ -168,10 +168,13 @@ class ActionController
             fpassthru($fp);
             exit();
         }
-        // else ?
+        else
+        {
+            throw new Exception('File not found : '.$path);
+        }
     }
     
-    protected function getName()
+    protected function name()
     {
         return strtolower(str_replace('Controller', '', get_class($this)));
     }
