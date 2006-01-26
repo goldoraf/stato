@@ -43,12 +43,10 @@ class MySqlDriver extends AbstractDriver
         $this->conn = @mysql_connect($this->config['host'],
                                      $this->config['user'],
                                      $this->config['pass']);
-        /*if (!$this->conn)
-        {
-            $this->error('DATABASE ERROR', array(), E_USER_ERROR);
-        }*/
         
         mysql_select_db($this->config['dbname']);
+        
+        mysql_query("SET NAMES 'utf8'");
     }
     
     /**
