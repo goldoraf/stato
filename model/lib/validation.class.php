@@ -207,24 +207,67 @@ class Validation
     
     public static function isUTF8($data, $options = array())
     {
-       // From http://w3.org/International/questions/qa-forms-utf-8.html
-       /*return preg_match('%^(?:
-             [\x09\x0A\x0D\x20-\x7E]            # ASCII
-           | [\xC2-\xDF][\x80-\xBF]             # non-overlong 2-byte
-           |  \xE0[\xA0-\xBF][\x80-\xBF]        # excluding overlongs
-           | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}  # straight 3-byte
-           |  \xED[\x80-\x9F][\x80-\xBF]        # excluding surrogates
-           |  \xF0[\x90-\xBF][\x80-\xBF]{2}     # planes 1-3
-           | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
-           |  \xF4[\x80-\x8F][\x80-\xBF]{2}     # plane 16
-       )*$%xs', $data);*/
-       
        if (strlen($str) == 0) return True;
         // If even just the first character can be matched, when the /u
         // modifier is used, then it's valid UTF-8. If the UTF-8 is somehow
         // invalid, nothing at all will match, even if the string contains
         // some valid sequences
         return (preg_match('/^.{1}/us',$str,$ar) == 1);
+    }
+    
+    public static function isValidUTF8($str)
+    {
+       // values of -1 represent disalloweded values for the first bytes in current UTF-8
+       /*static */$trailing_bytes = array (
+           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+           -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+           -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+           -1,-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+           2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 3,3,3,3,3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+       );
+    
+       $ups = unpack('C*', $str);
+       if (!($aCnt = count($ups))) return true; // Empty string *is* valid UTF-8
+       for ($i = 1; $i <= $aCnt;)
+       {
+           if (!($tbytes = $trailing_bytes[($b1 = $ups[$i++])])) continue;
+           if ($tbytes == -1) return false;
+          
+           $first = true;
+           while ($tbytes > 0 && $i <= $aCnt)
+           {
+               $cbyte = $ups[$i++];
+               if (($cbyte & 0xC0) != 0x80) return false;
+              
+               if ($first)
+               {
+                   switch ($b1)
+                   {
+                       case 0xE0:
+                           if ($cbyte < 0xA0) return false;
+                           break;
+                       case 0xED:
+                           if ($cbyte > 0x9F) return false;
+                           break;
+                       case 0xF0:
+                           if ($cbyte < 0x90) return false;
+                           break;
+                       case 0xF4:
+                           if ($cbyte > 0x8F) return false;
+                           break;
+                       default:
+                           break;
+                   }
+                   $first = false;
+               }
+               $tbytes--;
+           }
+           if ($tbytes) return false; // incomplete sequence at EOS
+       }       
+       return true;
     }
     
     private static function addError($entity, $attr, $message, $var = null)
