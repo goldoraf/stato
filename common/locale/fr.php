@@ -7,26 +7,8 @@ return array(
     'FORMAT_COUNTRY'    => 'France',
     'FORMAT_CURRENCY'   => '%s €', // printf()
     'FORMAT_DATE'       => '%d %B %Y', // strftime(): 19 mars 2005
+    'FORMAT_DATETIME'   => '%d %B %Y à %H:%M:%S',
     'FORMAT_TIME'       => '%R', // strftime: heure au format 24
-    
-    // operation actions
-    'OP_SAVE'       => 'Enregistrer',
-    'OP_PREVIEW'    => 'Prévisualiser',
-    'OP_CANCEL'     => 'Annuler',
-    'OP_DELETE'     => 'Supprimer',
-    'OP_RESET'      => 'Effacer',
-    'OP_NEXT'       => 'Suivant',
-    'OP_PREVIOUS'   => 'Précédent',
-    'OP_SEARCH'     => 'Rechercher',
-    'OP_GO'         => 'Valider',
-    
-    // error messages
-    'ERR_FILE_FIND' => 'Cannot find file.',
-    'ERR_FILE_OPEN' => 'Cannot open file.',
-    'ERR_FILE_READ' => 'Cannot read file.',
-    'ERR_EXTENSION' => 'Extension not loaded.',
-    'ERR_CONNECT'   => 'Connection failed.',
-    'ERR_INVALID'   => 'Invalid data.',
     
     // validation error messages
     'ERR_VALID_FORM'      => 'Veuillez renseigner ou corriger les champs ci-dessous :',

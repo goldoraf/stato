@@ -36,7 +36,8 @@ class Date
     
     public function format($strf)
     {
-        return utf8_encode(adodb_strftime($strf, $this->ts()));
+        //return utf8_encode(adodb_strftime($strf, $this->ts()));
+        return adodb_strftime($strf, $this->ts());
     }
     
     public function ts()
@@ -80,6 +81,11 @@ class DateTime extends Date
         $this->hour = $hour;
         $this->min  = $min;
         $this->sec  = $sec;
+    }
+    
+    public function locale()
+    {
+        return $this->format(Context::locale('FORMAT_DATETIME'));
     }
     
     public function __toString()
