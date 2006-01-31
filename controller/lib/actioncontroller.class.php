@@ -216,7 +216,13 @@ class ActionController
     protected function requireModel($model)
     {
         if (class_exists($model)) return;
-        $file = Context::inclusionPath().'/models/'.strtolower($model).'.class.php';
+        
+        if (!strpos($model, '/'))
+            $module = $this->request->module;
+        else
+            list($module, $model) = explode('/', $model);
+        
+        $file = Context::inclusionPath($module).'/models/'.strtolower($model).'.class.php';
         if (!file_exists($file)) throw new Exception('Model not found : '.$model);
         require_once($file);
     }
