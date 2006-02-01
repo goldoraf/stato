@@ -1,5 +1,15 @@
 <?php
 
+function error_handler($errorType, $message)
+{
+    // No exception thrown for notices : Stato uses some PHP4 librairies
+    // and we don't want to bother with "var is deprecated"
+    // Ideally, we could log this type of errors
+    if ($errorType != E_NOTICE && $errorType != E_STRICT)
+        throw new Exception( $message, $errorType);
+}
+set_error_handler('error_handler');
+
 class DispatchException extends Exception {}
 
 /**
@@ -18,7 +28,7 @@ class Dispatcher
 	 * 
 	 * @return void
 	 **/
-	function dispatch() 
+	public function dispatch() 
     {
 		Context::init();
         $request = Context::$request;
@@ -100,7 +110,7 @@ class Dispatcher
         }
 	}
 	
-	function getControllerPath($module, $controller)
+	private function getControllerPath($module, $controller)
 	{
         if ($module == 'root') return APP_DIR.'/controllers/'.$controller.'controller.class.php';
         return APP_DIR.'/modules/'.$module.'/controllers/'.$controller.'controller.class.php';
