@@ -21,10 +21,10 @@ class Database
        if (!isset(self::$instance))
        {
             $config = include(ROOT_DIR.'/conf/database.php');
-            $driverClass = $config['driver'].'Driver';
+            $driverClass = $config[APP_MODE]['driver'].'Driver';
             if (class_exists($driverClass))
             {
-                self::$instance = new $driverClass($config);
+                self::$instance = new $driverClass($config[APP_MODE]);
                 self::$instance->connect();
             }
             else

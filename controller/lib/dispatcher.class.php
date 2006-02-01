@@ -71,7 +71,7 @@ class Dispatcher
         }
         catch (DispatchException $e)
         {
-            if (!DEBUG_MODE)
+            if (APP_MODE == 'prod')
             {
                 header('location:'.BASE_DIR.'/public/html/404.html');
                 exit();
@@ -84,7 +84,7 @@ class Dispatcher
         }
         catch (Exception $e)
         {
-            if (!DEBUG_MODE)
+            if (APP_MODE == 'prod')
             {
                 header('location:'.BASE_DIR.'/public/html/500.html');
                 exit();

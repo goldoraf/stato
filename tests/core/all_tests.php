@@ -1,5 +1,7 @@
 <?php
 
+define('APP_MODE', 'test');
+
 define('ROOT_DIR', dirname(dirname(dirname(dirname(__FILE__)))));
 define('BASE_DIR', '/framework'); // to fix
 define('CORE_DIR', ROOT_DIR.'/core');

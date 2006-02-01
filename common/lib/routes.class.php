@@ -15,7 +15,7 @@ class Routes
             unset($options['validate']);
             self::$regexRoutes[$pattern] = $options;
             self::$routesMap[$options['module']][$options['controller']][$options['action']] = $regex;
-        }
+        }print_r(ROOT_DIR.'/conf/routes.php');
     }
     
     public static function rewriteUrl($options)

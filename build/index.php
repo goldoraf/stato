@@ -1,6 +1,6 @@
 <?php
 
-define('DEBUG_MODE', True);
+define('APP_MODE', 'dev');
 
 define('DOC_ROOT_DIR', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
 define('ROOT_DIR', str_replace('\\', '/', dirname(__FILE__)));
