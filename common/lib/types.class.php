@@ -36,8 +36,7 @@ class Date
     
     public function format($strf)
     {
-        //return utf8_encode(adodb_strftime($strf, $this->ts()));
-        return adodb_strftime($strf, $this->ts());
+        return utf8_encode(adodb_strftime($strf, $this->ts()));
     }
     
     public function ts()
