@@ -185,7 +185,7 @@ class MySqlDriver extends AbstractDriver
     public function escapeStr($str)
     {
         // throw exception if magic_quotes ?
-        return mysql_escape_string($str);
+        return mysql_real_escape_string($str, $this->conn);
     }
     
     public function quoteColumnName($name)

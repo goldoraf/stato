@@ -158,7 +158,7 @@ class Entity extends Observable implements ArrayAccess
         foreach($values as $key => $value)
         {
             if (is_array($value)) $multiParamsAttributes[$key] = $value;
-            elseif (!in_array($key, $this->attrProtected)) $this->$key = $value;
+            elseif (!in_array($key, $this->attrProtected)) $this->$key = stripslashes($value);
         }
         
         if (!empty($multiParamsAttributes)) $this->assignMultiparamsAttributes($multiParamsAttributes);
