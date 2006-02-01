@@ -2,8 +2,10 @@
 
 define('APP_MODE', 'test');
 
-define('ROOT_DIR', dirname(dirname(dirname(dirname(__FILE__)))));
-define('BASE_DIR', '/framework'); // to fix
+define('DOC_ROOT_DIR', str_replace('\\', '/', realpath(dirname(__FILE__).'/../../../..')));
+define('ROOT_DIR', str_replace('\\', '/', realpath(dirname(__FILE__).'/../../..')));
+define('BASE_DIR', str_replace(DOC_ROOT_DIR, '', ROOT_DIR));
+
 define('CORE_DIR', ROOT_DIR.'/core');
 
 define('ST_DIR', ROOT_DIR.'/lib/simpletest');

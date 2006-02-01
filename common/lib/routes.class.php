@@ -5,9 +5,11 @@ class Routes
     private static $regexRoutes = array();
     private static $routesMap   = array();
     
-    public static function initialize()
+    public static function initialize($configPath = Null)
     {
-        $routes = include(ROOT_DIR.'/conf/routes.php');
+        if ($configPath == Null) $configPath = ROOT_DIR.'/conf/routes.php';
+        
+        $routes = include($configPath);
         
         foreach($routes as $regex => $options)
         {
@@ -15,7 +17,7 @@ class Routes
             unset($options['validate']);
             self::$regexRoutes[$pattern] = $options;
             self::$routesMap[$options['module']][$options['controller']][$options['action']] = $regex;
-        }print_r(ROOT_DIR.'/conf/routes.php');
+        }
     }
     
     public static function rewriteUrl($options)

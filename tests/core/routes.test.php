@@ -6,7 +6,7 @@ class RoutesTest extends UnitTestCase
 {
     function RoutesTest()
     {
-        Routes::initialize();
+        Routes::initialize(CONFIG_DIR.'/routes.php');
     }
     
     function testConvertRegex()
