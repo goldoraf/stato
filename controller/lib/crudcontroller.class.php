@@ -10,23 +10,23 @@ class CRUDController extends ActionController
         {
             $this->model = str_replace('controller', '', strtolower(get_class($this)));
         }
-        $model = $this->model;
-        $this->useModels[] = $model;
+        
+        $this->useModels[] = $this->model;
         
         parent::__construct();
         
-        $this->response['entity_class'] = $this->model;
+        $this->entity_class = $this->model;
     }
     
     public function index()
     {
-        $this->response['entities'] = ActiveStore::findAll($this->model);
+        $this->entities = ActiveStore::findAll($this->model);
         $this->renderScaffold();
     }
     
     public function view()
     {
-        $this->response['entity'] = ActiveStore::findByPk($this->model, $this->params['id']);
+        $this->entity = ActiveStore::findByPk($this->model, $this->params['id']);
         $this->renderScaffold();
     }
     
@@ -49,17 +49,19 @@ class CRUDController extends ActionController
     
     public function edit()
     {
-        $this->response[$this->model] = ActiveStore::findByPk($this->model, $this->params['id']);
+        $class = $this->model;
+        
+        if ($this->request->isPost())
+        {
+            $entity = ActiveStore::findByPk($this->model, $this->params[$this->model]['id']);
+            if ($entity->updateAttributes($this->params[$this->model])) $this->redirect('index');
+        }
+        else
+        {
+            $entity = ActiveStore::findByPk($this->model, $this->params['id']);
+        }
+        $this->response[$this->model] = $entity;
         $this->renderScaffold();
-    }
-    
-    public function update()
-    {
-        $params = $this->params[$this->model];
-        $entity = ActiveStore::findByPk($this->model, $this->params[$this->model]['id']);
-        $entity->populate($params);
-        $entity->save();
-        $this->redirect('index');
     }
     
     public function delete()

@@ -37,13 +37,13 @@
   </style>
   </head>
   <body>
-        <h1><?php echo get_class($exception)." in {$controller}::{$action}()"; ?></h1>
-        <pre><?php echo $exception->getMessage(); ?></pre>
-        <p><?php echo "Exception occured at : ".$exception->getFile()." : ".$exception->getLine(); ?></p>
+        <h1><?php echo get_class($this->exception)." in {$this->controller}::{$this->action}()"; ?></h1>
+        <pre><?php echo $this->exception->getMessage(); ?></pre>
+        <p><?php echo "Exception occured at : ".$this->exception->getFile()." : ".$this->exception->getLine(); ?></p>
         <table>
             <caption>Stack trace</caption>
             <tr><th>#</th><th>File</th><th>Line</th><th>Function</th></tr>
-            <?php foreach ($exception->getTrace() as $num => $trace) { ?>
+            <?php foreach ($this->exception->getTrace() as $num => $trace) { ?>
             <tr>
                 <td><?php echo $num + 1; ?></td>
                 <td><?php echo $trace['file']; ?></td>

@@ -26,6 +26,16 @@ class Renderer
         $this->values = $values;
     }
     
+    public function __get($name)
+    {
+        if (isset($this->values[$name])) return $this->values[$name];
+    }
+    
+    public function __set($name, $value)
+    {
+        throw new Exception('You\'re not allowed to reassign template variables !');
+    }
+    
     /**
      * Renderer::render()
      * 
@@ -41,8 +51,6 @@ class Renderer
         }
         
         if (!$this->isCompiledTemplate()) $this->compile();
-        
-        extract ($this->values);
         
         ob_start ();
         include ($this->compiled);

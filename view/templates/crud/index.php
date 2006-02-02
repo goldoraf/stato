@@ -1,28 +1,27 @@
 <div id="contenu">
-    <h2>Liste des objets de type '<?php echo $entity_class; ?>'</h2>
-    <p><?php echo link_to('Nouvel objet', array('action' => 'add')); ?></p>
-    <?php if (empty($entities)) { ?>
+    <h2>Liste des objets de type '<?= $this->entity_class; ?>'</h2>
+    <p><?= link_to('Nouvel objet', array('action' => 'add')); ?></p>
+    <? if (count($this->entities) == 0) { ?>
         <p>Aucune donnée disponible.</p>
-    <?php } else { ?>
+    <? } else { ?>
         <table>
-            <tr><?php foreach($attributes = $entities[0]->contentAttributes() as $header) { ?>
-                <th><?php echo ucfirst($header); ?></th>
-            <?php } ?></tr>
-            <?php for ($i=0; $i<$count = count($entities); $i++) { ?>
-            <tr><?php foreach($attributes as $attr) { 
-                    $value = $entities[$i]->$attr;
-                    if (is_object($value)) $value = $value->__toString();
-                    if (strlen($value) > 40) $value = substr($value, 0, 40).'...';
+            <tr><? foreach($attributes = $this->entities[0]->contentAttributes() as $header) { ?>
+                <th><?= ucfirst($header); ?></th>
+            <? } ?></tr>
+            <? for ($i=0; $i<$count = count($this->entities); $i++) { ?>
+            <tr><? foreach($attributes as $attr) {
+                    $value = $this->entities[$i]->$attr;
+                    //if (is_object($value)) $value = $value->__toString();
                 ?>
-                <td><?php echo $value; ?></td>
-                <?php } ?>
-                <td><?php echo link_to('Voir', array('action' => 'view', 'id' => $entities[$i]->id)); ?></td>
-                <td><?php echo link_to('Editer', array('action' => 'edit', 'id' => $entities[$i]->id)); ?></td>
-                <td><?php echo link_to('Supprimer', array('action' => 'delete', 'id' => $entities[$i]->id), 
+                <td><?= truncate($value); ?></td>
+                <? } ?>
+                <td><?= link_to('Voir', array('action' => 'view', 'id' => $this->entities[$i]->id)); ?></td>
+                <td><?= link_to('Editer', array('action' => 'edit', 'id' => $this->entities[$i]->id)); ?></td>
+                <td><?= link_to('Supprimer', array('action' => 'delete', 'id' => $this->entities[$i]->id),
                                                    array('confirm' => 'Êtes-vous sûr de vouloir supprimer cet objet ?')); ?></td>
             </tr>
-        <?php } ?>
+        <? } ?>
         </table>
-    <?php } ?>
-    <p><?php echo link_to('Nouvel objet', array('action' => 'add')); ?></p>
+    <? } ?>
+    <p><?= link_to('Nouvel objet', array('action' => 'add')); ?></p>
 </div>

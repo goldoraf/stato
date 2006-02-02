@@ -1,9 +1,9 @@
 <h2>Détail</h2>
-<p><?php echo link_to('Retour', array('action' => 'index')); ?></p>
+<p><?= link_to('Retour', array('action' => 'index')); ?></p>
 <dl>
-<?php foreach($entity->contentAttributes() as $attr) { ?>
-    <dt><?php echo ucfirst($attr); ?></dt>
-    <dd><?php echo $entity->$attr; ?></dd>
-<?php } ?>
+<? foreach($this->entity->contentAttributes() as $attr) { ?>
+    <dt><?= ucfirst($attr); ?></dt>
+    <dd><?= $this->entity->$attr; ?></dd>
+<? } ?>
 </dl>
-<p><?php echo link_to('Retour', array('action' => 'index')); ?></p>
+<p><?= link_to('Retour', array('action' => 'index')); ?></p>
