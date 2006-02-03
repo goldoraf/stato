@@ -8,6 +8,10 @@ function calendar($object, $method, $options = array())
     {
         if (!is_date_type($value)) $value = SDateTime::parse($value);
     }
+    else
+    {
+        $value = SDateTime::today();
+    }
     
     $calOptions[] = 'inputField : "'.$id.'"';
     $calOptions[] = 'button : "'.$id.'_trigger"';
