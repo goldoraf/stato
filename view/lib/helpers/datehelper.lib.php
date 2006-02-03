@@ -54,8 +54,30 @@ function date_time_select($object, $method, $options = array())
     else
         $datetime = ($value != Null) ? $value : SDateTime::today(); 
     
-    return select_year($datetime, $options).select_month($datetime, $options).select_day($datetime, $options)
-    .select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
+    $order = (isset($options['order'])) ? $options['order'] : array('year', 'month', 'day', 'hour', 'minute', 'second');
+    $html = '';
+    foreach ($order as $param)
+    {
+        $html.= call_user_func('select_'.$param, $date, $options);
+    }
+    return $html;
+}
+
+function time_select($object, $method, $options = array())
+{
+    list($id, $options['prefix'], $value) = default_options($object, $method);
+    if (isset($options['include_blank']) && $options['include_blank'] == True)
+        $datetime = ($value != Null) ? $value : Null; 
+    else
+        $datetime = ($value != Null) ? $value : SDateTime::today(); 
+    
+    $order = (isset($options['order'])) ? $options['order'] : array('hour', 'minute', 'second');
+    $html = '';
+    foreach ($order as $param)
+    {
+        $html.= call_user_func('select_'.$param, $date, $options);
+    }
+    return $html;
 }
 
 function select_date($date = Null, $options = array())
