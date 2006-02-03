@@ -175,7 +175,7 @@ function select_html($type, $dateOptions, $options = array())
 function numerical_options($start, $end, $selected = Null, $step=1)
 {
     $options = '';
-    for($i = $start; $i != $end; $i = $i + $step)
+    for($i = $start; $i <= $end; $i = $i + $step)
     {
         $value = ($i > 9 ? $i : "0{$i}");
         if ($selected == $value)
