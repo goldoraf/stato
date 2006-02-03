@@ -222,7 +222,7 @@ class ActiveEntity extends Entity
     
     protected function saveWithTimestamps()
     {
-        $t = DateTime::today();
+        $t = SDateTime::today();
         if ($this->isNewRecord())
         {
             if ($this->attrExists('created_on')) $this->values['created_on'] = $t->__toString();

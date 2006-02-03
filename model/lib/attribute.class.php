@@ -59,7 +59,7 @@ class Attribute
     {
         if (is_string($data))
         {
-            try { $date = Date::parse($data); }
+            try { $date = SDate::parse($data); }
             catch (Exception $e) { return Null; }
             return $date;
         }
@@ -70,7 +70,7 @@ class Attribute
     {
         if (is_string($data))
         {
-            try { $date = DateTime::parse($data); }
+            try { $date = SDateTime::parse($data); }
             catch (Exception $e) { return Null;  }
             return $date;
         }

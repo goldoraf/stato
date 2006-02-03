@@ -6,7 +6,7 @@ function calendar($object, $method, $options = array())
     list($id, $name, $value) = default_options($object, $method);
     if ($value != Null)
     {
-        if (!is_date_type($value)) $value = DateTime::parse($value);
+        if (!is_date_type($value)) $value = SDateTime::parse($value);
     }
     
     $calOptions[] = 'inputField : "'.$id.'"';
@@ -31,7 +31,7 @@ function date_select($object, $method, $options = array())
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $date = ($value != Null) ? $value : 0; 
     else
-        $date = ($value != Null) ? $value : Date::today(); 
+        $date = ($value != Null) ? $value : SDate::today(); 
     
     $order = (isset($options['order'])) ? $options['order'] : array('year', 'month', 'day');
     $html = '';
@@ -48,7 +48,7 @@ function date_time_select($object, $method, $options = array())
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $datetime = ($value != Null) ? $value : Null; 
     else
-        $datetime = ($value != Null) ? $value : DateTime::today(); 
+        $datetime = ($value != Null) ? $value : SDateTime::today(); 
     
     return select_year($datetime, $options).select_month($datetime, $options).select_day($datetime, $options)
     .select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
@@ -56,20 +56,20 @@ function date_time_select($object, $method, $options = array())
 
 function select_date($date = Null, $options = array())
 {
-    if ($date == Null) $date = Date::today();
+    if ($date == Null) $date = SDate::today();
     return select_day($date, $options).select_month($date, $options).select_year($date, $options);
 }
 
 function select_date_time($datetime = Null, $options = array())
 {
-    if ($datetime == Null) $datetime = DateTime::today();
+    if ($datetime == Null) $datetime = SDateTime::today();
     return select_day($datetime, $options).select_month($datetime, $options).select_year($datetime, $options)
     .select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
 function select_time($datetime = Null, $options = array())
 {
-    if ($datetime == Null) $datetime = DateTime::today();
+    if ($datetime == Null) $datetime = SDateTime::today();
     return select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
@@ -117,7 +117,7 @@ function select_month($date, $options=array())
 function select_year($date, $options = array())
 {
     $yearOptions = '';
-    $today = Date::today();
+    $today = SDate::today();
     if (!isset($options['start_year'])) $options['start_year'] = $today->year - 5;
     if (!isset($options['end_year'])) $options['end_year'] = $today->year + 5;
     $step = ($options['start_year'] < $options['end_year']) ? 1 : -1;
@@ -136,7 +136,7 @@ function select_year($date, $options = array())
 
 function select_second($datetime, $options = array())
 {
-    $selected = (get_class($datetime) == 'DateTime') ? $datetime->sec : $datetime;
+    $selected = (get_class($datetime) == 'SDateTime') ? $datetime->sec : $datetime;
     $secOptions = numerical_options(0, 59, $selected);
     if (!isset($options['fieldname'])) $options['fieldname'] = 'sec';
     return select_html($options['fieldname'], $secOptions, $options);
@@ -144,7 +144,7 @@ function select_second($datetime, $options = array())
 
 function select_minute($datetime, $options = array())
 {
-    $selected = (get_class($datetime) == 'DateTime') ? $datetime->min : $datetime;
+    $selected = (get_class($datetime) == 'SDateTime') ? $datetime->min : $datetime;
     $step = (isset($options['minute_step'])) ? $options['minute_step'] : 1;
     $minOptions = numerical_options(0, 59, $selected, $step);
     if (!isset($options['fieldname'])) $options['fieldname'] = 'min';
@@ -153,7 +153,7 @@ function select_minute($datetime, $options = array())
 
 function select_hour($datetime, $options = array())
 {
-    $selected = (get_class($datetime) == 'DateTime') ? $datetime->hour : $datetime;
+    $selected = (get_class($datetime) == 'SDateTime') ? $datetime->hour : $datetime;
     $hourOptions = numerical_options(0, 23, $selected);
     if (!isset($options['fieldname'])) $options['fieldname'] = 'hour';
     return select_html($options['fieldname'], $hourOptions, $options);
@@ -184,7 +184,7 @@ function numerical_options($start, $end, $selected = Null, $step=1)
 
 function is_date_type($date)
 {
-    return in_array(get_class($date), array('Date', 'DateTime'));
+    return in_array(get_class($date), array('SDate', 'SDateTime'));
 }
 
 ?>

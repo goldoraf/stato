@@ -33,7 +33,7 @@ class ActiveEntityTest extends ActiveTestCase
     function testPreservingDateObjects()
     {
         $contract = ActiveStore::findByPk('Contract', 1);
-        $this->assertIsA($contract->date, 'Date');
+        $this->assertIsA($contract->date, 'SDate');
     }
     
     function testCreate()
@@ -69,22 +69,22 @@ class ActiveEntityTest extends ActiveTestCase
     
     function testSaveWithTimestamps()
     {
-        $created_date = new DateTime(2005,12,01,20,30,00);
+        $created_date = new SDateTime(2005,12,01,20,30,00);
         $post = ActiveStore::findByPk('Post', 2);
-        $this->assertIsA($post->created_on, 'DateTime');
+        $this->assertIsA($post->created_on, 'SDateTime');
         $this->assertEqual($created_date, $post->created_on);
         $this->assertEqual($post->created_on, $post->updated_on);
         $post->text = 'blo blo blo';
         $post->save();
         $this->assertNotEqual($post->created_on, $post->updated_on);
         
-        $today = Date::today();
+        $today = SDate::today();
         $new_post = new Post(array('title'=>'Timestamps and MySQL', 'author'=>'Goldoraf', 'text'=>'ttttt'));
         $this->assertNull($new_post->created_on);
         $this->assertNull($new_post->updated_on);
         $new_post->save();
-        $this->assertIsA($new_post->created_on, 'DateTime');
-        $this->assertIsA($new_post->created_on, 'DateTime');
+        $this->assertIsA($new_post->created_on, 'SDateTime');
+        $this->assertIsA($new_post->created_on, 'SDateTime');
         $this->assertEqual($new_post->created_on, $new_post->updated_on);
         $this->assertEqual($today->year, $new_post->created_on->year);
         $this->assertEqual($today->month, $new_post->created_on->month);

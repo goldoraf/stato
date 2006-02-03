@@ -2,7 +2,7 @@
 
 require_once(ROOT_DIR.'/lib/adodb-time.class.php');
 
-class Date
+class SDate
 {
     public $day   = Null;
     public $month = Null;
@@ -47,7 +47,7 @@ class Date
     public static function today()
     {
         $today = getdate();
-        return new Date($today['year'], $today['mon'], $today['mday']);
+        return new SDate($today['year'], $today['mon'], $today['mday']);
     }
     
     public static function parse($string)
@@ -56,14 +56,14 @@ class Date
         {
             if (preg_match($regex, $string, $matches))
             {
-                return new Date($matches['year'], $matches['month'], $matches['day']);
+                return new SDate($matches['year'], $matches['month'], $matches['day']);
             }
         }
         return False;
     }
 }
 
-class DateTime extends Date
+class SDateTime extends SDate
 {
     public $hour = Null;
     public $min  = Null;
@@ -100,7 +100,7 @@ class DateTime extends Date
     public static function today()
     {
         $today = getdate();
-        return new DateTime($today['year'], $today['mon'], $today['mday'], $today['hours'], $today['minutes'], $today['seconds']);
+        return new SDateTime($today['year'], $today['mon'], $today['mday'], $today['hours'], $today['minutes'], $today['seconds']);
     }
     
     public static function parse($string)
@@ -109,7 +109,7 @@ class DateTime extends Date
         {
             if (preg_match($regex, $string, $matches))
             {
-                return new DateTime($matches['year'], $matches['month'], $matches['day'], $matches['hour'], $matches['min'], $matches['sec']);
+                return new SDateTime($matches['year'], $matches['month'], $matches['day'], $matches['hour'], $matches['min'], $matches['sec']);
             }
         }
         return False;

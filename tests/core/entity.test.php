@@ -30,7 +30,7 @@ class EntityTest extends UnitTestCase
     {
         $emp = new Employe(array('firstname'=>'Steve', 'lastname'=>'Warson', 
                                  'date_of_birth'=>array('year'=>'1962', 'month'=>'09', 'day'=>'12')));
-        $this->assertIsA($emp->date_of_birth, 'Date');
+        $this->assertIsA($emp->date_of_birth, 'SDate');
         $this->assertEqual('1962-09-12', $emp->date_of_birth->__toString());
     }
 }
