@@ -34,12 +34,6 @@ class Database
        }
        return self::$instance;
     }
-    
-    public static function quote($value)
-    {
-        if (!isset(self::$instance)) self::getInstance();
-        return self::$instance->quote($value);
-    }
 }
 
 ?>

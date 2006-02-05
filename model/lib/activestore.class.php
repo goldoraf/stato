@@ -92,8 +92,7 @@ class ActiveStore
      **/
     public static function findBySql($entity, $sql)
     {
-        $db = Database::getInstance();
-        $rs = $db->select($sql);
+        $rs = self::connection()->select($sql);
         if (!$rs) return false;
         $set = array();
         while($row = $rs->fetch())
@@ -123,8 +122,7 @@ class ActiveStore
         $instance = self::getInstance($entity);
         $sql = 'UPDATE '.$instance->tableName.' SET '.self::sanitizeSql($updates);
         $sql.= self::addConditions($conditions);
-        $db = Database::getInstance();
-        $db->update($sql);
+        self::connection()->update($sql);
     }
     
     public static function deleteAll($entity, $conditions = Null)
@@ -132,8 +130,7 @@ class ActiveStore
         $instance = self::getInstance($entity);
         $sql = 'DELETE '.$instance->tableName.' SET '.self::sanitizeSql($updates);
         $sql.= self::addConditions($conditions);
-        $db = Database::getInstance();
-        $db->delete($sql);
+        self::connection()->delete($sql);
     }
     
     /**
@@ -144,10 +141,9 @@ class ActiveStore
     public static function count($entity, $conditions = null)
     {
         $instance = self::getInstance($entity);
-        $db = Database::getInstance();
         $sql = 'SELECT COUNT(*) AS count FROM '.$instance->tableName;
         $sql.= self::addConditions($conditions);
-        $rs = $db->select($sql);
+        $rs = self::connection()->select($sql);
         $row = $rs->fetch();
         return $row['count'];
     }
@@ -160,9 +156,8 @@ class ActiveStore
     public static function insertId($entity)
     {
         $instance = self::getInstance($entity);
-        $db = Database::getInstance();
         $sql = 'SELECT MAX('.$instance->identityField.') AS max FROM '.$instance->tableName;
-        $rs = $db->select($sql);
+        $rs = self::connection()->select($sql);
         $row = $rs->fetch();
         return $row['max'];
     }
@@ -171,8 +166,7 @@ class ActiveStore
     {
         if (!isset(self::$tables[$tableName])) 
         {
-            $db = Database::getInstance();
-            self::$tables[$tableName] = $db->getColumns($tableName);
+            self::$tables[$tableName] = self::connection()->getColumns($tableName);
         }
         return self::$tables[$tableName];
     }
@@ -180,7 +174,7 @@ class ActiveStore
     // must be public because Fixture uses it
     public static function arrayQuote($array)
     {
-        foreach($array as $key => $value) $array[$key] = Database::quote($value);
+        foreach($array as $key => $value) $array[$key] = self::connection()->quote($value);
         return $array;
     }
     
@@ -194,7 +188,6 @@ class ActiveStore
     protected static function prepareSelect($entity, $conditions=null, $options=array())
     {
         $instance = self::getInstance($entity);
-        $db = Database::getInstance();
         $sql = 'SELECT * FROM '.$instance->tableName;
         $sql.= self::addConditions($conditions);
         if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
@@ -202,7 +195,7 @@ class ActiveStore
         {
             $offset = 0;
             if (isset($options['offset'])) $offset = $options['offset'];
-            $sql.= $db->limit($options['limit'], $offset);
+            $sql.= self::connection()->limit($options['limit'], $offset);
         }
         return $sql;
     }
@@ -230,8 +223,7 @@ class ActiveStore
         $pkTable = self::getPkLookupTable($assocs, $abbrv);
         $pk = $instance->tableName.'_'.$instance->identityField;
         $sql = self::prepareSelectWithAssoc($instance, $conditions, $abbrv, $options, $assocs);
-        $db = Database::getInstance();
-        $rs = $db->select($sql);
+        $rs = self::connection()->select($sql);
         $records = array();
         $recordsInOrder = array();
         while($row = $rs->fetch())
@@ -289,11 +281,10 @@ class ActiveStore
     {
         $assocs[] = array(2 => array('table_name' => $tableName));
         $abbrv = array();
-        $db = Database::getInstance();
         foreach($assocs as $assoc)
         {
             $table = $assoc[2]['table_name'];
-            $columns = array_keys($db->getColumns($table));
+            $columns = array_keys(self::connection()->getColumns($table));
             foreach($columns as $column)
             {
                 $abbrv[$table.'_'.$column] = array($table, $column);
@@ -398,13 +389,13 @@ class ActiveStore
     
     private static function replaceBindVariables($stmt, $values)
     {
-        foreach ($values as $value) $stmt = preg_replace('/\?/i', $value, $stmt, 1);
+        foreach ($values as $value) $stmt = preg_replace('/\?/i', self::connection()->quote($value), $stmt, 1);
         return $stmt;
     }
     
     private static function replaceNamedBindVariables($stmt, $values)
     {
-        foreach ($values as $key => $value) $stmt = preg_replace('/'.$key.'/i', $value, $stmt, 1);
+        foreach ($values as $key => $value) $stmt = preg_replace('/'.$key.'/i', self::connection()->quote($value), $stmt, 1);
         return $stmt;
     }
     
@@ -424,6 +415,11 @@ class ActiveStore
         $double = array();
         for ($i = 0; $i < $count = count($array); $i++) $double[] = $keys[$i].'=>'.$values[$i];
         return 'array('.join(',', $double).')';
+    }
+    
+    private static function connection()
+    {
+        return Database::getInstance();
     }
 }
 
