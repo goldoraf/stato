@@ -408,15 +408,6 @@ class ActiveStore
         throw new Exception("ActiveStore : $className class not found.");
     }
     
-    private static function arrayToString($array)
-    {
-        $keys   = self::arrayQuote(array_keys($array));
-        $values = self::arrayQuote(array_values($array));
-        $double = array();
-        for ($i = 0; $i < $count = count($array); $i++) $double[] = $keys[$i].'=>'.$values[$i];
-        return 'array('.join(',', $double).')';
-    }
-    
     private static function connection()
     {
         return Database::getInstance();
