@@ -229,7 +229,7 @@ class ActionController
     
     protected function requireHelper($helper)
     {
-        $file = Context::inclusionPath()."/helpers/{$helper}.lib.php";
+        $file = Context::inclusionPath()."/helpers/{$helper}helper.lib.php";
         if (!file_exists($file)) throw new Exception('Helper not found : '.$helper);
         require_once($file);
     }

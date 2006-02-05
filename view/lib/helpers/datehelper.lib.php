@@ -1,34 +1,5 @@
 <?php
 
-function calendar($object, $method, $options = array())
-{
-    $calOptions = array();
-    list($id, $name, $value) = default_options($object, $method);
-    if ($value != Null)
-    {
-        if (!is_date_type($value)) $value = SDateTime::parse($value);
-    }
-    else
-    {
-        $value = SDateTime::today();
-    }
-    
-    $calOptions[] = 'inputField : "'.$id.'"';
-    $calOptions[] = 'button : "'.$id.'_trigger"';
-    $calOptions[] = 'ifFormat : "'.Context::locale('FORMAT_DATE').'"';
-    
-    return css_include_tag(ROOT_DIR.'/public/js/jscalendar/calendar-blue2.css')
-    .js_include_tag('jscalendar/calendar.js').js_include_tag('jscalendar/lang/calendar-en.js')
-    .js_include_tag('jscalendar/calendar-setup.js')
-    .text_field_tag($name, $id, $value->locale()).'<button id="'.$id.'_trigger">...</button>'
-    .js_tag('Calendar.setup({'.implode(",", $calOptions).'});');
-    /*.js_tag('Calendar.setup({
-                inputField : "'.$id.'",
-                ifFormat : "'.Context::locale('FORMAT_DATE').'",
-                button : "'.$id.'_trigger"
-            });');*/
-}
-
 function date_select($object, $method, $options = array())
 {
     list($id, $options['prefix'], $value) = default_options($object, $method);
