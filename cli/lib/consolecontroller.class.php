@@ -13,7 +13,7 @@ class ConsoleController
             print("No argument provided !\n");
             exit(0);
         }
-        
+        print_r($this->readArguments());
     }
     
     /**
