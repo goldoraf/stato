@@ -6,19 +6,18 @@ class Routes
     private static $regexRoutes = array();
     private static $routesMap   = array();
     
-    public static function initialize($configPath = Null)
-    {
-        if ($configPath == Null) $configPath = ROOT_DIR.'/conf/routes.php';   
-        $routes = include($configPath);
-        foreach($routes as $regex => $options) self::connect($regex, $options);
-    }
-    
     public static function connect($pattern, $options)
     {
         $regex = self::convertRegex($pattern, $options['validate']);
         unset($options['validate']);
+        if (!isset($options['module'])) $options['module'] = 'root';
         self::$regexRoutes[$regex] = $options;
         self::$routesMap[$options['module']][$options['controller']][$options['action']] = $pattern;
+    }
+    
+    public static function connectModule($module)
+    {
+        self::$modules[] = $module;
     }
     
     public static function rewriteUrl($options)
@@ -30,7 +29,11 @@ class Routes
         }
         else
         {
-            $url = BASE_DIR.'/'.$options['module'].'/'.$options['controller'].'/'.$options['action'];
+            if ($options['module'] == 'root')
+                $url = BASE_DIR.'/'.$options['controller'].'/'.$options['action'];
+            else
+                $url = BASE_DIR.'/'.$options['module'].'/'.$options['controller'].'/'.$options['action'];
+                
             foreach ($options as $key => $value)
             {
                 if (!in_array($key, array('module', 'controller', 'action'))) $url.= "/{$key}/{$value}";
@@ -55,10 +58,22 @@ class Routes
         }
         // Else...
         $set = explode('/', $url);
-        $options['module']     = $set[0];
-        $options['controller'] = $set[1];
-        $options['action']     = $set[2];
-        for ($i = 3; $i < $count = count($set); $i = $i+2) $options[$set[$i]] = $set[$i+1];
+        if (in_array($set[0], self::$modules))
+        {
+            $options['module']     = $set[0];
+            $options['controller'] = $set[1];
+            $options['action']     = $set[2];
+            $iInit = 3;
+        }
+        else
+        {
+            $options['module']     = 'root';
+            $options['controller'] = $set[0];
+            $options['action']     = $set[1];
+            $iInit = 2;
+        }
+        
+        for ($i = $iInit; $i < $count = count($set); $i = $i+2) $options[$set[$i]] = $set[$i+1];
         
         return $options;
     }
@@ -67,12 +82,6 @@ class Routes
     {
         return '#^'.preg_replace('/\{(\w+)\}/e', "self::getVarRegex('\\1', \$validate)", $regex).'$#i';
     }
-    
-    /*private static function registerModules()
-    {
-        $folder = new DirectoryIterator(APP_DIR.'/modules');
-        foreach($folder as $file) echo $file;
-    }*/
     
     private static function getVarRegex($key, $validate)
     {

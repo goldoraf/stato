@@ -21,7 +21,7 @@ class Context
     {
         if (Context::$status) return;
         
-        Routes::initialize();
+        require_once(ROOT_DIR.'/conf/routes.php');
         
         self::$request  = new Request();
         self::$response = new Response();
