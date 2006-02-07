@@ -81,7 +81,7 @@ class CRUDController extends ActionController
         $this->flash->discard();
         
         $action = $this->request->action;
-        $path = $this->getDefaultTemplatePath();
+        $path = $this->defaultTemplatePath();
         if (!file_exists($path)) $path = ROOT_DIR."/core/view/templates/crud/{$action}.php";
         
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
