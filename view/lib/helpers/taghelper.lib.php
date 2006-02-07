@@ -2,24 +2,25 @@
 
 function content_tag($name, $content, $options = array())
 {
-    return "<$name ".tag_options($options).">$content</$name>";
+    return "<$name".tag_options($options).">$content</$name>";
 }
 
 function tag($name, $options = array(), $open = False)
 {
-    return "<$name ".tag_options($options).($open ? ">" : "/>");
+    return "<$name".tag_options($options).($open ? ">" : "/>");
 }
 
 function img_tag($filename, $options = array())
 {
-    return '<img src="'.BASE_DIR.'/public/images/'.$filename.'" '.tag_options($options).' />';
+    return '<img src="'.BASE_DIR.'/public/images/'.$filename.'"'.tag_options($options).' />';
 }
 
 function tag_options($options = array())
 {
+    if (count($options) == 0) return;
     $set = array();
     foreach($options as $key => $value) $set[] = $key.'="'.$value.'"';
-    return implode(" ", $set);
+    return ' '.implode(" ", $set);
 }
 
 function js_tag($code)
