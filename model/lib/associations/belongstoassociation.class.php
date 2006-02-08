@@ -2,18 +2,18 @@
 
 class BelongsToAssociation extends Association
 {
-    public function replace($entity)
+    public function replace($record)
     {
-        if ($entity === Null)
+        if ($record === Null)
         {
             $this->target = Null;
             $this->owner[$this->foreignKey] = Null;
         }
         else
         {
-            $this->checkEntityType($entity);
-            $this->target = $entity;
-            if (!$entity->isNewRecord()) $this->owner[$this->foreignKey] = $entity->id;
+            $this->checkRecordType($record);
+            $this->target = $record;
+            if (!$record->isNewRecord()) $this->owner[$this->foreignKey] = $record->id;
         }
         $this->loaded = true;
     }
@@ -21,18 +21,18 @@ class BelongsToAssociation extends Association
     public function create($attributes=array())
     {
         $class = $this->assocClass;
-        $entity = new $class($attributes);
-        $entity->save();
-        $this->replace($entity);
-        return $entity;
+        $record = new $class($attributes);
+        $record->save();
+        $this->replace($record);
+        return $record;
     }
     
     public function build($attributes=array())
     {
         $class = $this->assocClass;
-        $entity = new $class($attributes);
-        $this->replace($entity);
-        return $entity;
+        $record = new $class($attributes);
+        $this->replace($record);
+        return $record;
     }
     
     public function beforeOwnerSave()
@@ -58,7 +58,7 @@ class BelongsToAssociation extends Association
     
     protected function findTarget()
     {
-        return ActiveStore::findByPk($this->assocClass, $this->owner[$this->foreignKey]);
+        return SActiveStore::findByPk($this->assocClass, $this->owner[$this->foreignKey]);
     }
     
     protected function isFkPresent()

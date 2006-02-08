@@ -1,24 +1,24 @@
 <?php
 
-class ActiveEntityTest extends ActiveTestCase
+class ActiveRecordTest extends ActiveTestCase
 {
     public $fixtures = array('posts', 'products', 'contracts');
     
     function testSetAttributes()
     {
-        $post = ActiveStore::findByPk('Post', 1);
+        $post = SActiveStore::findByPk('Post', 1);
         $post->title = 'Framework clone wars';
         $post->text  = 'bli bli bli';
         $post->save();
         $this->assertEqual('Framework clone wars', $post->title);
         $this->assertEqual('bli bli bli', $post->text);
-        $postBis = ActiveStore::findByPk('Post', 1);
+        $postBis = SActiveStore::findByPk('Post', 1);
         $this->assertEqual($post->author, $postBis->author);
     }
     
     function testReadWriteBooleanAttribute()
     {
-        $post = ActiveStore::findByPk('Post', 1);
+        $post = SActiveStore::findByPk('Post', 1);
         $this->assertTrue($post->published);
         $post->published = False;
         $this->assertFalse($post->published);
@@ -26,13 +26,13 @@ class ActiveEntityTest extends ActiveTestCase
         $this->assertTrue($post->published);
         $post->published = False;
         $post->save();
-        $postBis = ActiveStore::findByPk('Post', 1);
+        $postBis = SActiveStore::findByPk('Post', 1);
         $this->assertFalse($postBis->published);
     }
     
     function testPreservingDateObjects()
     {
-        $contract = ActiveStore::findByPk('Contract', 1);
+        $contract = SActiveStore::findByPk('Contract', 1);
         $this->assertIsA($contract->date, 'SDate');
     }
     
@@ -42,7 +42,7 @@ class ActiveEntityTest extends ActiveTestCase
         $product->name = 'DVD';
         $product->save();
         $this->assertEqual(2, $product->id);
-        $productReloaded = ActiveStore::findByPk('Product', $product->id);
+        $productReloaded = SActiveStore::findByPk('Product', $product->id);
         $this->assertEqual('DVD', $productReloaded->name);
     }
     
@@ -51,10 +51,10 @@ class ActiveEntityTest extends ActiveTestCase
         $product = new Product();
         $product->name = 'CD';
         $product->save();
-        $productReloaded = ActiveStore::findByPk('Product', $product->id);
+        $productReloaded = SActiveStore::findByPk('Product', $product->id);
         $productReloaded->name = 'CD-R';
         $productReloaded->save();
-        $productReloadedAgain = ActiveStore::findByPk('Product', $product->id);
+        $productReloadedAgain = SActiveStore::findByPk('Product', $product->id);
         $this->assertEqual('CD-R', $productReloadedAgain->name);
     }
     
@@ -64,13 +64,13 @@ class ActiveEntityTest extends ActiveTestCase
         $product->name = 'CD';
         $product->save();
         $product->delete();
-        $this->assertFalse(ActiveStore::findByPk('Product', $product->id));
+        $this->assertFalse(SActiveStore::findByPk('Product', $product->id));
     }
     
     function testSaveWithTimestamps()
     {
         $created_date = new SDateTime(2005,12,01,20,30,00);
-        $post = ActiveStore::findByPk('Post', 2);
+        $post = SActiveStore::findByPk('Post', 2);
         $this->assertIsA($post->created_on, 'SDateTime');
         $this->assertEqual($created_date, $post->created_on);
         $this->assertEqual($post->created_on, $post->updated_on);

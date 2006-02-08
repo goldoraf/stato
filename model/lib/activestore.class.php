@@ -1,12 +1,10 @@
 <?php
 
-class ActiveStore
+class SActiveStore
 {
     public static $tables = array();
     
     /**
-     * ActiveStore::findAll()
-     *
      * Returns all the records matched by the options used.
      *
      * @param $conditions : SQL string or array('id = :id AND name = :name',
@@ -21,50 +19,46 @@ class ActiveStore
      *
      * @return mixed
      **/
-    public static function findAll($entity, $conditions=null, $options=array())
+    public static function findAll($class, $conditions=null, $options=array())
     {
         if (isset($options['include']))
         {
-            return self::findWithAssociations($entity, $conditions, $options);
+            return self::findWithAssociations($class, $conditions, $options);
         }
         else
         {
-            $sql = self::prepareSelect($entity, $conditions, $options);
-            return self::findBySql($entity, $sql);
+            $sql = self::prepareSelect($class, $conditions, $options);
+            return self::findBySql($class, $sql);
         }
     }
     
     /**
-     * ActiveStore::findFirst()
-     *
      * Returns the first record matched by the options used.
      *
      * @return mixed
      **/
-    public static function findFirst($entity, $conditions=null, $options=array())
+    public static function findFirst($class, $conditions=null, $options=array())
     {
         $options = array_merge($options, array('limit' => 1));
-        $set = self::findAll($entity, $conditions, $options);
+        $set = self::findAll($class, $conditions, $options);
         return array_pop($set);
     }
     
     /**
-     * ActiveStore::findByPk()
-     *
      * Finds a record using a specific id.
      *
      * @param $value
      * @param $options
      * @return mixed
      **/
-    public static function findByPk($entity, $value, $options=array())
+    public static function findByPk($class, $value, $options=array())
     {
-        $instance = self::getInstance($entity);
+        $instance = self::getInstance($class);
         
         if (is_array($value))
         {
             $condition = $instance->identityField.' IN ('.join(',', $value).')';
-            return self::findAll($entity, $condition, $options);
+            return self::findAll($class, $condition, $options);
         }
         else
         {
@@ -79,68 +73,58 @@ class ActiveStore
             {
                 $condition = $instance->identityField.' = \''.$value.'\'';
             }
-            $set = self::findAll($entity, $condition, $opt);
+            $set = self::findAll($class, $condition, $opt);
             if (empty($set)) return False;
             return array_pop($set);
         }
     }
     
-    /**
-     * ActiveStore::findBySql()
-     *
-     * @return mixed
-     **/
-    public static function findBySql($entity, $sql)
+    public static function findBySql($class, $sql)
     {
         $rs = self::connection()->select($sql);
         if (!$rs) return false;
         $set = array();
         while($row = $rs->fetch())
         {
-            $set[] = self::getInstance($entity, $row);
+            $set[] = self::getInstance($class, $row);
         }
         //if (count($set) == 1) return $set[0];
         return $set;
     }
     
-    public static function create($entity, $attributes = array())
+    public static function create($class, $attributes = array())
     {
-        $object = new $entity($attributes);
+        $object = new $class($attributes);
         $object->save();
         return $object;
     }
     
-    public static function update($entity, $id, $attributes)
+    public static function update($class, $id, $attributes)
     {
-        $object = self::findByPk($entity, $id);
+        $object = self::findByPk($class, $id);
         $object->updateAttributes($attributes);
         return $object;
     }
     
-    public static function updateAll($entity, $updates, $conditions = Null)
+    public static function updateAll($class, $updates, $conditions = Null)
     {
-        $instance = self::getInstance($entity);
+        $instance = self::getInstance($class);
         $sql = 'UPDATE '.$instance->tableName.' SET '.self::sanitizeSql($updates);
         $sql.= self::addConditions($conditions);
         self::connection()->update($sql);
     }
     
-    public static function deleteAll($entity, $conditions = Null)
+    public static function deleteAll($class, $conditions = Null)
     {
-        $instance = self::getInstance($entity);
+        $instance = self::getInstance($class);
         $sql = 'DELETE '.$instance->tableName.' SET '.self::sanitizeSql($updates);
         $sql.= self::addConditions($conditions);
         self::connection()->delete($sql);
     }
     
-    /**
-     * ActiveStore::count()
-     *
-     * @return mixed
-     **/
-    public static function count($entity, $conditions = null)
+    public static function count($class, $conditions = null)
     {
-        $instance = self::getInstance($entity);
+        $instance = self::getInstance($class);
         $sql = 'SELECT COUNT(*) AS count FROM '.$instance->tableName;
         $sql.= self::addConditions($conditions);
         $rs = self::connection()->select($sql);
@@ -148,14 +132,9 @@ class ActiveStore
         return $row['count'];
     }
     
-    /**
-     * ActiveStore::insertId()
-     *
-     * @return mixed
-     **/
-    public static function insertId($entity)
+    public static function insertId($class)
     {
-        $instance = self::getInstance($entity);
+        $instance = self::getInstance($class);
         $sql = 'SELECT MAX('.$instance->identityField.') AS max FROM '.$instance->tableName;
         $rs = self::connection()->select($sql);
         $row = $rs->fetch();
@@ -178,16 +157,9 @@ class ActiveStore
         return $array;
     }
     
-    /**
-     * ActiveStore::prepareSelect()
-     *
-     * Méthode générant le SQL nécessaire à un SELECT
-     *
-     * @return mixed
-     **/
-    protected static function prepareSelect($entity, $conditions=null, $options=array())
+    protected static function prepareSelect($class, $conditions=null, $options=array())
     {
-        $instance = self::getInstance($entity);
+        $instance = self::getInstance($class);
         $sql = 'SELECT * FROM '.$instance->tableName;
         $sql.= self::addConditions($conditions);
         if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
@@ -215,9 +187,9 @@ class ActiveStore
     
     }
     
-    protected static function findWithAssociations($entity, $conditions, $options)
+    protected static function findWithAssociations($class, $conditions, $options)
     {
-        $instance = self::getInstance($entity, array(), True);
+        $instance = self::getInstance($class, array(), True);
         $assocs = self::getIncludedAssociations($instance, $options['include']);
         $abbrv = self::getSchemaAbbreviations($instance->tableName, $assocs);
         $pkTable = self::getPkLookupTable($assocs, $abbrv);
@@ -231,7 +203,7 @@ class ActiveStore
             $id = $row[$pk];
             if (!isset($records[$id]))
             {
-                $recordsInOrder[] = $records[$id] = self::getInstance($entity, 
+                $recordsInOrder[] = $records[$id] = self::getInstance($class,
                             self::extractRecord($abbrv, $instance->tableName, $row));
             }
             foreach($assocs as $key => $assoc)
@@ -331,11 +303,6 @@ class ActiveStore
         return $associations;
     }
     
-    /**
-     * ActiveStore::prepareSelectWithAssoc()
-     *
-     * @return mixed
-     **/
     private static function prepareSelectWithAssoc($instance, $conditions, $abbrv, $options, $associations)
     {
         $sql = 'SELECT '.self::columnAliases($abbrv).' FROM '.$instance->tableName;
@@ -399,13 +366,13 @@ class ActiveStore
         return $stmt;
     }
     
-    private static function getInstance($className, $values=array(), $dontInit=false)
+    private static function getInstance($class, $values=array(), $dontInit=false)
     {
-        if (class_exists($className))
+        if (class_exists($class))
         {
-            return new $className($values, $dontInit, False);
+            return new $class($values, $dontInit, False);
         }
-        throw new Exception("ActiveStore : $className class not found.");
+        throw new Exception("SActiveStore : $class class not found.");
     }
     
     private static function connection()

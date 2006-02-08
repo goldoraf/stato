@@ -13,8 +13,8 @@ require_once('lib/inflection.class.php');
 require_once('lib/observable.class.php');
 require_once('lib/mixins.class.php');
 
-require_once('lib/entity.class.php');
-require_once('lib/activeentity.class.php');
+require_once('lib/record.class.php');
+require_once('lib/activerecord.class.php');
 require_once('lib/activestore.class.php');
 require_once('lib/fixture.class.php');
 require_once('lib/paginator.class.php');

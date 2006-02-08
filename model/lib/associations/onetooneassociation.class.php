@@ -12,24 +12,24 @@ class OneToOneAssociation extends BelongsToAssociation
         $this->assocForeignKey = $options['association_foreign_key'];
     }
     
-    public function replace($entity)
+    public function replace($record)
     {
         if ($this->target !== Null)
         {
             $this->target[$this->foreignKey] = Null;
             $this->target->save(); // ou remplacer l'ensemble par $this->target->delete() ???
         }
-        if ($entity === Null)
+        if ($record === Null)
         {
             $this->target = Null;
             $this->owner[$this->assocForeignKey] = Null;
         }
         else
         {
-            $this->checkEntityType($entity);
-            if (!$entity->isNewRecord()) $this->owner[$this->assocForeignKey] = $entity->id;
-            if (!$this->owner->isNewRecord()) $entity[$this->foreignKey] = $this->owner->id;
-            $this->target = $entity;
+            $this->checkRecordType($record);
+            if (!$record->isNewRecord()) $this->owner[$this->assocForeignKey] = $record->id;
+            if (!$this->owner->isNewRecord()) $record[$this->foreignKey] = $this->owner->id;
+            $this->target = $record;
         }
         $this->loaded = true;
     }
@@ -59,7 +59,7 @@ class OneToOneAssociation extends BelongsToAssociation
     
     protected function findTarget()
     {
-        return ActiveStore::findFirst($this->assocClass, $this->constructSql());
+        return SActiveStore::findFirst($this->assocClass, $this->constructSql());
     }
     
     protected function isFkPresent()

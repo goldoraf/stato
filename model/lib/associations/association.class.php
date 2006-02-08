@@ -8,7 +8,6 @@ abstract class Association
     public $assocPrimaryKey = Null;
     public $foreignKey      = Null;
     
-    protected $db = Null;
     protected $owner = Null;
     protected $target = Null;
     protected $loaded = False;
@@ -16,7 +15,6 @@ abstract class Association
     
     public function __construct($owner, $name, $class, $options = array())
     {
-		$this->db = Database::getInstance();
         $this->options = $options;
         $this->owner = $owner;
         
@@ -83,18 +81,18 @@ abstract class Association
         return false;
     } 
     
-    protected function quotedIds($entities)
+    protected function quotedIds($records)
     {
         $ids = array();
-        foreach($entities as $entity) $ids[] = "'".$entity->id."'";
+        foreach($records as $record) $ids[] = "'".$record->id."'";
         return $ids;
     }
     
-    protected function checkEntityType($entity)
+    protected function checkRecordType($record)
     {
-        if (!is_object($entity) || get_class($entity) != $this->assocClass)
+        if (!is_object($record) || get_class($record) != $this->assocClass)
         {
-            throw new AssociationTypeMismatch('Bad Entity Type');
+            throw new AssociationTypeMismatch('Bad Record Type');
         }
     }
     

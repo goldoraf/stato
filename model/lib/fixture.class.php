@@ -45,7 +45,7 @@ class Fixture
             $pk = $temp->identityField;
             foreach($this->values as $obj => $values)
             {
-                $instances[$obj] = ActiveStore::findByPk($class, $values[$pk]);
+                $instances[$obj] = SActiveStore::findByPk($class, $values[$pk]);
             }
             return $instances;
         }
@@ -62,7 +62,7 @@ class Fixture
         foreach($this->values as $obj => $values)
         {
             $this->db->execute("INSERT INTO {$this->tableName} (".implode(', ', array_keys($values)).")"
-                ." VALUES (".implode(', ', ActiveStore::arrayQuote(array_values($values))).")");
+                ." VALUES (".implode(', ', SActiveStore::arrayQuote(array_values($values))).")");
         }
     }
     

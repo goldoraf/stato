@@ -5,17 +5,17 @@ class Paginator
     public $perPage     = 20;
     public $currentPage = 1;
     
-    private $entity    = Null;
+    private $className = Null;
     private $condition = Null;
     private $options   = array();
     private $param     = 'page';
     private $pageCount = Null;
     
-    public function __construct($entityClass, $perPage=20, $options=array())
+    public function __construct($className, $perPage=20, $options=array())
     {
-        $this->entity  = $entityClass;
-        $this->perPage = $perPage;
-        $this->options = $options;
+        $this->className  = $className;
+        $this->perPage    = $perPage;
+        $this->options    = $options;
         if (isset($options['parameter']))  $this->param = $options['parameter'];
         if (isset($options['conditions'])) $this->condition = $options['conditions'];
         
@@ -30,7 +30,7 @@ class Paginator
     
     public function getPage($page)
     {
-        return ActiveStore::findAll($this->entity, $this->condition, $this->sqlOptions($page));
+        return SActiveStore::findAll($this->className, $this->condition, $this->sqlOptions($page));
     }
     
     public function hasNextPage($page)
@@ -63,7 +63,7 @@ class Paginator
     
     public function hitsCount()
     {
-        return ActiveStore::count($this->entity, $this->condition);
+        return SActiveStore::count($this->className, $this->condition);
     }
     
     private function sqlOptions($page)

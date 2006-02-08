@@ -12,23 +12,23 @@ class Validation
         'alpha', 'alphanum', 'num', 'singleline', 'email', 'ip', 'xml', 'utf8'
     );
     
-    public static function validateAttribute($entity, $attr, $method = 'save')
+    public static function validateAttribute($record, $attr, $method = 'save')
     {
         // required ?
-        if (in_array($attr, $entity->attrRequired)) self::validatePresence($entity, $attr);
+        if (in_array($attr, $record->attrRequired)) self::validatePresence($record, $attr);
         // unique ?
-        if (in_array($attr, $entity->attrUnique)) self::validateUniqueness($entity, $attr);
+        if (in_array($attr, $record->attrUnique)) self::validateUniqueness($record, $attr);
         
-        if (isset($entity->validations[$attr]))
+        if (isset($record->validations[$attr]))
         {
-            foreach ($entity->validations[$attr] as $validation => $options)
+            foreach ($record->validations[$attr] as $validation => $options)
             {
                 if (!isset($options['on']) || $options['on'] == $method)
                 {
                     if (in_array($validation, self::$validations))
                     {
                         $method = 'validate'.ucfirst($validation);
-                        self::$method($entity, $attr, $options);
+                        self::$method($record, $attr, $options);
                     }
                     else throw new Exception("The validation rule '$validation' does not exist.");
                 }
@@ -36,41 +36,41 @@ class Validation
         }
     }
     
-    public static function validatePresence($entity, $attr, $options = array())
+    public static function validatePresence($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_REQUIRED', 'on' => 'save');
         $config = array_merge($config, $options);
         
-        if ($entity->$attr == '') self::addError($entity, $attr, $config['message']);
+        if ($record->$attr == '') self::addError($record, $attr, $config['message']);
     }
     
-    public static function validateUniqueness($entity, $attr, $options = array())
+    public static function validateUniqueness($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_UNIQUE', 'on' => 'save', 'scope' => Null);
         $config = array_merge($config, $options);
         
-        $value = $entity->$attr;
+        $value = $record->$attr;
         $conditionsSql = $attr.' '.self::attributeCondition($value);
         $conditionsValues = array($value);
         
         if ($config['scope'] !== Null)
         {
-            $scopeValue = $entity->readAttribute($config['scope']);
+            $scopeValue = $record->readAttribute($config['scope']);
             $conditionsSql.= ' AND '.$config['scope'].' '.self::attributeCondition($scopeValue);
             $conditionsValues[] = $scopeValue;
         }
         
-        if (!$entity->isNewRecord())
+        if (!$record->isNewRecord())
         {
-            $conditionsSql.= ' AND '.$entity->identityField.' <> ?';
-            $conditionsValues[] = $entity->id;
+            $conditionsSql.= ' AND '.$record->identityField.' <> ?';
+            $conditionsValues[] = $record->id;
         }
         
-        if (ActiveStore::findFirst(get_class($entity), array($conditionsSql, $conditionsValues)))
-            self::addError($entity, $attr, $config['message']);
+        if (SActiveStore::findFirst(get_class($record), array($conditionsSql, $conditionsValues)))
+            self::addError($record, $attr, $config['message']);
     }
     
-    public static function validateFormat($entity, $attr, $options = array())
+    public static function validateFormat($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_FORMAT', 'on' => 'save', 'pattern' => Null);
         $config = array_merge($config, $options);
@@ -85,10 +85,10 @@ class Validation
             
         if ($config['message'] === Null) $config['message'] = self::$messages[$method];
         
-        if (!self::$method($entity->$attr)) self::addError($entity, $attr, $config['message']);
+        if (!self::$method($record->$attr)) self::addError($record, $attr, $config['message']);
     }
     
-    public static function validateLength($entity, $attr, $options = array())
+    public static function validateLength($record, $attr, $options = array())
     {
         $config = array
         (
@@ -98,19 +98,19 @@ class Validation
         );
         $config = array_merge($config, $options);
         
-        $length = strlen($entity->$attr);
+        $length = strlen($record->$attr);
         
         if (isset($config['length']) && $length != $config['length'])
-            self::addError($entity, $attr, $config['wrong_size'], $config['length']);
+            self::addError($record, $attr, $config['wrong_size'], $config['length']);
             
         if (isset($config['min_length']) && $length < $config['min_length'])
-            self::addError($entity, $attr, $config['too_short'], $config['min_length']);
+            self::addError($record, $attr, $config['too_short'], $config['min_length']);
         
         if (isset($config['max_length']) && $length > $config['max_length'])
-            self::addError($entity, $attr, $config['too_long'], $config['max_length']);
+            self::addError($record, $attr, $config['too_long'], $config['max_length']);
     }
     
-    public static function validateInclusion($entity, $attr, $options = array())
+    public static function validateInclusion($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_INCLUSION', 'on' => 'save');
         $config = array_merge($config, $options);
@@ -118,11 +118,11 @@ class Validation
         if (!isset($config['choices']) || !is_array($config['choices']))
             throw new Exception('An array of choices must be supplied.');
             
-        if (!in_array($entity->$attr, $config['choices']))
-            self::addError($entity, $attr, $config['message']);
+        if (!in_array($record->$attr, $config['choices']))
+            self::addError($record, $attr, $config['message']);
     }
     
-    public static function validateExclusion($entity, $attr, $options = array())
+    public static function validateExclusion($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_EXCLUSION', 'on' => 'save');
         $config = array_merge($config, $options);
@@ -130,28 +130,28 @@ class Validation
         if (!isset($config['choices']) || !is_array($config['choices']))
             throw new Exception('An array of choices must be supplied.');
             
-        if (in_array($entity->$attr, $config['choices']))
-            self::addError($entity, $attr, $config['message']);
+        if (in_array($record->$attr, $config['choices']))
+            self::addError($record, $attr, $config['message']);
     }
     
-    public static function validateConfirmation($entity, $attr, $options = array())
+    public static function validateConfirmation($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_CONFIRM', 'on' => 'save');
         $config = array_merge($config, $options);
         
         $confirmAttr = $attr.'_confirmation';
         
-        if ($entity->$attr != $entity->$confirmAttr)
-            self::addError($entity, $attr, $config['message']);
+        if ($record->$attr != $record->$confirmAttr)
+            self::addError($record, $attr, $config['message']);
     }
     
-    public static function validateAcceptance($entity, $attr, $options = array())
+    public static function validateAcceptance($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_ACCEPT', 'on' => 'save', 'accept' => '1');
         $config = array_merge($config, $options);
         
-        if ($entity->$attr != $config['accept'])
-            self::addError($entity, $attr, $config['message']);
+        if ($record->$attr != $config['accept'])
+            self::addError($record, $attr, $config['message']);
     }
     
     public static function isAlpha($data, $options = array())
@@ -270,13 +270,13 @@ class Validation
        return true;
     }
     
-    private static function addError($entity, $attr, $message, $var = null)
+    private static function addError($record, $attr, $message, $var = null)
     {
         $message = Context::locale($message);
         $humanReadableAttr = Context::locale($attr);
         if ($humanReadableAttr == $attr) $humanReadableAttr = str_replace('_', ' ', $attr);
         $message = ucfirst(sprintf($message, $humanReadableAttr, $var));
-        if (!isset($entity->errors[$attr])) $entity->errors[$attr] = $message;
+        if (!isset($record->errors[$attr])) $record->errors[$attr] = $message;
     }
     
     private static function attributeCondition($value)

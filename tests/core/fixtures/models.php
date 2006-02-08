@@ -1,7 +1,7 @@
 <?php
 
 // For attribute access overloading test
-class Bill extends Entity
+class Bill extends SRecord
 {
     public $attributes = array
     (
@@ -18,14 +18,14 @@ class Bill extends Entity
 }
 
 // For boolean et timestamps attributes tests
-class Post extends ActiveEntity
+class Post extends SActiveRecord
 {
     public $tableName = 'posts';
     public $recordTimestamps = True;
 }
 
 // For belongsTo tests
-class Profile extends ActiveEntity
+class Profile extends SActiveRecord
 {
     public $tableName = 'profiles';
     public $relationships = array
@@ -34,13 +34,13 @@ class Profile extends ActiveEntity
     );
 }
 
-class Employe extends ActiveEntity
+class Employe extends SActiveRecord
 {
     public $tableName = 'employes';
 }
 
 // For hasMany tests
-class Company extends ActiveEntity
+class Company extends SActiveRecord
 {
     public $tableName = 'companies';
     public $relationships = array
@@ -49,14 +49,14 @@ class Company extends ActiveEntity
     );
 }
 
-class Product extends ActiveEntity
+class Product extends SActiveRecord
 {
     public $tableName = 'products';
     public $attrRequired = array('name');
 }
 
 // For manyToMany tests
-class Developer extends ActiveEntity
+class Developer extends SActiveRecord
 {
     public $tableName = 'developers';
     public $relationships = array
@@ -65,7 +65,7 @@ class Developer extends ActiveEntity
     );
 }
 
-class Project extends ActiveEntity
+class Project extends SActiveRecord
 {
     public $tableName = 'projects';
     public $relationships = array
@@ -75,7 +75,7 @@ class Project extends ActiveEntity
 }
 
 // For oneToOne tests
-class Client extends ActiveEntity
+class Client extends SActiveRecord
 {
     public $tableName = 'clients';
     public $relationships = array
@@ -84,7 +84,7 @@ class Client extends ActiveEntity
     );
 }
 
-class Contract extends ActiveEntity
+class Contract extends SActiveRecord
 {
     public $tableName = 'contracts';
     public $attrRequired = array('code');
@@ -95,7 +95,7 @@ class Contract extends ActiveEntity
 }
 
 // For eager loading tests
-class Article extends ActiveEntity
+class Article extends SActiveRecord
 {
     public $tableName = 'articles';
     public $relationships = array
@@ -105,7 +105,7 @@ class Article extends ActiveEntity
     );
 }
 
-class Comment extends ActiveEntity
+class Comment extends SActiveRecord
 {
     public $tableName = 'comments';
     public $relationships = array
@@ -114,7 +114,7 @@ class Comment extends ActiveEntity
     );
 }
 
-class Category extends ActiveEntity
+class Category extends SActiveRecord
 {
     public $tableName = 'categories';
     public $relationships = array
@@ -124,7 +124,7 @@ class Category extends ActiveEntity
 }
 
 // For ActAsList tests
-class Forum extends ActiveEntity
+class Forum extends SActiveRecord
 {
     public $tableName = 'forums';
     public $relationships = array
@@ -133,14 +133,14 @@ class Forum extends ActiveEntity
     );
 }
 
-class Topic extends ActiveEntity
+class Topic extends SActiveRecord
 {
     public $tableName = 'topics';
     public $actAs = array('List' => array('scope' => 'forum'));
 }
 
 // For validation tests
-/*class User extends ActiveEntity
+/*class User extends SActiveRecord
 {
     public $tableName = 'users';
     

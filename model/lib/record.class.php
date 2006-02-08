@@ -1,6 +1,6 @@
 <?php
 
-class Entity extends Observable implements ArrayAccess
+class SRecord extends Observable implements ArrayAccess
 {
     public $attributes    = array();
     public $relationships = array();

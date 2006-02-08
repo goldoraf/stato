@@ -16,42 +16,42 @@ class ManyToManyAssociation extends AssociationCollection
     {
         $this->loadTarget();
         $class = $this->assocClass;
-        $entity = new $class($attributes);
-        $this->target[] = $entity;
-        return $entity;
+        $record = new $class($attributes);
+        $this->target[] = $record;
+        return $record;
     }
     
     public function beforeOwnerDestroy()
     {
         $sql = "DELETE FROM {$this->joinTable} WHERE "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        $this->db->execute($sql);
+        Database::getInstance()->execute($sql);
     }
     
     protected function findTarget()
     {
-        return ActiveStore::findBySql($this->assocClass, $this->constructSql());
+        return SActiveStore::findBySql($this->assocClass, $this->constructSql());
     }
     
-    protected function insertEntity($entity)
+    protected function insertRecord($record)
     {
-        $entity->save();
+        $record->save();
         // ajout d'un enregistrement dans la table de jointure ...
         $sql = "INSERT INTO {$this->joinTable} SET "
-        ."{$this->assocForeignKey} = '{$entity->id}', "
+        ."{$this->assocForeignKey} = '{$record->id}', "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        $this->db->execute($sql);
+        Database::getInstance()->execute($sql);
     }
     
-    protected function deleteEntity($entity)
+    protected function deleteRecord($record)
     {
         $sql = "DELETE FROM {$this->joinTable} WHERE "
-        ."{$this->assocForeignKey} = '{$entity->id}' AND "
+        ."{$this->assocForeignKey} = '{$record->id}' AND "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        $this->db->execute($sql);
+        Database::getInstance()->execute($sql);
     }
     
-    protected function countEntities($condition)
+    protected function countRecords($condition)
     {
         $this->loadTarget();
         return count($this->target);

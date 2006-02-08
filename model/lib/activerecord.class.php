@@ -2,7 +2,7 @@
 
 class AssociationTypeMismatch extends Exception { }
 
-class ActiveEntity extends Entity
+class SActiveRecord extends SRecord
 {
     public $tableName        = Null;
     public $sqlMapping       = array();
@@ -21,7 +21,7 @@ class ActiveEntity extends Entity
     {
         $this->db = Database::getInstance();
         if ($this->tableName == Null) $this->tableName = Inflection::pluralize(strtolower(get_class($this)));
-        if (empty($this->attributes)) $this->attributes = ActiveStore::getAttributes($this->tableName);
+        if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
         else $this->initAttributes();
         
         $this->initValues();
@@ -82,11 +82,9 @@ class ActiveEntity extends Entity
     public function save()
     {
         if (!$this->isValid()) return false;
-        //$this->beforeSave();
         $this->setState('beforeSave');
         if ($this->isNewRecord()) $this->create();
         else $this->update();
-        //$this->afterSave();
         $this->setState('afterSave');
         return true;
     }
@@ -99,7 +97,6 @@ class ActiveEntity extends Entity
     public function isValid()
     {
         $this->errors = array();
-        //$this->beforeValidate();
         $this->setState('beforeValidate');
         $this->runValidations('save');
         $this->validate();
@@ -113,7 +110,6 @@ class ActiveEntity extends Entity
             $this->runValidations('update');
             $this->validateOnUpdate();
         }
-        //$this->afterValidate();
         $this->setState('afterValidate');
         return empty($this->errors);
     }
@@ -146,37 +142,31 @@ class ActiveEntity extends Entity
     
     public function create()
     {
-        //$this->beforeCreate();
         $this->setState('beforeCreate');
         $sql = 'INSERT INTO '.$this->tableName.' '.
                $this->prepareSqlSet();
         $this->id = $this->db->insert($sql);
         $this->newRecord = False;
-        //$this->afterCreate();
         $this->setState('afterCreate');
     }
     
     public function update()
     {
-        //$this->beforeUpdate();
         $this->setState('beforeUpdate');
         $sql = 'UPDATE '.$this->tableName.' '.
                $this->prepareSqlSet().
                ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
         $this->db->update($sql);
-        //$this->afterUpdate();
         $this->setState('afterUpdate');
     }
     
     public function delete()
     {
-        //$this->beforeDelete();
         $this->setState('beforeDelete');
         if ($this->isNewRecord()) return false;
         $sql = 'DELETE FROM '.$this->tableName.
                ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
         $this->db->update($sql);
-        //$this->afterDelete();
         $this->setState('afterDelete');
     }
     

@@ -7,14 +7,14 @@ class EagerLoadingTest extends ActiveTestCase
                              
     function testLoadingWithOneAssociation()
     {
-        $articles = ActiveStore::findAll('Article', Null, array('include' => array('comments')));
+        $articles = SActiveStore::findAll('Article', Null, array('include' => array('comments')));
         $this->assertTrue($articles[0]->comments->isLoaded());
         $this->assertTrue($articles[1]->comments->isLoaded()); // the assoc must be flagged as loaded even if empty
         $this->assertEqual(2, $articles[0]->countComments());
         $this->assertEqual(0, $articles[1]->countComments());
         $this->assertTrue($articles[0]->comments->contains($this->comments['comment_1']));
         
-        $article = ActiveStore::findFirst('Article', "articles.title='PHP6 overview'", array('include' => array('comments')));
+        $article = SActiveStore::findFirst('Article', "articles.title='PHP6 overview'", array('include' => array('comments')));
         $this->assertTrue($article->comments->isLoaded());
         $this->assertEqual(2, $article->countComments());
         $this->assertTrue($article->comments->contains($this->comments['comment_1']));
@@ -22,7 +22,7 @@ class EagerLoadingTest extends ActiveTestCase
     
     function testLoadingWithMultipleAssociations()
     {
-        $articles = ActiveStore::findAll('Article', Null, array('include' => array('comments', 'categories')));
+        $articles = SActiveStore::findAll('Article', Null, array('include' => array('comments', 'categories')));
         $this->assertTrue($articles[0]->comments->isLoaded());
         $this->assertEqual(2, $articles[0]->countComments());
         $this->assertTrue($articles[0]->categories->isLoaded());

@@ -6,11 +6,11 @@ abstract class AssociationCollection extends Association implements ArrayAccess,
     protected $ownerNewBeforeSave = false;
     protected $currentIndex = 0;
     
-    abstract protected function insertEntity($entity);
+    abstract protected function insertRecord($record);
     
-    abstract protected function deleteEntity($entity);
+    abstract protected function deleteRecord($record);
     
-    abstract protected function countEntities($condition);
+    abstract protected function countRecords($condition);
     
     /**
      * ArrayAccess methods
@@ -28,16 +28,16 @@ abstract class AssociationCollection extends Association implements ArrayAccess,
         return false;
     }
     
-    public function offsetSet($offset, $entity)
+    public function offsetSet($offset, $record)
     {
         if ($this->offsetExists($offset))
         {
-            $this->checkEntityType($entity);
-            if (!$this->owner->isNewRecord()) $this->insertEntity($entity);
-            $this->deleteEntity($this->target[$offset]);
-            $this->target[$offset] = $entity;
+            $this->checkRecordType($record);
+            if (!$this->owner->isNewRecord()) $this->insertRecord($record);
+            $this->deleteRecord($this->target[$offset]);
+            $this->target[$offset] = $record;
         }
-        else $this->add($entity);
+        else $this->add($record);
         return;
     }
     
@@ -85,46 +85,46 @@ abstract class AssociationCollection extends Association implements ArrayAccess,
      **/
     public function create($attributes=array())
     {
-        $entity = $this->build($attributes);
-        if (!$this->owner->isNewRecord()) $entity->save();
-        return $entity;
+        $record = $this->build($attributes);
+        if (!$this->owner->isNewRecord()) $record->save();
+        return $record;
     } 
     
-    public function add($entities)
+    public function add($records)
     {
-        if (!is_array($entities)) $entities = array($entities);
+        if (!is_array($records)) $records = array($records);
         $this->loadTarget();
-        foreach($entities as $entity)
+        foreach($records as $record)
         {
-            $this->checkEntityType($entity);
-            if (!$this->owner->isNewRecord()) $this->insertEntity($entity);
-            $this->target[] = $entity;
+            $this->checkRecordType($record);
+            if (!$this->owner->isNewRecord()) $this->insertRecord($record);
+            $this->target[] = $record;
         }
     }
     
-    public function delete($entities)
+    public function delete($records)
     {
-        if (!is_array($entities)) $entities = array($entities);
+        if (!is_array($records)) $records = array($records);
         $this->loadTarget();
-        foreach($entities as $entity)
+        foreach($records as $record)
         {
-            $this->checkEntityType($entity);
-            if (!$entity->isNewRecord()) $this->deleteEntity($entity);
-            unset($this->target[$this->search($entity)]);
+            $this->checkRecordType($record);
+            if (!$record->isNewRecord()) $this->deleteRecord($record);
+            unset($this->target[$this->search($record)]);
         }
     }
     
-    public function replace($entities)
+    public function replace($records)
     {
-        foreach($entities as $entity) $this->checkEntityType($entity);
-        $this->target = $entities;
+        foreach($records as $record) $this->checkRecordType($record);
+        $this->target = $records;
         $this->loaded = true;
     }
     
     public function count($condition=Null)
     {
         if ($this->loaded && $condition == Null) return count($this->target);
-        else return $this->countEntities($condition);
+        else return $this->countRecords($condition);
     }
     
     public function clear()
@@ -148,18 +148,18 @@ abstract class AssociationCollection extends Association implements ArrayAccess,
         return (count($this->target) == 0);
     }
     
-    public function contains($entity)
+    public function contains($record)
     {
-        if (($key = $this->search($entity)) === false) return false;
+        if (($key = $this->search($record)) === false) return false;
         return true;
     }
     
-    public function search($entity)
+    public function search($record)
     {
         $this->loadTarget();
         foreach($this->target as $key => $value)
         {
-            if ($value->id == $entity->id) return $key;
+            if ($value->id == $record->id) return $key;
         }
         return false;
     }
@@ -180,12 +180,12 @@ abstract class AssociationCollection extends Association implements ArrayAccess,
             else
             {
                 $toSave = array();
-                foreach($this->target as $entity)
+                foreach($this->target as $record)
                 {
-                    if ($entity->isNewRecord()) $toSave[] = $entity;
+                    if ($record->isNewRecord()) $toSave[] = $record;
                 }
             }
-            foreach($toSave as $entity) $this->insertEntity($entity);
+            foreach($toSave as $record) $this->insertRecord($record);
         }
     }
     
@@ -209,7 +209,7 @@ abstract class AssociationCollection extends Association implements ArrayAccess,
     
     protected function deleteAll()
     {
-        foreach($this->target as $entity) $entity->delete();
+        foreach($this->target as $record) $record->delete();
         $this->target = array();
     }
 }

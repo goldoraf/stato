@@ -1,7 +1,7 @@
 <?php
 
 require_once(CORE_DIR.'/model/model.php');
-require_once(TESTS_DIR.'/core/fixtures/entities.php');
+require_once(TESTS_DIR.'/core/fixtures/models.php');
 
 class ActiveTestCase extends UnitTestCase
 {
@@ -13,7 +13,7 @@ class ActiveTestCase extends UnitTestCase
     
     public function __construct()
     {
-        parent::UnitTestCase('ActiveEntity test');
+        parent::UnitTestCase('ActiveRecord test');
         $this->loadedFixtures = Fixture::createFixtures(FIXTURES_DIR, $this->fixtures);
     }
     

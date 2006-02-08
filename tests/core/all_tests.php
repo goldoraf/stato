@@ -25,14 +25,14 @@ require_once(CORE_DIR.'/common/common.php');
 $test =& new GroupTest('All tests');
 
 $test->addTestFile('callbacks.test.php');
-$test->addTestFile('routes.test.php');
+//$test->addTestFile('routes.test.php');
 $test->addTestFile('validation.test.php');
 $test->addTestFile('inflection.test.php');
 $test->addTestFile('encryption.test.php');
 $test->addTestFile('helpers.test.php');
 $test->addTestFile('database.test.php');
-$test->addTestFile('entity.test.php');
-$test->addTestFile('activeentity.test.php');
+$test->addTestFile('record.test.php');
+$test->addTestFile('activerecord.test.php');
 //$test->addTestFile('mixins.test.php');
 //$test->addTestFile('listmixin.test.php');
 $test->addTestFile('activestore.test.php');

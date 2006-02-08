@@ -6,19 +6,19 @@ class ActiveStoreTest extends ActiveTestCase
     
     function testFind()
     {
-        $companies = ActiveStore::findAll('Company');
+        $companies = SActiveStore::findAll('Company');
         $this->assertEqual(2, count($companies));
     }
     
     function testFindWithCondition()
     {
-        $companies = ActiveStore::findAll('Company', "name = 'Groupe W'");
+        $companies = SActiveStore::findAll('Company', "name = 'Groupe W'");
         $this->assertEqual(1, count($companies));
     }
     
     function testFindWithBindedCondition()
     {
-        $companies = ActiveStore::findAll('Company', array("name = :company", array(':company'=>'Groupe W')));
+        $companies = SActiveStore::findAll('Company', array("name = :company", array(':company'=>'Groupe W')));
         $this->assertEqual(1, count($companies));
     }
     
