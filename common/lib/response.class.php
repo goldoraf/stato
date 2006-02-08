@@ -1,19 +1,8 @@
 <?php
 
-/**
- * Response
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2004
- * @version 0.1
- * @access public
- **/
-class Response implements ArrayAccess
+class SResponse implements ArrayAccess
 {
-    //public $success = True;
     public $values = array();
-    //public $errors = array();
     
     public function offsetExists($offset)
     {

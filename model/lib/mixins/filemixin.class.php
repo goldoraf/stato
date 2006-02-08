@@ -4,7 +4,7 @@
 - validation mimetypes et size
 - verif existence et writability du rep de destination */
 
-class FileMixin
+class SFileMixin
 {
     /*public function __construct($values = Null)
     {

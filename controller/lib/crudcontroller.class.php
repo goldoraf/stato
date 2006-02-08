@@ -1,6 +1,6 @@
 <?php
 
-class CRUDController extends SActionController
+class SCrudController extends SActionController
 {
     public $model = Null;
     
@@ -15,7 +15,7 @@ class CRUDController extends SActionController
         
         $this->class_name = $this->model;
         $this->singular_name = strtolower($this->model);
-        $this->plural_name = Inflection::pluralize($this->singular_name);
+        $this->plural_name = SInflection::pluralize($this->singular_name);
     }
     
     public function index()
@@ -86,16 +86,16 @@ class CRUDController extends SActionController
         
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
         
-        $renderer = new Renderer($path, $this->response->values);
+        $renderer = new SRenderer($path, $this->response->values);
         
         if (!$this->layout)
             $layout = ROOT_DIR."/core/view/templates/crud/layout.php";
         else
             $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
             
-        if (!file_exists($layout)) throw new Exception('Layout not found');
+        if (!file_exists($layout)) throw new SException('Layout not found');
         $this->response['layout_content'] = $renderer->render();
-        $renderer = new Renderer($layout, $this->response->values);
+        $renderer = new SRenderer($layout, $this->response->values);
         
         $this->renderText($renderer->render());
     }

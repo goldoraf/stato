@@ -1,6 +1,6 @@
 <?php
 
-class OneToOneAssociation extends BelongsToAssociation
+class SOneToOneAssociation extends SBelongsToAssociation
 {
     public $assocForeignKey = Null;
     

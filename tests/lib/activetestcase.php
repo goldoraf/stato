@@ -14,7 +14,7 @@ class ActiveTestCase extends UnitTestCase
     public function __construct()
     {
         parent::UnitTestCase('ActiveRecord test');
-        $this->loadedFixtures = Fixture::createFixtures(FIXTURES_DIR, $this->fixtures);
+        $this->loadedFixtures = SFixture::createFixtures(FIXTURES_DIR, $this->fixtures);
     }
     
     public function setUp()

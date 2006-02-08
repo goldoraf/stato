@@ -1,6 +1,6 @@
 <?php
 
-class AssociationTypeMismatch extends Exception { }
+class SAssociationTypeMismatch extends SException { }
 
 class SActiveRecord extends SRecord
 {
@@ -19,8 +19,8 @@ class SActiveRecord extends SRecord
     
     public function __construct($values = Null, $dontInitAssocs=false, $newRecord = True)
     {
-        $this->db = Database::getInstance();
-        if ($this->tableName == Null) $this->tableName = Inflection::pluralize(strtolower(get_class($this)));
+        $this->db = SDatabase::getInstance();
+        if ($this->tableName == Null) $this->tableName = SInflection::pluralize(strtolower(get_class($this)));
         if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
         else $this->initAttributes();
         
@@ -35,7 +35,7 @@ class SActiveRecord extends SRecord
         {
             foreach($this->actAs as $type => $options)
             {
-                Mixins::aggregate(__CLASS__, $type.'Mixin');
+                SMixins::aggregate(__CLASS__, $type.'Mixin');
                 call_user_func(array($type.'Mixin', 'registerCallbacks'), $this);
             }
         }
@@ -254,7 +254,7 @@ class SActiveRecord extends SRecord
     {
         foreach($this->relationships as $name => $options)
         {
-            $this->assocs[$name] = AssociationProxy::getInstance($this, $name, $options, $this->sqlMapping($name));
+            $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $options, $this->sqlMapping($name));
         }
     }
     

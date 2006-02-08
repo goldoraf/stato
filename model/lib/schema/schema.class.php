@@ -1,6 +1,6 @@
 <?php
 
-class Schema
+class SSchema
 {
     public static function createTable($name, $tableDef, $options = array())
     {
@@ -8,7 +8,7 @@ class Schema
         $sql.= $tableDef->toSql();
         $sql.= ")";
         
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $db->execute($sql);
     }
     
@@ -19,7 +19,7 @@ class Schema
     
     public static function dropTable($name)
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $db->execute("DROP TABLE $name");
     }
     
@@ -27,7 +27,7 @@ class Schema
     {
         $sql = "ALTER TABLE $tableName ADD $columnName ".self::typeToSql($type, $options['limit']);
         $sql = self::addColumnOptions($sql, $options);
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $db->execute($sql);
     }
     
@@ -52,13 +52,13 @@ class Schema
         if (isset($options['unique'])) $indexType = 'UNIQUE';
         else $indexType = '';
         
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $db->execute("CREATE {$indexType} INDEX {$indexName} ON {$tableName} (".implode(', ', $columnName).")");
     }
     
     public static function removeIndex($tableName, $options = array())
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $db->execute("DROP ".self::indexName($tableName, $options)." ON {$tableName}");
     }
     
@@ -69,12 +69,12 @@ class Schema
         elseif (isset($options['name']))
             return $options['name'];
         else
-            throw new Exception('You must specify the index name');
+            throw new SException('You must specify the index name');
     }
     
     public static function typeToSql($type, $limit = Null)
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $native = $db->nativeDbTypes[$type];
         if ($limit === Null && isset($native['limit'])) $limit = $native['limit'];
         $sql = $native['name'];
@@ -84,7 +84,7 @@ class Schema
     
     public static function addColumnOptions($sql, $options)
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         if ($options['default'] !== Null)
             $sql.= 'DEFAULT '.$db->quote($options['default'], $options['type']);
         if ($options['null'] === False) $sql.= 'NOT NULL';

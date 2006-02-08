@@ -1,14 +1,5 @@
 <?php
 
-/**
- * UriHelper
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2005
- * @version 0.1
- * @access public
- **/
 function link_to($label, $urlOptions=array(), $htmlOptions=array())
 {
     if (is_array($urlOptions)) $url = url_for($urlOptions);
@@ -25,12 +16,12 @@ function link_to($label, $urlOptions=array(), $htmlOptions=array())
 
 function url_for($options)
 {
-    $req = Context::$request;
+    $req = SContext::$request;
     if (!isset($options['action']))     $options['action'] = $req->action;
     if (!isset($options['controller'])) $options['controller'] = $req->controller;
     if (!isset($options['module']))     $options['module'] = $req->module;
     
-    return Routes::rewriteUrl($options);
+    return SRoutes::rewriteUrl($options);
 }
 
 ?>

@@ -1,8 +1,8 @@
 <?php
 
-class AuthException extends Exception {}
+class SAuthException extends SException {}
 
-class Cookie
+class SCookie
 {
     private $created;
     private $userId;
@@ -24,7 +24,7 @@ class Cookie
         else
         {
             if (!array_key_exists(self::$cookieName, $_COOKIE))
-                throw new AuthException('No cookie !');
+                throw new SAuthException('No cookie !');
                 
             $this->unpackage($_COOKIE[self::$cookieName]);
         }
@@ -43,13 +43,13 @@ class Cookie
     public function validate()
     {
         if (!$this->version || !$this->created || !$this->userId)
-            throw new AuthException('Malformed cookie !');
+            throw new SAuthException('Malformed cookie !');
             
         if ($this->version != self::$myVersion)
-            throw new AuthException('Version mismatch !');
+            throw new SAuthException('Version mismatch !');
             
         if (time() - $this->created > self::$expiration)
-            throw new AuthException('Cookie expired !');
+            throw new SAuthException('Cookie expired !');
             
         if (time() - $this->created > self::$resetTime) $this->set();
     }
@@ -58,12 +58,12 @@ class Cookie
     {
         $parts = array(self::$myVersion, time(), $this->userId);
         $cookie = implode(self::$glue, $parts);
-        return Encryption::encrypt($cookie);
+        return SEncryption::encrypt($cookie);
     }
     
     private function unpackage($cookie)
     {
-        $buffer = Encryption::decrypt($cookie);
+        $buffer = SEncryption::decrypt($cookie);
         list($this->version, $this->created, $this->userId) = explode(self::$glue, $buffer);
     }
 }

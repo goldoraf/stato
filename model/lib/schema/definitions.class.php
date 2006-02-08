@@ -1,6 +1,6 @@
 <?php
 
-class Column
+class SColumn
 {
     public $name    = Null;
     public $type    = Null;
@@ -19,14 +19,14 @@ class Column
     
     public function toSql()
     {
-        $db = Database::getInstance();
-        $sql = $db->quoteColumnName($this->name).' '.Schema::typeToSql($this->type, $this->limit);
-        $sql = Schema::addColumnOptions($sql, array('null' => $this->null, 'default' => $this->default));
+        $db = SDatabase::getInstance();
+        $sql = $db->quoteColumnName($this->name).' '.SSchema::typeToSql($this->type, $this->limit);
+        $sql = SSchema::addColumnOptions($sql, array('null' => $this->null, 'default' => $this->default));
         return $sql;
     }
 }
 
-class Table
+class STable
 {
     private $columns = array();
     
@@ -63,7 +63,7 @@ class Table
     
     private function native($type)
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         return $db->nativeDbTypes[$type];
     }
 }

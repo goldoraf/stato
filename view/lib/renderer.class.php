@@ -1,19 +1,6 @@
 <?php
 
-/**
- * Renderer
- * 
- * classe de rendu de pages web.
- * elle utilise des templates PHP mais peut etre etendue 
- * pour chaque type de moteur de template.
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2004
- * @version 0.4
- * @access public
- **/
-class Renderer
+class SRenderer
 {
     private $template;
     private $compiled;
@@ -33,21 +20,14 @@ class Renderer
     
     public function __set($name, $value)
     {
-        throw new Exception('You\'re not allowed to reassign template variables !');
+        throw new SException('You\'re not allowed to reassign template variables !');
     }
     
-    /**
-     * Renderer::render()
-     * 
-     * retourne le rendu du template sous forme de chaine.
-     * 
-     * @return string
-     **/
     public function render()
     {
         if (!is_readable($this->template))
         {
-            throw new Exception('Template not found : '.$this->template);
+            throw new SException('Template not found : '.$this->template);
         }
         
         if (!$this->isCompiledTemplate()) $this->compile();

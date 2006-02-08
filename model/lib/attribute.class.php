@@ -1,6 +1,6 @@
 <?php
 
-class Attribute
+class SAttribute
 {
     public $name    = Null;
     public $type    = Null;

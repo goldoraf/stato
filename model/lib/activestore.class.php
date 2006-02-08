@@ -298,7 +298,7 @@ class SActiveStore
         foreach($include as $assoc)
         {
             if (isset($instance->relationships[$assoc]))
-                $associations[$assoc] = AssociationProxy::getOptions($instance, $assoc, $instance->relationships[$assoc]);
+                $associations[$assoc] = SAssociationProxy::getOptions($instance, $assoc, $instance->relationships[$assoc]);
         }
         return $associations;
     }
@@ -372,12 +372,12 @@ class SActiveStore
         {
             return new $class($values, $dontInit, False);
         }
-        throw new Exception("SActiveStore : $class class not found.");
+        throw new SException("SActiveStore : $class class not found.");
     }
     
     private static function connection()
     {
-        return Database::getInstance();
+        return SDatabase::getInstance();
     }
 }
 

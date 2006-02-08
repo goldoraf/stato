@@ -1,6 +1,6 @@
 <?php
 
-class Recordset
+class SRecordset
 {
     protected $resource;
     private $class;

@@ -2,22 +2,16 @@
 
 require_once(CORE_DIR.'/model/model.php');
 
-// apparemment, la classe InflectionTest est déjà définie par SimpleTest
-class InflectionClassTest extends UnitTestCase
+class SInflectionTest extends UnitTestCase
 {
-    function InflectionClassTest()
-    {
-        $this->UnitTestCase('Inflection class tests');
-    }
-    
     function testPlural()
     {
-        $this->assertEqual('products', Inflection::pluralize('product'));
+        $this->assertEqual('products', SInflection::pluralize('product'));
     }
     
     function testSingular()
     {
-        $this->assertEqual('product', Inflection::singularize('products'));
+        $this->assertEqual('product', SInflection::singularize('products'));
     }
 }
 

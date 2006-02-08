@@ -1,6 +1,6 @@
 <?php
 
-abstract class Association
+abstract class SAssociation
 {
     public $assocName       = Null;
     public $assocClass      = Null;
@@ -92,7 +92,7 @@ abstract class Association
     {
         if (!is_object($record) || get_class($record) != $this->assocClass)
         {
-            throw new AssociationTypeMismatch('Bad Record Type');
+            throw new SAssociationTypeMismatch('Bad Record Type');
         }
     }
     

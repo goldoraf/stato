@@ -1,6 +1,6 @@
 <?php
 
-class CSVFile
+class SCsvFile
 {
     public $fields = array();
     

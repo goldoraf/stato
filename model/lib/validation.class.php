@@ -1,6 +1,6 @@
 <?php
 
-class Validation
+class SValidation
 {
     public static $validations = array
     (
@@ -30,7 +30,7 @@ class Validation
                         $method = 'validate'.ucfirst($validation);
                         self::$method($record, $attr, $options);
                     }
-                    else throw new Exception("The validation rule '$validation' does not exist.");
+                    else throw new SException("The validation rule '$validation' does not exist.");
                 }
             }
         }
@@ -76,10 +76,10 @@ class Validation
         $config = array_merge($config, $options);
         
         if ($config['pattern'] === Null)
-            throw new Exception('A pattern must be supplied for format validation.');
+            throw new SException('A pattern must be supplied for format validation.');
             
         if (!in_array($config['pattern'], self::$patterns))
-            throw new Exception('The pattern provided does not exist.');
+            throw new SException('The pattern provided does not exist.');
         
         $method = 'is'.ucfirst($config['pattern']);
             
@@ -116,7 +116,7 @@ class Validation
         $config = array_merge($config, $options);
         
         if (!isset($config['choices']) || !is_array($config['choices']))
-            throw new Exception('An array of choices must be supplied.');
+            throw new SException('An array of choices must be supplied.');
             
         if (!in_array($record->$attr, $config['choices']))
             self::addError($record, $attr, $config['message']);
@@ -128,7 +128,7 @@ class Validation
         $config = array_merge($config, $options);
         
         if (!isset($config['choices']) || !is_array($config['choices']))
-            throw new Exception('An array of choices must be supplied.');
+            throw new SException('An array of choices must be supplied.');
             
         if (in_array($record->$attr, $config['choices']))
             self::addError($record, $attr, $config['message']);
@@ -272,8 +272,8 @@ class Validation
     
     private static function addError($record, $attr, $message, $var = null)
     {
-        $message = Context::locale($message);
-        $humanReadableAttr = Context::locale($attr);
+        $message = SContext::locale($message);
+        $humanReadableAttr = SContext::locale($attr);
         if ($humanReadableAttr == $attr) $humanReadableAttr = str_replace('_', ' ', $attr);
         $message = ucfirst(sprintf($message, $humanReadableAttr, $var));
         if (!isset($record->errors[$attr])) $record->errors[$attr] = $message;

@@ -11,7 +11,7 @@
  * @version 0.1
  * @access public
  **/
-class MySqlDriver extends AbstractDriver
+class SMySqlDriver extends SAbstractDriver
 {
     public $nativeDbTypes = array
     (
@@ -81,11 +81,11 @@ class MySqlDriver extends AbstractDriver
         $result = @mysql_query($strsql,$this->conn);
         if (is_resource($result))
         {
-            return new Recordset($result, get_class($this));
+            return new SRecordset($result, get_class($this));
         }
         if (!$result)
         {
-            throw new Exception('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
+            throw new SException('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
         }
         return true;
     }
@@ -98,7 +98,7 @@ class MySqlDriver extends AbstractDriver
             $fields = array();
             while($row = $rs->fetch())
             {
-                $fields[$row['Field']] = new Attribute($row['Field'], $this->simplifiedType($row['Type']), $row['Default']);
+                $fields[$row['Field']] = new SAttribute($row['Field'], $this->simplifiedType($row['Type']), $row['Default']);
             }
             return $fields;
         }

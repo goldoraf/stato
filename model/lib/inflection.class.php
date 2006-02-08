@@ -1,6 +1,6 @@
 <?php
 
-class Inflection
+class SInflection
 {
     private static $pluralRules = array
     (

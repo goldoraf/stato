@@ -1,14 +1,5 @@
 <?php
 
-/**
- * FormTagHelper
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2005
- * @version 0.1
- * @access public
- **/
 function form_tag($urlOptions, $options=array())
 {
     $htmlOptions = array_merge(array('method'=>'post'), $options);
@@ -48,16 +39,7 @@ function file_field_tag($name, $id=Null, $options=array())
 function text_area_tag($name, $id=Null, $content=Null, $options=array())
 {
     if ($id == Null) $id = $name;
-    $html = '';
-    if (isset($options['rich']) && $options['rich'] == True)
-    {
-        $html.= js_include_tag('tinymce/tiny_mce.js')
-        .js_tag('tinyMCE.init({mode : "exact", elements : "'.$id.'"})');
-        unset($options['rich']);
-        $options['cols'] = 50;
-        $options['rows'] = 15;
-    }
-    return $html.content_tag('textarea', $content, array_merge(array('name'=>$name, 'id'=>$id), $options));
+    return content_tag('textarea', $content, array_merge(array('name'=>$name, 'id'=>$id), $options));
 }
 
 function submit_tag($value='Ok', $options=array())

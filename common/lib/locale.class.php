@@ -1,6 +1,6 @@
 <?php
 
-class Locale
+class SLocale
 {
     public static $language = 'en';
     private static $strings = array();

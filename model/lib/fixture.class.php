@@ -1,6 +1,6 @@
 <?php
 
-class Fixture
+class SFixture
 {
     const CSV_MODE = 1;
     const INI_MODE = 2;
@@ -13,14 +13,14 @@ class Fixture
     
     public static function createFixtures($fixturesDir, $tableNames)
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $fixtures = array();
         foreach ($tableNames as $table)
         {
             $fixturePath = $fixturesDir.'/'.$table;
-            if (file_exists($fixturePath.'.csv')) $mode = Fixture::CSV_MODE;
-            else $mode = Fixture::INI_MODE;
-            $fixtures[$table] = new Fixture($db, $table, $fixturePath, $mode);
+            if (file_exists($fixturePath.'.csv')) $mode = SFixture::CSV_MODE;
+            else $mode = SFixture::INI_MODE;
+            $fixtures[$table] = new SFixture($db, $table, $fixturePath, $mode);
         }
         return $fixtures;
     }
@@ -29,7 +29,7 @@ class Fixture
     {
         $this->db = $db;
         $this->mode = $mode;
-        $this->className = ucfirst(Inflection::singularize($tableName));
+        $this->className = ucfirst(SInflection::singularize($tableName));
         $this->tableName = $tableName;
         $this->fixturePath = $fixturePath;
         $this->readFixtureFile();
@@ -70,7 +70,7 @@ class Fixture
     {
         if ($this->mode == self::CSV_MODE)
         {
-            $csv = new CSVFile($this->fixturePath.'.csv');
+            $csv = new SCsvFile($this->fixturePath.'.csv');
             $i = 1;
             while($data = $csv->fetchArray())
             {

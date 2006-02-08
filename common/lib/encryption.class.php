@@ -1,6 +1,6 @@
 <?php
 
-class Encryption
+class SEncryption
 {
     private static $cypher = 'blowfish';
     private static $mode   = 'cfb';

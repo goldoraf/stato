@@ -1,6 +1,6 @@
 <?php
 
-class Upload
+class SUpload
 {
     public $name = '';
     public $size = '';

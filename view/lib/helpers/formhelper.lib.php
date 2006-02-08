@@ -11,7 +11,7 @@
  **/
 function default_options($object, $method)
 {
-    $entity = Context::$response[$object];
+    $entity = SContext::$response[$object];
     return array("{$object}_{$method}", "{$object}[{$method}]", $entity->$method);
 }
 

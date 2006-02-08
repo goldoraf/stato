@@ -11,7 +11,7 @@ class InflectionTest extends UnitTestCase
     
     function testPlural()
     {
-        $this->assertEqual('products', Inflection::pluralize('product'));
+        $this->assertEqual('products', SInflection::pluralize('product'));
     }
     
     function testSingular()

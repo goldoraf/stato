@@ -1,15 +1,18 @@
 <?php
 
-/**
-* 
-* Encapsule les objets partagés (request, response, session)
-* 
-* 
-* @package 
-* @version 0.1
-* 
-*/
-class Context
+function error_handler($errorType, $message)
+{
+    // No exception thrown for notices : Stato uses some PHP4 librairies
+    // and we don't want to bother with "var is deprecated"
+    // Ideally, we could log this type of errors
+    if ($errorType != E_NOTICE && $errorType != E_STRICT)
+        throw new SException( $message, $errorType);
+}
+set_error_handler('error_handler');
+
+class SException extends Exception {}
+
+class SContext
 {
     public static $request  = null;
     public static $response = null;
@@ -19,22 +22,22 @@ class Context
     
     public static function init()
     {
-        if (Context::$status) return;
+        if (SContext::$status) return;
         
         require_once(ROOT_DIR.'/conf/routes.php');
         
-        self::$request  = new Request();
-        self::$response = new Response();
-        self::$session  = new Session();
+        self::$request  = new SRequest();
+        self::$response = new SResponse();
+        self::$session  = new SSession();
         
-        Locale::initialize();
+        SLocale::initialize();
         
         self::$status = True;
     }
     
     public static function locale($key)
     {
-        return Locale::translate($key);
+        return SLocale::translate($key);
     }
     
     public static function inclusionPath($module = Null)

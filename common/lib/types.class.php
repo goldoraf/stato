@@ -17,7 +17,7 @@ class SDate
     public function __construct($year, $month, $day)
     {
         if ($day == 0 || $month == 0 || $year ==0)
-            throw new Exception('Date class constructor needs not null values.');
+            throw new SException('Date class constructor needs not null values.');
             
         $this->day   = $day;
         $this->month = $month;
@@ -26,7 +26,7 @@ class SDate
     
     public function locale()
     {
-        return $this->format(Context::locale('FORMAT_DATE'));
+        return $this->format(SContext::locale('FORMAT_DATE'));
     }
     
     public function __toString()
@@ -84,7 +84,7 @@ class SDateTime extends SDate
     
     public function locale()
     {
-        return $this->format(Context::locale('FORMAT_DATETIME'));
+        return $this->format(SContext::locale('FORMAT_DATETIME'));
     }
     
     public function __toString()

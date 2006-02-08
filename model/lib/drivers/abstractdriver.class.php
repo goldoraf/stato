@@ -1,6 +1,6 @@
 <?php
 
-abstract class AbstractDriver
+abstract class SAbstractDriver
 {
     private $conn = null;
     

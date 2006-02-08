@@ -13,9 +13,9 @@ function simple_menu($links, $class='menu')
 
 function module_nav($module=Null, $class='menu', $except=array())
 {
-    if ($module == Null) $module = Context::$request->module;
-    if ($module == 'root') $folder = new Folder(APP_DIR.'/controllers');
-    else $folder = new Folder(APP_DIR.'/modules/'.$module.'/controllers');
+    if ($module == Null) $module = SContext::$request->module;
+    if ($module == 'root') $folder = new SFolder(APP_DIR.'/controllers');
+    else $folder = new SFolder(APP_DIR.'/modules/'.$module.'/controllers');
     
     $except[] = 'application';
     $controllers = array();

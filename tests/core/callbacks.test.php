@@ -1,6 +1,6 @@
 <?php
 
-class FakeEntity extends Observable
+class FakeRecord extends SObservable
 {
     public $value = 0;
     public $beforeValue = Null;
@@ -45,7 +45,7 @@ class CallbacksTest extends UnitTestCase
 {
     function testSelfCallbacks()
     {
-        $entity = new FakeEntity();
+        $entity = new FakeRecord();
         $this->assertEqual(0, $entity->value);
         $entity->save();
         $this->assertEqual(0, $entity->beforeValue);
@@ -55,7 +55,7 @@ class CallbacksTest extends UnitTestCase
     
     function testCallbacks()
     {
-        $entity = new FakeEntity();
+        $entity = new FakeRecord();
         $this->assertEqual(0, $entity->association->value);
         $entity->save();
         $this->assertEqual(1, $entity->association->value);

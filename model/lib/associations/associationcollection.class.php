@@ -1,6 +1,6 @@
 <?php
 
-abstract class AssociationCollection extends Association implements ArrayAccess, Iterator/*, Countable pas avant PHP 5.1 */
+abstract class SAssociationCollection extends SAssociation implements ArrayAccess, Iterator/*, Countable pas avant PHP 5.1 */
 {
     protected $target = array();
     protected $ownerNewBeforeSave = false;

@@ -1,37 +1,13 @@
 <?php
 
-function error_handler($errorType, $message)
-{
-    // No exception thrown for notices : Stato uses some PHP4 librairies
-    // and we don't want to bother with "var is deprecated"
-    // Ideally, we could log this type of errors
-    if ($errorType != E_NOTICE && $errorType != E_STRICT)
-        throw new Exception( $message, $errorType);
-}
-set_error_handler('error_handler');
+class SDispatchException extends SException {}
 
-class DispatchException extends Exception {}
-
-/**
- * Dispatcher
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2005
- * @version 0.1
- * @access public
- **/
-class Dispatcher
+class SDispatcher
 {	
-	/**
-	 * Dispatcher::dispatch()
-	 * 
-	 * @return void
-	 **/
 	public function dispatch() 
     {
-		Context::init();
-        $request = Context::$request;
+		SContext::init();
+        $request = SContext::$request;
         
         $moduleName = preg_replace('/[^a-z0-9\-_]+/i', '', $request->module);
 		$controName = preg_replace('/[^a-z0-9\-_]+/i', '', $request->controller);
@@ -43,11 +19,11 @@ class Dispatcher
             
             if ($moduleName != 'root' && !is_dir(APP_DIR.'/modules/'.$moduleName))
             {
-                throw new DispatchException($moduleName.' module not found !');
+                throw new SDispatchException($moduleName.' module not found !');
             }
             if (empty($controName))
             {
-                throw new DispatchException('No controller specified in this request !');
+                throw new SDispatchException('No controller specified in this request !');
             }
             // tentative d'inclusion de l'ApplicationController
     		if (file_exists($path = $this->getControllerPath('root', 'application')))
@@ -57,7 +33,7 @@ class Dispatcher
             // instanciation du controller
     		if (!file_exists($path = $this->getControllerPath($moduleName, $controName)))
     		{
-    			throw new DispatchException(ucfirst($controName).'Controller not found !');
+    			throw new SDispatchException(ucfirst($controName).'Controller not found !');
     		}
     		require_once($path);
     		$controllerName = $controName.'controller';
@@ -72,14 +48,14 @@ class Dispatcher
     		// execution de l'action
     		if (!$controller->actionExists($actionName))
     		{
-                throw new DispatchException($actionName.' action is not defined in '.ucfirst($controName).'Controller!');
+                throw new SDispatchException($actionName.' action is not defined in '.ucfirst($controName).'Controller!');
             }
             $controller->callAction($actionName);
             
             // rendu du template
             $controller->render();
         }
-        catch (DispatchException $e)
+        catch (SDispatchException $e)
         {
             if (APP_MODE == 'prod')
             {
@@ -88,7 +64,7 @@ class Dispatcher
             }
             else
             {
-                $c = new ActionController();
+                $c = new SActionController();
                 $c->renderText("<html><body><strong>Dispatch error : </strong>".$e->getMessage()."</body></html>");
             }
         }
@@ -101,7 +77,7 @@ class Dispatcher
             }
             else
             {
-                $c = new ActionController();
+                $c = new SActionController();
                 $c->exception  = $e;
                 $c->controller = ucfirst($controName).'Controller';
                 $c->action     = $actionName;

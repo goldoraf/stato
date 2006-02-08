@@ -1,6 +1,6 @@
 <?php
 
-class SecurityImage
+class SSecurityImage
 {
     public $code     = null;
     public $filename = null;
@@ -18,7 +18,7 @@ class SecurityImage
     public function __construct()
     {
         if (!is_dir(ROOT_DIR.'/public/images/captchas'))
-            throw new Exception("SecurityImage : folder public/images/captchas does not exists.");
+            throw new Exception("SSecurityImage : folder public/images/captchas does not exists.");
     }
     
     public function generate($chars = 5)

@@ -22,11 +22,11 @@ class SActionController
     
     public function __construct()
     {
-        $this->request  = Context::$request;
-        $this->session  = Context::$session;
-        $this->response = Context::$response;
+        $this->request  = SContext::$request;
+        $this->session  = SContext::$session;
+        $this->response = SContext::$response;
         
-        $this->flash = new Flash();
+        $this->flash = new SFlash();
         
         $this->params = $this->request->params;
         
@@ -89,7 +89,7 @@ class SActionController
     public function render()
     {
         $path = $this->defaultTemplatePath();
-        if (!file_exists($path)) throw new Exception('Template not found for this action');
+        if (!file_exists($path)) throw new SException('Template not found for this action');
         $this->renderFile($path);
     }
     
@@ -107,13 +107,13 @@ class SActionController
         
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
         
-        $renderer = new Renderer($path, $this->response->values);
+        $renderer = new SRenderer($path, $this->response->values);
         if ($this->layout)
         {
             $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
-            if (!file_exists($layout)) throw new Exception('Layout not found');
+            if (!file_exists($layout)) throw new SException('Layout not found');
             $this->response['layout_content'] = $renderer->render();
-            $renderer = new Renderer($layout, $this->response->values);
+            $renderer = new SRenderer($layout, $this->response->values);
         }
         $this->renderText($renderer->render());
     }
@@ -138,7 +138,7 @@ class SActionController
         if (!isset($options['module'])) $options['module'] = $this->request->module;
         if (!isset($options['action'])) $options['action'] = 'index';
         
-        $this->redirectToPath(Routes::rewriteUrl($options));
+        $this->redirectToPath(SRoutes::rewriteUrl($options));
     }
     
     protected function redirectToPath($path)
@@ -161,18 +161,18 @@ class SActionController
         }
         else
         {
-            throw new Exception('File not found : '.$path);
+            throw new SException('File not found : '.$path);
         }
     }
     
     protected function name()
     {
-        return strtolower(str_replace('Controller', '', get_class($this)));
+        return str_replace('controller', '', strtolower(get_class($this)));
     }
     
     protected function paginate($className, $perPage=10, $options=array())
     {
-        $paginator = new Paginator($className, $perPage, $options);
+        $paginator = new SPaginator($className, $perPage, $options);
         return array($paginator, $paginator->currentPage());
     }
     
@@ -201,7 +201,7 @@ class SActionController
     
     protected function templatePath($module, $controller, $action)
     {
-        return Context::inclusionPath($module)."/views/$controller/$action.php";
+        return SContext::inclusionPath($module)."/views/$controller/$action.php";
     }
     
     protected function requireModel($model)
@@ -213,15 +213,15 @@ class SActionController
         else
             list($module, $model) = explode('/', $model);
         
-        $file = Context::inclusionPath($module).'/models/'.strtolower($model).'.class.php';
-        if (!file_exists($file)) throw new Exception('Model not found : '.$model);
+        $file = SContext::inclusionPath($module).'/models/'.strtolower($model).'.class.php';
+        if (!file_exists($file)) throw new SException('Model not found : '.$model);
         require_once($file);
     }
     
     protected function requireHelper($helper)
     {
-        $file = Context::inclusionPath()."/helpers/{$helper}helper.lib.php";
-        if (!file_exists($file)) throw new Exception('Helper not found : '.$helper);
+        $file = SContext::inclusionPath()."/helpers/{$helper}helper.lib.php";
+        if (!file_exists($file)) throw new SException('Helper not found : '.$helper);
         require_once($file);
     }
 }

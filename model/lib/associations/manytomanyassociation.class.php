@@ -1,6 +1,6 @@
 <?php
 
-class ManyToManyAssociation extends AssociationCollection
+class SManyToManyAssociation extends SAssociationCollection
 {
     public $assocForeignKey = Null;
     public $joinTable = Null;
@@ -25,7 +25,7 @@ class ManyToManyAssociation extends AssociationCollection
     {
         $sql = "DELETE FROM {$this->joinTable} WHERE "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        Database::getInstance()->execute($sql);
+        SDatabase::getInstance()->execute($sql);
     }
     
     protected function findTarget()
@@ -40,7 +40,7 @@ class ManyToManyAssociation extends AssociationCollection
         $sql = "INSERT INTO {$this->joinTable} SET "
         ."{$this->assocForeignKey} = '{$record->id}', "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        Database::getInstance()->execute($sql);
+        SDatabase::getInstance()->execute($sql);
     }
     
     protected function deleteRecord($record)
@@ -48,7 +48,7 @@ class ManyToManyAssociation extends AssociationCollection
         $sql = "DELETE FROM {$this->joinTable} WHERE "
         ."{$this->assocForeignKey} = '{$record->id}' AND "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        Database::getInstance()->execute($sql);
+        SDatabase::getInstance()->execute($sql);
     }
     
     protected function countRecords($condition)

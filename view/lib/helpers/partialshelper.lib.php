@@ -3,19 +3,19 @@
 function render_partial($partialPath, $localAssigns = Null)
 {
     list($path, $partial) = partial_pieces($partialPath);
-    $template = Context::inclusionPath()."/views/$path/_$partial.php";
+    $template = SContext::inclusionPath()."/views/$path/_$partial.php";
     
     if ($localAssigns == Null)
-        $localAssigns = array($partial => Context::$response->values[$partial]);
+        $localAssigns = array($partial => SContext::$response->values[$partial]);
     
-    $renderer = new Renderer($template, $localAssigns);
+    $renderer = new SRenderer($template, $localAssigns);
     return $renderer->render();
 }
 
 function render_partial_collection($partialPath, $collection, $spacerTemplate = Null)
 {
     list($path, $partial) = partial_pieces($partialPath);
-    $template = Context::inclusionPath()."/views/$path/_$partial.php";
+    $template = SContext::inclusionPath()."/views/$path/_$partial.php";
     $partialsCollec = array();
     $counterName = $partial.'_counter';
     $counter = 0;
@@ -23,7 +23,7 @@ function render_partial_collection($partialPath, $collection, $spacerTemplate = 
     {
         $localAssigns[$counterName] = $counter;
         $localAssigns[$partial] = $element;
-        $renderer = new Renderer($template, $localAssigns);
+        $renderer = new SRenderer($template, $localAssigns);
         $partialsCollec[] = $renderer->render();
     }
     return implode('', $partialsCollec);
@@ -32,7 +32,7 @@ function render_partial_collection($partialPath, $collection, $spacerTemplate = 
 function partial_pieces($partialPath)
 {
     if (!strpos($partialPath, '/'))
-        return array(Context::$request->controller, $partialPath);
+        return array(SContext::$request->controller, $partialPath);
     else
         return explode('/', $partialPath);
 }

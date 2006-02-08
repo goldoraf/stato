@@ -1,6 +1,6 @@
 <?php
 
-class Folder extends DirectoryIterator
+class SFolder extends DirectoryIterator
 {
     public function __construct($path)
     {

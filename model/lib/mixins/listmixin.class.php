@@ -1,6 +1,6 @@
 <?php
 
-class ListMixin
+class SListMixin
 {
     public static function registerCallbacks($object)
     {
@@ -86,7 +86,7 @@ class ListMixin
     public function higherItem()
     {
         if (!$this->isInList()) return null;
-        return ActiveStore::findFirst(
+        return SActiveStore::findFirst(
             get_class($this),
             $this->scopeCondition()." AND {$this->positionField()} = ".($this->readAttribute($this->positionField()) - 1)
         );
@@ -95,7 +95,7 @@ class ListMixin
     public function lowerItem()
     {
         if (!$this->isInList()) return null;
-        return ActiveStore::findFirst(
+        return SActiveStore::findFirst(
             get_class($this),
             $this->scopeCondition()." AND {$this->positionField()} = ".($this->readAttribute($this->positionField()) + 1)
         );
@@ -109,7 +109,7 @@ class ListMixin
         if (ctype_alpha($scope))
         {
             if (!$this->modelExists($scope))
-                throw new Exception('The scope provided does not seem to be an existent model.');
+                throw new SException('The scope provided does not seem to be an existent model.');
             
             $scope = strtolower($scope).'_id';
         }
@@ -140,7 +140,7 @@ class ListMixin
     
     protected function bottomItem()
     {
-        return ActiveStore::findFirst(get_class($this), $this->scopeCondition(), array('order' => "{$this->positionField()} DESC"));
+        return SActiveStore::findFirst(get_class($this), $this->scopeCondition(), array('order' => "{$this->positionField()} DESC"));
     }
     
     protected function assumeBottomPosition()
@@ -155,7 +155,7 @@ class ListMixin
     
     protected function decrementPositionsOnHigherItems($position)
     {
-        ActiveStore::updateAll(
+        SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} - 1)",
             self::scopeCondition()." AND {$this->positionField()} <= {$position}"
@@ -165,7 +165,7 @@ class ListMixin
     protected function decrementPositionsOnLowerItems()
     {
         if (!$this->isInList()) return;
-        ActiveStore::updateAll(
+        SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} - 1)",
             self::scopeCondition()." AND {$this->positionField()} > ".$this->readAttribute($this->positionField())
@@ -175,7 +175,7 @@ class ListMixin
     protected function incrementPositionsOnHigherItems()
     {
         if (!$this->isInList()) return;
-        ActiveStore::updateAll(
+        SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} + 1)",
             self::scopeCondition()." AND {$this->positionField()} < ".$this->readAttribute($this->positionField())
@@ -184,7 +184,7 @@ class ListMixin
     
     protected function incrementPositionsOnLowerItems($position)
     {
-        ActiveStore::updateAll(
+        SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} + 1)",
             self::scopeCondition()." AND {$this->positionField()} >= {$position}"
@@ -193,7 +193,7 @@ class ListMixin
     
     protected function incrementPositionsOnAllItems()
     {
-        ActiveStore::updateAll(
+        SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} + 1)",
             self::scopeCondition()
@@ -210,7 +210,7 @@ class ListMixin
     protected function modelExists($className)
     {
         if (class_exists($className) 
-            || file_exists(MODULES_DIR.'/'.Context::$request->module.'/models/'.$className.'.class.php'))
+            || file_exists(MODULES_DIR.'/'.SContext::$request->module.'/models/'.$className.'.class.php'))
         {
             return True;
         }

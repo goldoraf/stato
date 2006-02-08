@@ -1,6 +1,6 @@
 <?php
 
-class HasManyAssociation extends AssociationCollection
+class SHasManyAssociation extends SAssociationCollection
 {
     public function build($attributes = array())
     {
@@ -31,7 +31,7 @@ class HasManyAssociation extends AssociationCollection
                 ' SET '.$this->foreignKey.' = \'NULL\''.
                 ' WHERE '.$this->foreignKey.' = \''.$this->owner->id.'\''.
                 ' AND '.$this->assocPrimaryKey.' = \''.$record->id.'\'';
-        Database::getInstance()->execute($sql);
+        SDatabase::getInstance()->execute($sql);
     }
     
     protected function countRecords($condition)

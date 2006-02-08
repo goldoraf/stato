@@ -1,6 +1,6 @@
 <?php
 
-class SRecord extends Observable implements ArrayAccess
+class SRecord extends SObservable implements ArrayAccess
 {
     public $attributes    = array();
     public $relationships = array();
@@ -203,7 +203,7 @@ class SRecord extends Observable implements ArrayAccess
     {
         foreach(array_keys($this->values) as $key)
         {
-            Validation::validateAttribute($this, $key, $method);
+            SValidation::validateAttribute($this, $key, $method);
         }
     }
     
@@ -237,7 +237,7 @@ class SRecord extends Observable implements ArrayAccess
             }
                 
             $this->values[$name] = $default;
-            $this->attributes[$name] = new Attribute($name, $type, $default, $options, True);
+            $this->attributes[$name] = new SAttribute($name, $type, $default, $options, True);
             
             if ($this->attributes[$name]->options['required'] === True) $this->attrRequired[] = $name;
             if ($this->attributes[$name]->options['unique'] === True) $this->attrUnique[] = $name;

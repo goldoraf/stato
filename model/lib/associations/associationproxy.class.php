@@ -1,13 +1,13 @@
 <?php
 
-class AssociationProxy
+class SAssociationProxy
 {
     public static function getInstance($owner, $name, $options, $mapping = array())
     {
         list($assocType, $dest, $assocOptions) = self::getOptions($owner, $name, $options, $mapping);
         if ($options['type'] == 'to_many') self::registerToManyMethods($owner, $name, $dest);
         else self::registerToOneMethods($owner, $name, $dest);
-        $assocClass = ucfirst($assocType).'Association';
+        $assocClass = 'S'.ucfirst($assocType).'Association';
         return new $assocClass($owner, $name, $dest, $assocOptions);
     }
     
@@ -18,19 +18,19 @@ class AssociationProxy
             $type = $options;
             $options = array();
         }
-        elseif (!isset($options['type'])) throw new Exception('Type of relationship is required.');
+        elseif (!isset($options['type'])) throw new SException('Type of relationship is required.');
         else $type = $options['type'];
         
         if (!isset($options['dest']))
         {
-            if ($options['type'] == 'to_many') $options['dest'] = Inflection::singularize($name);
+            if ($options['type'] == 'to_many') $options['dest'] = SInflection::singularize($name);
             else $options['dest'] = $name;
         }
         
         $dest = $options['dest'];
         // we instanciate the dest class without associations to avoid an infinite loop
         if (!class_exists($dest))
-            require_once(Context::inclusionPath().'/models/'.strtolower($dest).'.class.php');
+            require_once(SContext::inclusionPath().'/models/'.strtolower($dest).'.class.php');
             
         $destInstance = new $dest(Null, True);
         
@@ -110,7 +110,7 @@ class AssociationProxy
     private static function findAssocType($relationType, $destInstance, $ownerClass, $hasInverse = False)
     {
         if ($hasInverse && ($inverseType = self::findInverseType($destInstance, $ownerClass)) === false)
-                throw new Exception('Could not find inverse relationship.');
+                throw new SException('Could not find inverse relationship.');
         
         if ($relationType == 'to_one')
         {
@@ -130,7 +130,7 @@ class AssociationProxy
         foreach ($destInstance->relationships as $relName => $relOptions)
         {
             if ((isset($relOptions['dest']) && $relOptions['dest'] == $ownerClass)
-                || $relName == $ownerClass || Inflection::singularize($relName) == $ownerClass)
+                || $relName == $ownerClass || SInflection::singularize($relName) == $ownerClass)
             {
                 $type = $relOptions['type'];
                 break;
@@ -154,7 +154,7 @@ class AssociationProxy
         foreach(array_keys($options) as $key)
         {
             if (!in_array($key, $validOptions))
-                throw new Exception($key.' is not a valid mapping option.');
+                throw new SException($key.' is not a valid mapping option.');
         }
     }
 }

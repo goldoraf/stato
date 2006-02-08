@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Request
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2004
- * @version 0.5
- * @access public
- **/
-class Request
+class SRequest
 {
     const METHOD_POST = 1;
     const METHOD_GET  = 2;
@@ -44,7 +35,7 @@ class Request
     
     private function parseUrl()
     {
-        $options = Routes::parseUrl($this->uri);
+        $options = SRoutes::parseUrl($this->uri);
         $this->module     = $options['module'];
         $this->controller = $options['controller'];
         $this->action     = $options['action'];

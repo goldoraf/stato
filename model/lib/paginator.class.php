@@ -1,6 +1,6 @@
 <?php
 
-class Paginator
+class SPaginator
 {
     public $perPage     = 20;
     public $currentPage = 1;
@@ -19,8 +19,8 @@ class Paginator
         if (isset($options['parameter']))  $this->param = $options['parameter'];
         if (isset($options['conditions'])) $this->condition = $options['conditions'];
         
-        if (isset(Context::$request->params[$this->param]))
-            $this->currentPage = Context::$request->params[$this->param];
+        if (isset(SContext::$request->params[$this->param]))
+            $this->currentPage = SContext::$request->params[$this->param];
     }
     
     public function currentPage()

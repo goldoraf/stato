@@ -1,6 +1,6 @@
 <?php
 
-class Routes
+class SRoutes
 {
     private static $modules     = array();
     private static $regexRoutes = array();

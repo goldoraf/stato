@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Image
- * 
- * @package 
- * @author GoldoRaF
- * @copyright Copyright (c) 2004
- * @version 0.5
- * @access public
- **/
-class Image 
+class SImage 
 {
     public $width  = Null;
     public $height = Null;

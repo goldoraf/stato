@@ -1,8 +1,8 @@
 <?php
 
-class ConnectionException extends Exception {}
+class SConnectionException extends SException {}
 
-abstract class AbstractPDODriver
+abstract class SAbstractPDODriver
 {
     private $conn = null;
     
@@ -32,7 +32,7 @@ abstract class AbstractPDODriver
         catch (PDOException $e)
         {
             // what to do ?
-            throw new ConnectionException('Connection not established !');
+            throw new SConnectionException('Connection not established !');
         }
     }
     

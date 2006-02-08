@@ -2,7 +2,7 @@
 
 // Works perfectly with Apache 2.0.54 / PHP 5.0.4 / runkit 0.4 (XAMPP 1.4.15)
 // Crashes Apache with Apache 2.0.55 / PHP 5.0.5 / runkit 0.7 (XAMPP 1.5.0)
-class Mixins
+class SMixins
 {
     private static $mixins = array();
     

@@ -2,7 +2,7 @@
 
 function form($objectName, $options=array())
 {
-    $entity = Context::$response[$objectName];
+    $entity = SContext::$response[$objectName];
     
     if (!isset($options['action']))
     {
@@ -40,7 +40,7 @@ function form($objectName, $options=array())
 
 function input($objectName, $method, $options=array())
 {
-    $attr = Context::$response[$objectName]->attributes[$method];
+    $attr = SContext::$response[$objectName]->attributes[$method];
     
     switch($attr->type)
     {
@@ -71,14 +71,14 @@ function input($objectName, $method, $options=array())
 
 function error_message_on($objectName, $method, $prependText='', $appendText='', $divClass='form-error')
 {
-    $errors = Context::$response[$objectName]->errors;
+    $errors = SContext::$response[$objectName]->errors;
     if (isset($errors[$method]))
         return "<div class=\"{$divClass}\">{$prependText}{$errors[$method]}{$appendText}</div>";
 }
 
 function error_message_for($objectName, $options=array())
 {
-    $errors = Context::$response[$objectName]->errors;
+    $errors = SContext::$response[$objectName]->errors;
     if (!empty($errors))
     {
         $headerTag = 'h2';
@@ -96,7 +96,7 @@ function error_message_for($objectName, $options=array())
             $list.= '<li>'.link_to_function($error, "Field.focus('{$objectName}_{$field}')").'</li>';
             
         return content_tag('div', 
-        content_tag($headerTag, Context::locale('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
+        content_tag($headerTag, SContext::locale('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
         $options);
     }
 }

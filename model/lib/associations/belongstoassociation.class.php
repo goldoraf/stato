@@ -1,6 +1,6 @@
 <?php
 
-class BelongsToAssociation extends Association
+class SBelongsToAssociation extends SAssociation
 {
     public function replace($record)
     {

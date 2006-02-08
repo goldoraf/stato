@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Session
- * 
- * @package 
- * @author Raphael Rougeron
- * @copyright Copyright (c) 2004
- * @version 0.1
- * @access public
- **/
-class Session implements ArrayAccess
+class SSession implements ArrayAccess
 {
     public function __construct()
     {

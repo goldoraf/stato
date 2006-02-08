@@ -1,6 +1,6 @@
 <?php
 
-class ImageMixin
+class SImageMixin
 {
     public static function registerCallbacks($object)
     {

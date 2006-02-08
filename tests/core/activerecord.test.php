@@ -1,6 +1,6 @@
 <?php
 
-class ActiveRecordTest extends ActiveTestCase
+class SActiveRecordTest extends ActiveTestCase
 {
     public $fixtures = array('posts', 'products', 'contracts');
     

@@ -2,23 +2,18 @@
 
 require_once(CORE_DIR.'/model/model.php');
 
-class DatabaseTest extends UnitTestCase
+class SDatabaseTest extends UnitTestCase
 {
-    function DatabaseTest()
-    {
-        $this->UnitTestCase('Database class test');
-    }
-    
     function testConnection()
     {
-        $db1 = Database::getInstance();
-        $db2 = Database::getInstance();
+        $db1 = SDatabase::getInstance();
+        $db2 = SDatabase::getInstance();
         $this->assertReference($db1, $db2);
     }
     
     function testRecreate()
     {
-        $db = Database::getInstance();
+        $db = SDatabase::getInstance();
         $this->assertTrue($db->execute('DROP DATABASE IF EXISTS test_framework'));
         $this->assertTrue($db->execute('CREATE DATABASE test_framework'));
         $this->assertTrue($db->execute('USE test_framework'));

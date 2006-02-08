@@ -1,6 +1,6 @@
 <?php
 
-class BelongsToTest extends ActiveTestCase
+class SBelongsToTest extends ActiveTestCase
 {
     public $fixtures = array('profiles', 'employes');
     
@@ -86,7 +86,7 @@ class BelongsToTest extends ActiveTestCase
     }
 }
 
-class HasManyTest extends ActiveTestCase
+class SHasManyTest extends ActiveTestCase
 {
     public $fixtures = array('companies', 'products');
     
@@ -174,7 +174,7 @@ class HasManyTest extends ActiveTestCase
     }
 }
 
-class ManyToManyTest extends ActiveTestCase
+class SManyToManyTest extends ActiveTestCase
 {
     public $fixtures = array('developers', 'projects', 'developers_projects');
     
@@ -275,7 +275,7 @@ class ManyToManyTest extends ActiveTestCase
     }
 }
 
-class OneToOneTest extends ActiveTestCase
+class SOneToOneTest extends ActiveTestCase
 {
     public $fixtures = array('clients', 'contracts');
     
@@ -297,7 +297,7 @@ class OneToOneTest extends ActiveTestCase
         }
         catch (Exception $e)
         {
-            $this->assertEqual('AssociationTypeMismatch', get_class($e));
+            $this->assertEqual('SAssociationTypeMismatch', get_class($e));
         }
     }
     

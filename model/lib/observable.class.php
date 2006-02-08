@@ -1,6 +1,6 @@
 <?php
 
-abstract class Observable
+abstract class SObservable
 {
     //protected $state = Null;
     protected $observers = array();
@@ -50,7 +50,7 @@ abstract class Observable
     }
 }
 
-interface Observer
+interface SObserver
 {
     public function update($observable, $msg);
 }

@@ -1,6 +1,6 @@
 <?php
 
-class Flash implements ArrayAccess
+class SFlash implements ArrayAccess
 {
     private $session = Null;
     
