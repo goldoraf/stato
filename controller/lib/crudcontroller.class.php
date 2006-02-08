@@ -1,6 +1,6 @@
 <?php
 
-class CRUDController extends ActionController
+class CRUDController extends SActionController
 {
     public $model = Null;
     
@@ -20,12 +20,12 @@ class CRUDController extends ActionController
     
     public function index()
     {
-        $this->entities = ActiveStore::findAll($this->class_name);
+        $this->entities = SActiveStore::findAll($this->class_name);
     }
     
     public function view()
     {
-        $this->entity = ActiveStore::findByPk($this->class_name, $this->params['id']);
+        $this->entity = SActiveStore::findByPk($this->class_name, $this->params['id']);
     }
     
     public function create()
@@ -54,7 +54,7 @@ class CRUDController extends ActionController
         
         if ($this->request->isPost())
         {
-            $entity = ActiveStore::findByPk($this->class_name, $this->params[$this->class_name]['id']);
+            $entity = SActiveStore::findByPk($this->class_name, $this->params[$this->class_name]['id']);
             if ($entity->updateAttributes($this->params[$this->class_name]))
             {
                 $this->flash['notice'] = $this->singular_name.' was successfully updated !';
@@ -63,14 +63,14 @@ class CRUDController extends ActionController
         }
         else
         {
-            $entity = ActiveStore::findByPk($this->class_name, $this->params['id']);
+            $entity = SActiveStore::findByPk($this->class_name, $this->params['id']);
         }
         $this->response[$this->class_name] = $entity;
     }
     
     public function delete()
     {
-        $entity = ActiveStore::findByPk($this->class_name, $this->params['id']);
+        $entity = SActiveStore::findByPk($this->class_name, $this->params['id']);
         $entity->delete();
         $this->redirect('index');
     }

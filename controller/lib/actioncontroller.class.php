@@ -3,16 +3,7 @@
 require_once(ROOT_DIR.'/core/model/model.php');
 require_once(ROOT_DIR.'/core/view/view.php');
 
-/**
- * ActionController
- * 
- * @package 
- * @author goldoraf
- * @copyright Copyright (c) 2005
- * @version 0.1
- * @access public
- **/
-class ActionController
+class SActionController
 {   
     public $request  = null;
     public $session  = null;
@@ -179,13 +170,13 @@ class ActionController
         return strtolower(str_replace('Controller', '', get_class($this)));
     }
     
-    protected function paginate($entityClass, $perPage=10, $options=array())
+    protected function paginate($className, $perPage=10, $options=array())
     {
-        $paginator = new Paginator($entityClass, $perPage, $options);
+        $paginator = new Paginator($className, $perPage, $options);
         return array($paginator, $paginator->currentPage());
     }
     
-    protected function autoCompleteFor($args)
+    /*protected function autoCompleteFor($args)
     {
         $object = $args[0];
         $method = $args[1];
@@ -198,7 +189,7 @@ class ActionController
         $items = '';
         foreach($entities as $entity) $items.= "<li>{$entity->$method}</li>";
         $this->renderText("<ul>{$items}</ul>");
-    }
+    }*/
     
     protected function defaultTemplatePath()
     {
