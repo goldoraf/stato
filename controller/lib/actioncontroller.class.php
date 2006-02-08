@@ -37,6 +37,7 @@ class SActionController
         }
         
         foreach($this->useModels as $model) $this->requireModel($model);
+        foreach($this->useHelpers as $helper) $this->requireHelper($helper);
     }
     
     public function __get($name)
@@ -104,8 +105,6 @@ class SActionController
     {
         if (!$this->flash->isEmpty()) $this->response['flash'] = $this->flash->dump();
         $this->flash->discard();
-        
-        foreach($this->useHelpers as $helper) $this->requireHelper($helper);
         
         $renderer = new SRenderer($path, $this->response->values);
         if ($this->layout)
