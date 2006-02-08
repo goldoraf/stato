@@ -19,7 +19,7 @@ define('SITE_URL', 'http://'.SITE_HOST.BASE_DIR);
 require_once('core/common/common.php');
 require_once('core/controller/controller.php');
 
-$controller = new Dispatcher();
+$controller = new SDispatcher();
 $controller->dispatch();
 
 ?>

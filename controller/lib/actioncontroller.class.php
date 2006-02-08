@@ -220,7 +220,12 @@ class SActionController
     
     protected function requireHelper($helper)
     {
-        $file = SContext::inclusionPath()."/helpers/{$helper}helper.lib.php";
+        if (!strpos($helper, '/'))
+            $module = $this->request->module;
+        else
+            list($module, $helper) = explode('/', $helper);
+        
+        $file = SContext::inclusionPath($module)."/helpers/{$helper}helper.lib.php";
         if (!file_exists($file)) throw new SException('Helper not found : '.$helper);
         require_once($file);
     }

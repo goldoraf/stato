@@ -6,7 +6,7 @@ class SFlash implements ArrayAccess
     
     public function __construct()
     {
-        $this->session = Context::$session;
+        $this->session = SContext::$session;
     }
     
     public function discard()
