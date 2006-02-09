@@ -189,7 +189,7 @@ class SActiveRecord extends SRecord
     
     protected function readAssociation($name)
     {
-        if ($this->relationships[$name]['type'] == 'to_one')
+        if ($this->relationships[$name]['type'] == 'to_one' || $this->relationships[$name] == 'to_one')
             return $this->assocs[$name]->read();
         else
             return $this->assocs[$name];
