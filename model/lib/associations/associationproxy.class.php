@@ -23,7 +23,7 @@ class SAssociationProxy
         
         if (!isset($options['dest']))
         {
-            if ($options['type'] == 'to_many') $options['dest'] = SInflection::singularize($name);
+            if ($type == 'to_many') $options['dest'] = SInflection::singularize($name);
             else $options['dest'] = $name;
         }
         
