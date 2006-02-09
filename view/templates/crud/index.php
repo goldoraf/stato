@@ -1,5 +1,5 @@
 <h1>Listing <?= $this->plural_name; ?></h1>
-<p><?= link_to('New '.$this->singular_name, array('action' => 'create')); ?></p>
+<p><?= link_to('New '.$this->singular_name, array('action' => 'add')); ?></p>
 <? if (count($this->{$this->plural_name}) == 0) : ?>
     <p>No data.</p>
 <? else : ?>
@@ -15,12 +15,12 @@
                     <td><?= truncate($this->{$this->plural_name}[$i]->$attr); ?></td>
                 <? endforeach; ?>
                 <td><?= link_to('View', array('action' => 'view', 'id' => $this->{$this->plural_name}[$i]->id)); ?></td>
-                <td><?= link_to('Edit', array('action' => 'update', 'id' => $this->{$this->plural_name}[$i]->id)); ?></td>
+                <td><?= link_to('Edit', array('action' => 'edit', 'id' => $this->{$this->plural_name}[$i]->id)); ?></td>
                 <td><?= link_to('Delete', array('action' => 'delete', 'id' => $this->{$this->plural_name}[$i]->id),
                                           array('confirm' => 'Are you sure ?')); ?></td>
             </tr>
         <? endfor; ?>
     </table>
 <? endif; ?>
-<p><?= link_to('New '.$this->singular_name, array('action' => 'create')); ?></p>
+<p><?= link_to('New '.$this->singular_name, array('action' => 'add')); ?></p>
 

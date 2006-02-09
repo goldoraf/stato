@@ -21,64 +21,72 @@ class SCrudController extends SActionController
     public function index()
     {
         $this->{$this->plural_name} = SActiveStore::findAll($this->class_name);
+        $this->renderScaffold();
     }
     
     public function view()
     {
         $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params['id']);
+        $this->renderScaffold();
+    }
+    
+    public function add()
+    {
+        $this->{$this->singular_name} = $this->instantiate($this->class_name);
+        $this->renderScaffold();
     }
     
     public function create()
     {
-        $class = $this->class_name;
-        
-        if ($this->request->isPost())
+        $this->{$this->singular_name} = $this->instantiate($this->class_name, $this->params[$this->singular_name]);
+        if ($this->{$this->singular_name}->save())
         {
-            $this->{$this->singular_name} = new $class($this->params[$this->singular_name]);
-            if ($this->{$this->singular_name}->save())
-            {
-                $this->flash['notice'] = $this->class_name.' was successfully created !';
-                $this->redirect('index');
-            }
+            $this->flash['notice'] = $this->class_name.' was successfully created !';
+            $this->redirect('index');
         }
         else
         {
-            $this->{$this->singular_name} = new $class();
+            $this->renderScaffold('add');
         }
+    }
+    
+    public function edit()
+    {
+        $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params['id']);
+        $this->renderScaffold();
     }
     
     public function update()
     {
-        $class = $this->class_name;
-        
-        if ($this->request->isPost())
+        $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params[$this->singular_name]['id']);
+        if ($this->{$this->singular_name}->updateAttributes($this->params[$this->singular_name]))
         {
-            $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params[$this->singular_name]['id']);
-            if ($this->{$this->singular_name}->updateAttributes($this->params[$this->singular_name]))
-            {
-                $this->flash['notice'] = $this->class_name.' was successfully updated !';
-                $this->redirect('index');
-            }
+            $this->flash['notice'] = $this->class_name.' was successfully updated !';
+            $this->redirect('index');
         }
         else
         {
-            $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params['id']);
+            $this->renderScaffold('edit');
         }
     }
     
     public function delete()
     {
-        $entity = SActiveStore::findByPk($this->class_name, $this->params['id']);
-        $entity->delete();
+        SActiveStore::findByPk($this->class_name, $this->params['id'])->delete();
         $this->redirect('index');
     }
     
-    public function render()
+    protected function instantiate($class, $values = Null)
+    {
+        return new $class($values);
+    }
+    
+    protected function renderScaffold($action = Null)
     {
         if (!$this->flash->isEmpty()) $this->response['flash'] = $this->flash->dump();
         $this->flash->discard();
         
-        $action = $this->request->action;
+        if ($action == Null) $action = $this->request->action;
         $path = $this->defaultTemplatePath();
         if (!file_exists($path)) $path = ROOT_DIR."/core/view/templates/crud/{$action}.php";
         
