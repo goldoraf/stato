@@ -7,25 +7,25 @@ class SCrudController extends SActionController
     public function __construct()
     {
         if ($this->model == Null)
-            $this->model = str_replace('controller', '', strtolower(get_class($this)));
+            $this->model = SInflection::singularize(str_replace('controller', '', strtolower(get_class($this))));
         
         $this->useModels[] = $this->model;
         
         parent::__construct();
         
-        $this->class_name = $this->model;
+        $this->class_name = ucfirst($this->model);
         $this->singular_name = strtolower($this->model);
         $this->plural_name = SInflection::pluralize($this->singular_name);
     }
     
     public function index()
     {
-        $this->entities = SActiveStore::findAll($this->class_name);
+        $this->{$this->plural_name} = SActiveStore::findAll($this->class_name);
     }
     
     public function view()
     {
-        $this->entity = SActiveStore::findByPk($this->class_name, $this->params['id']);
+        $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params['id']);
     }
     
     public function create()
@@ -34,18 +34,17 @@ class SCrudController extends SActionController
         
         if ($this->request->isPost())
         {
-            $entity = new $class($this->params[$this->class_name]);
-            if ($entity->save())
+            $this->{$this->singular_name} = new $class($this->params[$this->singular_name]);
+            if ($this->{$this->singular_name}->save())
             {
-                $this->flash['notice'] = $this->singular_name.' was successfully created !';
+                $this->flash['notice'] = $this->class_name.' was successfully created !';
                 $this->redirect('index');
             }
         }
         else
         {
-            $entity = new $class();
+            $this->{$this->singular_name} = new $class();
         }
-        $this->response[$this->class_name] = $entity;
     }
     
     public function update()
@@ -54,18 +53,17 @@ class SCrudController extends SActionController
         
         if ($this->request->isPost())
         {
-            $entity = SActiveStore::findByPk($this->class_name, $this->params[$this->class_name]['id']);
-            if ($entity->updateAttributes($this->params[$this->class_name]))
+            $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params[$this->singular_name]['id']);
+            if ($this->{$this->singular_name}->updateAttributes($this->params[$this->singular_name]))
             {
-                $this->flash['notice'] = $this->singular_name.' was successfully updated !';
+                $this->flash['notice'] = $this->class_name.' was successfully updated !';
                 $this->redirect('index');
             }
         }
         else
         {
-            $entity = SActiveStore::findByPk($this->class_name, $this->params['id']);
+            $this->{$this->singular_name} = SActiveStore::findByPk($this->class_name, $this->params['id']);
         }
-        $this->response[$this->class_name] = $entity;
     }
     
     public function delete()
