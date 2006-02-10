@@ -26,6 +26,7 @@ require_once('lib/paginator.class.php');
 require_once('lib/filesystem/csv.class.php');
 require_once('lib/filesystem/image.class.php');
 require_once('lib/filesystem/folder.class.php');
+require_once('lib/filesystem/dir.class.php');
 
 require_once('lib/associations/associationproxy.class.php');
 require_once('lib/associations/association.class.php');
