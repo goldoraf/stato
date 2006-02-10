@@ -86,7 +86,7 @@ class SRequest
                 	{
                         $flags = array('name', 'type', 'tmp_name', 'error', 'size');
                         foreach($flags as $flag) $file[$flag] = $_FILES[$keys[$i]][$flag][$subkey];
-                        $this->params[$keys[$i]][$subkey] = new Upload($file);
+                        $this->params[$keys[$i]][$subkey] = new SUpload($file);
                     }
                     else
                     {
@@ -98,7 +98,7 @@ class SRequest
             {
                 if ($_FILES[$keys[$i]]['error'] != UPLOAD_ERR_NO_FILE)
             	{
-                    $this->params[$keys[$i]] = new Upload($_FILES[$keys[$i]]);
+                    $this->params[$keys[$i]] = new SUpload($_FILES[$keys[$i]]);
                 }
                 else
                 {

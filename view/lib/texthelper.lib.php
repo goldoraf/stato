@@ -11,7 +11,7 @@ function html_escape($html)
 function truncate($text, $length = 30, $truncateString = '...')
 {
     if (utf8_strlen($text) > $length)
-        return substr_replace($text, $truncateString, $length - utf8_strlen($truncateString));
+        return utf8_substr_replace($text, $truncateString, $length - utf8_strlen($truncateString));
     else
         return $text;
 }
