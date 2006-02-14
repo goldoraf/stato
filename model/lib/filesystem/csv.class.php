@@ -26,14 +26,17 @@ class SCsvFile
         return fgetcsv($this->resource, 4096, ";");
     }
     
-    public function fetchArray()
+    public function fetchArray($convert = True)
     {
         $data = $this->fetch();
         if ($data)
         {
             foreach($this->fields as $key => $value)
-            {//echo mb_detect_encoding($data[$key]);
-                $row[$value] = mb_convert_encoding($data[$key], "UTF-8", $this->encodings);
+            {
+                if ($convert)
+                    $row[$value] = mb_convert_encoding($data[$key], "UTF-8", $this->encodings);
+                else
+                    $row[$value] = $data[$key];
             }
             return $row;
         }
