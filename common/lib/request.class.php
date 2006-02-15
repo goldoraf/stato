@@ -11,12 +11,14 @@ class SRequest
     public $action     = Null;
     public $method     = Null;
     public $params     = array();
+    public $relativeUrlRoot = Null;
     
     public function __construct()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') $this->method = self::METHOD_POST;
         elseif ($_SERVER['REQUEST_METHOD'] == 'GET') $this->method = self::METHOD_GET;
         
+        $this->relativeUrlRoot = $this->relativeUrlRoot();
         $this->uri = $this->extractPath();
         
         $this->parseUrl();
@@ -42,37 +44,22 @@ class SRequest
         $this->params     = $options;
     }
     
-    /**
-    * Request::extractPath()
-    * 
-    * @return void
-    **/
     private function extractPath()
     {
-        // nettoyage de la partie signifiante de l'uri
-        if (preg_match('/^'.str_replace('/','\/',BASE_DIR).'(.*)$/',$_SERVER['REQUEST_URI'],$match))
-        {
-            $requestPart = preg_replace('/^[\/]?(.*?)[\/]?$/','$1',$match[1]);
-        }
-        return $requestPart;
+        return substr($_SERVER['REQUEST_URI'], strlen($this->relativeUrlRoot));
     }
     
-    /**
-    * Request::parseParameters()
-    * 
-    * @return void
-    **/
+    private function relativeUrlRoot()
+    {
+        return str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
+    }
+    
     private function parseParameters()
     {
-        // recup des params POST
         $keys  = array_keys($_POST);
         $count = sizeof($keys);
-        for ($i = 0; $i < $count; $i++)
-		{
-        	$this->params[$keys[$i]] = $_POST[$keys[$i]];
-        }
+        for ($i = 0; $i < $count; $i++) $this->params[$keys[$i]] = $_POST[$keys[$i]];
         
-        // recup des params FILES
 		$keys  = array_keys($_FILES);
         $count = sizeof($keys);
         for ($i = 0; $i < $count; $i++)
@@ -88,22 +75,15 @@ class SRequest
                         foreach($flags as $flag) $file[$flag] = $_FILES[$keys[$i]][$flag][$subkey];
                         $this->params[$keys[$i]][$subkey] = new SUpload($file);
                     }
-                    else
-                    {
-                        $this->params[$keys[$i]][$subkey] = False;
-                    }
+                    else $this->params[$keys[$i]][$subkey] = False;
                 }
             }
             else
             {
                 if ($_FILES[$keys[$i]]['error'] != UPLOAD_ERR_NO_FILE)
-            	{
                     $this->params[$keys[$i]] = new SUpload($_FILES[$keys[$i]]);
-                }
                 else
-                {
                     $this->params[$keys[$i]] = False;
-                }
             }
         }
 	}

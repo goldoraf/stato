@@ -4,11 +4,6 @@ require_once(CORE_DIR.'/common/common.php');
 
 class SRoutesTest extends UnitTestCase
 {
-    function testConvertRegex()
-    {
-        $this->assertEqual('#^photos/(?P<id>\d+)$#i', SRoutes::convertRegex('photos/{id}', array('id' => '\d+')));
-    }
-    
     function testRewriteUrl()
     {
         $this->assertEqual(BASE_DIR.'/photos/2005/09/13', 

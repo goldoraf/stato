@@ -32,7 +32,7 @@ class SLocale
     {
         self::$strings = include(ROOT_DIR.'/core/common/locale/'.self::$language.'.php');
         
-        $moduleI18nFile = MODULES_DIR.'/'.SContext::$request->module.'/i18n/'.self::$language.'.php';
+        $moduleI18nFile = SContext::inclusionPath().'/i18n/'.self::$language.'.php';
         
         if (file_exists($moduleI18nFile))
             self::$strings = array_merge(self::$strings, include($moduleI18nFile));

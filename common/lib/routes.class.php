@@ -22,24 +22,7 @@ class SRoutes
     
     public static function rewriteUrl($options)
     {
-        if (isset(self::$routesMap[$options['module']][$options['controller']][$options['action']]))
-        {
-            $regex = self::$routesMap[$options['module']][$options['controller']][$options['action']];
-            return BASE_DIR.'/'.preg_replace('/\{(\w+)\}/e', "self::getOption('\\1', \$options)", $regex);
-        }
-        else
-        {
-            if ($options['module'] == 'root')
-                $url = BASE_DIR.'/'.$options['controller'].'/'.$options['action'];
-            else
-                $url = BASE_DIR.'/'.$options['module'].'/'.$options['controller'].'/'.$options['action'];
-                
-            foreach ($options as $key => $value)
-            {
-                if (!in_array($key, array('module', 'controller', 'action'))) $url.= "/{$key}/{$value}";
-            }
-            return $url;
-        }
+        return SContext::$request->relativeUrlRoot.self::rewritePath($options);
     }
     
     public static function parseUrl($url)
@@ -78,7 +61,29 @@ class SRoutes
         return $options;
     }
     
-    public static function convertRegex($regex, $validate)
+    private static function rewritePath($options)
+    {
+        if (isset(self::$routesMap[$options['module']][$options['controller']][$options['action']]))
+        {
+            $regex = self::$routesMap[$options['module']][$options['controller']][$options['action']];
+            return preg_replace('/\{(\w+)\}/e', "self::getOption('\\1', \$options)", $regex);
+        }
+        else
+        {
+            if ($options['module'] == 'root')
+                $url = $options['controller'].'/'.$options['action'];
+            else
+                $url = $options['module'].'/'.$options['controller'].'/'.$options['action'];
+                
+            foreach ($options as $key => $value)
+            {
+                if (!in_array($key, array('module', 'controller', 'action'))) $url.= "/{$key}/{$value}";
+            }
+            return $url;
+        }
+    }
+    
+    private static function convertRegex($regex, $validate)
     {
         return '#^'.preg_replace('/\{(\w+)\}/e', "self::getVarRegex('\\1', \$validate)", $regex).'$#i';
     }

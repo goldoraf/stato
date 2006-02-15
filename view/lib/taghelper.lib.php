@@ -12,7 +12,7 @@ function tag($name, $options = array(), $open = False)
 
 function img_tag($filename, $options = array())
 {
-    return '<img src="'.BASE_DIR.'/public/images/'.$filename.'"'.tag_options($options).' />';
+    return '<img src="'.compute_public_path($filename, 'images').'"'.tag_options($options).' />';
 }
 
 function tag_options($options = array())
@@ -38,7 +38,7 @@ function js_include_tag($sources)
     if (!is_array($sources)) $sources = array($sources);
     $html = '';
     foreach($sources as $source)
-        $html.= '<script src="'.BASE_DIR.'/public/js/'.$source.'" type="text/javascript"></script>';
+        $html.= '<script src="'.compute_public_path($source, 'js').'" type="text/javascript"></script>';
     
     return $html;
 }
@@ -53,7 +53,14 @@ function css_include_tag($source)
 
 function css_link_tag($source)
 {
-    return '<link href="'.BASE_DIR.'/public/styles/'.$source.'" rel="stylesheet" type="text/css" media="screen" />';
+    return '<link href="'.compute_public_path($source, 'styles').'" rel="stylesheet" type="text/css" media="screen" />';
+}
+
+function compute_public_path($source, $dir, $ext = Null)
+{
+    $source = SContext::$request->relativeUrlRoot."{$dir}/{$source}";
+    
+    return $source;
 }
 
 ?>

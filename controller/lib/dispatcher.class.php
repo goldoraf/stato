@@ -59,7 +59,8 @@ class SDispatcher
         {
             if (APP_MODE == 'prod')
             {
-                header('location:'.BASE_DIR.'/public/html/404.html');
+                $c = new SActionController();
+                $c->renderText(file_get_contents(ROOT_DIR.'/public/404.html'));
                 exit();
             }
             else
@@ -72,7 +73,8 @@ class SDispatcher
         {
             if (APP_MODE == 'prod')
             {
-                header('location:'.BASE_DIR.'/public/html/500.html');
+                $c = new SActionController();
+                $c->renderText(file_get_contents(ROOT_DIR.'/public/500.html'));
                 exit();
             }
             else
