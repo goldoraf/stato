@@ -6,6 +6,7 @@ class SRequest
     const METHOD_GET  = 2;
     
     public $uri        = Null;
+    public $host       = Null;
     public $module     = Null;
     public $controller = Null;
     public $action     = Null;
@@ -20,6 +21,7 @@ class SRequest
         
         $this->relativeUrlRoot = $this->relativeUrlRoot();
         $this->uri = $this->extractPath();
+        $this->host = $_SERVER['SERVER_NAME'];
         
         $this->parseUrl();
         $this->parseParameters();
