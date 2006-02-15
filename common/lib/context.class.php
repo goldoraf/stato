@@ -26,11 +26,11 @@ class SContext
     {
         if (SContext::$status) return;
         
+        require_once(ROOT_DIR.'/conf/routes.php');
+        
         self::$request  = new SRequest();
         self::$response = new SResponse();
         self::$session  = new SSession();
-        
-        require_once(ROOT_DIR.'/conf/routes.php');
         
         SLocale::initialize();
         
