@@ -12,5 +12,6 @@ require_once('lib/recordhelper.lib.php');
 require_once('lib/partialshelper.lib.php');
 require_once('lib/texthelper.lib.php');
 require_once('lib/utf8helper.lib.php');
+require_once('lib/cachehelper.lib.php');
 
 ?>

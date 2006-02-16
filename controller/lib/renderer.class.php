@@ -32,7 +32,7 @@ class SRenderer
         
         if (!$this->isCompiledTemplate()) $this->compile();
         
-        ob_start ();
+        ob_start();
         include ($this->compiled);
         $str = ob_get_contents();
         ob_end_clean();

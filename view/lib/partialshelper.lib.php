@@ -18,13 +18,14 @@ function render_partial_collection($partialPath, $collection, $spacerTemplate = 
     $template = SContext::inclusionPath()."/views/$path/_$partial.php";
     $partialsCollec = array();
     $counterName = $partial.'_counter';
-    $counter = 0;
+    $counter = 1;
     foreach($collection as $element)
     {
         $localAssigns[$counterName] = $counter;
         $localAssigns[$partial] = $element;
         $renderer = new SRenderer($template, $localAssigns);
         $partialsCollec[] = $renderer->render();
+        $counter++;
     }
     return implode('', $partialsCollec);
 }
