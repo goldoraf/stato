@@ -12,7 +12,7 @@ class SRoutes
         unset($options['validate']);
         if (!isset($options['module'])) $options['module'] = 'root';
         self::$regexRoutes[$regex] = $options;
-        self::$routesMap[$options['module']][$options['controller']][$options['action']] = $pattern;
+        self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']] = $pattern;
     }
     
     public static function connectModule($module)
@@ -63,9 +63,9 @@ class SRoutes
     
     private static function rewritePath($options)
     {
-        if (isset(self::$routesMap[$options['module']][$options['controller']][$options['action']]))
+        if (isset(self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']]))
         {
-            $regex = self::$routesMap[$options['module']][$options['controller']][$options['action']];
+            $regex = self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']];
             return preg_replace('/\{(\w+)\}/e', "self::getOption('\\1', \$options)", $regex);
         }
         else
