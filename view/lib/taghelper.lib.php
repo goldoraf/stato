@@ -7,7 +7,7 @@ function content_tag($name, $content, $options = array())
 
 function tag($name, $options = array(), $open = False)
 {
-    return "<$name".tag_options($options).($open ? ">" : "/>");
+    return "<$name".tag_options($options).($open ? ">" : " />");
 }
 
 function img_tag($filename, $options = array())
@@ -51,9 +51,11 @@ function css_include_tag($source)
     return style_tag(file_get_contents($source));
 }
 
-function css_link_tag($source)
+function css_link_tag($source, $options = array())
 {
-    return '<link href="'.compute_public_path($source, 'styles').'" rel="stylesheet" type="text/css" media="screen" />';
+    $options = array_merge(array('rel' => 'stylesheet', 'type' => 'text/css', 'media' => 'screen'), $options);
+    $options['href'] = compute_public_path($source, 'styles');
+    return tag('link', $options);
 }
 
 function compute_public_path($source, $dir, $ext = Null)
