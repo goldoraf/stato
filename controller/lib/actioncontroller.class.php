@@ -216,17 +216,17 @@ class SActionController
         return $this->templatePath($module, $controller, $action);
     }
     
-    protected function templatePath($module, $controller, $action)
+    private function templatePath($module, $controller, $action)
     {
         return SContext::inclusionPath($module)."/views/$controller/$action.php";
     }
     
-    protected function isPerformed()
+    private function isPerformed()
     {
         return ($this->performedRender || $this->performedRedirect);
     }
     
-    protected function requireModel($model)
+    private function requireModel($model)
     {
         if (class_exists($model)) return;
         
@@ -240,7 +240,7 @@ class SActionController
         require_once($file);
     }
     
-    protected function requireHelper($helper)
+    private function requireHelper($helper)
     {
         if (!strpos($helper, '/'))
             $module = $this->request->module;

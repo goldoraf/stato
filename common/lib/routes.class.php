@@ -104,6 +104,15 @@ class SRoutes
         }
     }
     
+    private static function buildQueryString($options)
+    {
+        $string = '';
+        $elements = array();
+        foreach ($options as $key => $value) $elements[] = "{$key}=>{$value}";
+        if (!empty($elements)) $string.= '?'.implode('&', $elements);
+        return $string;
+    }
+    
     private static function convertRegex($regex, $validate)
     {
         return '#^'.preg_replace('/\{(\w+)\}/e', "self::getVarRegex('\\1', \$validate)", $regex).'$#i';
