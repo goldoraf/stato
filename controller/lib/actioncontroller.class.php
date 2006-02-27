@@ -14,11 +14,19 @@ class SActionController
     public $useModels   = array();
     public $useHelpers  = array();
     
+    public $cachePages     = array();
+    public $cacheActions   = array();
+    public $pageCacheDir   = null;
+    public $pageCacheExt   = '.html';
+    public $performCaching = True;
+    
     public $beforeFilters = array();
-    public $afterFilters = array();
+    public $afterFilters  = array();
     public $autoCompleteFor = array();
     
-    protected $virtualMethods = array();
+    protected $virtualMethods    = array();
+    protected $performedRender   = false;
+    protected $performedRedirect = false;
     
     public function __construct()
     {
@@ -29,6 +37,8 @@ class SActionController
         $this->flash = new SFlash();
         
         $this->params = $this->request->params;
+        
+        $this->pageCacheDir = ROOT_DIR.'/public/cache';
         
         foreach($this->autoCompleteFor as $params)
         {
@@ -80,11 +90,13 @@ class SActionController
         }
     }
     
-    public function callAction($action)
+    public function performAction($action)
     {
         foreach($this->beforeFilters as $method) $this->$method();
         $this->$action();
         foreach($this->afterFilters as $method) $this->$method();
+        if (!$this->isPerformed()) $this->render();
+        exit();
     }
     
     public function render()
@@ -96,9 +108,9 @@ class SActionController
     
     public function renderText($str)
     {
+        $this->performedRender = true;
         header("Content-Type: text/html; charset=utf-8");
         echo $str;
-        exit();
     }
     
     public function renderFile($path)
@@ -126,6 +138,7 @@ class SActionController
     
     protected function redirect($urlOptions)
     {
+        $this->performedRedirect = true;
         if (!is_array($urlOptions))
         {
             $options = array();
@@ -133,17 +146,22 @@ class SActionController
         }
         else $options = $urlOptions;
         
-        if (!isset($options['controller'])) $options['controller'] = $this->name();
-        if (!isset($options['module'])) $options['module'] = $this->request->module;
-        if (!isset($options['action'])) $options['action'] = 'index';
-        
-        $this->redirectToPath(SRoutes::rewriteUrl($options));
+        $this->redirectToPath($this->urlFor($options));
     }
     
     protected function redirectToPath($path)
     {
         header('location:'.$path);
         exit();
+    }
+    
+    protected function urlFor($options)
+    {
+        if (!isset($options['action']))     $options['action'] = 'index';
+        if (!isset($options['controller'])) $options['controller'] = $this->name();
+        if (!isset($options['module']))     $options['module'] = $this->request->module;
+        
+        return SRoutes::rewriteUrl($options);
     }
     
     protected function sendFile($path, $params=array())
@@ -201,6 +219,11 @@ class SActionController
     protected function templatePath($module, $controller, $action)
     {
         return SContext::inclusionPath($module)."/views/$controller/$action.php";
+    }
+    
+    protected function isPerformed()
+    {
+        return ($this->performedRender || $this->performedRedirect);
     }
     
     protected function requireModel($model)
