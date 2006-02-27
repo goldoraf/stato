@@ -6,6 +6,9 @@ class SRoutes
     private static $regexRoutes = array();
     private static $routesMap   = array();
     
+    private static $reservedOptions = array('only_path', 'protocol', 'host', 'anchor',
+        'trailing_slash', 'skip_relative_url_root');
+    
     public static function connect($pattern, $options)
     {
         $regex = self::convertRegex($pattern, $options['validate']);
@@ -79,6 +82,8 @@ class SRoutes
     
     private static function rewritePath($options)
     {
+        foreach(self::$reservedOptions as $opt) unset($options[$opt]);
+        
         if (isset(self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']]))
         {
             $regex = self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']];

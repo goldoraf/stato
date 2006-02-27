@@ -78,7 +78,7 @@ class SRequest
     
     private function parseUrl()
     {
-        $options = SRoutes::parseUrl($this->uri);
+        $options = SRoutes::parseUrl($this->requestUri());
         $this->module     = $options['module'];
         $this->controller = $options['controller'];
         $this->action     = $options['action'];
