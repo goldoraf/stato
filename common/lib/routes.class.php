@@ -59,24 +59,23 @@ class SRoutes
             }
         }
         // Else...
-        $set = explode('/', $url);
+        list($path, $queryString) = explode('?', $url);
+        $set = explode('/', $path);
         if (in_array($set[0], self::$modules))
         {
             $options['module']     = $set[0];
             $options['controller'] = $set[1];
             $options['action']     = $set[2];
-            $iInit = 3;
         }
         else
         {
             $options['module']     = 'root';
             $options['controller'] = $set[0];
             $options['action']     = $set[1];
-            $iInit = 2;
         }
         
-        for ($i = $iInit; $i < $count = count($set); $i = $i+2) $options[$set[$i]] = $set[$i+1];
-        
+        parse_str($queryString, $params);
+        $options = array_merge($params, $options);
         return $options;
     }
     
@@ -92,14 +91,15 @@ class SRoutes
         else
         {
             if ($options['module'] == 'root')
-                $url = $options['controller'].'/'.$options['action'];
+                $url = $options['controller'];
             else
-                $url = $options['module'].'/'.$options['controller'].'/'.$options['action'];
+                $url = $options['module'].'/'.$options['controller'];
                 
-            foreach ($options as $key => $value)
-            {
-                if (!in_array($key, array('module', 'controller', 'action'))) $url.= "/{$key}/{$value}";
-            }
+            if ($options['action'] != 'index') $url.= '/'.$options['action'];
+            
+            foreach(array('module', 'controller', 'action') as $opt) unset($options[$opt]);
+            $url.= self::buildQueryString($options);
+            
             return $url;
         }
     }
@@ -108,7 +108,7 @@ class SRoutes
     {
         $string = '';
         $elements = array();
-        foreach ($options as $key => $value) $elements[] = "{$key}=>{$value}";
+        foreach ($options as $key => $value) $elements[] = "{$key}={$value}";
         if (!empty($elements)) $string.= '?'.implode('&', $elements);
         return $string;
     }
