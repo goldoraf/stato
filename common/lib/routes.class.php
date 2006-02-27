@@ -22,7 +22,22 @@ class SRoutes
     
     public static function rewriteUrl($options)
     {
-        return SContext::$request->relativeUrlRoot.self::rewritePath($options);
+        $url = '';
+        $request = SContext::$request;
+        
+        if (!isset($options['only_path']) || $options['only_path'] == false)
+        {
+            $url.= isset($options['protocol']) ? $options['protocol'] : $request->protocol();
+            $url.= isset($options['host']) ? $options['host'] : $request->hostWithPort();
+        }
+        if (!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false)
+            $url.= $request->relativeUrlRoot();
+        
+        $url.= self::rewritePath($options);
+        if (isset($options['trailing_slash'])) $url.= '/';
+        if (isset($options['anchor'])) $url.= '#'.$options['anchor'];
+        
+        return $url;
     }
     
     public static function parseUrl($url)
