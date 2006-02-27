@@ -18,7 +18,7 @@ function url_for($options)
 {
     $req = SContext::$request;
     $options['only_path'] = true;
-    if (!isset($options['action']))     $options['action'] = $req->action;
+    if (!isset($options['action']))     $options['action'] = 'index';
     if (!isset($options['controller'])) $options['controller'] = $req->controller;
     if (!isset($options['module']))     $options['module'] = $req->module;
     

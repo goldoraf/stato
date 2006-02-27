@@ -11,6 +11,7 @@ class SRoutes
         $regex = self::convertRegex($pattern, $options['validate']);
         unset($options['validate']);
         if (!isset($options['module'])) $options['module'] = 'root';
+        if (!isset($options['action'])) $options['action'] = 'index';
         self::$regexRoutes[$regex] = $options;
         self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']] = $pattern;
     }
