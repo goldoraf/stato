@@ -31,6 +31,8 @@ class SActionController
     protected $performedRender   = false;
     protected $performedRedirect = false;
     
+    protected static $defaultRenderStatusCode = '200 OK';
+    
     public function __construct()
     {
         $this->view    = new SActionView($this);
@@ -138,6 +140,7 @@ class SActionController
     protected function renderText($str)
     {
         $this->performedRender = true;
+        $this->response->header['Status'] = self::$defaultRenderStatusCode;
         $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
         $this->response->body = $str;
     }
@@ -187,8 +190,28 @@ class SActionController
             $options['action'] = $urlOptions;
         }
         else $options = $urlOptions;
-        
+        $this->response->redirectedTo = $options;
         $this->response->redirect($this->urlFor($options));
+    }
+    
+    protected function eraseResults()
+    {
+        $this->eraseRenderResults();
+        $this->eraseRedirectResults();
+    }
+    
+    protected function eraseRenderResults()
+    {
+        $this->response->body = '';
+        $this->performedRender = false;
+    }
+    
+    protected function eraseRedirectResults()
+    {
+        $this->performedRedirect = false;
+        $this->response->redirectedTo = null;
+        $this->response->header['Status'] = self::$defaultRenderStatusCode;
+        unset($this->response->header['location']);
     }
     
     protected function sendFile($path, $params=array())
@@ -213,6 +236,29 @@ class SActionController
     {
         $paginator = new SPaginator($className, $perPage, $options);
         return array($paginator, $paginator->currentPage());
+    }
+    
+    protected function rescueAction($exception)
+    {
+        if ($this->isPerformed()) $this->eraseResults();
+        
+        if (APP_MODE == 'prod') $this->rescueActionLocally($exception);
+        else $this->rescueActionInPublic($exception);
+    }
+    
+    protected function rescueActionInPublic($exception)
+    {
+        // selon le type d'exception, 404 ou 500
+        $this->renderText(file_get_contents(ROOT_DIR.'/public/404.html'));
+        // $this->renderText(file_get_contents(ROOT_DIR.'/public/500.html'));
+    }
+    
+    protected function rescueActionLocally($exception)
+    {
+        $this->assigns['exception']  = $exception;
+        $this->assigns['controller'] = ucfirst($this->controllerName()).'Controller';
+        $this->assigns['action']     = $this->actionName();
+        $this->renderFile(ROOT_DIR.'/core/view/templates/rescue/exception.php');
     }
     
     /*protected function autoCompleteFor($args)
