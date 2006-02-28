@@ -60,7 +60,7 @@ function css_link_tag($source, $options = array())
 
 function compute_public_path($source, $dir, $ext = Null)
 {
-    $source = SContext::$request->relativeUrlRoot()."{$dir}/{$source}";
+    $source = SActionView::$controller->request->relativeUrlRoot()."{$dir}/{$source}";
     
     return $source;
 }

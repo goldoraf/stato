@@ -1,5 +1,7 @@
 <?php
 
+require_once('lib/actionview.class.php');
+
 require_once('lib/taghelper.lib.php');
 require_once('lib/urlhelper.lib.php');
 require_once('lib/formtaghelper.lib.php');

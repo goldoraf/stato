@@ -1,5 +1,7 @@
 <?php
 
+class SRoutingException extends SException {}
+
 class SRoutes
 {
     private static $modules     = array();
@@ -24,10 +26,32 @@ class SRoutes
         self::$modules[] = $module;
     }
     
-    public static function rewriteUrl($options)
+    public static function recognize($request)
+    {
+        $options = self::recognizePath($request->requestUri());
+        
+        $request->module     = $options['module'];
+        $request->controller = $options['controller'];
+        $request->action     = $options['action'];
+        $request->params     = $options;
+        
+        if ($request->module != 'root' && !is_dir(APP_DIR.'/modules/'.$request->module))
+            throw new SRoutingException($moduleName.' module not found !');
+        
+        if (empty($request->controller))
+            throw new SRoutingException('No controller specified in this request !');
+            
+        if (!file_exists($path = self::getControllerPath($request->module, $request->controller)))
+    		throw new SRoutingException(ucfirst($request->controller).'Controller not found !');
+    		
+    	require_once($path);
+		$controller = $request->controller.'controller';
+		return new $controller();
+    }
+    
+    public static function rewriteUrl($options, $request)
     {
         $url = '';
-        $request = SContext::$request;
         
         if (!isset($options['only_path']) || $options['only_path'] == false)
         {
@@ -44,7 +68,7 @@ class SRoutes
         return $url;
     }
     
-    public static function parseUrl($url)
+    private static function recognizePath($url)
     {
         foreach(self::$regexRoutes as $regex => $options)
         {
@@ -73,10 +97,8 @@ class SRoutes
             $options['controller'] = $set[0];
             $options['action']     = $set[1];
         }
-        
         parse_str($queryString, $params);
-        $options = array_merge($params, $options);
-        return $options;
+        return array_merge($params, $options);
     }
     
     private static function rewritePath($options)
@@ -126,6 +148,12 @@ class SRoutes
     private static function getOption($key, $options)
     {
         return $options[$key];
+    }
+    
+    private static function getControllerPath($module, $controller)
+	{
+        if ($module == 'root') return APP_DIR.'/controllers/'.$controller.'controller.class.php';
+        return APP_DIR.'/modules/'.$module.'/controllers/'.$controller.'controller.class.php';
     }
 }
 

@@ -26,7 +26,7 @@ class SDate
     
     public function locale()
     {
-        return $this->format(SContext::locale('FORMAT_DATE'));
+        return $this->format(SLocale::translate('FORMAT_DATE'));
     }
     
     public function __toString()
@@ -84,7 +84,7 @@ class SDateTime extends SDate
     
     public function locale()
     {
-        return $this->format(SContext::locale('FORMAT_DATETIME'));
+        return $this->format(SLocale::translate('FORMAT_DATETIME'));
     }
     
     public function __toString()

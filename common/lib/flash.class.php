@@ -4,9 +4,9 @@ class SFlash implements ArrayAccess
 {
     private $session = Null;
     
-    public function __construct()
+    public function __construct($session)
     {
-        $this->session = SContext::$session;
+        $this->session = $session;
     }
     
     public function discard()

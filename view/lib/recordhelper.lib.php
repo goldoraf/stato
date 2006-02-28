@@ -2,7 +2,7 @@
 
 function form($objectName, $options=array())
 {
-    $entity = SContext::$response[$objectName];
+    $entity = SActionView::$assigns[$objectName];
     
     if (!isset($options['action']))
     {
@@ -40,7 +40,7 @@ function form($objectName, $options=array())
 
 function input($objectName, $method, $options=array())
 {
-    $attr = SContext::$response[$objectName]->attributes[$method];
+    $attr = SActionView::$assigns[$objectName]->attributes[$method];
     
     switch($attr->type)
     {
@@ -71,14 +71,14 @@ function input($objectName, $method, $options=array())
 
 function error_message_on($objectName, $method, $prependText='', $appendText='', $divClass='form-error')
 {
-    $errors = SContext::$response[$objectName]->errors;
+    $errors = SActionView::$assigns[$objectName]->errors;
     if (isset($errors[$method]))
         return "<div class=\"{$divClass}\">{$prependText}{$errors[$method]}{$appendText}</div>";
 }
 
 function error_message_for($objectName, $options=array())
 {
-    $errors = SContext::$response[$objectName]->errors;
+    $errors = SActionView::$assigns[$objectName]->errors;
     if (!empty($errors))
     {
         $headerTag = 'h2';

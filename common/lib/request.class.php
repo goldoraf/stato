@@ -13,8 +13,7 @@ class SRequest
     
     public function __construct()
     {
-        $this->parseUrl();
-        $this->parseParameters();
+        if ($this->isPost()) $this->parsePostParameters();
     }
     
     public function isPost()
@@ -76,16 +75,7 @@ class SRequest
         return $this->relativeUrlRoot;
     }
     
-    private function parseUrl()
-    {
-        $options = SRoutes::parseUrl($this->requestUri());
-        $this->module     = $options['module'];
-        $this->controller = $options['controller'];
-        $this->action     = $options['action'];
-        $this->params     = $options;
-    }
-    
-    private function parseParameters()
+    private function parsePostParameters()
     {
         $keys  = array_keys($_POST);
         $count = sizeof($keys);

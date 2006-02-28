@@ -11,7 +11,7 @@
  **/
 function default_options($object, $method)
 {
-    $entity = SContext::$response[$object];
+    $entity = SActionView::$assigns[$object];
     return array("{$object}_{$method}", "{$object}[{$method}]", $entity->$method);
 }
 

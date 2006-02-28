@@ -8,6 +8,7 @@ class SActionController
     public $request  = null;
     public $session  = null;
     public $response = null;
+    public $view     = null;
     public $flash    = null;
     
     public $layout      = false;
@@ -30,15 +31,18 @@ class SActionController
     
     public function __construct()
     {
-        $this->request  = SContext::$request;
-        $this->session  = SContext::$session;
-        $this->response = SContext::$response;
-        
-        $this->flash = new SFlash();
-        
-        $this->params = $this->request->params;
+        $this->view    = new SActionView($this);
+        $this->session = new SSession();
+        $this->flash   = new SFlash($this->session);
         
         $this->pageCacheDir = ROOT_DIR.'/public/cache';
+    }
+    
+    public function process($request, $response)
+    {
+        $this->request  = $request;
+        $this->response = $response;
+        $this->params   = $this->request->params;
         
         foreach($this->autoCompleteFor as $params)
         {
@@ -48,6 +52,10 @@ class SActionController
         
         foreach($this->useModels as $model) $this->requireModel($model);
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
+        
+        $this->performAction($this->actionName());
+        
+        return $this->response;
     }
     
     public function __get($name)
@@ -96,7 +104,26 @@ class SActionController
         $this->$action();
         foreach($this->afterFilters as $method) $this->$method();
         if (!$this->isPerformed()) $this->render();
-        exit();
+    }
+    
+    public function urlFor($options)
+    {
+        if (!isset($options['action']))     $options['action'] = 'index';
+        if (!isset($options['controller'])) $options['controller'] = $this->controllerName();
+        if (!isset($options['module']))     $options['module'] = $this->request->module;
+        
+        return SRoutes::rewriteUrl($options, $this->request);
+    }
+    
+    public function controllerName()
+    {
+        return str_replace('controller', '', strtolower(get_class($this)));
+    }
+    
+    public function actionName()
+    {
+        if (empty($this->request->action)) return 'index';
+        return $this->request->action;
     }
     
     public function render()
@@ -109,8 +136,8 @@ class SActionController
     public function renderText($str)
     {
         $this->performedRender = true;
-        header("Content-Type: text/html; charset=utf-8");
-        echo $str;
+        $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
+        $this->response->body = $str;
     }
     
     public function renderFile($path)
@@ -118,15 +145,13 @@ class SActionController
         if (!$this->flash->isEmpty()) $this->response['flash'] = $this->flash->dump();
         $this->flash->discard();
         
-        $renderer = new SRenderer($path, $this->response->values);
         if ($this->layout)
         {
             $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
             if (!file_exists($layout)) throw new SException('Layout not found');
-            $this->response['layout_content'] = $renderer->render();
-            $renderer = new SRenderer($layout, $this->response->values);
+            $this->response['layout_content'] = $this->view->render($path, $this->response->values);
         }
-        $this->renderText($renderer->render());
+        $this->renderText($this->view->render($layout, $this->response->values));
     }
     
     protected function renderAction($action)
@@ -146,22 +171,7 @@ class SActionController
         }
         else $options = $urlOptions;
         
-        $this->redirectToPath($this->urlFor($options));
-    }
-    
-    protected function redirectToPath($path)
-    {
-        header('location:'.$path);
-        exit();
-    }
-    
-    protected function urlFor($options)
-    {
-        if (!isset($options['action']))     $options['action'] = 'index';
-        if (!isset($options['controller'])) $options['controller'] = $this->name();
-        if (!isset($options['module']))     $options['module'] = $this->request->module;
-        
-        return SRoutes::rewriteUrl($options);
+        $this->response->redirect($this->urlFor($options));
     }
     
     protected function sendFile($path, $params=array())
@@ -180,11 +190,6 @@ class SActionController
         {
             throw new SException('File not found : '.$path);
         }
-    }
-    
-    protected function name()
-    {
-        return str_replace('controller', '', strtolower(get_class($this)));
     }
     
     protected function paginate($className, $perPage=10, $options=array())
@@ -211,14 +216,14 @@ class SActionController
     protected function defaultTemplatePath()
     {
         $module     = $this->request->module;
-        $controller = $this->request->controller;
-        $action     = $this->request->action;
+        $controller = $this->controllerName();
+        $action     = $this->actionName();
         return $this->templatePath($module, $controller, $action);
     }
     
     private function templatePath($module, $controller, $action)
     {
-        return SContext::inclusionPath($module)."/views/$controller/$action.php";
+        return $this->inclusionPath($module)."/views/$controller/$action.php";
     }
     
     private function isPerformed()
@@ -235,7 +240,7 @@ class SActionController
         else
             list($module, $model) = explode('/', $model);
         
-        $file = SContext::inclusionPath($module).'/models/'.strtolower($model).'.class.php';
+        $file = $this->inclusionPath($module).'/models/'.strtolower($model).'.class.php';
         if (!file_exists($file)) throw new SException('Model not found : '.$model);
         require_once($file);
     }
@@ -247,9 +252,16 @@ class SActionController
         else
             list($module, $helper) = explode('/', $helper);
         
-        $file = SContext::inclusionPath($module)."/helpers/{$helper}helper.lib.php";
+        $file = $this->inclusionPath($module)."/helpers/{$helper}helper.lib.php";
         if (!file_exists($file)) throw new SException('Helper not found : '.$helper);
         require_once($file);
+    }
+    
+    private function inclusionPath($module = Null)
+    {
+        if ($module == Null) $module = $this->request->module;
+        if ($module == 'root') return APP_DIR;
+        return APP_DIR."/modules/$module";
     }
 }
 

@@ -92,18 +92,15 @@ class SCrudController extends SActionController
         
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
         
-        $renderer = new SRenderer($path, $this->response->values);
-        
         if (!$this->layout)
             $layout = ROOT_DIR."/core/view/templates/crud/layout.php";
         else
             $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
             
         if (!file_exists($layout)) throw new SException('Layout not found');
-        $this->response['layout_content'] = $renderer->render();
-        $renderer = new SRenderer($layout, $this->response->values);
+        $this->response['layout_content'] = $this->view->render($path, $this->response->values);
         
-        $this->renderText($renderer->render());
+        $this->renderText($this->view->render($layout, $this->response->values));
     }
 }
 
