@@ -1,40 +1,15 @@
 <?php
 
-class SResponse implements ArrayAccess
+class SResponse
 {
     public $body    = null;
     public $headers = array();
-    public $values  = array();
     
     private static $defaultHeaders = array('Cache-Control' => 'no_cache');
     
     public function __construct()
     {
         $this->headers = array_merge($this->headers, self::$defaultHeaders);
-    }
-    
-    public function offsetExists($offset)
-    {
-        if (isset($this->values[$offset])) return true;
-        return false;
-    }
-    
-    public function offsetGet($offset)
-    {
-        if ($this->offsetExists($offset)) return $this->values[$offset];
-        return false;
-    }
-    
-    public function offsetSet($offset, $value)
-    {
-        $this->values[$offset] = $value;
-        return;
-    }
-    
-    public function offsetUnset($offset)
-    {
-        if ($this->offsetExists($offset)) unset($this->values[$offset]);
-        return;
     }
     
     public function redirect($url, $permanently = false)
