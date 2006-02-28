@@ -33,7 +33,7 @@ class SRoutes
         $request->module     = $options['module'];
         $request->controller = $options['controller'];
         $request->action     = $options['action'];
-        $request->params     = $options;
+        $request->params     = array_merge($options, $request->params);
         
         if ($request->module != 'root' && !is_dir(APP_DIR.'/modules/'.$request->module))
             throw new SRoutingException($moduleName.' module not found !');
