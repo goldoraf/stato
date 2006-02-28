@@ -25,6 +25,8 @@ class SActionController
     public $afterFilters  = array();
     public $autoCompleteFor = array();
     
+    protected $assigns = array();
+    
     protected $virtualMethods    = array();
     protected $performedRender   = false;
     protected $performedRedirect = false;
@@ -62,12 +64,12 @@ class SActionController
     
     public function __get($name)
     {
-        if (isset($this->response[$name])) return $this->response[$name];
+        if (isset($this->assigns[$name])) return $this->assigns[$name];
     }
     
     public function __set($name, $value)
     {
-        $this->response[$name] = $value;
+        $this->assigns[$name] = $value;
     }
     
     public function __call($action, $args)
@@ -128,39 +130,52 @@ class SActionController
         return $this->request->action;
     }
     
-    public function render()
+    protected function render()
     {
-        $path = $this->defaultTemplatePath();
-        if (!file_exists($path)) throw new SException('Template not found for this action');
-        $this->renderFile($path);
+        $this->renderAction($this->actionName());
     }
     
-    public function renderText($str)
+    protected function renderText($str)
     {
         $this->performedRender = true;
         $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
         $this->response->body = $str;
     }
     
-    public function renderFile($path)
+    protected function renderFile($path)
     {
-        if (!$this->flash->isEmpty()) $this->response['flash'] = $this->flash->dump();
-        $this->flash->discard();
-        
-        if ($this->layout)
-        {
-            $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
-            if (!file_exists($layout)) throw new SException('Layout not found');
-            $this->response['layout_content'] = $this->view->render($path, $this->response->values);
-        }
-        $this->renderText($this->view->render($layout, $this->response->values));
+        $this->addVariablesToAssigns();
+        $this->renderText($this->view->render($path, $this->assigns));
     }
     
     protected function renderAction($action)
     {
-        $this->renderFile($this->templatePath($this->request->module,
-                                              $this->request->controller,
-                                              $action));
+        $template = $this->templatePath($this->request->module, $this->controllerName(), $action);
+        if (!file_exists($template)) throw new SException('Template not found for this action');
+        
+        if ($this->layout) $this->renderWithLayout($template);
+        else $this->renderFile($template);
+    }
+    
+    protected function renderWithLayout($template)
+    {
+        $this->addVariablesToAssigns();
+        $this->assigns['layout_content'] = $this->view->render($template, $this->assigns);
+        
+        $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
+        if (!file_exists($layout)) throw new SException('Layout not found');
+        $this->renderFile($layout);
+    }
+    
+    protected function addVariablesToAssigns()
+    {
+        if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
+        $this->flash->discard();
+    }
+    
+    protected function templatePath($module, $controller, $action)
+    {
+        return $this->inclusionPath($module)."/views/$controller/$action.php";
     }
     
     protected function redirect($urlOptions)
@@ -214,19 +229,6 @@ class SActionController
         foreach($entities as $entity) $items.= "<li>{$entity->$method}</li>";
         $this->renderText("<ul>{$items}</ul>");
     }*/
-    
-    protected function defaultTemplatePath()
-    {
-        $module     = $this->request->module;
-        $controller = $this->controllerName();
-        $action     = $this->actionName();
-        return $this->templatePath($module, $controller, $action);
-    }
-    
-    private function templatePath($module, $controller, $action)
-    {
-        return $this->inclusionPath($module)."/views/$controller/$action.php";
-    }
     
     private function isPerformed()
     {
