@@ -16,7 +16,7 @@ class SLocale
             }
         }
         
-        self::loadStrings();
+        self::loadStrings(ROOT_DIR.'/core/common/locale/');
         
         putenv("LANG=".self::$language.""); 
         setlocale(LC_ALL, self::$language);
@@ -28,14 +28,12 @@ class SLocale
         else return $key;
     }
     
-    private static function loadStrings()
+    public static function loadStrings($dir)
     {
-        self::$strings = include(ROOT_DIR.'/core/common/locale/'.self::$language.'.php');
+        $path = $dir.self::$language.'.php';
         
-        /*$moduleI18nFile = SContext::inclusionPath().'/i18n/'.self::$language.'.php';
-        
-        if (file_exists($moduleI18nFile))
-            self::$strings = array_merge(self::$strings, include($moduleI18nFile));*/
+        if (file_exists($path))
+            self::$strings = array_merge(self::$strings, include($path));
     }
     
     private static function getAcceptedLanguages()

@@ -36,6 +36,12 @@ class SActionController
         $this->flash   = new SFlash($this->session);
         
         $this->pageCacheDir = ROOT_DIR.'/public/cache';
+        
+        /*foreach($this->autoCompleteFor as $params)
+        {
+            $method = 'autoCompleteFor'.ucfirst($params[0]).ucfirst($params[1]);
+            $this->virtualMethods[$method] = array('autoCompleteFor', $params);
+        }*/
     }
     
     public function process($request, $response)
@@ -44,11 +50,7 @@ class SActionController
         $this->response = $response;
         $this->params   = $this->request->params;
         
-        foreach($this->autoCompleteFor as $params)
-        {
-            $method = 'autoCompleteFor'.ucfirst($params[0]).ucfirst($params[1]);
-            $this->virtualMethods[$method] = array('autoCompleteFor', $params);
-        }
+        SLocale::loadStrings($this->inclusionPath().'/i18n/');
         
         foreach($this->useModels as $model) $this->requireModel($model);
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
