@@ -83,24 +83,23 @@ class SCrudController extends SActionController
     
     protected function renderScaffold($action = Null)
     {
-        if (!$this->flash->isEmpty()) $this->response['flash'] = $this->flash->dump();
-        $this->flash->discard();
-        
-        if ($action == Null) $action = $this->request->action;
-        $path = $this->defaultTemplatePath();
-        if (!file_exists($path)) $path = ROOT_DIR."/core/view/templates/crud/{$action}.php";
-        
-        foreach($this->useHelpers as $helper) $this->requireHelper($helper);
-        
-        if (!$this->layout)
-            $layout = ROOT_DIR."/core/view/templates/crud/layout.php";
+        if ($action == Null) $action = $this->actionName();
+        $template = $this->templatePath($this->request->module, $this->controllerName(), $action);
+        if (file_exists($template)) $this->renderAction($action);
         else
-            $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
-            
-        if (!file_exists($layout)) throw new SException('Layout not found');
-        $this->response['layout_content'] = $this->view->render($path, $this->response->values);
-        
-        $this->renderText($this->view->render($layout, $this->response->values));
+        {
+            $this->addVariablesToAssigns();
+            $this->assigns['layout_content'] = $this->view->render($this->scaffoldPath($action), $this->assigns);
+            if (!$this->layout)
+                $this->renderFile($this->scaffoldPath('layout'));
+            else
+                $this->renderFile(APP_DIR.'/layouts/'.$this->layout.'.php');
+        }
+    }
+    
+    protected function scaffoldPath($templateName)
+    {
+        return ROOT_DIR."/core/view/templates/crud/{$templateName}.php";
     }
 }
 
