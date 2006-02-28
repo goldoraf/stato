@@ -2,8 +2,9 @@
 
 class SResponse
 {
-    public $body    = null;
-    public $headers = array();
+    public $body         = null;
+    public $headers      = array();
+    public $redirectedTo = null;
     
     private static $defaultHeaders = array('Cache-Control' => 'no_cache');
     
