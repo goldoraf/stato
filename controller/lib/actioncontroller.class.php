@@ -3,6 +3,9 @@
 require_once(ROOT_DIR.'/core/model/model.php');
 require_once(ROOT_DIR.'/core/view/view.php');
 
+class SUnknownControllerException extends SException {}
+class SUnknownActionException extends SException {}
+
 class SActionController
 {   
     public $request  = null;
@@ -33,6 +36,17 @@ class SActionController
     
     protected static $defaultRenderStatusCode = '200 OK';
     
+    public static function factory($request, $response)
+    {
+        if (!file_exists($path = self::controllerPath($request->module, $request->controller)))
+    		throw new SUnknownControllerException(ucfirst($request->controller).'Controller not found !');
+    		
+    	require_once($path);
+		$controllerName = $request->controller.'controller';
+		$controller = new $controllerName();
+		return $controller->process($request, $response);
+    }
+    
     public function __construct()
     {
         $this->view    = new SActionView($this);
@@ -40,28 +54,41 @@ class SActionController
         $this->flash   = new SFlash($this->session);
         
         $this->pageCacheDir = ROOT_DIR.'/public/cache';
+    }
+    
+    public function process($request, $response, $method = 'performAction', $arguments = null)
+    {
+        $this->request  = $request;
+        $this->response = $response;
+        $this->params   = $this->request->params;
+        
+        if ($arguments != null) $this->$method($arguments);
+        else $this->$method();
+        
+        return $this->response;
+    }
+    
+    public function performAction()
+    {
+        $action = $this->actionName();
+        if (!$this->actionExists($action))
+            throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
+            
+        SLocale::loadStrings($this->inclusionPath().'/i18n/');
+        
+        foreach($this->useModels as $model) $this->requireModel($model);
+        foreach($this->useHelpers as $helper) $this->requireHelper($helper);
         
         /*foreach($this->autoCompleteFor as $params)
         {
             $method = 'autoCompleteFor'.ucfirst($params[0]).ucfirst($params[1]);
             $this->virtualMethods[$method] = array('autoCompleteFor', $params);
         }*/
-    }
-    
-    public function process($request, $response)
-    {
-        $this->request  = $request;
-        $this->response = $response;
-        $this->params   = $this->request->params;
         
-        SLocale::loadStrings($this->inclusionPath().'/i18n/');
-        
-        foreach($this->useModels as $model) $this->requireModel($model);
-        foreach($this->useHelpers as $helper) $this->requireHelper($helper);
-        
-        $this->performAction($this->actionName());
-        
-        return $this->response;
+        foreach($this->beforeFilters as $method) $this->$method();
+        $this->$action();
+        foreach($this->afterFilters as $method) $this->$method();
+        if (!$this->isPerformed()) $this->render();
     }
     
     public function __get($name)
@@ -84,34 +111,6 @@ class SActionController
         }
     }
     
-    public function actionExists($action)
-    {
-        try
-        {
-            $method = new ReflectionMethod(get_class($this), $action);
-            if ($method->isPublic() && !$method->isConstructor()
-                && $method->getDeclaringClass()->getName() != __CLASS__)
-                return true;
-            else
-                return false;
-        }
-        catch (ReflectionException $e)
-        {
-            if (in_array($action, array_keys($this->virtualMethods)))
-                return true;
-            else
-                return false;
-        }
-    }
-    
-    public function performAction($action)
-    {
-        foreach($this->beforeFilters as $method) $this->$method();
-        $this->$action();
-        foreach($this->afterFilters as $method) $this->$method();
-        if (!$this->isPerformed()) $this->render();
-    }
-    
     public function urlFor($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';
@@ -124,6 +123,11 @@ class SActionController
     public function controllerName()
     {
         return str_replace('controller', '', strtolower(get_class($this)));
+    }
+    
+    public function controllerClassName()
+    {
+        return ucfirst($this->controllerName()).'Controller';
     }
     
     public function actionName()
@@ -281,6 +285,26 @@ class SActionController
         return ($this->performedRender || $this->performedRedirect);
     }
     
+    public function actionExists($action)
+    {
+        try
+        {
+            $method = new ReflectionMethod(get_class($this), $action);
+            if ($method->isPublic() && !$method->isConstructor()
+                && $method->getDeclaringClass()->getName() != __CLASS__)
+                return true;
+            else
+                return false;
+        }
+        catch (ReflectionException $e)
+        {
+            if (in_array($action, array_keys($this->virtualMethods)))
+                return true;
+            else
+                return false;
+        }
+    }
+    
     private function requireModel($model)
     {
         if (class_exists($model)) return;
@@ -312,6 +336,12 @@ class SActionController
         if ($module == Null) $module = $this->request->module;
         if ($module == 'root') return APP_DIR;
         return APP_DIR."/modules/$module";
+    }
+    
+    private static function controllerPath($module, $controller)
+	{
+        if ($module == 'root') return APP_DIR.'/controllers/'.$controller.'controller.class.php';
+        return APP_DIR.'/modules/'.$module.'/controllers/'.$controller.'controller.class.php';
     }
 }
 

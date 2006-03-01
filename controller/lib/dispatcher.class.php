@@ -13,7 +13,6 @@ function error_handler($errorType, $message)
 set_error_handler('error_handler');
 
 class SException extends Exception {}
-
 class SDispatchException extends SException {}
 
 class SDispatcher
@@ -31,10 +30,7 @@ class SDispatcher
             
     		if (file_exists($path = APP_DIR.'/controllers/applicationcontroller.class.php')) require_once($path);
     		
-    		$controller = SRoutes::recognize($request);
-    		
-    		$controller->process($request, $response)->out();
-        
+    		SActionController::factory(SRoutes::recognize($request), $response)->out();
         }
         catch (Exception $e)
         {
