@@ -96,7 +96,7 @@ function error_message_for($objectName, $options=array())
             $list.= '<li>'.link_to_function($error, "Field.focus('{$objectName}_{$field}')").'</li>';
             
         return content_tag('div', 
-        content_tag($headerTag, SContext::locale('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
+        content_tag($headerTag, SLocale::translate('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
         $options);
     }
 }
