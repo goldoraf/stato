@@ -41,12 +41,7 @@ class SRoutes
         if (empty($request->controller))
             throw new SRoutingException('No controller specified in this request !');
             
-        if (!file_exists($path = self::getControllerPath($request->module, $request->controller)))
-    		throw new SRoutingException(ucfirst($request->controller).'Controller not found !');
-    		
-    	require_once($path);
-		$controller = $request->controller.'controller';
-		return new $controller();
+        return $request;
     }
     
     public static function rewriteUrl($options, $request)
@@ -148,12 +143,6 @@ class SRoutes
     private static function getOption($key, $options)
     {
         return $options[$key];
-    }
-    
-    private static function getControllerPath($module, $controller)
-	{
-        if ($module == 'root') return APP_DIR.'/controllers/'.$controller.'controller.class.php';
-        return APP_DIR.'/modules/'.$module.'/controllers/'.$controller.'controller.class.php';
     }
 }
 
