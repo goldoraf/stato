@@ -13,6 +13,7 @@ class SActionController
     public $response = null;
     public $view     = null;
     public $flash    = null;
+    public $logger   = null;
     
     public $layout      = false;
     public $useModels   = array();
@@ -58,6 +59,7 @@ class SActionController
         $this->view    = new SActionView($this);
         $this->session = new SSession();
         $this->flash   = new SFlash($this->session);
+        $this->logger  = SLogger::getInstance();
         
         $this->pageCacheDir = ROOT_DIR.'/public/cache';
     }
@@ -142,42 +144,42 @@ class SActionController
         return $this->request->action;
     }
     
-    protected function render()
+    protected function render($status = null)
     {
-        $this->renderAction($this->actionName());
+        $this->renderAction($this->actionName(), $status);
     }
     
-    protected function renderText($str)
-    {
-        $this->performedRender = true;
-        $this->response->header['Status'] = self::$defaultRenderStatusCode;
-        $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
-        $this->response->body = $str;
-    }
-    
-    protected function renderFile($path)
-    {
-        $this->addVariablesToAssigns();
-        $this->renderText($this->view->render($path, $this->assigns));
-    }
-    
-    protected function renderAction($action)
+    protected function renderAction($action, $status = null)
     {
         $template = $this->templatePath($this->request->module, $this->controllerName(), $action);
         if (!file_exists($template)) throw new SException('Template not found for this action');
         
-        if ($this->layout) $this->renderWithLayout($template);
-        else $this->renderFile($template);
+        if ($this->layout) $this->renderWithLayout($template, $status);
+        else $this->renderFile($template, $status);
     }
     
-    protected function renderWithLayout($template)
+    protected function renderWithLayout($template, $status = null)
     {
         $this->addVariablesToAssigns();
         $this->assigns['layout_content'] = $this->view->render($template, $this->assigns);
         
         $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
         if (!file_exists($layout)) throw new SException('Layout not found');
-        $this->renderFile($layout);
+        $this->renderFile($layout, $status);
+    }
+    
+    protected function renderFile($path, $status = null)
+    {
+        $this->addVariablesToAssigns();
+        $this->renderText($this->view->render($path, $this->assigns), $status);
+    }
+    
+    protected function renderText($str, $status = null)
+    {
+        $this->performedRender = true;
+        $this->response->header['Status'] = (!empty($status)) ? $status : self::$defaultRenderStatusCode;
+        $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
+        $this->response->body = $str;
     }
     
     protected function addVariablesToAssigns()
@@ -251,7 +253,7 @@ class SActionController
     protected function rescueAction($exception)
     {
         if ($this->isPerformed()) $this->eraseResults();
-        
+        $this->logError($exception);
         if (APP_MODE == 'dev') $this->rescueActionLocally($exception);
         else $this->rescueActionInPublic($exception);
     }
@@ -270,6 +272,12 @@ class SActionController
         $this->assigns['controller'] = ucfirst($this->controllerName()).'Controller';
         $this->assigns['action']     = $this->actionName();
         $this->renderFile(ROOT_DIR.'/core/view/templates/rescue/exception.php');
+    }
+    
+    protected function logError($exception)
+    {
+        $this->logger->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
+        .implode("\n    ", $this->cleanBacktrace($exception))."\n");
     }
     
     /*protected function autoCompleteFor($args)
@@ -292,7 +300,7 @@ class SActionController
         return ($this->performedRender || $this->performedRedirect);
     }
     
-    public function actionExists($action)
+    private function actionExists($action)
     {
         try
         {
@@ -310,6 +318,14 @@ class SActionController
             else
                 return false;
         }
+    }
+    
+    private function cleanBacktrace($exception)
+    {
+        $trace = array();
+        foreach ($exception->getTrace() as $t)
+            $trace[] = $t['file'].':'.$t['line'].' in \''.$t['function'].'\'';
+        return $trace;
     }
     
     private function requireModel($model)
