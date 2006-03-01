@@ -34,7 +34,7 @@ class SDispatcher
         }
         catch (Exception $e)
         {
-            print_r($e);
+            SActionController::processWithException($request, $response, $e)->out();
         }
 	}
 }

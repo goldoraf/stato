@@ -47,6 +47,12 @@ class SActionController
 		return $controller->process($request, $response);
     }
     
+    public static function processWithException($request, $response, $exception)
+    {
+        $controller = new SActionController();
+        return $controller->process($request, $response, 'rescueAction', $exception);
+    }
+    
     public function __construct()
     {
         $this->view    = new SActionView($this);
@@ -246,15 +252,16 @@ class SActionController
     {
         if ($this->isPerformed()) $this->eraseResults();
         
-        if (APP_MODE == 'prod') $this->rescueActionLocally($exception);
+        if (APP_MODE == 'dev') $this->rescueActionLocally($exception);
         else $this->rescueActionInPublic($exception);
     }
     
     protected function rescueActionInPublic($exception)
     {
-        // selon le type d'exception, 404 ou 500
-        $this->renderText(file_get_contents(ROOT_DIR.'/public/404.html'));
-        // $this->renderText(file_get_contents(ROOT_DIR.'/public/500.html'));
+        if (in_array(get_class($exception), array('SRoutingException', 
+            'SUnknownControllerException', 'SUnknownActionException')))
+            $this->renderText(file_get_contents(ROOT_DIR.'/public/404.html'));
+        else $this->renderText(file_get_contents(ROOT_DIR.'/public/500.html'));
     }
     
     protected function rescueActionLocally($exception)
