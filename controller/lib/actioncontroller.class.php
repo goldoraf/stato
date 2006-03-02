@@ -83,7 +83,7 @@ class SActionController
             throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
             
         SLocale::loadStrings($this->inclusionPath().'/i18n/');
-        SUrlRewriter::initialise($this->request);
+        SUrlRewriter::initialize($this->request);
         
         foreach($this->useModels as $model) $this->requireModel($model);
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
