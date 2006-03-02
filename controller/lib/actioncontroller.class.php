@@ -5,6 +5,7 @@ require_once(ROOT_DIR.'/core/view/view.php');
 
 class SUnknownControllerException extends SException {}
 class SUnknownActionException extends SException {}
+class SDoubleRenderException extends SException {}
 
 class SActionController
 {   
@@ -120,15 +121,6 @@ class SActionController
         }
     }
     
-    public function urlFor($options)
-    {
-        if (!isset($options['action']))     $options['action'] = 'index';
-        if (!isset($options['controller'])) $options['controller'] = $this->controllerName();
-        if (!isset($options['module']))     $options['module'] = $this->request->module;
-        
-        return SUrlRewriter::rewrite($options);
-    }
-    
     public function controllerName()
     {
         return str_replace('controller', '', strtolower(get_class($this)));
@@ -147,6 +139,8 @@ class SActionController
     
     protected function render($status = null)
     {
+        if ($this->isPerformed())
+            throw new SDoubleRenderException('Can only render or redirect once per action');
         $this->renderAction($this->actionName(), $status);
     }
     
@@ -194,17 +188,36 @@ class SActionController
         return $this->inclusionPath($module)."/views/$controller/$action.php";
     }
     
-    protected function redirect($urlOptions)
+    protected function redirectTo($options)
     {
-        $this->performedRedirect = true;
-        if (!is_array($urlOptions))
+        if (is_array($options))
         {
-            $options = array();
-            $options['action'] = $urlOptions;
+            $this->redirectTo($this->urlFor($options));
+            //$this->response->redirectedTo = $options;
         }
-        else $options = $urlOptions;
-        $this->response->redirectedTo = $options;
-        $this->response->redirect($this->urlFor($options));
+        elseif (preg_match('#^\w+://.*#', $options))
+        {
+            if ($this->isPerformed())
+                throw new SDoubleRenderException('Can only render or redirect once per action');
+            
+            $this->logger->info("Redirected to {$options}");
+            $this->response->redirect($options);
+            $this->response->redirectedTo = $options;
+            $this->performedRedirect = true;
+        }
+        else
+        {
+            $this->redirectTo($this->request->protocol().$this->request->hostWithPort().$options);
+        }
+    }
+    
+    protected function urlFor($options)
+    {
+        if (!isset($options['action']))     $options['action'] = 'index';
+        if (!isset($options['controller'])) $options['controller'] = $this->controllerName();
+        if (!isset($options['module']))     $options['module'] = $this->request->module;
+        
+        return SUrlRewriter::rewrite($options);
     }
     
     protected function eraseResults()
