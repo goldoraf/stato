@@ -11,6 +11,15 @@ class SUrlRewriter
         self::$request = $request;
     }
     
+    public static function urlFor($options)
+    {
+        if (!isset($options['action']))     $options['action'] = 'index';
+        if (!isset($options['controller'])) $options['controller'] = self::$request->controller;
+        if (!isset($options['module']))     $options['module'] = self::$request->module;
+        
+        return self::rewrite($options);
+    }
+    
     public static function rewrite($options = array())
     {
         return self::rewriteUrl(self::rewritePath($options), $options);
@@ -41,7 +50,7 @@ class SUrlRewriter
         
         list($path, $extraKeys) = SRoutes::generate($options);
         
-        if (!empty($extraKeys)) $path.= self::buildQueryString($options);
+        if (!empty($extraKeys)) $path.= self::buildQueryString($extraKeys);
         
         return $path;
     }
