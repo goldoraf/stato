@@ -1,17 +1,17 @@
 <?php
 
-function select($object, $method, $choices, $options = array(), $htmlOptions = array())
+function select($objectName, $method, $object, $choices, $options = array(), $htmlOptions = array())
 {
-    list($id, $name, $value) = default_options($object, $method);
+    list($id, $name, $value) = default_options($objectName, $method, $object);
     $optionsBlock = options_for_select($choices, $value);
     if ($options['include_blank']) $optionsBlock = '<option></option>'.$optionsBlock;
     return select_tag($name, $id, $optionsBlock, $htmlOptions);
 }
 
 
-function collection_select($object, $method, $collection, $valueProp, $textProp, $options=array(), $htmlOptions = array())
+function collection_select($objectName, $method, $object, $collection, $valueProp, $textProp, $options=array(), $htmlOptions = array())
 {
-    list($id, $name, $value) = default_options($object, $method);
+    list($id, $name, $value) = default_options($objectName, $method, $object);
     $optionsBlock = options_from_collection_for_select($collection, $valueProp, $textProp, $value);
     if ($options['include_blank']) $optionsBlock = '<option></option>'.$optionsBlock;
     return select_tag($name, $id, $optionsBlock, $htmlOptions);
