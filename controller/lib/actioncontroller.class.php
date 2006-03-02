@@ -139,8 +139,6 @@ class SActionController
     
     protected function render($status = null)
     {
-        if ($this->isPerformed())
-            throw new SDoubleRenderException('Can only render or redirect once per action');
         $this->renderAction($this->actionName(), $status);
     }
     
@@ -171,6 +169,9 @@ class SActionController
     
     protected function renderText($str, $status = null)
     {
+        if ($this->isPerformed())
+            throw new SDoubleRenderException('Can only render or redirect once per action');
+        
         $this->performedRender = true;
         $this->response->header['Status'] = (!empty($status)) ? $status : self::$defaultRenderStatusCode;
         $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
