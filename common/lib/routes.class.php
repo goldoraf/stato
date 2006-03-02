@@ -8,9 +8,6 @@ class SRoutes
     private static $regexRoutes = array();
     private static $routesMap   = array();
     
-    private static $reservedOptions = array('only_path', 'protocol', 'host', 'anchor',
-        'trailing_slash', 'skip_relative_url_root');
-    
     public static function connect($pattern, $options)
     {
         $regex = self::convertRegex($pattern, $options['validate']);
@@ -36,7 +33,7 @@ class SRoutes
         $request->params     = array_merge($options, $request->params);
         
         if ($request->module != 'root' && !is_dir(APP_DIR.'/modules/'.$request->module))
-            throw new SRoutingException($moduleName.' module not found !');
+            throw new SRoutingException($request->module.' module not found !');
         
         if (empty($request->controller))
             throw new SRoutingException('No controller specified in this request !');
@@ -44,23 +41,24 @@ class SRoutes
         return $request;
     }
     
-    public static function rewriteUrl($options, $request)
+    public static function generate($options)
     {
-        $url = '';
-        
-        if (!isset($options['only_path']) || $options['only_path'] == false)
+        if (isset(self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']]))
         {
-            $url.= isset($options['protocol']) ? $options['protocol'] : $request->protocol();
-            $url.= isset($options['host']) ? $options['host'] : $request->hostWithPort();
+            $regex = self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']];
+            return array(preg_replace('/\{(\w+)\}/e', "self::getOption('\\1', \$options)", $regex), array());
         }
-        if (!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false)
-            $url.= $request->relativeUrlRoot();
-        
-        $url.= self::rewritePath($options);
-        if (isset($options['trailing_slash'])) $url.= '/';
-        if (isset($options['anchor'])) $url.= '#'.$options['anchor'];
-        
-        return $url;
+        else
+        {
+            if ($options['module'] == 'root')
+                $url = $options['controller'];
+            else
+                $url = $options['module'].'/'.$options['controller'];   
+            if ($options['action'] != 'index') $url.= '/'.$options['action'];
+            
+            foreach(array('module', 'controller', 'action') as $opt) unset($options[$opt]);
+            return array($url, $options);
+        }
     }
     
     private static function recognizePath($url)
@@ -94,40 +92,6 @@ class SRoutes
         }
         parse_str($queryString, $params);
         return array_merge($params, $options);
-    }
-    
-    private static function rewritePath($options)
-    {
-        foreach(self::$reservedOptions as $opt) unset($options[$opt]);
-        
-        if (isset(self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']]))
-        {
-            $regex = self::$routesMap[$options['module'].'/'.$options['controller'].'/'.$options['action']];
-            return preg_replace('/\{(\w+)\}/e', "self::getOption('\\1', \$options)", $regex);
-        }
-        else
-        {
-            if ($options['module'] == 'root')
-                $url = $options['controller'];
-            else
-                $url = $options['module'].'/'.$options['controller'];
-                
-            if ($options['action'] != 'index') $url.= '/'.$options['action'];
-            
-            foreach(array('module', 'controller', 'action') as $opt) unset($options[$opt]);
-            $url.= self::buildQueryString($options);
-            
-            return $url;
-        }
-    }
-    
-    private static function buildQueryString($options)
-    {
-        $string = '';
-        $elements = array();
-        foreach ($options as $key => $value) $elements[] = "{$key}={$value}";
-        if (!empty($elements)) $string.= '?'.implode('&', $elements);
-        return $string;
     }
     
     private static function convertRegex($regex, $validate)

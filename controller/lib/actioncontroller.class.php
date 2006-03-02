@@ -83,6 +83,7 @@ class SActionController
             throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
             
         SLocale::loadStrings($this->inclusionPath().'/i18n/');
+        SUrlRewriter::initialise($this->request);
         
         foreach($this->useModels as $model) $this->requireModel($model);
         foreach($this->useHelpers as $helper) $this->requireHelper($helper);
@@ -125,7 +126,7 @@ class SActionController
         if (!isset($options['controller'])) $options['controller'] = $this->controllerName();
         if (!isset($options['module']))     $options['module'] = $this->request->module;
         
-        return SRoutes::rewriteUrl($options, $this->request);
+        return SUrlRewriter::rewrite($options);
     }
     
     public function controllerName()
