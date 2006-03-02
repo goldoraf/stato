@@ -1,12 +1,10 @@
 <?php
 
-function form($objectName, $options=array())
+function form($objectName, $object, $options=array())
 {
-    $entity = SActionView::$assigns[$objectName];
-    
     if (!isset($options['action']))
     {
-        if ($entity->isNewRecord()) $options['action'] = 'create';
+        if ($object->isNewRecord()) $options['action'] = 'create';
         else $options['action'] = 'update';
     }
     
@@ -16,18 +14,18 @@ function form($objectName, $options=array())
     $form = '<form id="" enctype="multipart/form-data" method="post" action="'
             .url_for(array('action' => $options['action'])).'">';
     
-    if (!$entity->isNewRecord()) $form.= hidden_field($objectName, 'id');
+    if (!$object->isNewRecord()) $form.= hidden_field($objectName, 'id', $object);
     
-    $fields = $entity->contentAttributes();
-    $class  = get_class($entity);
+    $fields = $object->contentAttributes();
+    $class  = get_class($object);
     
     foreach($fields as $name)
     {
-        $attr = $entity->attributes[$name];
+        $attr = $object->attributes[$name];
         $label = ucfirst($attr->name);
         
         $form.= '<p><label for="'.strtolower($class).'_'.$attr->name.'">'
-        .$label."</label>\n".input($objectName, $attr->name)."</p>\n";
+        .$label."</label>\n".input($objectName, $attr->name, $object)."</p>\n";
     }
     
     if (isset($options['include'])) $form.= $options['include'];
@@ -38,47 +36,47 @@ function form($objectName, $options=array())
     return $form;
 }
 
-function input($objectName, $method, $options=array())
+function input($objectName, $method, $object, $options=array())
 {
-    $attr = SActionView::$assigns[$objectName]->attributes[$method];
+    $attr = $object->attributes[$method];
     
     switch($attr->type)
     {
         case 'string':
-            $str = text_field($objectName, $method, $options);
+            $str = text_field($objectName, $method, $object, $options);
             break;
         case 'text':
-            $str = text_area($objectName, $method, $options);
+            $str = text_area($objectName, $method, $object, $options);
             break;
         case 'date':
-            $str = date_select($objectName, $method);
+            $str = date_select($objectName, $method, $object);
             break;
         case 'datetime':
-            $str = date_time_select($objectName, $method);
+            $str = date_time_select($objectName, $method, $object);
             break;
         case 'integer':
-            $str = text_field($objectName, $method, $options);
+            $str = text_field($objectName, $method, $object, $options);
             break;
         case 'boolean':
-            $str = select($objectName, $method, array('True', 'False'), array(), $options);
+            $str = select($objectName, $method, $object, array('True', 'False'), array(), $options);
             break;
         default:
-            $str = hidden_field($objectName, $method);
+            $str = hidden_field($objectName, $method, $object);
             break;
     }
     return $str;
 }
 
-function error_message_on($objectName, $method, $prependText='', $appendText='', $divClass='form-error')
+function error_message_on($method, $object, $prependText='', $appendText='', $divClass='form-error')
 {
-    $errors = SActionView::$assigns[$objectName]->errors;
+    $errors = $object->errors;
     if (isset($errors[$method]))
         return "<div class=\"{$divClass}\">{$prependText}{$errors[$method]}{$appendText}</div>";
 }
 
-function error_message_for($objectName, $options=array())
+function error_message_for($object, $options=array())
 {
-    $errors = SActionView::$assigns[$objectName]->errors;
+    $errors = $object->errors;
     if (!empty($errors))
     {
         $headerTag = 'h2';
