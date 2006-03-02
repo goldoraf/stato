@@ -16,7 +16,7 @@ function link_to($label, $urlOptions=array(), $htmlOptions=array())
 
 function url_for($options)
 {
-    return SActionView::$controller->urlFor($options);
+    return SUrlRewriter::urlFor($options);
 }
 
 ?>
