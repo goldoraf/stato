@@ -60,9 +60,10 @@ function css_link_tag($source, $options = array())
 
 function compute_public_path($source, $dir, $ext = Null)
 {
-    $source = SActionView::$controller->request->relativeUrlRoot()."{$dir}/{$source}";
-    
-    return $source;
+    static $relativeUrlRoot = null;
+    if ($relativeUrlRoot == null)
+        $relativeUrlRoot = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
+    return "{$relativeUrlRoot}{$dir}/{$source}";
 }
 
 ?>
