@@ -42,7 +42,7 @@ class SCrudController extends SActionController
         if ($this->{$this->singular_name}->save())
         {
             $this->flash['notice'] = $this->class_name.' was successfully created !';
-            $this->redirect('index');
+            $this->redirectTo(array('action' => 'index'));
         }
         else
         {
@@ -62,7 +62,7 @@ class SCrudController extends SActionController
         if ($this->{$this->singular_name}->updateAttributes($this->params[$this->singular_name]))
         {
             $this->flash['notice'] = $this->class_name.' was successfully updated !';
-            $this->redirect('index');
+            $this->redirectTo(array('action' => 'index'));
         }
         else
         {
@@ -73,7 +73,7 @@ class SCrudController extends SActionController
     public function delete()
     {
         SActiveStore::findByPk($this->class_name, $this->params['id'])->delete();
-        $this->redirect('index');
+        $this->redirectTo(array('action' => 'index'));
     }
     
     protected function instantiate($class, $values = Null)
