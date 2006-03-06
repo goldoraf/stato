@@ -272,8 +272,8 @@ class SValidation
     
     private static function addError($record, $attr, $message, $var = null)
     {
-        $message = SContext::locale($message);
-        $humanReadableAttr = SContext::locale($attr);
+        $message = SLocale::translate($message);
+        $humanReadableAttr = SLocale::translate($attr);
         if ($humanReadableAttr == $attr) $humanReadableAttr = str_replace('_', ' ', $attr);
         $message = ucfirst(sprintf($message, $humanReadableAttr, $var));
         if (!isset($record->errors[$attr])) $record->errors[$attr] = $message;
