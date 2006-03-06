@@ -15,7 +15,6 @@ class SUrlRewriter
     {
         if (!isset($options['action']))     $options['action'] = 'index';
         if (!isset($options['controller'])) $options['controller'] = self::$request->controller;
-        if (!isset($options['module']))     $options['module'] = self::$request->module;
         
         return self::rewrite($options);
     }

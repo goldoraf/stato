@@ -84,7 +84,7 @@ class SCrudController extends SActionController
     protected function renderScaffold($action = Null)
     {
         if ($action == Null) $action = $this->actionName();
-        $template = $this->templatePath($this->request->module, $this->controllerName(), $action);
+        $template = $this->templatePath($this->controllerName(), $action);
         if (file_exists($template)) $this->renderAction($action);
         else
         {
@@ -93,7 +93,7 @@ class SCrudController extends SActionController
             if (!$this->layout)
                 $this->renderFile($this->scaffoldPath('layout'));
             else
-                $this->renderFile(APP_DIR.'/layouts/'.$this->layout.'.php');
+                $this->renderFile(APP_DIR.'/views/layouts/'.$this->layout.'.php');
         }
     }
     

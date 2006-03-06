@@ -40,7 +40,7 @@ class SActionController
     
     public static function factory($request, $response)
     {
-        if (!file_exists($path = self::controllerPath($request->module, $request->controller)))
+        if (!file_exists($path = self::controllerPath($request->controller)))
     		throw new SUnknownControllerException(ucfirst($request->controller).'Controller not found !');
     		
     	require_once($path);
@@ -144,7 +144,7 @@ class SActionController
     
     protected function renderAction($action, $status = null)
     {
-        $template = $this->templatePath($this->request->module, $this->controllerName(), $action);
+        $template = $this->templatePath($this->controllerName(), $action);
         if (!file_exists($template)) throw new SException('Template not found for this action');
         
         if ($this->layout) $this->renderWithLayout($template, $status);
@@ -156,7 +156,7 @@ class SActionController
         $this->addVariablesToAssigns();
         $this->assigns['layout_content'] = $this->view->render($template, $this->assigns);
         
-        $layout = APP_DIR.'/layouts/'.$this->layout.'.php';
+        $layout = APP_DIR.'/views/layouts/'.$this->layout.'.php';
         if (!file_exists($layout)) throw new SException('Layout not found');
         $this->renderFile($layout, $status);
     }
@@ -184,9 +184,9 @@ class SActionController
         $this->flash->discard();
     }
     
-    protected function templatePath($module, $controller, $action)
+    protected function templatePath($controller, $action)
     {
-        return $this->inclusionPath($module)."/views/$controller/$action.php";
+        return APP_DIR."/views/$controller/$action.php";
     }
     
     protected function redirectTo($options)
@@ -216,7 +216,6 @@ class SActionController
     {
         if (!isset($options['action']))     $options['action'] = 'index';
         if (!isset($options['controller'])) $options['controller'] = $this->controllerName();
-        if (!isset($options['module']))     $options['module'] = $this->request->module;
         
         return SUrlRewriter::rewrite($options);
     }
@@ -347,39 +346,21 @@ class SActionController
     {
         if (class_exists($model)) return;
         
-        if (!strpos($model, '/'))
-            $module = $this->request->module;
-        else
-            list($module, $model) = explode('/', $model);
-        
-        $file = $this->inclusionPath($module).'/models/'.strtolower($model).'.class.php';
+        $file = APP_DIR.'/models/'.strtolower($model).'.class.php';
         if (!file_exists($file)) throw new SException('Model not found : '.$model);
         require_once($file);
     }
     
     private function requireHelper($helper)
     {
-        if (!strpos($helper, '/'))
-            $module = $this->request->module;
-        else
-            list($module, $helper) = explode('/', $helper);
-        
-        $file = $this->inclusionPath($module)."/helpers/{$helper}helper.lib.php";
+        $file = APP_DIR."/helpers/{$helper}helper.lib.php";
         if (!file_exists($file)) throw new SException('Helper not found : '.$helper);
         require_once($file);
     }
     
-    private function inclusionPath($module = Null)
-    {
-        if ($module == Null) $module = $this->request->module;
-        if ($module == 'root') return APP_DIR;
-        return APP_DIR."/modules/$module";
-    }
-    
-    private static function controllerPath($module, $controller)
+    private static function controllerPath($controller)
 	{
-        if ($module == 'root') return APP_DIR.'/controllers/'.$controller.'controller.class.php';
-        return APP_DIR.'/modules/'.$module.'/controllers/'.$controller.'controller.class.php';
+        return APP_DIR.'/controllers/'.$controller.'controller.class.php';
     }
 }
 

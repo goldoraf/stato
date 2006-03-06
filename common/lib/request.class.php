@@ -2,7 +2,6 @@
 
 class SRequest
 {
-    public $module     = Null;
     public $controller = Null;
     public $action     = Null;
     public $params     = array();
