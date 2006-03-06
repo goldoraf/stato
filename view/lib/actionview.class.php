@@ -2,17 +2,16 @@
 
 class SActionView
 {
-    public static $controller = null;
-    public static $assigns = array();
+    private $assigns = array();
     
-    public function __construct($controller)
+    public function __construct()
     {
-        self::$controller = $controller;
+        
     }
     
     public function __get($name)
     {
-        if (isset(self::$assigns[$name])) return self::$assigns[$name];
+        if (isset($this->assigns[$name])) return $this->assigns[$name];
     }
     
     public function __set($name, $value)
@@ -22,7 +21,7 @@ class SActionView
     
     public function render($template, $assigns)
     {
-        self::$assigns = $assigns;
+        $this->assigns = $assigns;
         
         if (!is_readable($template))
             throw new SException('Template not found : '.$template);

@@ -57,7 +57,7 @@ class SActionController
     
     public function __construct()
     {
-        $this->view    = new SActionView($this);
+        $this->view    = new SActionView();
         $this->session = new SSession();
         $this->flash   = new SFlash($this->session);
         $this->logger  = SLogger::getInstance();
