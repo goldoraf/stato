@@ -16,12 +16,12 @@ class SActionController
     public $flash    = null;
     public $logger   = null;
     
-    public $layout      = false;
-    public $useModels   = array();
-    public $useHelpers  = array();
+    public $layout   = false;
+    public $models   = array();
+    public $helpers  = array();
     
-    public $cachePages     = array();
-    public $cacheActions   = array();
+    public $cachedPages    = array();
+    public $cachedActions  = array();
     public $pageCacheDir   = null;
     public $pageCacheExt   = '.html';
     public $performCaching = True;
@@ -86,8 +86,8 @@ class SActionController
         SLocale::loadStrings($this->inclusionPath().'/i18n/');
         SUrlRewriter::initialize($this->request);
         
-        foreach($this->useModels as $model) $this->requireModel($model);
-        foreach($this->useHelpers as $helper) $this->requireHelper($helper);
+        foreach($this->models as $model) $this->requireModel($model);
+        foreach($this->helpers as $helper) $this->requireHelper($helper);
         
         /*foreach($this->autoCompleteFor as $params)
         {
