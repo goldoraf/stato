@@ -96,9 +96,16 @@ class SActionController
         }*/
         
         foreach($this->beforeFilters as $method) $this->$method();
+        
         $this->$action();
-        foreach($this->afterFilters as $method) $this->$method();
         if (!$this->isPerformed()) $this->render();
+        
+        foreach($this->afterFilters as $method) $this->$method();
+        
+        if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
+            $this->cachePage($this->response->body, 
+                             $this->urlFor(array('action' => $this->actionName(), 'params' => $this->params,
+                                           'only_path' => true, 'skip_relative_url_root' => true)));
     }
     
     public function __get($name)
@@ -173,8 +180,8 @@ class SActionController
             throw new SDoubleRenderException('Can only render or redirect once per action');
         
         $this->performedRender = true;
-        $this->response->header['Status'] = (!empty($status)) ? $status : self::$defaultRenderStatusCode;
-        $this->response->header['Content-Type'] = 'text/html; charset=utf-8';
+        $this->response->headers['Status'] = (!empty($status)) ? $status : self::$defaultRenderStatusCode;
+        $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->response->body = $str;
     }
     
@@ -236,8 +243,8 @@ class SActionController
     {
         $this->performedRedirect = false;
         $this->response->redirectedTo = null;
-        $this->response->header['Status'] = self::$defaultRenderStatusCode;
-        unset($this->response->header['location']);
+        $this->response->headers['Status'] = self::$defaultRenderStatusCode;
+        unset($this->response->headers['location']);
     }
     
     protected function sendFile($path, $params=array())
@@ -256,6 +263,15 @@ class SActionController
         {
             throw new SException('File not found : '.$path);
         }
+    }
+    
+    protected function cachePage($content, $path)
+    {
+        if (!$this->performCaching) return;
+        
+        if (!SFileUtils::mkdirs(dirname($this->pageCachePath($path)), 0700, true))
+            throw new SException('Caching failed with dirs creation');
+        file_put_contents($this->pageCachePath($path), $content);
     }
     
     protected function paginate($className, $perPage=10, $options=array())
@@ -340,6 +356,24 @@ class SActionController
         foreach ($exception->getTrace() as $t)
             $trace[] = $t['file'].':'.$t['line'].' in \''.$t['function'].'\'';
         return $trace;
+    }
+    
+    private function pageCachePath($path)
+    {
+        return $this->pageCacheDir.$this->pageCacheFile($path);
+    }
+    
+    private function pageCacheFile($path)
+    {
+        $name = ((empty($path) || $path == '/') ? '/index' : '/'.$path);
+        $name.= $this->pageCacheExt;
+        return $name;
+    }
+    
+    private function isCachingAllowed()
+    {
+        return (!$this->request->isPost() && isset($this->response->headers['Status'])
+            && $this->response->headers['Status'] < 400);
     }
     
     private function requireModel($model)
