@@ -2,19 +2,19 @@
 
 class SCrudController extends SActionController
 {
-    public $model = Null;
+    public $scaffold = Null;
     
     public function __construct()
     {
-        if ($this->model == Null)
-            $this->model = SInflection::singularize(str_replace('controller', '', strtolower(get_class($this))));
+        if ($this->scaffold == Null)
+            $this->scaffold = SInflection::singularize(str_replace('controller', '', strtolower(get_class($this))));
         
-        $this->useModels[] = $this->model;
+        $this->models[] = $this->scaffold;
         
         parent::__construct();
         
-        $this->class_name = ucfirst($this->model);
-        $this->singular_name = strtolower($this->model);
+        $this->class_name = ucfirst($this->scaffold);
+        $this->singular_name = strtolower($this->scaffold);
         $this->plural_name = SInflection::pluralize($this->singular_name);
     }
     
