@@ -103,9 +103,7 @@ class SActionController
         foreach($this->afterFilters as $method) $this->$method();
         
         if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
-            $this->cachePage($this->response->body, 
-                             $this->urlFor(array('action' => $this->actionName(), 'params' => $this->params,
-                                           'only_path' => true, 'skip_relative_url_root' => true)));
+            $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
     }
     
     public function __get($name)
@@ -265,13 +263,31 @@ class SActionController
         }
     }
     
-    protected function cachePage($content, $path)
+    protected function cachePage($content = null, $options = array())
     {
         if (!$this->performCaching) return;
+        
+        if ($content == null) $content = $this->response->body;
+        if (is_array($options))
+            $path = $this->urlFor(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
+        else 
+            $path = $options;
         
         if (!SFileUtils::mkdirs(dirname($this->pageCachePath($path)), 0700, true))
             throw new SException('Caching failed with dirs creation');
         file_put_contents($this->pageCachePath($path), $content);
+    }
+    
+    protected function expirePage($options = array())
+    {
+        if (!$this->performCaching) return;
+        
+        if (is_array($options))
+            $path = $this->urlFor(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
+        else 
+            $path = $options;
+            
+        if (file_exists($this->pageCachePath($path))) unlink($this->pageCachePath($path));
     }
     
     protected function paginate($className, $perPage=10, $options=array())
