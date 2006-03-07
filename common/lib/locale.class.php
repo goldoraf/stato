@@ -2,7 +2,7 @@
 
 class SLocale
 {
-    public static $language = 'en';
+    public static $language = 'en_US';
     private static $strings = array();
     
     public static function initialize()
@@ -18,8 +18,10 @@ class SLocale
         
         self::loadStrings(ROOT_DIR.'/core/common/locale/');
         
-        putenv("LANG=".self::$language.""); 
-        setlocale(LC_ALL, self::$language);
+        putenv("LANG=".self::$language."");
+        if (count($exp = explode('_', self::$language)) != 1) $winLanguage = $exp[0];
+        else $winLanguage = self::$language;
+        setlocale(LC_TIME, $winLanguage, self::$language, self::$language.'UTF-8');
     }
     
     public static function translate($key)
@@ -68,6 +70,12 @@ class SLocale
                         $indicecandidat = $j;
                     } 
                 }
+            }
+            
+            if (strpos($candidat, '-'))
+            {
+                list($pref, $suff) = explode('-', $candidat);
+                $candidat = $pref.'_'.strtoupper($suff);
             }
             
             $resultat[$i] = $candidat;
