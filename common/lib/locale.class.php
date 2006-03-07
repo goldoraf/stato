@@ -21,7 +21,7 @@ class SLocale
         putenv("LANG=".self::$language."");
         if (count($exp = explode('_', self::$language)) != 1) $winLanguage = $exp[0];
         else $winLanguage = self::$language;
-        setlocale(LC_TIME, $winLanguage, self::$language, self::$language.'UTF-8');
+        setlocale(LC_TIME, $winLanguage, self::$language, self::$language.'.UTF-8');
     }
     
     public static function translate($key)
