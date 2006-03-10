@@ -81,10 +81,12 @@ class SDynamicComponent extends SComponent
     {
         if (isset($url->params[$this->key]))
         {
-            $url->parts[] = $url->params[$this->key];
+            if ($url->params[$this->key] != $this->default)
+                $url->parts[] = $url->params[$this->key];
             unset($url->params[$this->key]);
         }
-        elseif ($this->default !== null && !$this->isOptional()) $url->parts[] = $this->default;
+        elseif ($this->default !== null && !$this->isOptional())
+            $url->parts[] = $this->default;
         else $url->parts[] = false;
     }
     
@@ -265,7 +267,7 @@ class SRoute
     
     protected function addDefaultRequirements()
     {
-        if (!in_array('action', $this->pathKeys)) $this->known['action'] = 'index';
+        //if (!in_array('action', $this->pathKeys)) $this->known['action'] = 'index';
     }
 }
 
@@ -302,6 +304,8 @@ class SRouteSet
                 // Removes numeric keys from the matches array
                 foreach($matches as $key => $match)
                     if (is_int($key)) unset($matches[$key]);
+                
+                if (empty($matches['controller'])) unset($matches['controller']);
                 
                 $options = array_merge($route->defaults, $matches); // or $route->known ??? or ???
                 break;
@@ -434,6 +438,17 @@ class SRoutesGenerationTest extends UnitTestCase
         $this->assertEqual(array('', array()),
             $this->gen(array('controller'=>'blog')));
     }
+    
+    function testEmptyPath()
+    {
+        $map = new SRouteSet();
+        $map->connect('', array('controller'=>'blog', 'action'=>'recent'));
+        $map->connect(':controller/:action/:id');
+        $this->setMap($map);
+        
+        $this->assertEqual(array('', array()),
+            $this->gen(array('controller'=>'blog', 'action'=>'recent')));
+    }
 }
 
 class SRoutesRecognitionTest extends UnitTestCase
@@ -463,6 +478,35 @@ class SRoutesRecognitionTest extends UnitTestCase
             $this->rec('posts'));
         $this->assertEqual(array('controller'=>'users', 'action'=>'show', 'group'=>'admin', 'pays'=>'france'),
             $this->rec('users/show?group=admin&pays=france'));
+    }
+    
+    function testBasicRuleWithDefaultController()
+    {
+        $map = new SRouteSet();
+        $map->connect(':controller/:action/:id', array('controller'=>'blog'));
+        $this->setMap($map);
+        
+        $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
+            $this->rec('posts/view/45'));
+        $this->assertEqual(array('controller'=>'posts', 'action'=>'view'),
+            $this->rec('posts/view'));
+        $this->assertEqual(array('controller'=>'posts'),
+            $this->rec('posts'));
+        $this->assertEqual(array('controller'=>'blog'),
+            $this->rec(''));
+        $this->assertEqual(array('controller'=>'users', 'action'=>'show', 'group'=>'admin', 'pays'=>'france'),
+            $this->rec('users/show?group=admin&pays=france'));
+    }
+    
+    function testEmptyPath()
+    {
+        $map = new SRouteSet();
+        $map->connect('', array('controller'=>'blog', 'action'=>'recent'));
+        $map->connect(':controller/:action/:id');
+        $this->setMap($map);
+        
+        $this->assertEqual(array('controller'=>'blog', 'action'=>'recent'),
+            $this->rec(''));
     }
 }
 
