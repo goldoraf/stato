@@ -285,7 +285,11 @@ class SRouteSet
         if (!isset($this->genMap[$options['controller']])) $actions = $this->genMap['*'];
         else $actions = $this->genMap[$options['controller']];
         
-        if (!isset($actions[$options['action']])) $route = $actions['*'];
+        if (!isset($actions[$options['action']]))
+        {
+            if (isset($actions['*'])) $route = $actions['*'];
+            else $route = $this->genMap['*']['*'];
+        }
         else $route = $actions[$options['action']];
         
         return $route->generate($options);
