@@ -15,15 +15,20 @@ require_once(ST_DIR.'/reporter.php');
 
 define('TESTS_DIR', ROOT_DIR.'/core/tests');
 require_once(TESTS_DIR.'/lib/showpasses.php');
+require_once(TESTS_DIR.'/lib/colortextreporter.php');
 require_once(TESTS_DIR.'/lib/activetestcase.php');
 
 define('CONFIG_DIR', TESTS_DIR.'/core/conf');
 define('FIXTURES_DIR', TESTS_DIR.'/core/fixtures');
 
+class SException extends Exception {}
+
+set_include_path(get_include_path() . PATH_SEPARATOR . TESTS_DIR.'/core');
+
 $test =& new GroupTest('All tests');
 
 $test->addTestFile('callbacks.test.php');
-//$test->addTestFile('routes.test.php');
+$test->addTestFile('routes.test.php');
 $test->addTestFile('inflection.test.php');
 $test->addTestFile('encryption.test.php');
 $test->addTestFile('helpers.test.php');
@@ -36,6 +41,6 @@ $test->addTestFile('activestore.test.php');
 $test->addTestFile('eagerloading.test.php');
 $test->addTestFile('associations.test.php');
 
-$test->run(new HtmlReporter());
+$test->run(new TextReporter());
 
 ?>
