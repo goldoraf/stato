@@ -21,7 +21,9 @@ class SDispatcher
     {
     	try
     	{
-            require_once(ROOT_DIR.'/conf/routes.php');
+            $map = include(ROOT_DIR.'/conf/routes.php');
+            
+            SRoutes::initialize($map);
     		
     		SLocale::initialize();
             

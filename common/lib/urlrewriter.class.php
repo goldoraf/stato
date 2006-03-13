@@ -48,7 +48,10 @@ class SUrlRewriter
         foreach(self::$reservedOptions as $opt) unset($options[$opt]);
         
         if (isset($options['params']))
+        {
             foreach ($options['params'] as $key => $value) $options[$key] = $value;
+            unset($options['params']);
+        }
         
         list($path, $extraKeys) = SRoutes::generate($options);
         
