@@ -358,6 +358,9 @@ class SRoutes
     {
         $options = self::$map->recognizePath($request->requestUri());
         
+        if ($options === null)
+            throw new SRoutingException('Recognition failed for '.$request->requestUri());
+        
         $request->controller = $options['controller'];
         $request->action     = $options['action'];
         $request->params     = array_merge($options, $request->params);
