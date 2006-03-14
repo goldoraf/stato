@@ -82,6 +82,9 @@ class SDynamicComponent extends SComponent
         {
             if ($url->params[$this->key] != $this->default)
                 $url->parts[] = $url->params[$this->key];
+            elseif (!empty($url->parts) && $url->parts[count($url->parts)-1] !== false)
+                $url->parts[] = $this->default;
+            
             unset($url->params[$this->key]);
         }
         elseif ($this->default !== null && !$this->isOptional())
@@ -100,6 +103,16 @@ class SDynamicComponent extends SComponent
 
 class SControllerComponent extends SDynamicComponent
 {
+    public $subdir = null;
+    
+    public function writeGeneration($url)
+    {
+        if (isset($url->params[$this->key]) && $this->subdir !== null)
+            $url->params[$this->key] = str_replace($this->subdir.'/', '', $url->params[$this->key]);
+            
+        parent::writeGeneration($url);
+    }
+    
     public function regex()
     {
         return '(?P<'.$this->key.'>\w*)';
@@ -156,6 +169,7 @@ class SRoute
     public $keys       = array();
     public $defaults   = array();
     public $regex      = null;
+    public $subdir     = null;
     
     public function __construct($path, $options = array())
     {
@@ -172,7 +186,10 @@ class SRoute
     {
         $url = new SUrl($options);
         
-        foreach ($this->components as $comp) $comp->writeGeneration($url);
+        //foreach ($this->components as $comp) $comp->writeGeneration($url);
+        $comps = array_reverse($this->components);
+        foreach ($comps as $comp) $comp->writeGeneration($url);
+        $url->parts = array_reverse($url->parts);
         
         if ($url->hasGaps())
             throw new SRoutingException("No url can be generated for the options : $options");
@@ -187,7 +204,6 @@ class SRoute
     {
         list($regex, $optional) = $this->buildRecursiveRegex($this->components);
         $this->regex = '#^'.$regex.'$#i';
-        //echo $this->regex."\n";
     }
     
     protected function buildRecursiveRegex($components)
@@ -236,6 +252,21 @@ class SRoute
             unset($options['requirements']);
         }
         
+        if (isset($options['subdirectory']))
+        {
+            if (!in_array('controller', $this->pathKeys))
+            {
+                throw new SRoutingException('Subdirectory option must be used 
+                with a route including a ControllerComponent');
+            }
+            
+            foreach($this->components as $k => $c)
+                if ($c->key() == 'controller') $c->subdir = $options['subdirectory'];
+            
+            $this->subdir = $options['subdirectory'];
+            unset($options['subdirectory']);
+        }
+        
         foreach ($options as $k => $v)
         {
             if (in_array($k, $this->pathKeys))
@@ -282,7 +313,16 @@ class SRouteSet
     
     public function generate($options)
     {
-        if (!isset($this->genMap[$options['controller']])) $actions = $this->genMap['*'];
+        if (!isset($this->genMap[$options['controller']]))
+        {
+            if (strpos($options['controller'], '/'))
+            {
+                list($subdir, $contr) = explode('/', $options['controller']);
+                $actions = $this->genMap[$subdir.'/*'];
+            }
+            else
+                $actions = $this->genMap['*'];
+        }
         else $actions = $this->genMap[$options['controller']];
         
         if (!isset($actions[$options['action']]))
@@ -314,6 +354,9 @@ class SRouteSet
                 $options = array_merge($route->defaults, $matches);
                 $options = array_merge($route->known, $options);
                 
+                if ($route->subdir !== null)
+                    $options['controller'] = $route->subdir.'/'.$options['controller'];
+                
                 $recognized = true;
                 
                 break;
@@ -339,7 +382,13 @@ class SRouteSet
                 else
                     $this->genMap[$r->known['controller']]['*'] = $r;
             }
-            else $this->genMap['*']['*'] = $r;
+            else
+            {
+                if ($r->subdir !== null)
+                    $this->genMap[$r->subdir.'/*']['*'] = $r;
+                else
+                    $this->genMap['*']['*'] = $r;
+            }
         }
     }
 }
