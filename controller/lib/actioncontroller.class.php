@@ -199,7 +199,7 @@ class SActionController
     
     protected function templatePath($controller, $action)
     {
-        return APP_DIR."/views/$controller/$action.php";
+        return APP_DIR."/views/".$this->subDirectory()."$controller/$action.php";
     }
     
     protected function redirectTo($options)
