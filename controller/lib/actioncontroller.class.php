@@ -310,7 +310,15 @@ class SActionController
     
     protected function paginate($className, $perPage=10, $options=array())
     {
-        $paginator = new SPaginator($className, $perPage, $options);
+        if (isset($options['parameter']))  $param = $options['parameter'];
+        else $param = 'page';
+        
+        if (isset($this->request->params[$param]))
+            $currentPage = $this->request->params[$param];
+        else
+            $currentPage = null;
+        
+        $paginator = new SPaginator($className, $perPage, $currentPage, $options);
         return array($paginator, $paginator->currentPage());
     }
     

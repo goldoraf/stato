@@ -11,16 +11,14 @@ class SPaginator
     private $param     = 'page';
     private $pageCount = Null;
     
-    public function __construct($className, $perPage=20, $options=array())
+    public function __construct($className, $perPage=20, $currentPage=Null, $options=array())
     {
-        $this->className  = $className;
-        $this->perPage    = $perPage;
-        $this->options    = $options;
+        $this->className   = $className;
+        $this->perPage     = $perPage;
+        $this->currentPage = $currentPage;
+        $this->options     = $options;
         if (isset($options['parameter']))  $this->param = $options['parameter'];
         if (isset($options['conditions'])) $this->condition = $options['conditions'];
-        
-        if (isset(SContext::$request->params[$this->param]))
-            $this->currentPage = SContext::$request->params[$this->param];
     }
     
     public function currentPage()
