@@ -17,17 +17,22 @@ class SRequest
     
     public function isPost()
     {
-        return $_SERVER['REQUEST_METHOD'] == 'POST';
+        return $this->method() == 'POST';
     }
     
     public function isGet()
     {
-        return $_SERVER['REQUEST_METHOD'] == 'GET';
+        return $this->method() == 'GET';
     }
     
     public function isSSL()
     {
         return $_SERVER['HTTPS'] == 'on';
+    }
+    
+    public function method()
+    {
+        return $_SERVER['REQUEST_METHOD'];
     }
     
     public function host()
@@ -38,6 +43,11 @@ class SRequest
     public function port()
     {
         return $_SERVER['SERVER_PORT'];
+    }
+    
+    public function remoteIp()
+    {
+        return $_SERVER['REMOTE_ADDR'];
     }
     
     public function protocol()

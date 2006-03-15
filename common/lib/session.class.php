@@ -13,6 +13,11 @@ class SSession implements ArrayAccess
         session_destroy();
     }
     
+    public function sessionId()
+    {
+        return session_id();
+    }
+    
     public function offsetExists($offset)
     {
         if (isset($_SESSION[$offset])) return true;

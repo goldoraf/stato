@@ -79,6 +79,8 @@ class SActionController
         $this->response = $response;
         $this->params   = $this->request->params;
         
+        $this->logProcessing();
+        
         if ($arguments != null) $this->$method($arguments);
         else $this->$method();
         
@@ -339,6 +341,16 @@ class SActionController
         
         $paginator = new SPaginator($className, $perPage, $currentPage, $options);
         return array($paginator, $paginator->currentPage());
+    }
+    
+    protected function logProcessing()
+    {
+        $log = 'Processing '.$this->controllerClassName().'::'.$this->actionName()
+            .'() for '.$this->request->remoteIp().' at '
+            .SDateTime::today()->__toString().' ['.$this->request->method().']';
+        if (($sessId = $this->session->sessionId()) != '') $log.= "\n    Session ID: ".$sessId;
+        $log.= "\n    Parameters: ".serialize($this->params)."\n";
+        $this->logger->info($log);
     }
     
     protected function rescueAction($exception)
