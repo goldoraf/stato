@@ -217,6 +217,16 @@ class SActionController
         }
     }
     
+    protected function redirectBack()
+    {
+        if (isset($_SERVER['HTTP_REFERER'])) $this->redirectTo($_SERVER['HTTP_REFERER']);
+        else
+        {
+            throw new SException('No HTTP_REFERER was set in the request to this action, 
+                so redirectBack() could not be called successfully');
+        }
+    }
+    
     protected function urlFor($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';
