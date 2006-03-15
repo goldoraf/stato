@@ -33,6 +33,8 @@ class SActionController
     protected $assigns = array();
     
     protected $virtualMethods    = array();
+    protected $subDirectory      = null;
+    
     protected $performedRender   = false;
     protected $performedRedirect = false;
     
@@ -44,8 +46,14 @@ class SActionController
     		throw new SUnknownControllerException(ucfirst($request->controller).'Controller not found !');
     		
     	require_once($path);
-		$controllerName = $request->controller.'controller';
-		$controller = new $controllerName();
+    	
+    	if (strpos($request->controller, '/'))
+    	   list($subdir, $controllerName) = explode('/', $request->controller);
+    	else
+    	   $controllerName = $request->controller;
+		
+        $className = $controllerName.'controller';
+		$controller = new $className();
 		return $controller->process($request, $response);
     }
     
@@ -83,7 +91,7 @@ class SActionController
         if (!$this->actionExists($action))
             throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
             
-        SLocale::loadStrings($this->inclusionPath().'/i18n/');
+        SLocale::loadStrings(APP_DIR.'/i18n/'.$this->subDirectory());
         SUrlRewriter::initialize($this->request);
         
         foreach($this->models as $model) $this->requireModel($model);
@@ -406,16 +414,33 @@ class SActionController
     {
         if (class_exists($model)) return;
         
-        $file = APP_DIR.'/models/'.strtolower($model).'.class.php';
+        $file = APP_DIR.'/models/'.$this->subDirectory().strtolower($model).'.class.php';
         if (!file_exists($file)) throw new SException('Model not found : '.$model);
         require_once($file);
     }
     
     private function requireHelper($helper)
     {
-        $file = APP_DIR."/helpers/{$helper}helper.lib.php";
+        $file = APP_DIR."/helpers/".$this->subDirectory()."{$helper}helper.lib.php";
         if (!file_exists($file)) throw new SException('Helper not found : '.$helper);
         require_once($file);
+    }
+    
+    private function subDirectory()
+    {
+        if ($this->subDirectory === null)
+        {
+            $reflection = new ReflectionClass(get_class($this));
+            $relative = str_replace(APP_DIR.'/controllers/', '', 
+                            str_replace('\\', '/', $reflection->getFileName()));
+            if (strpos($relative, '/'))
+            {
+                list($subdir, $file) = explode('/', $relative);
+                $this->subDirectory = $subdir.'/';
+            }
+            else $this->subDirectory = '';    
+        }
+        return $this->subDirectory;
     }
     
     private static function controllerPath($controller)
