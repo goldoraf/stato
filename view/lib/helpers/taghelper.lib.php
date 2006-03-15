@@ -12,7 +12,7 @@ function tag($name, $options = array(), $open = False)
 
 function img_tag($filename, $options = array())
 {
-    return '<img src="'.compute_public_path($filename, 'images').'"'.tag_options($options).' />';
+    return '<img src="'.image_path($filename).'"'.tag_options($options).' />';
 }
 
 function tag_options($options = array())
@@ -56,6 +56,11 @@ function css_link_tag($source, $options = array())
     $options = array_merge(array('rel' => 'stylesheet', 'type' => 'text/css', 'media' => 'screen'), $options);
     $options['href'] = compute_public_path($source, 'styles');
     return tag('link', $options);
+}
+
+function image_path($source)
+{
+    return compute_public_path($source, 'images');
 }
 
 function compute_public_path($source, $dir, $ext = Null)

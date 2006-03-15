@@ -12,6 +12,11 @@ function form_tag($urlOptions, $options=array())
     return tag('form', $htmlOptions, True);
 }
 
+function end_form_tag()
+{
+    return '</form>';
+}
+
 function text_field_tag($name, $id=Null, $value=Null, $options=array())
 {
     if ($id == Null) $id = $name;
@@ -44,7 +49,12 @@ function text_area_tag($name, $id=Null, $content=Null, $options=array())
 
 function submit_tag($value='Ok', $options=array())
 {
-    return "<input type=\"submit\" name=\"submit\" value=\"$value\" ".tag_options($options)."/>\n";
+    return "<input type=\"submit\" name=\"commit\" value=\"$value\" ".tag_options($options)."/>\n";
+}
+
+function image_submit_tag($source, $options=array())
+{
+    return "<input type=\"image\" src=\"".image_path($source)."\" ".tag_options($options)."/>\n";
 }
 
 function select_tag($name, $id=Null, $optionsBlock='', $options=array())
