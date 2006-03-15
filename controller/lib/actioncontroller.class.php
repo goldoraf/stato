@@ -238,7 +238,8 @@ class SActionController
     protected function urlFor($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';
-        if (!isset($options['controller'])) $options['controller'] = $this->controllerName();
+        if (!isset($options['controller'])) 
+            $options['controller'] = $this->subDirectory().$this->controllerName();
         
         return SUrlRewriter::rewrite($options);
     }
