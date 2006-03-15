@@ -30,7 +30,19 @@ class SAssociationProxy
         $dest = $options['dest'];
         // we instanciate the dest class without associations to avoid an infinite loop
         if (!class_exists($dest))
-            require_once(SContext::inclusionPath().'/models/'.strtolower($dest).'.class.php');
+        {
+            $reflection = new ReflectionClass(get_class($owner));
+            $relative = str_replace(APP_DIR.'/models/', '', 
+                            str_replace('\\', '/', $reflection->getFileName()));
+            if (strpos($relative, '/'))
+            {
+                list($subdir, $file) = explode('/', $relative);
+                $path = APP_DIR.'/models/'.$subdir.'/';
+            }
+            else $path = APP_DIR.'/models/';
+            
+            require_once($path.strtolower($dest).'.class.php');
+        }
             
         $destInstance = new $dest(Null, True);
         
