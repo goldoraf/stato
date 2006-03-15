@@ -11,7 +11,7 @@ class SPaginator
     private $param     = 'page';
     private $pageCount = Null;
     
-    public function __construct($className, $perPage=20, $currentPage=Null, $options=array())
+    public function __construct($className, $perPage=20, $currentPage=1, $options=array())
     {
         $this->className   = $className;
         $this->perPage     = $perPage;

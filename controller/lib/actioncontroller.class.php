@@ -316,7 +316,7 @@ class SActionController
         if (isset($this->request->params[$param]))
             $currentPage = $this->request->params[$param];
         else
-            $currentPage = null;
+            $currentPage = 1;
         
         $paginator = new SPaginator($className, $perPage, $currentPage, $options);
         return array($paginator, $paginator->currentPage());
