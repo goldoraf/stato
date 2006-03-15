@@ -235,6 +235,24 @@ class SActionController
         }
     }
     
+    protected function expiresIn($seconds, $options = array())
+    {
+        $cacheOptions = array_merge(array('max-age' => $seconds, 'private' => true), $options);
+        $cacheControl = array();
+        foreach ($cacheOptions as $k => $v)
+        {
+            if ($v === false || $v === null) unset($cacheOptions[$k]);
+            if ($v === true) $cacheControl[] = $k;
+            else $cacheControl[] = "$k=$v";
+        }
+        $this->response->headers['Cache-Control'] = implode(',', $cacheControl);
+    }
+    
+    protected function expiresNow()
+    {
+        $this->response->headers['Cache-Control'] = 'no-cache';
+    }
+    
     protected function urlFor($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';
