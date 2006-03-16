@@ -26,8 +26,16 @@ class SLocale
     
     public static function translate($key)
     {
-        if (isset(self::$strings[$key])) return self::$strings[$key];
-        else return $key;
+        if (is_array($key))
+        {
+            foreach ($key as $k => $v) $key[$k] = self::translate($v);
+            return $key;
+        }
+        else
+        {
+            if (isset(self::$strings[$key])) return self::$strings[$key];
+            else return $key;
+        }
     }
     
     public static function loadStrings($dir)
