@@ -13,6 +13,9 @@ class SCrudController extends SActionController
         
         parent::__construct();
         
+        if (strpos($this->scaffold, '/') !== false)
+            list($rest, $this->scaffold) = explode('/', $this->scaffold);
+        
         $this->class_name = ucfirst($this->scaffold);
         $this->singular_name = strtolower($this->scaffold);
         $this->plural_name = SInflection::pluralize($this->singular_name);

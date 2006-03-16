@@ -453,16 +453,31 @@ class SActionController
     {
         if (class_exists($model)) return;
         
-        $file = APP_DIR.'/models/'.$this->subDirectory().strtolower($model).'.class.php';
-        if (!file_exists($file)) throw new SException('Model not found : '.$model);
-        require_once($file);
+        list($subdir, $file) = $this->dependencySubDir($model);
+        $path = APP_DIR.'/models/'.$subdir.strtolower($file).'.class.php';
+        if (!file_exists($path)) throw new SException('Model not found : '.$file);
+        require_once($path);
     }
     
     private function requireHelper($helper)
     {
-        $file = APP_DIR."/helpers/".$this->subDirectory()."{$helper}helper.lib.php";
-        if (!file_exists($file)) throw new SException('Helper not found : '.$helper);
-        require_once($file);
+        list($subdir, $file) = $this->dependencySubDir($helper);
+        $path = APP_DIR.'/helpers/'.$subdir.strtolower($file).'helper.lib.php';
+        if (!file_exists($path)) throw new SException('Helper not found : '.$file);
+        require_once($path);
+    }
+    
+    private function dependencySubDir($object = null)
+    {
+        if (strpos($object, '/') === false)
+            return array($this->subDirectory(), $object);
+        elseif (strpos($object, '/') == 0)
+            return array('', substr($object, 1));
+        else
+        {
+            list($subdir, $object) = explode('/', $object);
+            return array($subdir.'/', $object);
+        }
     }
     
     private function subDirectory()
@@ -472,7 +487,7 @@ class SActionController
             $reflection = new ReflectionClass(get_class($this));
             $relative = str_replace(APP_DIR.'/controllers/', '', 
                             str_replace('\\', '/', $reflection->getFileName()));
-            if (strpos($relative, '/'))
+            if (strpos($relative, '/') !== false)
             {
                 list($subdir, $file) = explode('/', $relative);
                 $this->subDirectory = $subdir.'/';
