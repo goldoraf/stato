@@ -15,5 +15,6 @@ require_once('lib/helpers/partialshelper.lib.php');
 require_once('lib/helpers/texthelper.lib.php');
 require_once('lib/helpers/utf8helper.lib.php');
 require_once('lib/helpers/cachehelper.lib.php');
+require_once('lib/helpers/i18nhelper.lib.php');
 
 ?>
