@@ -12,6 +12,7 @@ class SActionController
     public $request  = null;
     public $session  = null;
     public $response = null;
+    public $params   = null;
     public $view     = null;
     public $flash    = null;
     public $logger   = null;
