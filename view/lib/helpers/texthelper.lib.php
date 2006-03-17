@@ -38,4 +38,56 @@ function sanitize($html)
     return $safehtml->parse($html);
 }
 
+function cycle($values, $name = 'default')
+{
+    $cycle = SCycle::getCycle($name);
+    if ($cycle === null || $cycle->values != $values)
+        $cycle = SCycle::setCycle($name, new SCycle($values));
+    return $cycle->__toString();
+}
+
+function reset_cycle($name = 'default')
+{
+    $cycle = SCycle::getCycle($name);
+    if ($cycle !== null) $cycle->reset();
+}
+
+class SCycle
+{
+    public $values = array();
+    private $index = 0;
+    
+    private static $cycles = array();
+    
+    public function __construct($values)
+    {
+        $this->values = $values;
+    }
+    
+    public function __toString()
+    {
+        $value = $this->values[$this->index];
+        if ($this->index == count($this->values) - 1) $this->index = 0;
+        else $this->index++;
+        return $value;
+    }
+    
+    public function reset()
+    {
+        $this->index = 0;
+    }
+    
+    public static function setCycle($name, $cycle)
+    {
+        self::$cycles[$name] = $cycle;
+        return $cycle;
+    }
+    
+    public static function getCycle($name)
+    {
+        if (isset(self::$cycles[$name])) return self::$cycles[$name];
+        else return null;
+    }
+}
+
 ?>
