@@ -51,11 +51,17 @@ function css_include_tag($source)
     return style_tag(file_get_contents($source));
 }
 
-function css_link_tag($source, $options = array())
+function css_link_tag($sources, $options = array())
 {
-    $options = array_merge(array('rel' => 'stylesheet', 'type' => 'text/css', 'media' => 'screen'), $options);
-    $options['href'] = compute_public_path($source, 'styles');
-    return tag('link', $options);
+    if (!is_array($sources)) $sources = array($sources);
+    $html = '';
+    foreach($sources as $source)
+    {
+        $options = array_merge(array('rel' => 'stylesheet', 'type' => 'text/css', 'media' => 'screen'), $options);
+        $options['href'] = compute_public_path($source, 'styles');
+        $html.= tag('link', $options)."\n";
+    }
+    return $html;
 }
 
 function image_path($source)
