@@ -43,9 +43,7 @@ class SInflection
         foreach (self::$pluralRules as $rule => $replace)
         {
 			if (preg_match($rule, $word))
-            {
-				return preg_replace($rule, $replace, $word);
-			}
+                return preg_replace($rule, $replace, $word);
 		}
 		return false;
     }
@@ -55,11 +53,20 @@ class SInflection
         foreach (self::$singularRules as $rule => $replace)
         {
 			if (preg_match($rule, $word))
-            {
-				return preg_replace($rule, $replace, $word);
-			}
+                return preg_replace($rule, $replace, $word);
 		}
 		return false;
+    }
+    
+    public static function underscore($camelCasedWord)
+    {
+        return strtolower(preg_replace('/([a-z\d])([A-Z])/', '\1_\2', 
+            preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $camelCasedWord)));
+    }
+    
+    public static function camelize($underscoreWord)
+    {
+        return preg_replace('/(^|_)(.)/e', "strtoupper('\\2')", $underscoreWord);
     }
 }
 

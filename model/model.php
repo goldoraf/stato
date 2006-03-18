@@ -8,7 +8,6 @@ require_once('lib/drivers/mysqldriver.class.php');
 
 require_once('lib/attribute.class.php');
 require_once('lib/validation.class.php');
-require_once('lib/inflection.class.php');
 
 require_once('lib/observable.class.php');
 require_once('lib/mixins.class.php');

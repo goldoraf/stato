@@ -13,6 +13,18 @@ class SInflectionTest extends UnitTestCase
     {
         $this->assertEqual('product', SInflection::singularize('products'));
     }
+    
+    function testUnderscore()
+    {
+        $this->assertEqual('my_test_controller', SInflection::underscore('MyTestController'));
+        $this->assertEqual('s_my_test_controller', SInflection::underscore('SMyTestController'));
+    }
+    
+    function testCamelize()
+    {
+        $this->assertEqual('MyTestController', SInflection::camelize('my_test_controller'));
+        $this->assertEqual('SMyTestController', SInflection::camelize('s_my_test_controller'));
+    }
 }
 
 ?>
