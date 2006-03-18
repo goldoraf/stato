@@ -41,7 +41,7 @@ class SAssociationProxy
             }
             else $path = APP_DIR.'/models/';
             
-            require_once($path.strtolower($dest).'.class.php');
+            require_once($path.SInflection::underscore($dest).'.php');
         }
             
         $destInstance = new $dest(Null, True);

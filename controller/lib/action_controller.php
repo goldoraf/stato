@@ -97,8 +97,10 @@ class SActionController
         SLocale::loadStrings(APP_DIR.'/i18n/'.$this->subDirectory());
         SUrlRewriter::initialize($this->request);
         
-        foreach($this->models as $model) $this->requireModel($model);
-        foreach($this->helpers as $helper) $this->requireHelper($helper);
+        foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
+        
+        $this->requireDependencies('models', $this->models);
+        $this->requireDependencies('helpers', $this->helpers);
         
         /*foreach($this->autoCompleteFor as $params)
         {
@@ -450,22 +452,15 @@ class SActionController
             && $this->response->headers['Status'] < 400);
     }
     
-    private function requireModel($model)
+    private function requireDependencies($layer, $dependencies)
     {
-        if (class_exists($model)) return;
-        
-        list($subdir, $file) = $this->dependencySubDir($model);
-        $path = APP_DIR.'/models/'.$subdir.strtolower($file).'.class.php';
-        if (!file_exists($path)) throw new SException('Model not found : '.$file);
-        require_once($path);
-    }
-    
-    private function requireHelper($helper)
-    {
-        list($subdir, $file) = $this->dependencySubDir($helper);
-        $path = APP_DIR.'/helpers/'.$subdir.strtolower($file).'helper.lib.php';
-        if (!file_exists($path)) throw new SException('Helper not found : '.$file);
-        require_once($path);
+        foreach ($dependencies as $dependency)
+        {
+            list($subdir, $class) = $this->dependencySubDir($dependency);
+            $path = APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
+            if (!file_exists($path)) throw new SException("Missing $layer $dependency");
+            require_once($path);
+        }
     }
     
     private function dependencySubDir($object = null)
