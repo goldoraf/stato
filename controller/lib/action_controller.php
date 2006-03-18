@@ -500,7 +500,7 @@ class SActionController
     
     private static function controllerPath($controller)
 	{
-        return APP_DIR.'/controllers/'.$controller.'controller.class.php';
+        return APP_DIR.'/controllers/'.SInflection::underscore($controller).'_controller.php';
     }
 }
 
