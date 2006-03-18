@@ -29,7 +29,7 @@ class SDispatcher
             $request  = new SRequest();
             $response = new SResponse();
             
-    		if (file_exists($path = APP_DIR.'/controllers/applicationcontroller.class.php')) require_once($path);
+    		if (file_exists($path = APP_DIR.'/controllers/application_controller.php')) require_once($path);
     		
     		SActionController::factory(SRoutes::recognize($request), $response)->out();
         }
