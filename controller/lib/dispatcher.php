@@ -12,7 +12,6 @@ function error_handler($errorType, $message)
 }
 set_error_handler('error_handler');
 
-class SException extends Exception {}
 class SDispatchException extends SException {}
 
 class SDispatcher

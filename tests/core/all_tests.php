@@ -21,8 +21,6 @@ require_once(TESTS_DIR.'/lib/activetestcase.php');
 define('CONFIG_DIR', TESTS_DIR.'/core/conf');
 define('FIXTURES_DIR', TESTS_DIR.'/core/fixtures');
 
-class SException extends Exception {}
-
 set_include_path(get_include_path() . PATH_SEPARATOR . TESTS_DIR.'/core');
 
 $test =& new GroupTest('All tests');

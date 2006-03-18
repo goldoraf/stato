@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/common/common.php');
+require_once(CORE_DIR.'/controller/controller.php');
 
 class SRoutesTest extends UnitTestCase
 {

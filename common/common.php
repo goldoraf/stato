@@ -1,5 +1,6 @@
 <?php
 
+require_once('lib/exception.php');
 require_once('lib/types.php');
 require_once('lib/locale.php');
 require_once('lib/encryption.php');
