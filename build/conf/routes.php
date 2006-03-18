@@ -1,10 +1,8 @@
 <?php
 
-$routes = array
-(
-    
-);
+$map = new SRouteSet();
+$map->connect(':controller/:action/:id');
 
-return $routes;
+return $map;
 
 ?>
