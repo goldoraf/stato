@@ -6,19 +6,19 @@ class SCrudController extends SActionController
     
     public function __construct()
     {
-        if ($this->scaffold == Null)
-            $this->scaffold = SInflection::singularize(str_replace('controller', '', strtolower(get_class($this))));
-        
-        $this->models[] = $this->scaffold;
-        
         parent::__construct();
         
-        if (strpos($this->scaffold, '/') !== false)
-            list($rest, $this->scaffold) = explode('/', $this->scaffold);
+        if ($this->scaffold !== Null)
+        {
+            $this->models[] = $this->scaffold;
         
-        $this->class_name = ucfirst($this->scaffold);
-        $this->singular_name = strtolower($this->scaffold);
-        $this->plural_name = SInflection::pluralize($this->singular_name);
+            if (strpos($this->scaffold, '/') !== false)
+                list($rest, $this->scaffold) = explode('/', $this->scaffold);
+            
+            $this->class_name = ucfirst($this->scaffold);
+            $this->singular_name = strtolower($this->scaffold);
+            $this->plural_name = SInflection::pluralize($this->singular_name);
+        }
     }
     
     public function index()
@@ -103,6 +103,26 @@ class SCrudController extends SActionController
     protected function scaffoldPath($templateName)
     {
         return ROOT_DIR."/core/view/templates/crud/{$templateName}.php";
+    }
+    
+    protected function actionExists($action)
+    {
+        if ($this->scaffold === null)
+        {
+            try
+            {
+                $method = new ReflectionMethod(get_class($this), $action);
+                if ($method->getDeclaringClass()->getName() == __CLASS__)
+                    return false;
+                else
+                    return parent::actionExists($action);
+            }
+            catch (ReflectionException $e)
+            {
+                return parent::actionExists($action);
+            }
+        }    
+        else return parent::actionExists($action);
     }
 }
 
