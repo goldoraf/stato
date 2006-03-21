@@ -155,6 +155,26 @@ class SActionController
         return $this->request->action;
     }
     
+    protected function actionExists($action)
+    {
+        try
+        {
+            $method = new ReflectionMethod(get_class($this), $action);
+            if ($method->isPublic() && !$method->isConstructor()
+                && $method->getDeclaringClass()->getName() != __CLASS__)
+                return true;
+            else
+                return false;
+        }
+        catch (ReflectionException $e)
+        {
+            if (in_array($action, array_keys($this->virtualMethods)))
+                return true;
+            else
+                return false;
+        }
+    }
+    
     protected function render($status = null)
     {
         $this->renderAction($this->actionName(), $status);
@@ -404,26 +424,6 @@ class SActionController
     private function isPerformed()
     {
         return ($this->performedRender || $this->performedRedirect);
-    }
-    
-    private function actionExists($action)
-    {
-        try
-        {
-            $method = new ReflectionMethod(get_class($this), $action);
-            if ($method->isPublic() && !$method->isConstructor()
-                && $method->getDeclaringClass()->getName() != __CLASS__)
-                return true;
-            else
-                return false;
-        }
-        catch (ReflectionException $e)
-        {
-            if (in_array($action, array_keys($this->virtualMethods)))
-                return true;
-            else
-                return false;
-        }
     }
     
     private function cleanBacktrace($exception)
