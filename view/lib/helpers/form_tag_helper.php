@@ -17,34 +17,29 @@ function end_form_tag()
     return '</form>';
 }
 
-function text_field_tag($name, $id=Null, $value=Null, $options=array())
+function text_field_tag($name, $value=Null, $options=array())
 {
-    if ($id == Null) $id = $name;
-    return "<input type=\"text\" id=\"$id\" name=\"$name\" value=\"$value\" ".tag_options($options)."/>\n";
+    return "<input type=\"text\" name=\"$name\" value=\"$value\" ".tag_options($options)."/>\n";
 }
 
-function password_field_tag($name, $id=Null, $value=Null, $options=array())
+function password_field_tag($name, $value=Null, $options=array())
 {
-    if ($id == Null) $id = $name;
-    return "<input type=\"password\" id=\"$id\" name=\"$name\" value=\"$value\" ".tag_options($options)."/>\n";
+    return "<input type=\"password\" name=\"$name\" value=\"$value\" ".tag_options($options)."/>\n";
 }
 
-function hidden_field_tag($name, $id=Null, $value=Null, $options=array())
+function hidden_field_tag($name, $value=Null, $options=array())
 {
-    if ($id == Null) $id = $name;
-    return "<input type=\"hidden\" id=\"$id\" name=\"$name\" value=\"$value\" ".tag_options($options)."/>\n";
+    return "<input type=\"hidden\" name=\"$name\" value=\"$value\" ".tag_options($options)."/>\n";
 }
 
-function file_field_tag($name, $id=Null, $options=array())
+function file_field_tag($name, $options=array())
 {
-    if ($id == Null) $id = $name; // attention...
-    return "<input type=\"file\" id=\"$id\" name=\"$name\" ".tag_options($options)."/>\n";
+    return "<input type=\"file\" name=\"$name\" ".tag_options($options)."/>\n";
 }
 
-function text_area_tag($name, $id=Null, $content=Null, $options=array())
+function text_area_tag($name, $content=Null, $options=array())
 {
-    if ($id == Null) $id = $name;
-    return content_tag('textarea', $content, array_merge(array('name'=>$name, 'id'=>$id), $options));
+    return content_tag('textarea', $content, array_merge(array('name'=>$name), $options));
 }
 
 function submit_tag($value='Ok', $options=array())
@@ -57,22 +52,21 @@ function image_submit_tag($source, $options=array())
     return "<input type=\"image\" src=\"".image_path($source)."\" ".tag_options($options)."/>\n";
 }
 
-function select_tag($name, $id=Null, $optionsBlock='', $options=array())
+function select_tag($name, $optionsBlock='', $options=array())
 {
-    if ($id == Null) $id = $name;
-    return content_tag('select', $optionsBlock, array_merge(array('name'=>$name, 'id'=>$id), $options));
+    return content_tag('select', $optionsBlock, array_merge(array('name'=>$name), $options));
 }
 
-function check_box_tag($name, $id=Null, $value="1", $checked=false, $options=array())
+function check_box_tag($name, $value="1", $checked=false, $options=array())
 {
-    $htmlOptions = array_merge(array('type'=>'checkbox', 'name'=>$name, 'id'=>$id, 'value'=>$value), $options);
+    $htmlOptions = array_merge(array('type'=>'checkbox', 'name'=>$name, 'value'=>$value), $options);
     if ($checked) $htmlOptions['checked'] = "checked";
     return tag('input', $htmlOptions);
 }
 
-function radio_button_tag($name, $id, $value, $checked=false, $options=array())
+function radio_button_tag($name, $value, $checked=false, $options=array())
 {
-    $htmlOptions = array_merge(array('type'=>'radio', 'name'=>$name, 'id'=>$id, 'value'=>$value), $options);
+    $htmlOptions = array_merge(array('type'=>'radio', 'name'=>$name, 'value'=>$value), $options);
     if ($checked) $htmlOptions['checked'] = "checked";
     return tag('input', $htmlOptions);
 }
