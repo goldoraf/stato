@@ -11,7 +11,7 @@ function form($objectName, $object, $options=array())
     if (!isset($options['submit_value']))
         $options['submit_value'] = ucfirst($options['action']);
     
-    $form = '<form id="" enctype="multipart/form-data" method="post" action="'
+    $form = '<form enctype="multipart/form-data" method="post" action="'
             .url_for(array('action' => $options['action'])).'">';
     
     if (!$object->isNewRecord()) $form.= hidden_field($objectName, 'id', $object);
