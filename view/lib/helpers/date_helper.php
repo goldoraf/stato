@@ -2,7 +2,7 @@
 
 function date_select($objectName, $method, $object, $options = array())
 {
-    list($id, $options['prefix'], $value) = default_options($objectName, $method, $object);
+    list($options['prefix'], $value) = default_date_options($objectName, $method, $object);
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $date = ($value != Null) ? $value : 0; 
     else
@@ -19,7 +19,7 @@ function date_select($objectName, $method, $object, $options = array())
 
 function date_time_select($objectName, $method, $object, $options = array())
 {
-    list($id, $options['prefix'], $value) = default_options($objectName, $method, $object);
+    list($options['prefix'], $value) = default_date_options($objectName, $method, $object);
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $datetime = ($value != Null) ? $value : Null; 
     else
@@ -36,7 +36,7 @@ function date_time_select($objectName, $method, $object, $options = array())
 
 function time_select($objectName, $method, $object, $options = array())
 {
-    list($id, $options['prefix'], $value) = default_options($objectName, $method, $object);
+    list($options['prefix'], $value) = default_date_options($objectName, $method, $object);
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $datetime = ($value != Null) ? $value : Null; 
     else
@@ -163,6 +163,11 @@ function select_html($type, $dateOptions, $options = array())
     if (isset($options['include_blank']) && $options['include_blank'] == True) $html.= '<option value=""></option>';
     $html.= $dateOptions."</select>\n";
     return $html;
+}
+
+function default_date_options($objectName, $method, $object)
+{
+    return array("{$objectName}[{$method}]", $object->$method);
 }
 
 function numerical_options($start, $end, $selected = Null, $step=1)

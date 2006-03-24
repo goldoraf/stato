@@ -5,7 +5,8 @@ function select($objectName, $method, $object, $choices, $options = array(), $ht
     list($id, $name, $value) = default_options($objectName, $method, $object);
     $optionsBlock = options_for_select($choices, $value);
     if ($options['include_blank']) $optionsBlock = '<option></option>'.$optionsBlock;
-    return select_tag($name, $id, $optionsBlock, $htmlOptions);
+    $htmlOptions = array_merge(array('id' => $id), $htmlOptions);
+    return select_tag($name, $optionsBlock, $htmlOptions);
 }
 
 
@@ -14,7 +15,8 @@ function collection_select($objectName, $method, $object, $collection, $valuePro
     list($id, $name, $value) = default_options($objectName, $method, $object);
     $optionsBlock = options_from_collection_for_select($collection, $valueProp, $textProp, $value);
     if ($options['include_blank']) $optionsBlock = '<option></option>'.$optionsBlock;
-    return select_tag($name, $id, $optionsBlock, $htmlOptions);
+    $htmlOptions = array_merge(array('id' => $id), $htmlOptions);
+    return select_tag($name, $optionsBlock, $htmlOptions);
 }
 
 function options_for_select($set, $selected=Null)
