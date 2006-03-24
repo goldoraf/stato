@@ -30,20 +30,8 @@ class SAssociationProxy
         $dest = $options['dest'];
         // we instanciate the dest class without associations to avoid an infinite loop
         if (!class_exists($dest))
-        {
-            $reflection = new ReflectionClass(get_class($owner));
-            $relative = str_replace(APP_DIR.'/models/', '', 
-                            str_replace('\\', '/', $reflection->getFileName()));
-            if (strpos($relative, '/'))
-            {
-                list($subdir, $file) = explode('/', $relative);
-                $path = APP_DIR.'/models/'.$subdir.'/';
-            }
-            else $path = APP_DIR.'/models/';
-            
-            require_once($path.SInflection::underscore($dest).'.php');
-        }
-            
+            SDependencies::requireDependency('models', $dest, get_class($owner));
+        
         $destInstance = new $dest(Null, True);
         
         $mapping['table_name']  = $destInstance->tableName;

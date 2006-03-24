@@ -94,13 +94,13 @@ class SActionController
         if (!$this->actionExists($action))
             throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
             
-        SLocale::loadStrings(APP_DIR.'/i18n/'.$this->subDirectory());
+        SLocale::loadStrings(APP_DIR.'/i18n/'.SDependencies::subDirectory(get_class($this)));
         SUrlRewriter::initialize($this->request);
         
         foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
         
-        $this->requireDependencies('models', $this->models);
-        $this->requireDependencies('helpers', $this->helpers);
+        SDependencies::requireDependencies('models', $this->models, get_class($this));
+        SDependencies::requireDependencies('helpers', $this->helpers, get_class($this));
         
         /*foreach($this->autoCompleteFor as $params)
         {
@@ -224,7 +224,7 @@ class SActionController
     
     protected function templatePath($controller, $action)
     {
-        return APP_DIR."/views/".$this->subDirectory()."$controller/$action.php";
+        return APP_DIR."/views/".SDependencies::subDirectory(get_class($this))."$controller/$action.php";
     }
     
     protected function redirectTo($options)
@@ -450,47 +450,6 @@ class SActionController
     {
         return (!$this->request->isPost() && isset($this->response->headers['Status'])
             && $this->response->headers['Status'] < 400);
-    }
-    
-    private function requireDependencies($layer, $dependencies)
-    {
-        foreach ($dependencies as $dependency)
-        {
-            list($subdir, $class) = $this->dependencySubDir($dependency);
-            $path = APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
-            if (!file_exists($path)) throw new SException("Missing $layer $dependency");
-            require_once($path);
-        }
-    }
-    
-    private function dependencySubDir($object = null)
-    {
-        if (strpos($object, '/') === false)
-            return array($this->subDirectory(), $object);
-        elseif (strpos($object, '/') == 0)
-            return array('', substr($object, 1));
-        else
-        {
-            list($subdir, $object) = explode('/', $object);
-            return array($subdir.'/', $object);
-        }
-    }
-    
-    private function subDirectory()
-    {
-        if ($this->subDirectory === null)
-        {
-            $reflection = new ReflectionClass(get_class($this));
-            $relative = str_replace(APP_DIR.'/controllers/', '', 
-                            str_replace('\\', '/', $reflection->getFileName()));
-            if (strpos($relative, '/') !== false)
-            {
-                list($subdir, $file) = explode('/', $relative);
-                $this->subDirectory = $subdir.'/';
-            }
-            else $this->subDirectory = '';    
-        }
-        return $this->subDirectory;
     }
     
     private static function controllerPath($controller)
