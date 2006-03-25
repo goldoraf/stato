@@ -4,6 +4,13 @@ class SAssociationProxy
 {
     public static function getInstance($owner, $name, $options, $mapping = array())
     {
+        if (!is_array($options))
+        {
+            $type = $options;
+            $options = array();
+            $options['type'] = $type;
+        }
+        
         list($assocType, $dest, $assocOptions) = self::getOptions($owner, $name, $options, $mapping);
         if ($options['type'] == 'to_many') self::registerToManyMethods($owner, $name, $dest);
         else self::registerToOneMethods($owner, $name, $dest);
@@ -13,13 +20,9 @@ class SAssociationProxy
     
     public static function getOptions($owner, $name, $options, $mapping = array())
     {
-        if (!is_array($options))
-        {
-            $type = $options;
-            $options = array();
-        }
-        elseif (!isset($options['type'])) throw new SException('Type of relationship is required.');
-        else $type = $options['type'];
+        if (!isset($options['type'])) throw new SException('Type of relationship is required.');
+        
+        $type = $options['type'];
         
         if (!isset($options['dest']))
         {
