@@ -74,7 +74,7 @@ function error_message_on($method, $object, $prependText='', $appendText='', $di
         return "<div class=\"{$divClass}\">{$prependText}{$errors[$method]}{$appendText}</div>";
 }
 
-function error_message_for($object, $options=array())
+function error_message_for($objectName, $object, $options=array())
 {
     $errors = $object->errors;
     if (!empty($errors))
