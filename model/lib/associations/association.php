@@ -90,7 +90,7 @@ abstract class SAssociation
     
     protected function checkRecordType($record)
     {
-        if (!is_object($record) || get_class($record) != $this->assocClass)
+        if (!is_object($record) || strtolower(get_class($record)) != $this->assocClass)
         {
             throw new SAssociationTypeMismatch('Bad Record Type');
         }
