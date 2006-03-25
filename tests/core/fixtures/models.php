@@ -124,7 +124,7 @@ class Category extends SActiveRecord
 }
 
 // For ActAsList tests
-class Forum extends SActiveRecord
+/*class Forum extends SActiveRecord
 {
     public $tableName = 'forums';
     public $relationships = array
@@ -137,7 +137,7 @@ class Topic extends SActiveRecord
 {
     public $tableName = 'topics';
     public $actAs = array('List' => array('scope' => 'forum'));
-}
+}*/
 
 // For validation tests
 /*class User extends SActiveRecord

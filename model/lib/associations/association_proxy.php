@@ -30,7 +30,7 @@ class SAssociationProxy
             else $options['dest'] = $name;
         }
         
-        $dest = $options['dest'];
+        $dest = strtolower($options['dest']);
         // we instanciate the dest class without associations to avoid an infinite loop
         if (!class_exists($dest))
             SDependencies::requireDependency('models', $dest, get_class($owner));
@@ -64,7 +64,7 @@ class SAssociationProxy
     {
         self::assertValidOptions($options, array('foreign_key'));
         if (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = strtolower($dest).'_id';
+            $options['foreign_key'] = $dest.'_id';
         
         return $options;
     }
@@ -75,7 +75,7 @@ class SAssociationProxy
         if (!isset($options['foreign_key'])) 
             $options['foreign_key'] = strtolower(get_class($owner)).'_id';
         if (!isset($options['association_foreign_key'])) 
-            $options['association_foreign_key'] = strtolower($dest).'_id';
+            $options['association_foreign_key'] = $dest.'_id';
         if (!isset($options['join_table']))
             $options['join_table'] = self::joinTableName($owner->tableName, $options['table_name']);
         
@@ -88,7 +88,7 @@ class SAssociationProxy
         if (!isset($options['foreign_key']))
             $options['foreign_key'] = strtolower(get_class($owner)).'_id';
         if (!isset($options['association_foreign_key'])) 
-            $options['association_foreign_key'] = strtolower($dest).'_id';
+            $options['association_foreign_key'] = $dest.'_id';
         
         return $options;
     }
@@ -96,8 +96,8 @@ class SAssociationProxy
     private static function registerToOneMethods($owner, $name, $dest)
     {
         $owner->registerAssociationMethod($name, $name, 'read');
-        $owner->registerAssociationMethod('build'.$dest, $name, 'build');
-        $owner->registerAssociationMethod('create'.$dest, $name, 'create');
+        $owner->registerAssociationMethod('build'.ucfirst($dest), $name, 'build');
+        $owner->registerAssociationMethod('create'.ucfirst($dest), $name, 'create');
     }
     
     private static function registerToManyMethods($owner, $name, $dest)
