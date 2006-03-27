@@ -95,11 +95,11 @@ class SHasManyTest extends ActiveTestCase
         $company = SActiveStore::findByPk('Company', 1);
         $product = new Product(array('name'=>'CD-R', 'price'=>'0.75'));
         $company->products[] = $product;
-        //$this->assertEqual(2, count($company->products));
+        $this->assertEqual(2, $company->products->count());
         $this->assertEqual(2, $company->countProducts());
         $company->save();
         $companyReloaded = SActiveStore::findByPk('Company', 1);
-        //$this->assertEqual(2, count($companyReloaded->products));
+        $this->assertEqual(2, $companyReloaded->products->count());
         $this->assertEqual(2, $companyReloaded->countProducts());
     }
     
