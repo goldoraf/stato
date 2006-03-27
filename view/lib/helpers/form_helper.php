@@ -2,8 +2,20 @@
 
 function default_options($objectName, $method, $object, $options = array())
 {
-    $options = array_merge(array('id' => "{$objectName}_{$method}"), $options);
-    return array("{$objectName}[{$method}]", $object->$method, $options);
+    if (isset($options['index']))
+    {
+        $index = $options['index'];
+        unset($options['index']);
+        $name = "{$objectName}[{$index}][{$method}]";
+        $id = "{$objectName}_{$index}_{$method}";
+    }
+    else
+    {
+        $name = "{$objectName}[{$method}]";
+        $id = "{$objectName}_{$method}";
+    }
+    $options = array_merge(array('id' => $id), $options);
+    return array($name, $object->$method, $options);
 }
 
 function text_field($objectName, $method, $object, $options = array())
