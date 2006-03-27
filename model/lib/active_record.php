@@ -15,8 +15,6 @@ class SActiveRecord extends SRecord
     protected $assocMethods = array();
     protected $newRecord = False;
     
-    public $actAs = False;
-    
     public function __construct($values = Null, $dontInitAssocs=false, $newRecord = True)
     {
         $this->db = SDatabase::getInstance();
@@ -30,15 +28,6 @@ class SActiveRecord extends SRecord
         $this->newRecord = $newRecord;
         
         if (!$dontInitAssocs) $this->initAssociations();
-        
-        if (is_array($this->actAs))
-        {
-            foreach($this->actAs as $type => $options)
-            {
-                SMixins::aggregate(__CLASS__, $type.'Mixin');
-                call_user_func(array($type.'Mixin', 'registerCallbacks'), $this);
-            }
-        }
     }
     
     public function __call($methodMissing, $args)

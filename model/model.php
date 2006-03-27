@@ -5,16 +5,14 @@ require_once('lib/recordset.php');
 require_once('lib/attribute.php');
 require_once('lib/validation.php');
 require_once('lib/observable.php');
-require_once('lib/mixins.php');
 require_once('lib/record.php');
 require_once('lib/active_record.php');
 require_once('lib/active_store.php');
 require_once('lib/fixture.php');
 require_once('lib/paginator.php');
 
-//require_once('lib/mixins/list_mixin.php');
-//require_once('lib/mixins/file_mixin.php');
-//require_once('lib/mixins/image_mixin.php');
+require_once('lib/decorators/base_decorator.php');
+require_once('lib/decorators/list_decorator.php');
 
 require_once('lib/drivers/abstract_driver.php');
 require_once('lib/drivers/mysql_driver.php');

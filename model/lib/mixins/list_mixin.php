@@ -158,7 +158,7 @@ class SListMixin
         SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} - 1)",
-            self::scopeCondition()." AND {$this->positionField()} <= {$position}"
+            $this->scopeCondition()." AND {$this->positionField()} <= {$position}"
         );
     }
     
@@ -168,7 +168,7 @@ class SListMixin
         SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} - 1)",
-            self::scopeCondition()." AND {$this->positionField()} > ".$this->readAttribute($this->positionField())
+            $this->scopeCondition()." AND {$this->positionField()} > ".$this->readAttribute($this->positionField())
         );
     }
     
@@ -178,7 +178,7 @@ class SListMixin
         SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} + 1)",
-            self::scopeCondition()." AND {$this->positionField()} < ".$this->readAttribute($this->positionField())
+            $this->scopeCondition()." AND {$this->positionField()} < ".$this->readAttribute($this->positionField())
         );
     }
     
@@ -187,7 +187,7 @@ class SListMixin
         SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} + 1)",
-            self::scopeCondition()." AND {$this->positionField()} >= {$position}"
+            $this->scopeCondition()." AND {$this->positionField()} >= {$position}"
         );
     }
     
@@ -196,7 +196,7 @@ class SListMixin
         SActiveStore::updateAll(
             get_class($this),
             "{$this->positionField()} = ({$this->positionField()} + 1)",
-            self::scopeCondition()
+            $this->scopeCondition()
         );
     }
     

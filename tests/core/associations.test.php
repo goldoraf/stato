@@ -151,8 +151,7 @@ class SHasManyTest extends ActiveTestCase
         $this->assertEqual('toaster', $new_product->name);
         $this->assertTrue($new_product->isNewRecord());
         $nb_products = $company->countProducts();
-        $offset = $nb_products - 1; // crash si on écrit $company->products[$nb_products - 1]  !!!!!
-        $this->assertEqual($new_product, $company->products[$offset]);
+        $this->assertEqual($new_product, $company->products[$nb_products - 1]);
         $this->assertTrue($new_product->save());
         $this->assertFalse($new_product->isNewRecord());
         $company->products(True);
@@ -166,8 +165,7 @@ class SHasManyTest extends ActiveTestCase
         $this->assertTrue($new_product->isNewRecord());
         $this->assertFalse($new_product->isValid());
         $nb_products = $company->countProducts();
-        $offset = $nb_products - 1; // crash si on écrit $company->products[$nb_products - 1]  !!!!!
-        $this->assertEqual($new_product, $company->products[$offset]);
+        $this->assertEqual($new_product, $company->products[$nb_products - 1]);
         $this->assertFalse($new_product->save());
         $company->products(True);
         $this->assertEqual($nb_products - 1, $company->countProducts());

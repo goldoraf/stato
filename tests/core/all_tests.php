@@ -38,6 +38,8 @@ $test->addTestFile('activerecord.test.php');
 $test->addTestFile('activestore.test.php');
 $test->addTestFile('eagerloading.test.php');
 $test->addTestFile('associations.test.php');
+$test->addTestFile('decorators.test.php');
+$test->addTestFile('listdecorator.test.php');
 
 $test->run(new TextReporter());
 

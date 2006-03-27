@@ -40,13 +40,10 @@ abstract class SObservable
         $this->$state();
         foreach($this->observers as $observer) $observer->update($this, $state);
         if (isset($this->callbacks[$state]))
-        {
             foreach($this->callbacks[$state] as $callback) call_user_func($callback);
-        }
+        
         if (isset($this->selfCallbacks[$state]))
-        {
             foreach($this->selfCallbacks[$state] as $callback) $this->$callback();
-        }
     }
 }
 
