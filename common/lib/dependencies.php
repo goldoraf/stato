@@ -21,8 +21,13 @@ class SDependencies
         if ($relativeTo === null) return '';
         
         $reflection = new ReflectionClass($relativeTo);
+        return self::fileSubDirectory($reflection->getFileName());
+    }
+    
+    public static function fileSubDirectory($file)
+    {
         $relativeDir = preg_replace('#'.APP_DIR.'/(\w+)/#i', '', 
-                        str_replace('\\', '/', $reflection->getFileName()));
+                        str_replace('\\', '/', $file));
         if (strpos($relativeDir, '/') !== false)
         {
             list($subdir, $file) = explode('/', $relativeDir);

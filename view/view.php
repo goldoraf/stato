@@ -11,7 +11,6 @@ require_once('lib/helpers/date_helper.php');
 require_once('lib/helpers/pager_helper.php');
 require_once('lib/helpers/ajax_helper.php');
 require_once('lib/helpers/record_helper.php');
-require_once('lib/helpers/partials_helper.php');
 require_once('lib/helpers/text_helper.php');
 require_once('lib/helpers/utf8_helper.php');
 require_once('lib/helpers/cache_helper.php');

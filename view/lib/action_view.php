@@ -3,11 +3,7 @@
 class SActionView
 {
     private $assigns = array();
-    
-    public function __construct()
-    {
-        
-    }
+    private $templateDir = null;
     
     public function __get($name)
     {
@@ -21,10 +17,11 @@ class SActionView
     
     public function render($template, $assigns)
     {
-        $this->assigns = $assigns;
-        
         if (!is_readable($template))
             throw new SException('Template not found : '.$template);
+            
+        $this->assigns = $assigns;
+        $this->templateDir = dirname($template);
         
         $compiled = $this->compiledTemplatePath($template);
         
@@ -37,6 +34,37 @@ class SActionView
         ob_end_clean();
         
         return $str;
+    }
+    
+    public function renderPartial($partialPath, $localAssigns = Null)
+    {
+        list($path, $partial) = $this->partialPieces($partialPath);
+        $template = "$path/_$partial.php";
+        
+        if ($localAssigns == Null)
+            $localAssigns = array($partial => $this->assigns[$partial]);
+        
+        $view = new SActionView();
+        return $view->render($template, $localAssigns);
+    }
+    
+    public function renderPartialCollection($partialPath, $collection, $spacerTemplate = Null)
+    {
+        list($path, $partial) = $this->partialPieces($partialPath);
+        $template = "$path/_$partial.php";
+        
+        $partialsCollec = array();
+        $counterName = $partial.'_counter';
+        $counter = 1;
+        foreach($collection as $element)
+        {
+            $localAssigns[$counterName] = $counter;
+            $localAssigns[$partial] = $element;
+            $view = new SActionView();
+            $partialsCollec[] = $view->render($template, $localAssigns);
+            $counter++;
+        }
+        return implode('', $partialsCollec);
     }
     
     private function compile($template, $compiledPath)
@@ -63,6 +91,17 @@ class SActionView
     private function compiledTemplatePath($template)
     {
         return ROOT_DIR.'/cache/templates/'.md5($template);
+    }
+    
+    private function partialPieces($partialPath)
+    {
+        if (strpos($partialPath, '/') === false)
+            return array($this->templateDir, $partialPath);
+        else
+        {
+            list($subPath, $partial) = explode('/', $partialPath);
+            return array(APP_DIR."/views/$subPath", $partial);
+        }
     }
 }
 
