@@ -20,6 +20,7 @@ function default_options($objectName, $method, $object, $options = array())
 
 function text_field($objectName, $method, $object, $options = array())
 {
+    $options = array_merge(array('size' => 30), $options);
     list($name, $value, $options) = default_options($objectName, $method, $object, $options);
     return text_field_tag($name, $value, $options);
 }
@@ -44,6 +45,7 @@ function hidden_field($objectName, $method, $object, $options = array())
 
 function text_area($objectName, $method, $object, $options = array())
 {
+    $options = array_merge(array('cols' => 40, 'rows' => 20), $options);
     list($name, $value, $options) = default_options($objectName, $method, $object, $options);
     return text_area_tag($name, $value, $options);
 }
@@ -53,7 +55,7 @@ function check_box($objectName, $method, $object, $options = array(), $checkedVa
     list($name, $value, $options) = default_options($objectName, $method, $object, $options);
     if ($value) $checked = True;
     else $checked = False;
-    return hidden_field_tag($name, Null, $uncheckedValue)
+    return hidden_field_tag($name, $uncheckedValue)
     .check_box_tag($name, $checkedValue, $checked, $options);
 }
 
