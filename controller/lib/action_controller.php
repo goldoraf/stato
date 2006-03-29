@@ -29,6 +29,11 @@ class SActionController
     
     public $beforeFilters = array();
     public $afterFilters  = array();
+    public $aroundFilters = array();
+    
+    public $skipBeforeFilters = array();
+    public $skipAfterFilters  = array();
+    
     public $autoCompleteFor = array();
     
     protected $assigns = array();
@@ -108,12 +113,17 @@ class SActionController
             $this->virtualMethods[$method] = array('autoCompleteFor', $params);
         }*/
         
-        foreach($this->beforeFilters as $method) $this->$method();
+        $beforeResult = $this->processFilters('before');
+        foreach($this->aroundFilters as $filter) $filter->before($this);
         
-        $this->$action();
-        if (!$this->isPerformed()) $this->render();
+        if ($beforeResult !== false && !$this->isPerformed())
+        {
+            $this->$action();
+            if (!$this->isPerformed()) $this->render();
+        }
         
-        foreach($this->afterFilters as $method) $this->$method();
+        foreach($this->aroundFilters as $filter) $filter->after($this);
+        $this->processFilters('after');
         
         if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
             $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
@@ -178,6 +188,31 @@ class SActionController
             else
                 return false;
         }
+    }
+    
+    protected function processFilters($state)
+    {
+        $prop = $state.'Filters';
+        foreach ($this->$prop as $filter)
+        {
+            if (is_array($filter))
+            {
+                $method = $filter[0];
+                if ((isset($filter['only']) && in_array($this->actionName(), $filter['only']))
+                    || (isset($filter['except']) && !in_array($this->actionName(), $filter['except']))
+                    || (!isset($filter['only']) && !isset($filter['except'])))
+                    $result = $this->callFilter($method, $state);
+            }
+            else $result = $this->callFilter($filter, $state);
+            
+            if ($result === false) return false;
+        }
+    }
+    
+    protected function callFilter($method, $state)
+    {
+        $skipProp = 'skip'.ucfirst($state).'Filters';
+        if (!in_array($method, $this->$skipProp)) return $this->$method();
     }
     
     protected function render($status = null)
