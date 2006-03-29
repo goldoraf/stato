@@ -2,8 +2,14 @@
 
 class SActionView
 {
-    private $assigns = array();
+    private $assigns     = array();
+    private $controller  = null;
     private $templateDir = null;
+    
+    public function __construct($controller)
+    {
+        $this->controller = $controller;
+    }
     
     public function __get($name)
     {
@@ -44,7 +50,7 @@ class SActionView
         if ($localAssigns == Null)
             $localAssigns = array($partial => $this->assigns[$partial]);
         
-        $view = new SActionView();
+        $view = new SActionView($this->controller);
         return $view->render($template, $localAssigns);
     }
     
@@ -60,11 +66,34 @@ class SActionView
         {
             $localAssigns[$counterName] = $counter;
             $localAssigns[$partial] = $element;
-            $view = new SActionView();
+            $view = new SActionView($this->controller);
             $partialsCollec[] = $view->render($template, $localAssigns);
             $counter++;
         }
         return implode('', $partialsCollec);
+    }
+    
+    public function cacheStart($id, $lifetime = 30)
+    {
+        if ($this->isFragmentCacheValid($id, $lifetime))
+        {
+            echo file_get_contents($this->fragmentCachePath($id));
+            return true;
+        }
+        else
+        {
+            ob_start();
+            //ob_implicit_flush(false); necessary ?
+            return false;
+        }
+    }
+    
+    public function cacheEnd($id = null)
+    {
+        $str = ob_get_contents();
+        ob_end_clean();
+        file_put_contents($this->fragmentCachePath($id), 'Fragment cached !'.$str.'Fragment cached !');
+        echo $str;
     }
     
     private function compile($template, $compiledPath)
@@ -102,6 +131,17 @@ class SActionView
             list($subPath, $partial) = explode('/', $partialPath);
             return array(APP_DIR."/views/$subPath", $partial);
         }
+    }
+    
+    private function isFragmentCacheValid($id, $lifetime)
+    {
+        if (file_exists($this->fragmentCachePath($id))) return true;
+        return false;
+    }
+    
+    private function fragmentCachePath($id)
+    {
+        return ROOT_DIR."/cache/fragments/{$id}";
     }
 }
 
