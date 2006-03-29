@@ -4,7 +4,7 @@ class SUrlRewriter
 {
     private static $request = null;
     private static $reservedOptions = array('only_path', 'protocol', 'host', 'anchor',
-        'trailing_slash', 'skip_relative_url_root');
+        'trailing_slash', 'skip_relative_url_root', 'action_suffix');
         
     public static function initialize($request)
     {
@@ -37,6 +37,7 @@ class SUrlRewriter
             $url.= self::$request->relativeUrlRoot();
         
         $url.= $path;
+        if (isset($options['action_suffix'])) $url.= '/'.$options['action_suffix'];
         if (isset($options['trailing_slash'])) $url.= '/';
         if (isset($options['anchor'])) $url.= '#'.$options['anchor'];
         

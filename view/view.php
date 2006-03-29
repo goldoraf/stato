@@ -13,7 +13,6 @@ require_once('lib/helpers/ajax_helper.php');
 require_once('lib/helpers/record_helper.php');
 require_once('lib/helpers/text_helper.php');
 require_once('lib/helpers/utf8_helper.php');
-require_once('lib/helpers/cache_helper.php');
 require_once('lib/helpers/i18n_helper.php');
 
 ?>

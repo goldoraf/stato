@@ -5,6 +5,7 @@ class SActionView
     private $assigns     = array();
     private $controller  = null;
     private $templateDir = null;
+    private $tmpCacheKey = null;
     
     public function __construct($controller)
     {
@@ -73,26 +74,42 @@ class SActionView
         return implode('', $partialsCollec);
     }
     
-    public function cacheStart($id, $lifetime = 30)
+    public function cacheStart($id = null, $lifetime = 30)
     {
-        if ($this->isFragmentCacheValid($id, $lifetime))
+        if (!$this->controller->performCaching) return;
+        
+        if ($id === null) $id = array('controller' => $this->controller->controllerPath(),
+                                      'action' => $this->controller->actionName());
+        
+        $cacheKey = $this->fragmentCacheKey($id);
+        if ($this->isFragmentCacheValid($cacheKey, $lifetime))
         {
-            echo file_get_contents($this->fragmentCachePath($id));
+            echo file_get_contents($cacheKey);
             return true;
         }
-        else
-        {
-            ob_start();
-            //ob_implicit_flush(false); necessary ?
-            return false;
-        }
+        $this->tmpCacheKey = $cacheKey;
+        ob_start();
+        return false;
     }
     
     public function cacheEnd($id = null)
     {
+        if (!$this->controller->performCaching) return;
+        
+        if ($id !== null) $cacheKey = $id;
+        else
+        {
+            $cacheKey = $this->tmpCacheKey;
+            $this->tmpCacheKey = null;
+        }
+        
         $str = ob_get_contents();
         ob_end_clean();
-        file_put_contents($this->fragmentCachePath($id), 'Fragment cached !'.$str.'Fragment cached !');
+        
+        if (!SFileUtils::mkdirs(dirname($cacheKey), 0700, true))
+            throw new SException('Caching failed with dirs creation');
+            
+        file_put_contents($cacheKey, 'Fragment cached !'.$str.'Fragment cached !');
         echo $str;
     }
     
@@ -133,14 +150,21 @@ class SActionView
         }
     }
     
-    private function isFragmentCacheValid($id, $lifetime)
+    private function isFragmentCacheValid($file, $lifetime)
     {
-        if (file_exists($this->fragmentCachePath($id))) return true;
+        if (file_exists($file))
+        {
+            if ($lifetime === null || (time() < filemtime($file) + $lifetime)) return true;
+            else return false;
+        }
         return false;
     }
     
-    private function fragmentCachePath($id)
+    private function fragmentCacheKey($id)
     {
+        if (is_array($id))
+            list($protocol, $id) = explode('://', SUrlRewriter::urlFor($id));
+        
         return ROOT_DIR."/cache/fragments/{$id}";
     }
 }

@@ -43,7 +43,7 @@ class SActionController
     
     public static function factory($request, $response)
     {
-        if (!file_exists($path = self::controllerPath($request->controller)))
+        if (!file_exists($path = self::controllerFile($request->controller)))
     		throw new SUnknownControllerException(ucfirst($request->controller).'Controller not found !');
     		
     	require_once($path);
@@ -149,6 +149,11 @@ class SActionController
         return ucfirst($this->controllerName()).'Controller';
     }
     
+    public function controllerPath()
+    {
+        return SDependencies::subDirectory(get_class($this)).$this->controllerName();
+    }
+    
     public function actionName()
     {
         if (empty($this->request->action)) return 'index';
@@ -182,7 +187,7 @@ class SActionController
     
     protected function renderAction($action, $status = null)
     {
-        $template = $this->templatePath($this->controllerName(), $action);
+        $template = $this->templatePath($this->controllerPath(), $action);
         if (!file_exists($template)) throw new SException('Template not found for this action');
         
         if ($this->layout) $this->renderWithLayout($template, $status);
@@ -222,9 +227,9 @@ class SActionController
         $this->flash->discard();
     }
     
-    protected function templatePath($controller, $action)
+    protected function templatePath($controllerPath, $action)
     {
-        return APP_DIR."/views/".SDependencies::subDirectory(get_class($this))."$controller/$action.php";
+        return APP_DIR."/views/$controllerPath/$action.php";
     }
     
     protected function redirectTo($options)
@@ -282,7 +287,7 @@ class SActionController
     {
         if (!isset($options['action']))     $options['action'] = 'index';
         if (!isset($options['controller'])) 
-            $options['controller'] = $this->subDirectory().$this->controllerName();
+            $options['controller'] = $this->controllerPath();
         
         return SUrlRewriter::rewrite($options);
     }
@@ -350,6 +355,17 @@ class SActionController
             $path = $options;
             
         if (file_exists($this->pageCachePath($path))) unlink($this->pageCachePath($path));
+    }
+    
+    protected function expireFragment($id)
+    {
+        if (!$this->performCaching) return;
+        
+        if (is_array($id))
+            list($protocol, $id) = explode('://', $this->urlFor($id));
+        
+        $file = ROOT_DIR."/cache/fragments/{$id}";
+        if (file_exists($file)) unlink($file);
     }
     
     protected function paginate($className, $perPage=10, $options=array())
@@ -452,7 +468,7 @@ class SActionController
             && $this->response->headers['Status'] < 400);
     }
     
-    private static function controllerPath($controller)
+    private static function controllerFile($controller)
 	{
         return APP_DIR.'/controllers/'.SInflection::underscore($controller).'_controller.php';
     }
