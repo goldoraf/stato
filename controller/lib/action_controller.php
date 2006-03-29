@@ -113,6 +113,9 @@ class SActionController
             $this->virtualMethods[$method] = array('autoCompleteFor', $params);
         }*/
         
+        if (!empty($this->cachedActions))
+            $this->aroundFilters[] = new SActionCacheFilter($this->cachedActions);
+        
         $beforeResult = $this->processFilters('before');
         foreach($this->aroundFilters as $filter) $filter->before($this);
         
@@ -168,6 +171,21 @@ class SActionController
     {
         if (empty($this->request->action)) return 'index';
         return $this->request->action;
+    }
+    
+    public function urlFor($options = array())
+    {
+        if (!isset($options['controller']))
+        {
+            $options['controller'] = $this->controllerPath();
+            if (!isset($options['action'])) $options['action'] = $this->actionName();
+        }
+        else
+        {
+            if (!isset($options['action'])) $options['action'] = 'index';
+        }   
+        
+        return SUrlRewriter::rewrite($options);
     }
     
     protected function actionExists($action)
@@ -245,7 +263,8 @@ class SActionController
         $this->renderText($this->view->render($path, $this->assigns), $status);
     }
     
-    protected function renderText($str, $status = null)
+    // public method because used by ActionCacheFilter
+    public function renderText($str, $status = null)
     {
         if ($this->isPerformed())
             throw new SDoubleRenderException('Can only render or redirect once per action');
@@ -316,15 +335,6 @@ class SActionController
     protected function expiresNow()
     {
         $this->response->headers['Cache-Control'] = 'no-cache';
-    }
-    
-    protected function urlFor($options)
-    {
-        if (!isset($options['action']))     $options['action'] = 'index';
-        if (!isset($options['controller'])) 
-            $options['controller'] = $this->controllerPath();
-        
-        return SUrlRewriter::rewrite($options);
     }
     
     protected function eraseResults()

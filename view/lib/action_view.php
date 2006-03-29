@@ -82,9 +82,9 @@ class SActionView
                                       'action' => $this->controller->actionName());
         
         $cacheKey = $this->fragmentCacheKey($id);
-        if ($this->isFragmentCacheValid($cacheKey, $lifetime))
+        if (($cache = $this->readFragment($cacheKey, $lifetime)) !== false)
         {
-            echo file_get_contents($cacheKey);
+            echo $cache;
             return true;
         }
         $this->tmpCacheKey = $cacheKey;
@@ -103,14 +103,25 @@ class SActionView
             $this->tmpCacheKey = null;
         }
         
-        $str = ob_get_contents();
+        $content = ob_get_contents();
         ob_end_clean();
         
-        if (!SFileUtils::mkdirs(dirname($cacheKey), 0700, true))
+        $this->writeFragment($cacheKey, $content);
+        echo $content;
+    }
+    
+    public function readFragment($key, $lifetime = 30)
+    {
+        if ($this->isFragmentCacheValid($key, $lifetime)) return file_get_contents($key);
+        return false;
+    }
+    
+    public function writeFragment($key, $content)
+    {
+        if (!SFileUtils::mkdirs(dirname($key), 0700, true))
             throw new SException('Caching failed with dirs creation');
             
-        file_put_contents($cacheKey, 'Fragment cached !'.$str.'Fragment cached !');
-        echo $str;
+        file_put_contents($key, $content);
     }
     
     private function compile($template, $compiledPath)
@@ -166,6 +177,38 @@ class SActionView
             list($protocol, $id) = explode('://', SUrlRewriter::urlFor($id));
         
         return ROOT_DIR."/cache/fragments/{$id}";
+    }
+}
+
+class SActionCacheFilter
+{
+    private $actions = array();
+    private $renderedActionCache = false;
+    
+    public function __construct($actions)
+    {
+        $this->actions = $actions;
+    }
+    
+    public function before($controller)
+    {
+        if (!in_array($controller->actionName(), $this->actions)) return;
+        list($protocol, $key) = $controller->urlFor();
+        
+        if (($cache = $controller->view->readFragment($key)) !== false)
+        {
+            $this->renderedActionCache = true;
+            $controller->renderText($cache);
+            return false;
+        }
+    }
+    
+    public function after($controller)
+    {
+        if (!in_array($controller->actionName(), $this->actions) || $this->renderedActionCache) return;
+        list($protocol, $key) = $controller->urlFor();
+        
+        $controller->view->writeFragment($key, $controller->response->body);
     }
 }
 
