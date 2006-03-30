@@ -3,6 +3,7 @@
 class SResponse
 {
     public $body         = null;
+    public $assigns      = array();
     public $headers      = array();
     public $redirectedTo = null;
     
