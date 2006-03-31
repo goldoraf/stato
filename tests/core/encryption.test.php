@@ -2,7 +2,7 @@
 
 require_once(CORE_DIR.'/common/common.php');
 
-class SEncryptionTest extends UnitTestCase
+class EncryptionTest extends UnitTestCase
 {
     function testBasic()
     {

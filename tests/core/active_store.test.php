@@ -1,6 +1,6 @@
 <?php
 
-class SActiveStoreTest extends ActiveTestCase
+class ActiveStoreTest extends ActiveTestCase
 {
     public $fixtures = array('companies');
     

@@ -13,7 +13,8 @@ class ActiveTestCase extends UnitTestCase
     
     public function __construct()
     {
-        parent::UnitTestCase('ActiveRecord test');
+        parent::UnitTestCase();
+        $this->recreateDatabase();
         $this->loadedFixtures = SFixture::createFixtures(FIXTURES_DIR, $this->fixtures);
     }
     
@@ -43,6 +44,19 @@ class ActiveTestCase extends UnitTestCase
         {
             if (($insts = $fixture->instanciateFixtures()) !== false) $this->$table = $insts;
         }
+    }
+    
+    private function recreateDatabase()
+    {
+        $db = SDatabase::getInstance();
+        $dbname = $db->config['dbname'];
+        $db->execute("DROP DATABASE IF EXISTS $dbname");
+        $db->execute("CREATE DATABASE $dbname");
+        $db->execute("USE $dbname");
+        $sql = file_get_contents(TESTS_DIR.'/core/fixtures/test_framework.sql');
+        $requetes = explode(';', $sql);
+        array_pop($requetes);
+        foreach($requetes as $req) $db->execute($req);
     }
 }
 

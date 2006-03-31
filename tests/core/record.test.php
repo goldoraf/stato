@@ -3,7 +3,7 @@
 require_once(CORE_DIR.'/model/model.php');
 require_once(TESTS_DIR.'/core/fixtures/models.php');
 
-class SRecordTest extends UnitTestCase
+class RecordTest extends UnitTestCase
 {
     function testAttributeAccess()
     {

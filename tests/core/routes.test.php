@@ -2,7 +2,7 @@
 
 require_once(CORE_DIR.'/controller/controller.php');
 
-class SRoutesTest extends UnitTestCase
+class RoutesTest extends UnitTestCase
 {
     function setMap($map)
     {

@@ -1,6 +1,6 @@
 <?php
 
-class SListDecoratorTest extends ActiveTestCase
+class ListDecoratorTest extends ActiveTestCase
 {
     public $fixtures = array('topics', 'forums');
     public $useInstantiatedFixtures = True;

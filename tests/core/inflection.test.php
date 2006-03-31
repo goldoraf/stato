@@ -1,7 +1,5 @@
 <?php
 
-require_once(CORE_DIR.'/model/model.php');
-
 class InflectionTest extends UnitTestCase
 {
     function testPlural()

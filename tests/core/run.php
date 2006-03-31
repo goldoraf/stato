@@ -45,15 +45,14 @@ else
     $test->addTestFile('filters.test.php');
     $test->addTestFile('routes.test.php');
     
-    $test->addTestFile('database.test.php');
     $test->addTestFile('record.test.php');
-    $test->addTestFile('activerecord.test.php');
-    $test->addTestFile('activestore.test.php');
-    $test->addTestFile('eagerloading.test.php');
+    $test->addTestFile('active_record.test.php');
+    $test->addTestFile('active_store.test.php');
+    $test->addTestFile('eager_loading.test.php');
     $test->addTestFile('associations.test.php');
     $test->addTestFile('callbacks.test.php');
     $test->addTestFile('decorators.test.php');
-    $test->addTestFile('listdecorator.test.php');
+    $test->addTestFile('list_decorator.test.php');
     
     $test->addTestFile('tag_helper.test.php');
     $test->addTestFile('ajax_helper.test.php');
