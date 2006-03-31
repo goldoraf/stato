@@ -83,8 +83,8 @@ class SActionController
     {
         $this->request  = $request;
         $this->response = $response;
-        $this->params   = $this->request->params;
-        $this->response->assigns =& $this->assigns;
+        $this->params   =& $this->request->params;
+        $this->assigns  =& $this->response->assigns;
         
         $this->logProcessing();
         
