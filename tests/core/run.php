@@ -57,6 +57,7 @@ else
     $test->addTestFile('tag_helper.test.php');
     $test->addTestFile('ajax_helper.test.php');
     $test->addTestFile('form_helper.test.php');
+    $test->addTestFile('date_helper.test.php');
 }
 
 $test->run(new TextReporter());
