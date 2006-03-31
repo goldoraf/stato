@@ -18,6 +18,11 @@ class SLocale
         
         self::loadStrings(ROOT_DIR.'/core/common/locale/');
         
+        self::setLocale();
+    }
+    
+    public static function setLocale()
+    {
         putenv("LANG=".self::$language."");
         if (count($exp = explode('_', self::$language)) != 1) $winLanguage = $exp[0];
         else $winLanguage = self::$language;
