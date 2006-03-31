@@ -120,7 +120,7 @@ function select_year($date, $options = array())
     if (!isset($options['end_year'])) $options['end_year'] = $today->year + 5;
     $step = ($options['start_year'] < $options['end_year']) ? 1 : -1;
     $selected = is_date_type($date) ? $date->year : $date;
-    for($i = $options['start_year']; $i != $options['end_year']; $i = $i + $step)
+    for($i = $options['start_year']; $i != $options['end_year'] + $step; $i = $i + $step)
     {
         if ($i == $selected)
             $yearOptions.= "<option value=\"{$i}\" selected=\"selected\">{$i}</option>\n";
@@ -160,7 +160,9 @@ function select_hour($datetime, $options = array())
 function select_html($type, $dateOptions, $options = array())
 {
     if (!isset($options['prefix'])) $options['prefix'] = 'date';
-    $html = '<select name="'.$options['prefix']."[{$type}]\">\n";
+    $html = '<select name="'.$options['prefix']."[{$type}]\"";
+    if (isset($options['disabled']) && $options['disabled'] == true) $html.= ' disabled="disabled"';
+    $html.= ">\n";
     if (isset($options['include_blank']) && $options['include_blank'] == True) $html.= '<option value=""></option>';
     $html.= $dateOptions."</select>\n";
     return $html;
