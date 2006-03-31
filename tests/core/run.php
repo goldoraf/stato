@@ -18,6 +18,7 @@ define('TESTS_DIR', ROOT_DIR.'/core/tests');
 require_once(TESTS_DIR.'/lib/showpasses.php');
 require_once(TESTS_DIR.'/lib/colortextreporter.php');
 require_once(TESTS_DIR.'/lib/activetestcase.php');
+require_once(TESTS_DIR.'/lib/helpertestcase.php');
 
 define('CONFIG_DIR', TESTS_DIR.'/core/conf');
 define('FIXTURES_DIR', TESTS_DIR.'/core/fixtures');
@@ -37,23 +38,25 @@ if ($_SERVER['argc'] != 1)
 else
 {
     $test =& new GroupTest('All tests');
-
-    $test->addTestFile('filters.test.php');
-    $test->addTestFile('callbacks.test.php');
-    $test->addTestFile('routes.test.php');
+    
     $test->addTestFile('inflection.test.php');
     $test->addTestFile('encryption.test.php');
-    $test->addTestFile('helpers.test.php');
+
+    $test->addTestFile('filters.test.php');
+    $test->addTestFile('routes.test.php');
+    
     $test->addTestFile('database.test.php');
     $test->addTestFile('record.test.php');
     $test->addTestFile('activerecord.test.php');
-    //$test->addTestFile('mixins.test.php');
-    //$test->addTestFile('listmixin.test.php');
     $test->addTestFile('activestore.test.php');
     $test->addTestFile('eagerloading.test.php');
     $test->addTestFile('associations.test.php');
+    $test->addTestFile('callbacks.test.php');
     $test->addTestFile('decorators.test.php');
     $test->addTestFile('listdecorator.test.php');
+    
+    $test->addTestFile('tag_helper.test.php');
+    $test->addTestFile('ajax_helper.test.php');
 }
 
 $test->run(new TextReporter());
