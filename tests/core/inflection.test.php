@@ -2,7 +2,7 @@
 
 require_once(CORE_DIR.'/model/model.php');
 
-class SInflectionTest extends UnitTestCase
+class InflectionTest extends UnitTestCase
 {
     function testPlural()
     {
@@ -24,6 +24,11 @@ class SInflectionTest extends UnitTestCase
     {
         $this->assertEqual('MyTestController', SInflection::camelize('my_test_controller'));
         $this->assertEqual('SMyTestController', SInflection::camelize('s_my_test_controller'));
+    }
+    
+    function testWikify()
+    {
+        $this->assertEqual('hello_world', SInflection::wikify('Hello World'));
     }
 }
 

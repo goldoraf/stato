@@ -68,6 +68,11 @@ class SInflection
     {
         return preg_replace('/(^|_)(.)/e', "strtoupper('\\2')", $underscoreWord);
     }
+    
+    public static function wikify($sentence)
+    {
+        return strtolower(preg_replace('/\W/', '', preg_replace('/\s/', '_', $sentence)));
+    }
 }
 
 ?>
