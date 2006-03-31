@@ -31,7 +31,7 @@ session_start();
 if ($_SERVER['argc'] != 1)
 {
     $file = $_SERVER['argv'][1].'.test.php';
-    $class = ucfirst($_SERVER['argv'][1]).'Test';
+    $class = ucfirst(str_replace('_', '', $_SERVER['argv'][1])).'Test';
     require_once($file);
     $test = new $class();
 }
@@ -57,6 +57,7 @@ else
     
     $test->addTestFile('tag_helper.test.php');
     $test->addTestFile('ajax_helper.test.php');
+    $test->addTestFile('form_helper.test.php');
 }
 
 $test->run(new TextReporter());

@@ -5,6 +5,8 @@ class DomAssertEqualTest extends UnitTestCase
     function testDomAssertEqual()
     {
         $this->assertTrue($this->assertDomEqual('<fake />', '<fake />'));
+        $this->assertTrue($this->assertDomEqual('<fake />', '<fake/>'));
+        $this->assertTrue($this->assertDomEqual("<fake />\n", '<fake />'));
         $this->assertFalse($this->assertDomEqual('<fake />', '<nuke />'));
         $this->assertTrue($this->assertDomEqual('<fake></fake>', '<fake />'));
         

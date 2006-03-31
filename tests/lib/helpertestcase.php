@@ -4,8 +4,14 @@ class DomEqualExpectation extends EqualExpectation {
     
     function test($compare, $nasty = false)
     {
-        $docValue = DOMDocument::loadXML('<root>'.$this->_value.'</root>');
-        $docCompare = DOMDocument::loadXML('<root>'.$compare.'</root>');
+        $docValue = new DOMDocument();
+        $docValue->preserveWhiteSpace = false;
+        $docValue->loadXML('<root>'.$this->_value.'</root>');
+        
+        $docCompare = new DOMDocument();
+        $docCompare->preserveWhiteSpace = false;
+        $docCompare->loadXML('<root>'.$compare.'</root>');
+        
         return $this->_domCompare($docValue->documentElement, $docCompare->documentElement);
     }
     
