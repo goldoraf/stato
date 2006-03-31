@@ -54,13 +54,13 @@ function time_select($objectName, $method, $object, $options = array())
 function select_date($date = Null, $options = array())
 {
     if ($date == Null) $date = SDate::today();
-    return select_day($date, $options).select_month($date, $options).select_year($date, $options);
+    return select_year($date, $options).select_month($date, $options).select_day($date, $options);
 }
 
 function select_date_time($datetime = Null, $options = array())
 {
     if ($datetime == Null) $datetime = SDateTime::today();
-    return select_day($datetime, $options).select_month($datetime, $options).select_year($datetime, $options)
+    return select_year($date, $options).select_month($date, $options).select_day($date, $options)
     .select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
