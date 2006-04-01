@@ -29,7 +29,7 @@ function date_time_select($objectName, $method, $object, $options = array())
     $html = '';
     foreach ($order as $param)
     {
-        $html.= call_user_func('select_'.$param, $date, $options);
+        $html.= call_user_func('select_'.$param, $datetime, $options);
     }
     return $html;
 }
@@ -46,7 +46,7 @@ function time_select($objectName, $method, $object, $options = array())
     $html = '';
     foreach ($order as $param)
     {
-        $html.= call_user_func('select_'.$param, $date, $options);
+        $html.= call_user_func('select_'.$param, $datetime, $options);
     }
     return $html;
 }
