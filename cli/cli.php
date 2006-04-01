@@ -1,5 +1,5 @@
 <?php
 
-require_once('lib/consolecontroller.class.php');
+require_once('lib/console_utils.php');
 
 ?>

@@ -1,21 +1,9 @@
 <?php
 
-class ConsoleException extends Exception {}
+class SConsoleException extends Exception {}
 
-class ConsoleController
+class SConsoleUtils
 {
-    protected $arguments = array();
-    
-    public function __construct()
-    {
-        if ($argc == 1)
-        {
-            print("No argument provided !\n");
-            exit(0);
-        }
-        print_r($this->readArguments());
-    }
-    
     /**
     * Function from PEAR::Console_Getopt.
     * Safely read the $argv PHP array across different PHP configurations.
@@ -24,7 +12,7 @@ class ConsoleController
     * @access public
     * @return mixed the $argv PHP array
     */
-    private function readArguments()
+    public static function readArguments()
     {
         global $argv;
         if (!is_array($argv))
