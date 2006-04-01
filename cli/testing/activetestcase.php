@@ -1,7 +1,9 @@
 <?php
 
+define('FIXTURES_DIR', CORE_DIR.'/model/test/fixtures');
+
 require_once(CORE_DIR.'/model/model.php');
-require_once(TESTS_DIR.'/core/fixtures/models.php');
+require_once(FIXTURES_DIR.'/models.php');
 
 class ActiveTestCase extends UnitTestCase
 {
@@ -53,7 +55,7 @@ class ActiveTestCase extends UnitTestCase
         $db->execute("DROP DATABASE IF EXISTS $dbname");
         $db->execute("CREATE DATABASE $dbname");
         $db->execute("USE $dbname");
-        $sql = file_get_contents(TESTS_DIR.'/core/fixtures/test_framework.sql');
+        $sql = file_get_contents(FIXTURES_DIR.'/test_framework.sql');
         $requetes = explode(';', $sql);
         array_pop($requetes);
         foreach($requetes as $req) $db->execute($req);
