@@ -57,7 +57,7 @@ function check_box($objectName, $method, $object, $options = array(), $checkedVa
     if ($value) $checked = True;
     else $checked = False;
     return check_box_tag($name, $checkedValue, $checked, $options)
-    .hidden_field_tag($name, $uncheckedValue);
+    .tag('input', array('type' => 'hidden', 'name' => $name, 'value' => $uncheckedValue));
 }
 
 function radio_button($objectName, $method, $object, $tagValue, $options = array())
