@@ -19,7 +19,7 @@ function tag_options($options = array())
 {
     if (count($options) == 0) return;
     $set = array();
-    foreach($options as $key => $value) $set[] = $key.'="'.$value.'"';
+    foreach($options as $key => $value) if ($value !== null) $set[] = $key.'="'.$value.'"';
     return ' '.implode(" ", $set);
 }
 
