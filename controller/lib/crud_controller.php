@@ -4,16 +4,14 @@ class SCrudController extends SActionController
 {
     public $scaffold = Null;
     
-    public function __construct()
+    protected function initialize()
     {
-        parent::__construct();
-        
         if ($this->scaffold !== Null)
         {
             $this->models[] = $this->scaffold;
         
             if (strpos($this->scaffold, '/') !== false)
-                list($rest, $this->scaffold) = explode('/', $this->scaffold);
+                list( , $this->scaffold) = explode('/', $this->scaffold);
             
             $this->class_name = ucfirst($this->scaffold);
             $this->singular_name = strtolower($this->scaffold);

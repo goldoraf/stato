@@ -100,6 +100,8 @@ class SActionController
         if (!$this->actionExists($action))
             throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
             
+        $this->initialize();
+            
         SLocale::loadStrings(APP_DIR.'/i18n/'.SDependencies::subDirectory(get_class($this)));
         SUrlRewriter::initialize($this->request);
         
@@ -187,6 +189,12 @@ class SActionController
         }   
         
         return SUrlRewriter::rewrite($options);
+    }
+    
+    // Overwrite to perform initializations prior to action call
+    protected function initialize()
+    {
+    
     }
     
     protected function actionExists($action)
