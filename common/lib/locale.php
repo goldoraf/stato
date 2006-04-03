@@ -9,14 +9,14 @@ class SLocale
     {
         foreach (self::getAcceptedLanguages() as $language)
         {
-            if (file_exists(ROOT_DIR.'/core/common/locale/'.$language.'.php'))
+            if (file_exists(ROOT_DIR.'/core/common/lib/locale/'.$language.'.php'))
             {
                 self::$language = $language;
                 break;
             }
         }
         
-        self::loadStrings(ROOT_DIR.'/core/common/locale/');
+        self::loadStrings(ROOT_DIR.'/core/common/lib/locale/');
         
         self::setLocale();
     }
