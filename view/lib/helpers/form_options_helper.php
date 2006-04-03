@@ -3,8 +3,7 @@
 function select($objectName, $method, $object, $choices, $options = array(), $htmlOptions = array())
 {
     list($name, $value, $htmlOptions) = default_options($objectName, $method, $object, $htmlOptions);
-    $optionsBlock = options_for_select($choices, $value);
-    if ($options['include_blank']) $optionsBlock = '<option></option>'.$optionsBlock;
+    $optionsBlock = add_select_options(options_for_select($choices, $value), $options, $value);
     return select_tag($name, $optionsBlock, $htmlOptions);
 }
 
@@ -12,40 +11,38 @@ function select($objectName, $method, $object, $choices, $options = array(), $ht
 function collection_select($objectName, $method, $object, $collection, $valueProp, $textProp, $options=array(), $htmlOptions = array())
 {
     list($name, $value, $htmlOptions) = default_options($objectName, $method, $object, $htmlOptions);
-    $optionsBlock = options_from_collection_for_select($collection, $valueProp, $textProp, $value);
-    if ($options['include_blank']) $optionsBlock = '<option></option>'.$optionsBlock;
+    $optionsBlock = add_select_options(options_from_collection_for_select($collection, $valueProp, $textProp, $value), $options, $value);
     return select_tag($name, $optionsBlock, $htmlOptions);
+}
+
+function add_select_options($optionsBlock, $options, $value = null)
+{
+    if ($options['include_blank']) $optionsBlock = '<option value=""></option>'.$optionsBlock;
+    if (empty($value) && isset($options['prompt']))
+        $optionsBlock = '<option value="">'.$options['prompt'].'</option>'.$optionsBlock;
+    return $optionsBlock;
 }
 
 function options_for_select($set, $selected=Null)
 {
     $str = '';
+    if (!is_array($selected)) $selected = array($selected);
     foreach ($set as $lib => $value)
     {
         if (is_numeric($lib)) $lib = $value; // non-associative array
-        if (is_array($selected) && in_array($value, $selected))
-            $str.= "<option value=\"$value\" selected=\"selected\">$lib</option>\n";
-        elseif ($value == $selected)
-            $str.= "<option value=\"$value\" selected=\"selected\">$lib</option>\n";
-        else
-            $str.= "<option value=\"$value\">$lib</option>\n";
+        
+        $str.= '<option value="'.html_escape($value).'"';
+        if (in_array($value, $selected)) $str.= ' selected="selected"';
+        $str.= '>'.html_escape($lib)."</option>\n";
     }
     return $str;
 }
 
 function options_from_collection_for_select($collection, $valueProp, $textProp, $selected=null)
 {
-    $str = '';
-    foreach ($collection as $entity)
-    {
-        if ($entity->$valueProp == $selected /* && $selected != Null */)
-            $str.= '<option value="'.$entity->$valueProp.'" selected="selected">'.
-            $entity->$textProp.'</option>'."\n";
-        else
-            $str.= '<option value="'.$entity->$valueProp.'">'.
-            $entity->$textProp.'</option>'."\n";
-    }
-    return $str;
+    $set = array();
+    foreach ($collection as $entity) $set[$entity->$textProp] = $entity->$valueProp;
+    return options_for_select($set, $selected);
 }
 
 function options_groups_from_collection_for_select()
