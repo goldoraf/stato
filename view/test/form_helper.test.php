@@ -2,21 +2,9 @@
 
 require_once(CORE_DIR.'/view/view.php');
 
-class MockPost
+class MockPost extends MockRecord
 {
-    private $attributes = array('title', 'author', 'body', 'private', 'written_on');
-    private $values = array();
-    
-    public function __set($key, $value)
-    {
-        if (in_array($key, $this->attributes)) $this->values[$key] = $value;
-    }
-    
-    public function __get($key)
-    {
-        if (isset($this->values[$key])) return $this->values[$key];
-        else return null;
-    }
+    protected $attributes = array('title', 'author', 'body', 'private', 'written_on');
 }
 
 class FormHelperTest extends HelperTestCase
@@ -97,6 +85,11 @@ class FormHelperTest extends HelperTestCase
         $this->assertDomEqual(
             text_area('post', 'body', $this->post),
             '<textarea cols="40" id="post_body" name="post[body]" rows="20">PHP is a general-purpose scripting language...</textarea>'
+        );
+        $this->post = 'Hello <b>world</b>';
+        $this->assertDomEqual(
+            text_area('post', 'body', $this->post),
+            '<textarea cols="40" id="post_body" name="post[body]" rows="20">Hello &lt;b&gt;world&lt;/b&gt;</textarea>'
         );
     }
 }

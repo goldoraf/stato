@@ -5,21 +5,9 @@ require_once(CORE_DIR.'/view/view.php');
 SLocale::$language = 'en_US';
 SLocale::setLocale();
 
-class MockArticle
+class MockArticle extends MockRecord
 {
-    private $attributes = array('written_on');
-    private $values = array();
-    
-    public function __set($key, $value)
-    {
-        if (in_array($key, $this->attributes)) $this->values[$key] = $value;
-    }
-    
-    public function __get($key)
-    {
-        if (isset($this->values[$key])) return $this->values[$key];
-        else return null;
-    }
+    protected $attributes = array('written_on');
 }
 
 class DateHelperTest extends HelperTestCase

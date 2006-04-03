@@ -48,7 +48,7 @@ function text_area($objectName, $method, $object, $options = array())
 {
     $options = array_merge(array('cols' => 40, 'rows' => 20), $options);
     list($name, $value, $options) = default_options($objectName, $method, $object, $options);
-    return text_area_tag($name, $value, $options);
+    return text_area_tag($name, html_escape($value), $options);
 }
 
 function check_box($objectName, $method, $object, $options = array(), $checkedValue = '1', $uncheckedValue = '0')
