@@ -3,6 +3,7 @@
 require_once('lib/action_view.php');
 
 require_once('lib/helpers/tag_helper.php');
+require_once('lib/helpers/asset_tag_helper.php');
 require_once('lib/helpers/url_helper.php');
 require_once('lib/helpers/form_tag_helper.php');
 require_once('lib/helpers/form_options_helper.php');

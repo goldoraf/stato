@@ -1,5 +1,10 @@
 <?php
 
+function javascript_tag($code)
+{
+    return '<script type="text/javascript">'.$code.'</script>';
+}
+
 function link_to_function($content, $function, $htmlOptions = array())
 {
     $options = array_merge($htmlOptions, array('href' => '#', 'onclick' => $function.'; return false;'));

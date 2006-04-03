@@ -12,6 +12,25 @@ class TagHelperTest extends HelperTestCase
             '<a class="link" href="http://www.php.net">Test</a>'
         );
     }
+    
+    public function testRejectOptions()
+    {
+        $this->assertDomEqual(tag('p', array('ignore' => null)), '<p />');
+        $this->assertDomEqual(tag('p', array('ignore' => false)), '<p />');
+    }
+    
+    public function testConvertTrueOptions()
+    {
+        $this->assertDomEqual(
+            tag('p', array('disabled' => true, 'multiple' => true)),
+            '<p disabled="disabled" multiple="multiple" />'
+        );
+    }
+    
+    public function testCdataSection()
+    {
+        $this->assertEqual(cdata_section('<hello world>'), '<![CDATA[<hello world>]]>');
+    }
 }
 
 ?>
