@@ -473,7 +473,7 @@ class SActionController
         $this->assigns['exception']  = $exception;
         $this->assigns['controller'] = ucfirst($this->controllerName()).'Controller';
         $this->assigns['action']     = $this->actionName();
-        $this->renderFile(ROOT_DIR.'/core/view/templates/rescue/exception.php');
+        $this->renderFile(ROOT_DIR.'/core/controller/lib/templates/rescue/exception.php');
     }
     
     protected function logError($exception)

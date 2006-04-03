@@ -100,7 +100,7 @@ class SCrudController extends SActionController
     
     protected function scaffoldPath($templateName)
     {
-        return ROOT_DIR."/core/view/templates/crud/{$templateName}.php";
+        return ROOT_DIR."/core/controller/lib/templates/crud/{$templateName}.php";
     }
     
     protected function actionExists($action)
