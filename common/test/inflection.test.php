@@ -28,6 +28,13 @@ class InflectionTest extends UnitTestCase
     {
         $this->assertEqual('hello_world', SInflection::wikify('Hello World'));
     }
+    
+    function testHumanize()
+    {
+        $this->assertEqual('Post', SInflection::humanize('post_id'));
+        $this->assertEqual('Relative post', SInflection::humanize('relative_post_id'));
+        $this->assertEqual('My test', SInflection::humanize('my_test'));
+    }
 }
 
 ?>

@@ -73,6 +73,11 @@ class SInflection
     {
         return strtolower(preg_replace('/\W/', '', preg_replace('/\s/', '_', $sentence)));
     }
+    
+    public static function humanize($word)
+    {
+        return ucfirst(preg_replace('/_/', ' ', preg_replace('/_id/', '', $word)));
+    }
 }
 
 ?>
