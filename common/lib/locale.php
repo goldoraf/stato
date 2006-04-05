@@ -5,19 +5,10 @@ class SLocale
     public static $language = 'en_US';
     private static $strings = array();
     
-    public static function initialize()
+    public static function initialize($detectLanguage = true)
     {
-        foreach (self::getAcceptedLanguages() as $language)
-        {
-            if (file_exists(ROOT_DIR.'/core/common/lib/locale/'.$language.'.php'))
-            {
-                self::$language = $language;
-                break;
-            }
-        }
-        
+        if ($detectLanguage) self::detectLanguage();
         self::loadStrings(ROOT_DIR.'/core/common/lib/locale/');
-        
         self::setLocale();
     }
     
@@ -49,6 +40,18 @@ class SLocale
         
         if (file_exists($path))
             self::$strings = array_merge(self::$strings, include($path));
+    }
+    
+    private static function detectLanguage()
+    {
+        foreach (self::getAcceptedLanguages() as $language)
+        {
+            if (file_exists(ROOT_DIR.'/core/common/lib/locale/'.$language.'.php'))
+            {
+                self::$language = $language;
+                break;
+            }
+        }
     }
     
     private static function getAcceptedLanguages()

@@ -11,7 +11,7 @@ return array(
     'FORMAT_TIME'       => '%r', // strftime: 12-hour am/pm
     
     // validation error messages
-    'ERR_VALID_FORM'      => 'Please correct the noted errors :',
+    'ERR_VALID_FORM'      => 'Please correct the following errors :',
     'ERR_VALID_REQUIRED'  => '%s is required.',
     'ERR_VALID_UNIQUE'    => '%s is taken.',
     'ERR_VALID_FORMAT'    => '%s is invalid.',
