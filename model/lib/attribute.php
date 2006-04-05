@@ -2,9 +2,9 @@
 
 class SAttribute
 {
-    public $name    = Null;
-    public $type    = Null;
-    public $default = Null;
+    public $name    = null;
+    public $type    = null;
+    public $default = null;
     public $options = array
     (
         'required'    => False,
@@ -13,7 +13,7 @@ class SAttribute
         'validations' => array()
     );
     
-    public function __construct($name, $type, $default, $options = array(), $dontTypecastDefault = False)
+    public function __construct($name, $type, $default = null, $options = array(), $dontTypecastDefault = False)
     {
         $this->name    = $name;
         $this->type    = $type;
@@ -24,7 +24,7 @@ class SAttribute
     
     public function typecast($data)
     {
-        if ($data == Null) return Null;
+        if ($data == null) return null;
         
         switch($this->type)
         {
@@ -60,7 +60,7 @@ class SAttribute
         if (is_string($data))
         {
             try { $date = SDate::parse($data); }
-            catch (Exception $e) { return Null; }
+            catch (Exception $e) { return null; }
             return $date;
         }
         return $data;
@@ -71,7 +71,7 @@ class SAttribute
         if (is_string($data))
         {
             try { $date = SDateTime::parse($data); }
-            catch (Exception $e) { return Null;  }
+            catch (Exception $e) { return null;  }
             return $date;
         }
         return $data;
