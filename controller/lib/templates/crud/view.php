@@ -5,8 +5,8 @@
 </p>
 <? foreach($this->{$this->singular_name}->contentAttributes() as $attr) : ?>
     <p>
-        <b><?= ucfirst($attr); ?> : </b>
-        <?= $this->{$this->singular_name}->$attr; ?>
+        <b><?= SInflection::humanize($attr->name); ?> : </b>
+        <?= $this->{$this->singular_name}->{$attr->name}; ?>
     </p>
 <? endforeach; ?>
 <p>
