@@ -2,6 +2,9 @@
 
 require_once(CORE_DIR.'/view/view.php');
 require_once(CORE_DIR.'/model/lib/attribute.php');
+require_once(CORE_DIR.'/common/lib/locale.php');
+
+SLocale::initialize(false);
 
 class MockContent extends MockRecord
 {
@@ -70,6 +73,50 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
+    public function testErrorMessageFor()
+    {
+        $this->post->errors['title'] = 'Title can\'t be empty';
+        $this->post->contentAttributes = array
+        (
+            new SAttribute('title', 'string'),
+        );
+        $this->assertDomEqual(
+            error_message_for('post', $this->post),
+            '<div id="form-errors" class="form-errors">
+            <h2>Please correct the following errors :</h2>
+            <ul>
+            <li><a href="#" onclick="Field.focus(\'post_title\'); return false;">Title can\'t be empty</a></li>
+            </ul>
+            </div>'
+        );
+        $this->assertDomEqual(
+            error_message_for('post', $this->post, array('id' => 'bad-errors', 'header_tag' => 'h5')),
+            '<div id="bad-errors" class="form-errors">
+            <h5>Please correct the following errors :</h5>
+            <ul>
+            <li><a href="#" onclick="Field.focus(\'post_title\'); return false;">Title can\'t be empty</a></li>
+            </ul>
+            </div>'
+        );
+    }
+    
+    public function testErrorMessageOn()
+    {
+        $this->post->errors['title'] = 'can\'t be empty';
+        $this->post->contentAttributes = array
+        (
+            new SAttribute('title', 'string'),
+        );
+        $this->assertDomEqual(
+            error_message_on('title', $this->post),
+            '<div class="form-error">can\'t be empty</div>'
+        );
+        $this->assertDomEqual(
+            error_message_on('title', $this->post, 'Title ', ' you stupid !', 'mistake'),
+            '<div class="mistake">Title can\'t be empty you stupid !</div>'
+        );
+    }
+    
     public function testFormWithStrings()
     {
         $this->post->contentAttributes = array
@@ -125,6 +172,26 @@ class RecordHelperTest extends HelperTestCase
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <input type="submit" name="commit" value="Update" />
+            </form>'
+        );
+    }
+    
+    public function testFormWithErrors()
+    {
+        $this->post->errors['title'] = 'Title can\'t be empty';
+        $this->post->contentAttributes = array
+        (
+            new SAttribute('title', 'string'),
+        );
+        $this->assertDomEqual(
+            form('post', $this->post),
+            '<form method="post" action="create">
+            <p><label for="post_title">Title</label>
+            <div class="field-with-errors">
+            <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" />
+            </div>
+            </p>
+            <input type="submit" name="commit" value="Create" />
             </form>'
         );
     }

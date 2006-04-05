@@ -75,7 +75,7 @@ function error_wrapping($tag, $hasError)
 function error_message_on($method, $object, $prependText='', $appendText='', $divClass='form-error')
 {
     if (isset($object->errors[$method]))
-        return "<div class=\"{$divClass}\">{$prependText}{$errors[$method]}{$appendText}</div>";
+        return "<div class=\"{$divClass}\">{$prependText}{$object->errors[$method]}{$appendText}</div>";
 }
 
 function error_message_for($objectName, $object, $options=array())
