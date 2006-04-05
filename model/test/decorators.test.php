@@ -27,7 +27,7 @@ class DecoratorsTest extends ActiveTestCase
         $this->assertEqual(1, $post->testMethod());
         $post->title = 'Framework clone wars';
         $this->assertEqual('Framework clone wars', $post->title);
-        $this->assertEqual(array('title', 'author', 'text', 'published'), $post->contentAttributes());
+        $this->assertEqual(array('title', 'author', 'text', 'published'), array_keys($post->contentAttributes()));
         $post->save();
         $postBis = new DummyDecorator(SActiveStore::findByPk('Post', 1), 'test');
         $this->assertEqual($post->title, $postBis->title);

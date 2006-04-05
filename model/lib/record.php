@@ -2,7 +2,6 @@
 
 class SRecord extends SObservable implements ArrayAccess
 {
-    public $attributes    = array();
     public $relationships = array();
     public $attrRequired  = array();
     
@@ -14,6 +13,7 @@ class SRecord extends SObservable implements ArrayAccess
     public $validations   = array();
     public $errors        = array();
     
+    protected $attributes = array();
     protected $values     = array();
     protected $assocs     = array();
     
@@ -95,9 +95,14 @@ class SRecord extends SObservable implements ArrayAccess
     
     }
     
+    public function getAttribute($name)
+    {
+        return $this->attributes[$name];
+    }
+    
     public function contentAttributes()
     {
-        return array_keys($this->attributes);
+        return $this->attributes;
     }
     
     protected function attrExists($name)

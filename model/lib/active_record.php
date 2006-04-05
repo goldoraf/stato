@@ -57,12 +57,12 @@ class SActiveRecord extends SRecord
     public function contentAttributes()
     {
         $attributes = array();
-        foreach(array_keys($this->attributes) as $key)
+        foreach($this->attributes as $key => $attr)
         {
             if ($key != $this->identityField && !preg_match('/_id|_count/', $key)
                 && !in_array($key, $this->metaAttributes))
             {
-                $attributes[] = $key;
+                $attributes[$key] = $attr;
             }
         }
         return $attributes;
