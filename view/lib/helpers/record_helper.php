@@ -11,34 +11,33 @@ function form($objectName, $object, $options=array())
     if (!isset($options['submit_value']))
         $options['submit_value'] = ucfirst($options['action']);
     
-    $form = '<form enctype="multipart/form-data" method="post" action="'
-            .url_for(array('action' => $options['action'])).'">';
+    if (isset($options['multipart']) && $options['multipart'] === true)
+        $form = form_tag(array('action' => $options['action']), array('multipart' => true));
+    else
+        $form = form_tag(array('action' => $options['action']));
     
     if (!$object->isNewRecord()) $form.= hidden_field($objectName, 'id', $object);
     
     $fields = $object->contentAttributes();
-    $class  = get_class($object);
     
-    foreach($fields as $name)
+    foreach($fields as $attr)
     {
-        $attr = $object->attributes[$name];
-        $label = ucfirst($attr->name);
-        
-        $form.= '<p><label for="'.strtolower($class).'_'.$attr->name.'">'
-        .$label."</label>\n".input($objectName, $attr->name, $object)."</p>\n";
+        $form.= '<p><label for="'.$objectName.'_'.$attr->name.'">'
+        .SInflection::humanize($attr->name)."</label>\n"
+        .input($objectName, $attr->name, $object)."</p>\n";
     }
     
     if (isset($options['include'])) $form.= $options['include'];
     
     $form.= submit_tag($options['submit_value']);
-    $form.= '</form>';
+    $form.= end_form_tag();
     
     return $form;
 }
 
 function input($objectName, $method, $object, $options=array())
 {
-    $attr = $object->attributes[$method];
+    $attr = $object->getAttribute($method);
     
     switch($attr->type)
     {
@@ -58,7 +57,7 @@ function input($objectName, $method, $object, $options=array())
             $str = text_field($objectName, $method, $object, $options);
             break;
         case 'boolean':
-            $str = select($objectName, $method, $object, array('True', 'False'), array(), $options);
+            $str = check_box($objectName, $method, $object, $options);
             break;
         default:
             $str = hidden_field($objectName, $method, $object);
