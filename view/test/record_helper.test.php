@@ -43,6 +43,33 @@ class RecordHelperTest extends HelperTestCase
         $this->post->written_on = new SDate(2006, 3, 31);
     }
     
+    public function testBasicInputTag()
+    {
+        $this->post->contentAttributes = array
+        (
+            new SAttribute('title', 'string'),
+        );
+        $this->assertDomEqual(
+            input('post', 'title', $this->post),
+            '<input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" />'
+        );
+    }
+    
+    public function testBasicInputTagWithError()
+    {
+        $this->post->errors['title'] = 'Error !';
+        $this->post->contentAttributes = array
+        (
+            new SAttribute('title', 'string'),
+        );
+        $this->assertDomEqual(
+            input('post', 'title', $this->post),
+            '<div class="field-with-errors">
+            <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" />
+            </div>'
+        );
+    }
+    
     public function testFormWithStrings()
     {
         $this->post->contentAttributes = array

@@ -63,13 +63,18 @@ function input($objectName, $method, $object, $options=array())
             $str = hidden_field($objectName, $method, $object);
             break;
     }
-    return $str;
+    
+    return error_wrapping($str, isset($object->errors[$method]));
+}
+
+function error_wrapping($tag, $hasError)
+{
+    return $hasError ? "<div class=\"field-with-errors\">$tag</div>" : $tag;
 }
 
 function error_message_on($method, $object, $prependText='', $appendText='', $divClass='form-error')
 {
-    $errors = $object->errors;
-    if (isset($errors[$method]))
+    if (isset($object->errors[$method]))
         return "<div class=\"{$divClass}\">{$prependText}{$errors[$method]}{$appendText}</div>";
 }
 
