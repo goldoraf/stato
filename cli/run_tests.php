@@ -46,8 +46,17 @@ if ($_SERVER['argc'] == 2)
 }
 else
 {
-    $test =& new GroupTest('All tests');
-    foreach (array('common', 'controller', 'model', 'view') as $package) addPackageTests($test, $package);
+    /*$test =& new GroupTest('All tests');
+    foreach (array('common', 'controller', 'model', 'view') as $package) addPackageTests($test, $package);*/
+    echo "\nPHP is not Ruby ! Please launch tests separately for each layer to avoid 
+conflicts between fake and normal classes.\n
+    Usage : run_tests.php [layer]\n
+    Layers :\n
+    - common\n
+    - controller\n
+    - model\n
+    - view\n";
+    die();
 }
 
 $test->run(new TextReporter());
