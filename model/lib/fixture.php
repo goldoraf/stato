@@ -13,7 +13,7 @@ class SFixture
     
     public static function createFixtures($fixturesDir, $tableNames)
     {
-        $db = SDatabase::getInstance();
+        $db = SActiveRecord::connection();
         $fixtures = array();
         foreach ($tableNames as $table)
         {

@@ -31,7 +31,7 @@ class SHasManyAssociation extends SAssociationCollection
                 ' SET '.$this->foreignKey.' = \'NULL\''.
                 ' WHERE '.$this->foreignKey.' = \''.$this->owner->id.'\''.
                 ' AND '.$this->assocPrimaryKey.' = \''.$record->id.'\'';
-        SDatabase::getInstance()->execute($sql);
+        SActiveRecord::connection()->execute($sql);
     }
     
     protected function countRecords($condition)

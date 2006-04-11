@@ -1,6 +1,5 @@
 <?php
 
-require_once('lib/database.php');
 require_once('lib/recordset.php');
 require_once('lib/attribute.php');
 require_once('lib/definitions.php');

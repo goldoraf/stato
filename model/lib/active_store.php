@@ -377,7 +377,7 @@ class SActiveStore
     
     private static function connection()
     {
-        return SDatabase::getInstance();
+        return SActiveRecord::connection();
     }
 }
 

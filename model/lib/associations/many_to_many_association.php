@@ -25,7 +25,7 @@ class SManyToManyAssociation extends SAssociationCollection
     {
         $sql = "DELETE FROM {$this->joinTable} WHERE "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        SDatabase::getInstance()->execute($sql);
+        SActiveRecord::connection()->execute($sql);
     }
     
     protected function findTarget()
@@ -40,7 +40,7 @@ class SManyToManyAssociation extends SAssociationCollection
         $sql = "INSERT INTO {$this->joinTable} SET "
         ."{$this->assocForeignKey} = '{$record->id}', "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        SDatabase::getInstance()->execute($sql);
+        SActiveRecord::connection()->execute($sql);
     }
     
     protected function deleteRecord($record)
@@ -48,7 +48,7 @@ class SManyToManyAssociation extends SAssociationCollection
         $sql = "DELETE FROM {$this->joinTable} WHERE "
         ."{$this->assocForeignKey} = '{$record->id}' AND "
         ."{$this->foreignKey} = '{$this->owner->id}'";
-        SDatabase::getInstance()->execute($sql);
+        SActiveRecord::connection()->execute($sql);
     }
     
     protected function countRecords($condition)

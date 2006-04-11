@@ -10,14 +10,16 @@ class SActiveRecord extends SRecord
     public $inheritanceField = 'type';
     public $recordTimestamps = False;
     
-    protected $db = Null;
+    //protected $db = Null;
     protected $metaAttributes = array('created_on', 'updated_on');
     protected $assocMethods = array();
     protected $newRecord = False;
     
+    protected static $conn = Null;
+    
     public function __construct($values = Null, $dontInitAssocs=false, $newRecord = True)
     {
-        $this->db = SDatabase::getInstance();
+        //$this->db = SDatabase::getInstance();
         if ($this->tableName == Null) $this->tableName = SInflection::pluralize(strtolower(get_class($this)));
         if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
         else $this->initAttributes();
@@ -45,13 +47,6 @@ class SActiveRecord extends SRecord
     public function __repr()
     {
         return $this->id;
-    }
-    
-    public static function establishConnection($config = array())
-    {
-        // TODO : cette méthode établit la connec et une méthode self::connection()
-        // permet de la retriever. Ainsi on peut gérer un pool de connecs.
-        // Cf connection_specification.rb
     }
     
     public function contentAttributes()
@@ -134,7 +129,7 @@ class SActiveRecord extends SRecord
         $this->setState('beforeCreate');
         $sql = 'INSERT INTO '.$this->tableName.' '.
                $this->prepareSqlSet();
-        $this->id = $this->db->insert($sql);
+        $this->id = $this->conn()->insert($sql);
         $this->newRecord = False;
         $this->setState('afterCreate');
     }
@@ -145,7 +140,7 @@ class SActiveRecord extends SRecord
         $sql = 'UPDATE '.$this->tableName.' '.
                $this->prepareSqlSet().
                ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
-        $this->db->update($sql);
+        $this->conn()->update($sql);
         $this->setState('afterUpdate');
     }
     
@@ -155,7 +150,7 @@ class SActiveRecord extends SRecord
         if ($this->isNewRecord()) return false;
         $sql = 'DELETE FROM '.$this->tableName.
                ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
-        $this->db->update($sql);
+        $this->conn()->update($sql);
         $this->setState('afterDelete');
     }
     
@@ -194,7 +189,7 @@ class SActiveRecord extends SRecord
         $set = array();
         foreach($this->attributes as $column => $attr)
         {
-                $set[] = "$column = ".$this->db->quote($this->$column, $attr->type);
+                $set[] = "$column = ".$this->conn()->quote($this->$column, $attr->type);
         }
         return 'SET '.join(',', $set);
     }
@@ -251,6 +246,31 @@ class SActiveRecord extends SRecord
     {
         if (isset($this->sqlMapping[$attr])) return $this->sqlMapping[$attr];
         else return array();
+    }
+    
+    /**
+     * CONNECTION MANAGEMENT ===================================================
+     **/
+    public static function connection()
+    {
+        if (!isset(self::$conn)) self::establishConnection();
+        return self::$conn;
+    }
+    
+    protected function conn()
+    {
+        return self::connection();
+    }
+    
+    protected static function establishConnection($config = array())
+    {
+        $config = include(ROOT_DIR.'/conf/database.php');
+        $driverClass = 'S'.$config[APP_MODE]['driver'].'Driver';
+        if (!class_exists($driverClass)) 
+            throw new SException('Database driver not found !');
+        
+        self::$conn = new $driverClass($config[APP_MODE]);
+        self::$conn->connect();
     }
 }
 
