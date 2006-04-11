@@ -10,7 +10,6 @@ class SActiveRecord extends SRecord
     public $inheritanceField = 'type';
     public $recordTimestamps = False;
     
-    //protected $db = Null;
     protected $metaAttributes = array('created_on', 'updated_on');
     protected $assocMethods = array();
     protected $newRecord = False;
@@ -19,7 +18,6 @@ class SActiveRecord extends SRecord
     
     public function __construct($values = Null, $dontInitAssocs=false, $newRecord = True)
     {
-        //$this->db = SDatabase::getInstance();
         if ($this->tableName == Null) $this->tableName = SInflection::pluralize(strtolower(get_class($this)));
         if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
         else $this->initAttributes();

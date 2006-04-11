@@ -50,7 +50,7 @@ class ActiveTestCase extends UnitTestCase
     
     private function recreateDatabase()
     {
-        $db = SDatabase::getInstance();
+        $db = SActiveRecord::connection();
         $dbname = $db->config['dbname'];
         $db->execute("DROP DATABASE IF EXISTS $dbname");
         $db->execute("CREATE DATABASE $dbname");
