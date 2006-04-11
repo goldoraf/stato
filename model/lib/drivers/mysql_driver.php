@@ -1,16 +1,5 @@
 <?php
 
-/**
- * MySqlDriver
- * 
- * Classe de connexion MySQL
- * 
- * @package 
- * @author Raphaël Rougeron
- * @copyright Copyright (c) 2004
- * @version 0.1
- * @access public
- **/
 class SMySqlDriver extends SAbstractDriver
 {
     public $nativeDbTypes = array
@@ -33,11 +22,6 @@ class SMySqlDriver extends SAbstractDriver
         '/enum|set/i'                               => 'string'
     );
 
-    /**
-     * MySqlDriver::connect()
-     * 
-     * @return bool
-     **/
     public function connect()
     {
         $this->conn = @mysql_connect($this->config['host'],
@@ -49,44 +33,25 @@ class SMySqlDriver extends SAbstractDriver
         mysql_query("SET NAMES 'utf8'");
     }
     
-    /**
-     * MySqlDriver::disconnect()
-     * 
-     * @return void
-     **/
     public function disconnect()
     {
         mysql_close($this->conn);
         $this->conn = null;
     }
     
-    /**
-     * MySqlDriver::getError()
-     * 
-     * @return string
-     **/
     public function getError()
     {
         return mysql_errno($this->conn) . ": " . mysql_error($this->conn). "\n";
     }
 
-    /**
-     * MySqlDriver::execute()
-     * 
-     * @param $strsql la requete SQL
-     * @return mixed
-     **/
     public function execute($strsql)
     {
         $result = @mysql_query($strsql,$this->conn);
-        if (is_resource($result))
-        {
-            return new SRecordset($result, get_class($this));
-        }
+        if (is_resource($result)) return new SRecordset($result, get_class($this));
+        
         if (!$result)
-        {
             throw new SException('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
-        }
+            
         return true;
     }
     
@@ -98,7 +63,9 @@ class SMySqlDriver extends SAbstractDriver
             $fields = array();
             while($row = $rs->fetch())
             {
-                $fields[$row['Field']] = new SAttribute($row['Field'], $this->simplifiedType($row['Type']), $row['Default']);
+                $fields[$row['Field']] = new SAttribute($row['Field'], 
+                                                        $this->simplifiedType($row['Type']), 
+                                                        $row['Default']);
             }
             return $fields;
         }
@@ -111,21 +78,11 @@ class SMySqlDriver extends SAbstractDriver
         return parent::simplifiedType($sqlType);
     }
     
-    /**
-     * MySqlDriver::lastInsertId()
-     * 
-     * @return int
-     **/
     public function lastInsertId()
     {
         return mysql_insert_id($this->conn);
     }
     
-    /**
-     * MySqlDriver::affectedRows()
-     * 
-     * @return int
-     **/
     public function affectedRows()
     {
         return mysql_affected_rows($this->conn);
@@ -141,12 +98,6 @@ class SMySqlDriver extends SAbstractDriver
         return @mysql_fetch_assoc($resource);
     }
     
-    /**
-     * MySqlDriver::getLastUpdate()
-     * 
-     * @param $table
-     * @return mixed
-     **/
     public function getLastUpdate($table)
     {
         $rs = $this->execute("SHOW TABLE STATUS LIKE '".$table."'");
@@ -158,30 +109,16 @@ class SMySqlDriver extends SAbstractDriver
         return false;
     }
     
-    /**
-     * MySqlDriver::limit()
-     * 
-     * @return string
-     **/
     public function limit($count, $offset=0)
     {
         if ($count > 0)
         {
             $sql = " LIMIT $count";
-            if ($offset > 0)
-            {
-                $sql .= " OFFSET $offset";
-            }
+            if ($offset > 0) $sql .= " OFFSET $offset";
         }
         return $sql;
     }
     
-    /**
-     * MySqlDriver::escapeStr()
-     * 
-     * @param $str la chaine a escaper
-     * @return string
-     **/
     public function escapeStr($str)
     {
         // throw exception if magic_quotes ?
@@ -191,6 +128,91 @@ class SMySqlDriver extends SAbstractDriver
     public function quoteColumnName($name)
     {
         return "`$name`";
+    }
+    
+    /**
+     * SCHEMA STATEMENTS =======================================================
+     **/
+    public function createTable($name, $tableDef, $options = array())
+    {
+        $sql = "CREATE TABLE $name (";
+        $sql.= $tableDef->toSql();
+        $sql.= ")";
+        
+        $this->execute($sql);
+    }
+    
+    public function renameTable($oldName, $newName)
+    {
+    
+    }
+    
+    public function dropTable($name)
+    {
+        $this->execute("DROP TABLE $name");
+    }
+    
+    public function addColumn($tableName, $columnName, $type, $options = array())
+    {
+        $sql = "ALTER TABLE $tableName ADD $columnName ".self::typeToSql($type, $options['limit']);
+        $sql = self::addColumnOptions($sql, $options);
+        $this->execute($sql);
+    }
+    
+    public function changeColumn($tableName, $columnName, $type, $options = array())
+    {
+    
+    }
+    
+    public function renameColumn($tableName, $columnName, $newName)
+    {
+    
+    }
+    
+    public function addIndex($tableName, $columnName, $options = array())
+    {
+        if (isset($options['name'])) $indexName = $options['name'];
+        else
+        {
+            if (!is_array($columnName)) $columnName = array($columnName);
+            $indexName = "{$tableName}_".$columnName[0]."_index";
+        }
+        if (isset($options['unique'])) $indexType = 'UNIQUE';
+        else $indexType = '';
+        
+        $this->execute("CREATE {$indexType} INDEX {$indexName} ON {$tableName} (".implode(', ', $columnName).")");
+    }
+    
+    public function removeIndex($tableName, $options = array())
+    {
+        $this->execute("DROP ".self::indexName($tableName, $options)." ON {$tableName}");
+    }
+    
+    public function indexName($tableName, $options = array())
+    {
+        if (isset($options['column']))
+            return "{$tableName}_".$options['column']."_index";
+        elseif (isset($options['name']))
+            return $options['name'];
+        else
+            throw new SException('You must specify the index name');
+    }
+    
+    public function typeToSql($type, $limit = Null)
+    {
+        $native = $this->nativeDbTypes[$type];
+        if ($limit === Null && isset($native['limit'])) $limit = $native['limit'];
+        $sql = $native['name'];
+        if ($limit !== Null) $sql.= "($limit)";
+        return $sql;
+    }
+    
+    public function addColumnOptions($sql, $options)
+    {
+        if ($options['default'] !== Null)
+            $sql.= 'DEFAULT '.$this->quote($options['default'], $options['type']);
+        if ($options['null'] === False) $sql.= 'NOT NULL';
+        return $sql;
     }
 }
 
