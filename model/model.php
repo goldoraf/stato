@@ -3,6 +3,7 @@
 require_once('lib/database.php');
 require_once('lib/recordset.php');
 require_once('lib/attribute.php');
+require_once('lib/definitions.php');
 require_once('lib/validation.php');
 require_once('lib/observable.php');
 require_once('lib/record.php');

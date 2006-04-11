@@ -20,8 +20,8 @@ class SColumn
     public function toSql()
     {
         $db = SDatabase::getInstance();
-        $sql = $db->quoteColumnName($this->name).' '.SSchema::typeToSql($this->type, $this->limit);
-        $sql = SSchema::addColumnOptions($sql, array('null' => $this->null, 'default' => $this->default));
+        $sql = $db->quoteColumnName($this->name).' '.$db->typeToSql($this->type, $this->limit);
+        $sql = $db->addColumnOptions($sql, array('null' => $this->null, 'default' => $this->default));
         return $sql;
     }
 }
@@ -44,7 +44,7 @@ class STable
     {
         if (!is_object($name))
         {
-            $column = new Column($name, $type);
+            $column = new SColumn($name, $type);
             if (isset($options['limit']))   $column->limit = $options['limit'];
             if (isset($options['default'])) $column->default = $options['default'];
             if (isset($options['null']))    $column->null = $options['null'];
@@ -63,8 +63,7 @@ class STable
     
     private function native($type)
     {
-        $db = SDatabase::getInstance();
-        return $db->nativeDbTypes[$type];
+        return SDatabase::getInstance()->nativeDbTypes[$type];
     }
 }
 
