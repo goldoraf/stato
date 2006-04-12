@@ -7,6 +7,9 @@ class SMySqlDriver extends SAbstractDriver
         'primary_key'   => 'int(11) DEFAULT NULL auto_increment PRIMARY KEY',
         'string'        => array('name' => 'varchar', 'limit' => 255),
         'text'          => array('name' => 'text'),
+        'float'         => array('name' => 'float'),
+        'datetime'      => array('name' => 'datetime'),
+        'date'          => array('name' => 'date'),
         'integer'       => array('name' => 'int', 'limit' => 11),
         'boolean'       => array('name' => 'tinyint', 'limit' => 1)
     );
@@ -15,7 +18,7 @@ class SMySqlDriver extends SAbstractDriver
     (
         '/tinyint|smallint|mediumint|int|bigint/i'  => 'integer',
         '/tinytext|text|mediumtext|longtext/i'      => 'text',
-        '/float|double|decimal/i'                   => 'string',
+        '/float|double|decimal/i'                   => 'float',
         '/varchar|char/i'                           => 'string',
         '/datetime|timestamp/i'                     => 'datetime',
         '/date/i'                                   => 'date',
@@ -159,6 +162,11 @@ class SMySqlDriver extends SAbstractDriver
         $this->execute($sql);
     }
     
+    public function removeColumn($tableName, $columnName)
+    {
+        $this->execute("ALTER TABLE {$tableName} DROP {$columnName}");
+    }
+    
     public function changeColumn($tableName, $columnName, $type, $options = array())
     {
     
@@ -201,17 +209,21 @@ class SMySqlDriver extends SAbstractDriver
     public function typeToSql($type, $limit = Null)
     {
         $native = $this->nativeDbTypes[$type];
-        if ($limit === Null && isset($native['limit'])) $limit = $native['limit'];
-        $sql = $native['name'];
-        if ($limit !== Null) $sql.= "($limit)";
+        if (!is_array($native)) $sql = $native;
+        else
+        {
+            if ($limit === Null && isset($native['limit'])) $limit = $native['limit'];
+            $sql = $native['name'];
+            if ($limit !== Null) $sql.= "($limit)";
+        }
         return $sql;
     }
     
     public function addColumnOptions($sql, $options)
     {
         if ($options['default'] !== Null)
-            $sql.= 'DEFAULT '.$this->quote($options['default'], $options['type']);
-        if ($options['null'] === False) $sql.= 'NOT NULL';
+            $sql.= ' DEFAULT '.$this->quote($options['default'], $options['type']);
+        if ($options['null'] === False) $sql.= ' NOT NULL';
         return $sql;
     }
 }

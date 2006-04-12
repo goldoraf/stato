@@ -8,7 +8,7 @@ class SColumn
     public $default = Null;
     public $null    = True;
     
-    public function __construct($name, $type, $limit = Null, $default = Null, $null = False)
+    public function __construct($name, $type, $limit = Null, $default = Null, $null = True)
     {
         $this->name    = $name;
         $this->type    = $type;
@@ -19,7 +19,7 @@ class SColumn
     
     public function toSql()
     {
-        $db = SDatabase::getInstance();
+        $db = SActiveRecord::connection();
         $sql = $db->quoteColumnName($this->name).' '.$db->typeToSql($this->type, $this->limit);
         $sql = $db->addColumnOptions($sql, array('null' => $this->null, 'default' => $this->default));
         return $sql;
@@ -37,7 +37,7 @@ class STable
     
     public function addPrimaryKey($name)
     {
-        $this->addColumn($name, $this->native('primary_key'));
+        $this->addColumn($name, 'primary_key');
     }
     
     public function addColumn($name, $type = Null, $options = array())
@@ -59,11 +59,6 @@ class STable
         $cols = array();
         foreach($this->columns as $column) $cols[] = $column->toSql();
         return implode(', ', $cols);
-    }
-    
-    private function native($type)
-    {
-        return SDatabase::getInstance()->nativeDbTypes[$type];
     }
 }
 

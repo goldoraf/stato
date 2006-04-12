@@ -128,3 +128,9 @@ CREATE TABLE `articles_categories` (
   `article_id` int(11) NOT NULL default '0',
   `category_id` int(11) NOT NULL default '0'
 ) TYPE=MyISAM ;
+
+CREATE TABLE `people` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `first_name` varchar(50) default NULL,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;

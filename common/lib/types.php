@@ -74,7 +74,7 @@ class SDateTime extends SDate
         'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2}) (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/'
     );
     
-    public function __construct($year, $month, $day, $hour, $min, $sec)
+    public function __construct($year, $month, $day, $hour = 0, $min = 0, $sec = 0)
     {
         parent::__construct($year, $month, $day);
         $this->hour = $hour;

@@ -8,7 +8,8 @@ return array
     'associations',
     'callbacks',
     'decorators',
-    'list_decorator'
+    'list_decorator',
+    'migration'
 );
 
 ?>

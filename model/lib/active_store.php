@@ -2,7 +2,7 @@
 
 class SActiveStore
 {
-    public static $tables = array();
+    private static $tables = array();
     
     /**
      * Returns all the records matched by the options used.
@@ -117,9 +117,9 @@ class SActiveStore
     public static function deleteAll($class, $conditions = Null)
     {
         $instance = self::getInstance($class);
-        $sql = 'DELETE '.$instance->tableName.' SET '.self::sanitizeSql($updates);
+        $sql = 'DELETE FROM '.$instance->tableName;
         $sql.= self::addConditions($conditions);
-        self::connection()->delete($sql);
+        self::connection()->update($sql);
     }
     
     public static function count($class, $conditions = null)
@@ -148,6 +148,11 @@ class SActiveStore
             self::$tables[$tableName] = self::connection()->getColumns($tableName);
         }
         return self::$tables[$tableName];
+    }
+    
+    public static function resetAttributeInformation($tableName)
+    {
+        unset(self::$tables[$tableName]);
     }
     
     // must be public because Fixture uses it
