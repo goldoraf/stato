@@ -35,6 +35,13 @@ abstract class SAbstractDriver
         return $set;
     }
     
+    public function selectOne($sql)
+    {
+        $rs = $this->select($sql);
+        if (!$rs) return false;
+        return $rs->fetch();
+    }
+    
     public function insert($sql)
     {
         if (!$this->execute($sql)) return false;
@@ -57,12 +64,7 @@ abstract class SAbstractDriver
     public function simplifiedType($sqlType)
     {
         foreach($this->simplifiedTypes as $regex => $type)
-        {
-            if (preg_match($regex, $sqlType))
-            {
-                return $type;
-            }
-        }
+            if (preg_match($regex, $sqlType)) return $type;
     }
     
     public function quote($value, $attributeType = Null)
