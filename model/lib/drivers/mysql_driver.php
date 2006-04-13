@@ -193,7 +193,8 @@ class SMySqlDriver extends SAbstractDriver
     
     public function removeIndex($tableName, $options = array())
     {
-        $this->execute("DROP ".self::indexName($tableName, $options)." ON {$tableName}");
+        if (!is_array($options)) $options = array('column' => $options);
+        $this->execute("DROP INDEX ".self::indexName($tableName, $options)." ON {$tableName}");
     }
     
     public function indexName($tableName, $options = array())
