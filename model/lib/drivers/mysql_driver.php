@@ -227,6 +227,17 @@ class SMySqlDriver extends SAbstractDriver
         if ($options['null'] === False) $sql.= ' NOT NULL';
         return $sql;
     }
+    
+    public function initializeSchemaInformation()
+    {
+        try
+        {
+            $this->execute('CREATE TABLE '.SMigrator::$schemaInfoTableName.' (version '
+            .$this->typeToSql('integer').')');
+            $this->execute('INSERT INTO '.SMigrator::$schemaInfoTableName.' (version) VALUES (0)');
+        }
+        catch (Exception $e) {}
+    }
 }
 
 ?>
