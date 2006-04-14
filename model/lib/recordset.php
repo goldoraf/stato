@@ -11,9 +11,9 @@ class SRecordset
         $this->class = $class;
     }
     
-    public function fetch()
+    public function fetch($associative = true)
     {
-        return call_user_func(array($this->class, 'fetch'), $this->resource);
+        return call_user_func(array($this->class, 'fetch'), $this->resource, $associative);
     }
     
     public function rowCount()

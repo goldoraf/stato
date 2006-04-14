@@ -53,7 +53,7 @@ class SMySqlDriver extends SAbstractDriver
         if (is_resource($result)) return new SRecordset($result, get_class($this));
         
         if (!$result)
-            throw new SException('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
+            throw new SInvalidStatementException('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
             
         return true;
     }
@@ -156,7 +156,7 @@ class SMySqlDriver extends SAbstractDriver
     
     public function renameTable($oldName, $newName)
     {
-    
+        $this->execute("RENAME TABLE $oldName TO $newName");
     }
     
     public function dropTable($name)
@@ -178,12 +178,22 @@ class SMySqlDriver extends SAbstractDriver
     
     public function changeColumn($tableName, $columnName, $type, $options = array())
     {
-    
+        if (!isset($options['default']))
+        {
+            $column = $this->selectOne("SHOW COLUMNS FROM $tableName LIKE '$columnName'");
+            $options['default'] = $column['Default'];
+        }
+        $sql = "ALTER TABLE $tableName CHANGE $columnName $columnName "
+        .self::typeToSql($type, $options['limit']);
+        $sql = self::addColumnOptions($sql, $options);
+        $this->execute($sql);
     }
     
     public function renameColumn($tableName, $columnName, $newName)
     {
-    
+        $column = $this->selectOne("SHOW COLUMNS FROM $tableName LIKE '$columnName'");
+        $currentType = $column['Type'];
+        $this->execute("ALTER TABLE $tableName CHANGE $columnName $newName $currentType");
     }
     
     public function addIndex($tableName, $columnName, $options = array())

@@ -9,6 +9,7 @@ require_once('lib/record.php');
 require_once('lib/active_record.php');
 require_once('lib/active_store.php');
 require_once('lib/fixture.php');
+require_once('lib/migration.php');
 require_once('lib/paginator.php');
 
 require_once('lib/decorators/base_decorator.php');

@@ -29,6 +29,7 @@ class SColumn
 class STable
 {
     private $columns = array();
+    private $hasPk = false;
     
     public function __construct()
     {
@@ -38,6 +39,7 @@ class STable
     public function addPrimaryKey($name)
     {
         $this->addColumn($name, 'primary_key');
+        $this->hasPk = true;
     }
     
     public function addColumn($name, $type = Null, $options = array())
@@ -56,6 +58,7 @@ class STable
     
     public function toSql()
     {
+        if (!$this->hasPk) $this->addColumn('id', 'primary_key');
         $cols = array();
         foreach($this->columns as $column) $cols[] = $column->toSql();
         return implode(', ', $cols);

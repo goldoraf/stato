@@ -1,5 +1,7 @@
 <?php
 
+class SInvalidStatementException extends Exception {}
+
 abstract class SAbstractDriver
 {
     private $conn = null;
