@@ -4,19 +4,12 @@ class SConsoleException extends Exception {}
 
 class SConsoleUtils
 {
-    public function readOptions($options = array())
+    public function readOptions($short_options, $long_options = null)
     {
-        $short = '';
-        foreach ($options as $o)
-        {
-            if (substr($o, -2) == '==') $short.= $o{0}.'::';
-            elseif (substr($o, -1) == '=') $short.= $o{0}.':';
-            else $short.= $o{0};
-        }
         $args = self::readArguments();
         array_shift($args);
-        list($options, ) = self::parseOptions($args, $short, $options);
-        return $options;
+        list($opt, ) = self::parseOptions($args, $short_options, $long_options);
+        return $opt;
     }
     
     /**
