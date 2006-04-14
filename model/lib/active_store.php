@@ -150,7 +150,7 @@ class SActiveStore
     public static function getAttributes($tableName)
     {
         if (!isset(self::$tables[$tableName])) 
-            self::$tables[$tableName] = self::connection()->getColumns($tableName);
+            self::$tables[$tableName] = self::connection()->columns($tableName);
         
         return self::$tables[$tableName];
     }
@@ -266,7 +266,7 @@ class SActiveStore
         foreach($assocs as $assoc)
         {
             $table = $assoc[2]['table_name'];
-            $columns = array_keys(self::connection()->getColumns($table));
+            $columns = array_keys(self::connection()->columns($table));
             foreach($columns as $column)
             {
                 $abbrv[$table.'_'.$column] = array($table, $column);

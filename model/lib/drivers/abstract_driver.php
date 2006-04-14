@@ -106,7 +106,7 @@ abstract class SAbstractDriver
     
     abstract protected function limit($count, $offset=0);
     
-    abstract protected function getColumns($table);
+    abstract protected function columns($table);
     
     abstract protected function lastInsertId();
     
@@ -114,7 +114,7 @@ abstract class SAbstractDriver
     
     abstract protected static function rowCount($resource);
     
-    abstract protected static function fetch($resource);
+    abstract protected static function fetch($resource, $associative = true);
     
     abstract protected function escapeStr($str);
 }

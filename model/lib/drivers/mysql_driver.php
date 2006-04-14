@@ -58,7 +58,7 @@ class SMySqlDriver extends SAbstractDriver
         return true;
     }
     
-    public function getColumns($table)
+    public function columns($table)
     {
         $rs = $this->execute("SHOW COLUMNS FROM ".$table);
         if ($rs)
@@ -96,9 +96,10 @@ class SMySqlDriver extends SAbstractDriver
         return @mysql_num_rows($resource);
     }
     
-    public static function fetch($resource)
+    public static function fetch($resource, $associative = true)
     {
-        return @mysql_fetch_array($resource);
+        if ($associative) return @mysql_fetch_assoc($resource);
+        else return @mysql_fetch_row($resource);
     }
     
     public function getLastUpdate($table)
@@ -140,7 +141,7 @@ class SMySqlDriver extends SAbstractDriver
     {
         $tables = array();
         $rs = $this->execute('SHOW TABLES');
-        while ($row = $rs->fetch()) $tables[] = $row[0];
+        while ($row = $rs->fetch(false)) $tables[] = $row[0];
         return $tables;
     } 
     
