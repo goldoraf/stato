@@ -98,7 +98,7 @@ class SMySqlDriver extends SAbstractDriver
     
     public static function fetch($resource)
     {
-        return @mysql_fetch_assoc($resource);
+        return @mysql_fetch_array($resource);
     }
     
     public function getLastUpdate($table)
@@ -136,6 +136,14 @@ class SMySqlDriver extends SAbstractDriver
     /**
      * SCHEMA STATEMENTS =======================================================
      **/
+    public function tables()
+    {
+        $tables = array();
+        $rs = $this->execute('SHOW TABLES');
+        while ($row = $rs->fetch()) $tables[] = $row[0];
+        return $tables;
+    } 
+    
     public function createTable($name, $tableDef, $options = array())
     {
         $sql = "CREATE TABLE $name (";

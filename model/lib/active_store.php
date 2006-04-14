@@ -141,12 +141,17 @@ class SActiveStore
         return $row['max'];
     }
     
+    public static function tableExists($tableName)
+    {
+        if (in_array($tableName, self::connection()->tables())) return true;
+        return false;
+    }
+    
     public static function getAttributes($tableName)
     {
         if (!isset(self::$tables[$tableName])) 
-        {
             self::$tables[$tableName] = self::connection()->getColumns($tableName);
-        }
+        
         return self::$tables[$tableName];
     }
     
