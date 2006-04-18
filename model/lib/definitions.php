@@ -36,13 +36,13 @@ class STable
     
     }
     
-    public function addPrimaryKey($name)
+    public function addPrimaryKey($name, $type = 'primary_key', $options = array())
     {
-        $this->addColumn($name, 'primary_key');
+        $this->addColumn($name, $type, $options);
         $this->hasPk = true;
     }
     
-    public function addColumn($name, $type = Null, $options = array())
+    public function addColumn($name, $type, $options = array())
     {
         if (!is_object($name))
         {
@@ -58,7 +58,7 @@ class STable
     
     public function toSql()
     {
-        if (!$this->hasPk) $this->addColumn('id', 'primary_key');
+        if (!$this->hasPk) $this->addPrimaryKey('id');
         $cols = array();
         foreach($this->columns as $column) $cols[] = $column->toSql();
         return implode(', ', $cols);
