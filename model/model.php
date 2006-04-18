@@ -19,9 +19,10 @@ require_once('lib/drivers/abstract_driver.php');
 require_once('lib/drivers/mysql_driver.php');
 
 require_once('lib/filesystem/csv.php');
-require_once('lib/filesystem/image.php');
 require_once('lib/filesystem/folder.php');
 require_once('lib/filesystem/dir.php');
+if (extension_loaded('gd')) require_once('lib/filesystem/image.php');
+if (extension_loaded('zip')) require_once('lib/filesystem/zip.php');
 
 require_once('lib/associations/association_proxy.php');
 require_once('lib/associations/association.php');
