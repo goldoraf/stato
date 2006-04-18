@@ -53,4 +53,33 @@ class SCsvFile
     }
 }
 
+/*class csvstream{
+   var $position; 
+   var $varname; 
+   function stream_open($path, $mode, $options, &$opened_path){ 
+       $url = parse_url($path); 
+       $this->varname = $url['host'] ;
+       $this->position = 0; 
+       return true;
+   }
+  function stream_read($count){ 
+       $ret = substr($GLOBALS[$this->varname], $this->position, $count); 
+       $this->position += strlen($ret); 
+       return $ret; 
+   }
+  function stream_eof(){ 
+       return $this->position >= strlen($GLOBALS[$this->varname]); 
+   } 
+   function stream_tell(){ 
+       return $this->position; 
+   } 
+}
+
+   stream_wrapper_register("csvstr", "csvstream") ;
+   $str="yak, llama, 'big llama', 'wobmat, with a comma in it', bandycoot";
+
+   $fp = fopen("csvstr://str", "r+"); 
+   print_r(fgetcsv($fp,100,",","'"));*/
+
+
 ?>
