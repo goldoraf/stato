@@ -21,7 +21,7 @@ class SZipIterator implements Iterator
     public function next()
     {
         $this->entry = zip_read($this->resource);
-        $this->entryName = zip_entry_name($this->entry);
+        if ($this->valid()) $this->entryName = zip_entry_name($this->entry);
     }
     
     public function valid()
