@@ -9,7 +9,8 @@ return array
     'callbacks',
     'decorators',
     'list_decorator',
-    'migration'
+    'migration',
+    'csv'
 );
 
 ?>

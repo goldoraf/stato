@@ -70,9 +70,9 @@ class SFixture
     {
         if ($this->mode == self::CSV_MODE)
         {
-            $csv = new SCsvFile($this->fixturePath.'.csv');
+            $csv = new SCsvIterator(fopen($this->fixturePath.'.csv', 'r'));
             $i = 1;
-            while($data = $csv->fetchArray())
+            foreach($csv as $data)
             {
                 $this->values[strtolower($this->className).'_'.$i] = $data;
                 $i++;
