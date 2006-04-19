@@ -37,7 +37,7 @@ abstract class SMigration
     
     public function __call($method, $args)
     {
-        call_user_func_array(array(SActiveRecord::connection(), $method), $args);
+        return call_user_func_array(array(SActiveRecord::connection(), $method), $args);
     }
 }
 
