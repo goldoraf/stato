@@ -10,7 +10,6 @@ class SZipIterator implements Iterator
     public function __construct($filepath)
     {
         $this->filepath = $filepath;
-        $this->rewind();
     }
     
     public function __destruct()
