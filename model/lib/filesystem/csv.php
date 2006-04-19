@@ -18,6 +18,9 @@ class SCsvIterator implements Iterator
     
     public function __construct($resource, $config = array())
     {
+        if (!is_resource($resource)) 
+            throw new SException('Resource provided is not valid');
+            
         $this->resource = $resource;
         $this->config = array_merge($this->config, $config);
         if ($this->config['has_fields_in_first_line'])
@@ -32,7 +35,7 @@ class SCsvIterator implements Iterator
         return $this->fields;
     }
     
-    public function replaceFields($fields)
+    public function assignFields($fields)
     {
         $this->fields = $fields;
     }
@@ -79,6 +82,9 @@ class SCsvIterator implements Iterator
     
     private function fetchAssoc()
     {
+        if (count($this->fields) != count($this->data))
+            throw new SException("Wrong field count at line {$this->line}");
+        
         $row = array();
         foreach ($this->fields as $key => $value) 
             $row[$value] = $this->convertEncoding($this->data[$key]);
