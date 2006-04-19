@@ -71,7 +71,7 @@ abstract class SAbstractDriver
     
     public function quote($value, $attributeType = Null)
     {
-        if ($value == Null) return "NULL";
+        if ($value == Null && $value !== 0) return "NULL";
         switch($attributeType)
         {
             case 'date':
