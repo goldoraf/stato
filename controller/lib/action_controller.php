@@ -58,7 +58,7 @@ class SActionController
     	else
     	   $controllerName = $request->controller;
 		
-        $className = $controllerName.'controller';
+        $className = SInflection::camelize($controllerName).'Controller';
 		$controller = new $className();
 		return $controller->process($request, $response);
     }
