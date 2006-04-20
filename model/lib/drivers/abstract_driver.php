@@ -31,7 +31,6 @@ abstract class SAbstractDriver
     public function selectAll($sql)
     {
         $rs = $this->select($sql);
-        if (!$rs) return false;
         $set = array();
         while($row = $rs->fetch()) $set[] = $row;
         return $set;
@@ -39,9 +38,7 @@ abstract class SAbstractDriver
     
     public function selectOne($sql)
     {
-        $rs = $this->select($sql);
-        if (!$rs) return false;
-        return $rs->fetch();
+        return $this->select($sql)->fetch();
     }
     
     public function insert($sql)
