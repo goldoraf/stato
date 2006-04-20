@@ -14,6 +14,22 @@ function link_to($label, $urlOptions=array(), $htmlOptions=array())
     return content_tag('a', $label, array_merge(array('href' => $url), $htmlOptions));
 }
 
+function link_to_unless_current($label, $urlOptions=array(), $htmlOptions=array())
+{
+    return link_to_unless(is_current_page($urlOptions), $label, $urlOptions, $htmlOptions);
+}
+
+function link_to_unless($condition, $label, $urlOptions=array(), $htmlOptions=array())
+{
+    if ($condition) return $label;
+    else return link_to($label, $urlOptions, $htmlOptions);
+}
+
+function link_to_if($condition, $label, $urlOptions=array(), $htmlOptions=array())
+{
+    return link_to_unless(!$condition, $label, $urlOptions, $htmlOptions);
+}
+
 function button_to($label, $urlOptions=array(), $htmlOptions=array())
 {
     if (is_array($urlOptions)) $url = url_for($urlOptions);
@@ -34,6 +50,11 @@ function button_to($label, $urlOptions=array(), $htmlOptions=array())
 function url_for($options)
 {
     return SUrlRewriter::urlFor($options);
+}
+
+function is_current_page($options)
+{
+    return SUrlRewriter::isCurrentPage($options);
 }
 
 ?>

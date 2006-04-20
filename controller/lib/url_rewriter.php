@@ -11,6 +11,13 @@ class SUrlRewriter
         self::$request = $request;
     }
     
+    public static function isCurrentPage($options)
+    {
+        $options['only_path'] = true;
+        $options['skip_relative_url_root'] = true;
+        return self::urlFor($options) == self::$request->requestUri();
+    }
+    
     public static function urlFor($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';
