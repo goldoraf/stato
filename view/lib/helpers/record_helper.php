@@ -56,6 +56,9 @@ function input($objectName, $method, $object, $options=array())
         case 'integer':
             $str = text_field($objectName, $method, $object, $options);
             break;
+        case 'float':
+            $str = text_field($objectName, $method, $object, $options);
+            break;
         case 'boolean':
             $str = check_box($objectName, $method, $object, $options);
             break;
