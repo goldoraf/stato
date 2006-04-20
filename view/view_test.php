@@ -8,7 +8,8 @@ return array
     'form_helper',
     'form_options_helper',
     'date_helper',
-    'record_helper'
+    'record_helper',
+    'number_helper'
 );
 
 ?>

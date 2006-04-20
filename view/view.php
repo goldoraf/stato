@@ -15,5 +15,6 @@ require_once('lib/helpers/record_helper.php');
 require_once('lib/helpers/text_helper.php');
 require_once('lib/helpers/utf8_helper.php');
 require_once('lib/helpers/i18n_helper.php');
+require_once('lib/helpers/number_helper.php');
 
 ?>
