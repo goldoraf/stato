@@ -21,7 +21,7 @@ class SColumn
     {
         $db = SActiveRecord::connection();
         $sql = $db->quoteColumnName($this->name).' '.$db->typeToSql($this->type, $this->limit);
-        $sql = $db->addColumnOptions($sql, array('null' => $this->null, 'default' => $this->default));
+        $sql = $db->addColumnOptions($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
         return $sql;
     }
 }

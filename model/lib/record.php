@@ -163,7 +163,11 @@ class SRecord extends SObservable implements ArrayAccess
         foreach($values as $key => $value)
         {
             if (is_array($value)) $multiParamsAttributes[$key] = $value;
-            elseif (!in_array($key, $this->attrProtected)) $this->$key = stripslashes($value);
+            elseif (!in_array($key, $this->attrProtected))
+            {
+                if (!is_object($value)) $this->$key = stripslashes($value);
+                else $this->$key = $value;
+            }
         }
         
         if (!empty($multiParamsAttributes)) $this->assignMultiparamsAttributes($multiParamsAttributes);
@@ -171,10 +175,7 @@ class SRecord extends SObservable implements ArrayAccess
     
     protected function convertNumberValue($value)
     {
-        if ($value === True)  return 1;
-        if ($value === False) return 0;
-        if ($value == '')     return Null;
-        
+        if ($value === '') return Null;
         return $value;
     }
     

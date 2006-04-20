@@ -167,7 +167,7 @@ class SMySqlDriver extends SAbstractDriver
     public function addColumn($tableName, $columnName, $type, $options = array())
     {
         $sql = "ALTER TABLE $tableName ADD $columnName ".self::typeToSql($type, $options['limit']);
-        $sql = self::addColumnOptions($sql, $options);
+        $sql = self::addColumnOptions($sql, $type, $options);
         $this->execute($sql);
     }
     
@@ -185,7 +185,7 @@ class SMySqlDriver extends SAbstractDriver
         }
         $sql = "ALTER TABLE $tableName CHANGE $columnName $columnName "
         .self::typeToSql($type, $options['limit']);
-        $sql = self::addColumnOptions($sql, $options);
+        $sql = self::addColumnOptions($sql, $type, $options);
         $this->execute($sql);
     }
     
@@ -239,10 +239,10 @@ class SMySqlDriver extends SAbstractDriver
         return $sql;
     }
     
-    public function addColumnOptions($sql, $options)
+    public function addColumnOptions($sql, $type, $options)
     {
         if ($options['default'] !== Null)
-            $sql.= ' DEFAULT '.$this->quote($options['default'], $options['type']);
+            $sql.= ' DEFAULT '.$this->quote($options['default'], $type);
         if ($options['null'] === False) $sql.= ' NOT NULL';
         return $sql;
     }

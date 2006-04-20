@@ -24,7 +24,7 @@ class SAttribute
     
     public function typecast($data)
     {
-        if ($data == null) return null;
+        if ($data === null) return null;
         
         switch($this->type)
         {
