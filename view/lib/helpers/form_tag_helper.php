@@ -12,6 +12,11 @@ function form_tag($urlOptions, $options=array())
     return tag('form', $htmlOptions, True);
 }
 
+function start_form_tag($urlOptions, $options=array())
+{
+    return form_tag($urlOptions, $options);
+}
+
 function end_form_tag()
 {
     return '</form>';
