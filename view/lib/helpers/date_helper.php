@@ -8,13 +8,7 @@ function date_select($objectName, $method, $object, $options = array())
     else
         $date = ($value != Null) ? $value : SDate::today(); 
     
-    $order = (isset($options['order'])) ? $options['order'] : array('year', 'month', 'day');
-    $html = '';
-    foreach ($order as $param)
-    {
-        $html.= call_user_func('select_'.$param, $date, $options);
-    }
-    return $html;
+    return select_date($date, $options);
 }
 
 function date_time_select($objectName, $method, $object, $options = array())
@@ -25,13 +19,7 @@ function date_time_select($objectName, $method, $object, $options = array())
     else
         $datetime = ($value != Null) ? $value : SDateTime::today(); 
     
-    $order = (isset($options['order'])) ? $options['order'] : array('year', 'month', 'day', 'hour', 'minute', 'second');
-    $html = '';
-    foreach ($order as $param)
-    {
-        $html.= call_user_func('select_'.$param, $datetime, $options);
-    }
-    return $html;
+    return select_date_time($datetime, $options);
 }
 
 function time_select($objectName, $method, $object, $options = array())
@@ -42,32 +30,44 @@ function time_select($objectName, $method, $object, $options = array())
     else
         $datetime = ($value != Null) ? $value : SDateTime::today(); 
     
-    $order = (isset($options['order'])) ? $options['order'] : array('hour', 'minute', 'second');
-    $html = '';
-    foreach ($order as $param)
-    {
-        $html.= call_user_func('select_'.$param, $datetime, $options);
-    }
-    return $html;
+    return select_time($datetime, $options);
 }
 
 function select_date($date = Null, $options = array())
 {
     if ($date == Null) $date = SDate::today();
-    return select_year($date, $options).select_month($date, $options).select_day($date, $options);
+    $order = (isset($options['order'])) ? $options['order'] : array('year', 'month', 'day');
+    $html = '';
+    foreach ($order as $param) 
+        $html.= call_user_func('select_'.$param, $date, $options);
+    
+    return $html;
+    //return select_year($date, $options).select_month($date, $options).select_day($date, $options);
 }
 
 function select_date_time($datetime = Null, $options = array())
 {
     if ($datetime == Null) $datetime = SDateTime::today();
-    return select_year($date, $options).select_month($date, $options).select_day($date, $options)
-    .select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
+    $order = (isset($options['order'])) ? $options['order'] : array('year', 'month', 'day', 'hour', 'minute', 'second');
+    $html = '';
+    foreach ($order as $param)
+        $html.= call_user_func('select_'.$param, $datetime, $options);
+    
+    return $html;
+    //return select_year($date, $options).select_month($date, $options).select_day($date, $options)
+    //.select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
 function select_time($datetime = Null, $options = array())
 {
     if ($datetime == Null) $datetime = SDateTime::today();
-    return select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
+    $order = (isset($options['order'])) ? $options['order'] : array('hour', 'minute', 'second');
+    $html = '';
+    foreach ($order as $param)
+        $html.= call_user_func('select_'.$param, $datetime, $options);
+    
+    return $html;
+    //return select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
 function select_day($date, $options=array())
@@ -81,9 +81,9 @@ function select_day($date, $options=array())
         else
             $dayOptions.= "<option value=\"{$i}\">{$i}</option>\n";
     }
-    if (!isset($options['fieldname'])) $options['fieldname'] = 'day';
+    if (!isset($options['field_name'])) $options['field_name'] = 'day';
     
-    return select_html($options['fieldname'], $dayOptions, $options);
+    return select_html($options['field_name'], $dayOptions, $options);
 }
 
 function select_month($date, $options=array())
@@ -107,9 +107,9 @@ function select_month($date, $options=array())
         else
             $monthOptions.= "<option value=\"{$i}\">{$month}</option>\n";
     }
-    if (!isset($options['fieldname'])) $options['fieldname'] = 'month';
+    if (!isset($options['field_name'])) $options['field_name'] = 'month';
     
-    return select_html($options['fieldname'], $monthOptions, $options);
+    return select_html($options['field_name'], $monthOptions, $options);
 }
 
 function select_year($date, $options = array())
@@ -127,17 +127,17 @@ function select_year($date, $options = array())
         else
             $yearOptions.= "<option value=\"{$i}\">{$i}</option>\n";
     }
-    if (!isset($options['fieldname'])) $options['fieldname'] = 'year';
+    if (!isset($options['field_name'])) $options['field_name'] = 'year';
     
-    return select_html($options['fieldname'], $yearOptions, $options);
+    return select_html($options['field_name'], $yearOptions, $options);
 }
 
 function select_second($datetime, $options = array())
 {
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->sec : $datetime;
     $secOptions = numerical_options(0, 59, $selected);
-    if (!isset($options['fieldname'])) $options['fieldname'] = 'sec';
-    return select_html($options['fieldname'], $secOptions, $options);
+    if (!isset($options['field_name'])) $options['field_name'] = 'sec';
+    return select_html($options['field_name'], $secOptions, $options);
 }
 
 function select_minute($datetime, $options = array())
@@ -145,16 +145,16 @@ function select_minute($datetime, $options = array())
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->min : $datetime;
     $step = (isset($options['minute_step'])) ? $options['minute_step'] : 1;
     $minOptions = numerical_options(0, 59, $selected, $step);
-    if (!isset($options['fieldname'])) $options['fieldname'] = 'min';
-    return select_html($options['fieldname'], $minOptions, $options);
+    if (!isset($options['field_name'])) $options['field_name'] = 'min';
+    return select_html($options['field_name'], $minOptions, $options);
 }
 
 function select_hour($datetime, $options = array())
 {
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->hour : $datetime;
     $hourOptions = numerical_options(0, 23, $selected);
-    if (!isset($options['fieldname'])) $options['fieldname'] = 'hour';
-    return select_html($options['fieldname'], $hourOptions, $options);
+    if (!isset($options['field_name'])) $options['field_name'] = 'hour';
+    return select_html($options['field_name'], $hourOptions, $options);
 }
 
 function select_html($type, $dateOptions, $options = array())
