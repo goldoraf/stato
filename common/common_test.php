@@ -3,7 +3,8 @@
 return array
 (
     'inflection',
-    'encryption'
+    'encryption',
+    'date'
 );
 
 ?>

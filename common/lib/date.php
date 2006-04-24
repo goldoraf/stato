@@ -31,7 +31,12 @@ class SDate
     
     public function __toString()
     {
-        return adodb_date("Y-m-d", $this->ts());
+        return sprintf('%04d-%02d-%02d', $this->year, $this->month, $this->day);
+    }
+    
+    public function toIso8601()
+    {
+        return sprintf('%04d%02d%02dT00:00:00', $this->year, $this->month, $this->day);
     }
     
     public function format($strf)
@@ -55,9 +60,7 @@ class SDate
         foreach (self::$regex as $regex)
         {
             if (preg_match($regex, $string, $matches))
-            {
                 return new SDate($matches['year'], $matches['month'], $matches['day']);
-            }
         }
         return False;
     }
@@ -89,7 +92,14 @@ class SDateTime extends SDate
     
     public function __toString()
     {
-        return adodb_date("Y-m-d H:i:s", $this->ts());
+        return sprintf('%04d-%02d-%02d %02d:%02d:%02d', $this->year, $this->month, 
+                       $this->day, $this->hour, $this->min, $this->sec);
+    }
+    
+    public function toIso8601()
+    {
+        return sprintf('%04d%02d%02dT%02d:%02d:%02d', $this->year, $this->month, 
+                       $this->day, $this->hour, $this->min, $this->sec);
     }
     
     public function ts()
@@ -100,7 +110,8 @@ class SDateTime extends SDate
     public static function today()
     {
         $today = getdate();
-        return new SDateTime($today['year'], $today['mon'], $today['mday'], $today['hours'], $today['minutes'], $today['seconds']);
+        return new SDateTime($today['year'], $today['mon'], $today['mday'], 
+                             $today['hours'], $today['minutes'], $today['seconds']);
     }
     
     public static function parse($string)
@@ -108,9 +119,8 @@ class SDateTime extends SDate
         foreach (self::$regex as $regex)
         {
             if (preg_match($regex, $string, $matches))
-            {
-                return new SDateTime($matches['year'], $matches['month'], $matches['day'], $matches['hour'], $matches['min'], $matches['sec']);
-            }
+                return new SDateTime($matches['year'], $matches['month'], $matches['day'], 
+                                     $matches['hour'], $matches['min'], $matches['sec']);
         }
         return False;
     }
