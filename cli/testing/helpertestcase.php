@@ -25,15 +25,10 @@ class MockRecord
 
 class DomEqualExpectation extends EqualExpectation {
     
-    function test($compare, $nasty = false)
+    function test($compare)
     {
-        $docValue = new DOMDocument();
-        $docValue->preserveWhiteSpace = false;
-        $docValue->loadXML('<root>'.$this->_value.'</root>');
-        
-        $docCompare = new DOMDocument();
-        $docCompare->preserveWhiteSpace = false;
-        $docCompare->loadXML('<root>'.$compare.'</root>');
+        $docValue = $this->_instanciateDomDocument($this->_value);
+        $docCompare = $this->_instanciateDomDocument($compare);
         
         return $this->_domCompare($docValue->documentElement, $docCompare->documentElement);
     }
@@ -87,14 +82,31 @@ class DomEqualExpectation extends EqualExpectation {
         
         return true;
     }
+    
+    function _instanciateDomDocument($xml)
+    {
+        $doc = new DOMDocument();
+        $doc->preserveWhiteSpace = false;
+        if ($this->_hasXmlDeclaration($xml)) $doc->loadXML($xml);
+        else $doc->loadXML('<root>'.$xml.'</root>');
+        return $doc;
+    }
+    
+    function _hasXmlDeclaration($xml)
+    {
+        if (preg_match('/<\?xml version="1.0"\?>/', $xml) == 1) return true;
+        return false;
+    }
 }
 
-class HelperTestCase extends UnitTestCase
+class XmlTestCase extends UnitTestCase
 {
     function assertDomEqual($first, $second, $message = "%s")
     {
         return $this->assertExpectation(new DomEqualExpectation($first), $second, $message);
     }
 }
+
+class HelperTestCase extends XmlTestCase {}
 
 ?>
