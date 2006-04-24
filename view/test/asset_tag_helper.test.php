@@ -38,10 +38,10 @@ class AssetTagHelperTest extends HelperTestCase
     {
         $this->assertDomEqual(
             javascript_include_defaults(),
-            '<script src="/js/controls.js" type="text/javascript"></script>
+            '<script src="/js/prototype.js" type="text/javascript"></script>
+            <script src="/js/controls.js" type="text/javascript"></script>
             <script src="/js/dragdrop.js" type="text/javascript"></script>
-            <script src="/js/effects.js" type="text/javascript"></script>
-            <script src="/js/prototype.js" type="text/javascript"></script>'
+            <script src="/js/effects.js" type="text/javascript"></script>'
         );
         $this->assertDomEqual(
             javascript_include_tag('sortable'),
