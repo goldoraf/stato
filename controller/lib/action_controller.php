@@ -5,6 +5,7 @@ require_once(ROOT_DIR.'/core/view/view.php');
 
 class SUnknownControllerException extends SException {}
 class SUnknownActionException extends SException {}
+class SUnknownProtocolException extends SException {}
 class SDoubleRenderException extends SException {}
 
 class SActionController
@@ -48,19 +49,10 @@ class SActionController
     
     public static function factory($request, $response)
     {
-        if (!file_exists($path = self::controllerFile($request->controller)))
-    		throw new SUnknownControllerException(ucfirst($request->controller).'Controller not found !');
-    		
-    	require_once($path);
-    	
-    	if (strpos($request->controller, '/'))
-    	   list($subdir, $controllerName) = explode('/', $request->controller);
-    	else
-    	   $controllerName = $request->controller;
-		
-        $className = SInflection::camelize($controllerName).'Controller';
-		$controller = new $className();
-		return $controller->process($request, $response);
+        if ($request->controller == 'api') 
+            return self::dispatchWebServiceRequest($request, $response);
+		else 
+            return self::instanciateController($request->controller)->process($request, $response);
     }
     
     public static function processWithException($request, $response, $exception)
@@ -526,6 +518,58 @@ class SActionController
     {
         return (!$this->request->isPost() && isset($this->response->headers['Status'])
             && $this->response->headers['Status'] < 400);
+    }
+    
+    private static function dispatchWebServiceRequest($request, $response)
+    {
+        require_once(ROOT_DIR.'/core/webservice/webservice.php');
+        
+        $protocol = $request->action;
+        if (!in_array($protocol, array('xmlrpc')))
+            throw new SUnknownProtocolException($protocol);
+        $class = 'S'.$protocol.'Server';
+        $server = new $class();
+        list($method, $params) = $server->parseRequest($request->rawPostData());
+        $parts = explode('.', $method);
+        if (count($parts) < 2 || count($parts) > 3)
+            throw new SException("Requested method does not exist : $method");
+        $method = array_pop($parts);
+        if (count($parts) == 2) $service = $parts[0].'/'.$parts[1];
+        else $service = $parts[0];
+        
+        $wsRequest = new SWebServiceRequest($protocol, $service, $method, $params);
+        $returnValue = self::invokeWebService($wsRequest);
+        $response->body = $server->writeResponse($returnValue);
+        return $response;
+    }
+    
+    private static function invokeWebService($request)
+    {
+        if (file_exists(self::controllerFile('api')))
+            return self::instanciateController('api')->invokeDelegatedWebService($request);
+        else
+            return self::instanciateController($request->service)->invokeDirectWebService($request);
+    }
+    
+    public function invokeDirectWebService($request)
+    {
+        return call_user_func_array(array(&$this, $request->method), $request->params);
+    }
+    
+    private static function instanciateController($controller)
+    {
+        if (!file_exists($path = self::controllerFile($controller)))
+    		throw new SUnknownControllerException(ucfirst($controller).'Controller not found !');
+    		
+    	require_once($path);
+    	
+    	if (strpos($controller, '/'))
+    	   list( , $controllerName) = explode('/', $controller);
+    	else
+    	   $controllerName = $controller;
+		
+        $className = SInflection::camelize($controllerName).'Controller';
+		return new $className();
     }
     
     private static function controllerFile($controller)
