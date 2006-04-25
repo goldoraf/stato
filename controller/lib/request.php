@@ -70,6 +70,11 @@ class SRequest
         return $this->host().$this->portString();
     }
     
+    public function rawPostData()
+    {
+        return file_get_contents('php://input');
+    }
+    
     public function requestUri()
     {
         if (!isset($this->requestUri))
