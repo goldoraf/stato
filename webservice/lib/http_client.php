@@ -16,6 +16,7 @@ class SHttpClient
     public function get($redirectMax = 5)
     {
         $ch = $this->connect();
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_MAXREDIRS, $redirectMax);
         return $this->execute($ch);
     }
@@ -25,7 +26,6 @@ class SHttpClient
         $ch = $this->connect();
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        //curl_setopt ($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
         return $this->execute($ch);        
     }
     
