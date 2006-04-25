@@ -1,5 +1,7 @@
 <?php
 
+class SXmlRpcClientException extends SException {}
+
 class SXmlRpcClient
 {
     private $uri = null;
@@ -27,7 +29,7 @@ class SXmlRpcClient
             $method = implode('.', $this->namespaces).".$method";
             $this->namespaces = array();
         }
-        $this->sendRequest($method, $args);
+        return $this->sendRequest($method, $args);
     }
     
     private function sendRequest($method, $args)
@@ -40,10 +42,44 @@ class SXmlRpcClient
             "Content-length: ".$request->length()
         );
         $client = new SHttpClient($this->uri, $headers);
-        print_r($request->toXml());
-        print_r($client->post($request->toXml()));
+        $response = $client->post($request->toXml());
+        
+        if ($response->code != 200)
+            throw new SXmlRpcClientException("Request failed with code {$response->code}");
+        
+        return $this->parseResponse($response->body);
+    }
+    
+    private function parseResponse($xmlString)
+    {
+        try { $xml = new SimpleXMLElement($xmlString); }
+        catch (Exception $e) { throw new SXmlRpcClientException('Failed to parse response'); }
+        
+        if (!empty($xml->fault))
+        {
+            if (empty($xml->fault->value))
+                throw new SXmlRpcClientException('Invalid fault response : no <value> tag');
+            
+            try { $fault = SXmlRpcValue::typecast($xml->fault->value->asXML()); }
+            catch (SXmlRpcValueException $e) { 
+                throw new SXmlRpcClientException('Invalid fault response');
+            }
+            
+            throw new SXmlRpcClientException('Request failed, '.$fault['faultCode']
+                                             .': '.$fault['faultString']);
+        }
+        elseif (empty($xml->params))
+            throw new SXmlRpcClientException('Invalid fault response : no <params> tag');
+        elseif (empty($xml->params->param))
+            throw new SXmlRpcClientException('Invalid fault response : no <param> tag');
+        elseif (empty($xml->params->param->value))
+            throw new SXmlRpcClientException('Invalid fault response : no <value> tag');
+            
+        return SXmlRpcValue::typecast($xml->params->param->value->asXML());
     }
 }
+
+class SXmlRpcValueException extends SException {}
 
 class SXmlRpcValue
 {
@@ -52,6 +88,68 @@ class SXmlRpcValue
     public function __construct($value)
     {
         $this->value = $value;
+    }
+    
+    public static function typecast($xmlString)
+    {
+        try { $xml = new SimpleXMLElement($xmlString); }
+        catch (Exception $e) { 
+            throw new SXmlRpcValueException("Failed to typecast XML value : $xmlString");
+        }
+        
+        list($type, $value) = each($xml);
+        if (!$type) $type = 'string';
+        
+        switch ($type)
+        {
+            case 'i4':
+            
+            case 'int':
+                return (integer) $value;
+                break;
+            case 'double':
+                return (float) $value;
+                break;
+            case 'boolean':
+                return $value == 1;
+                break;
+            case 'string':
+                return $value;
+                break;
+            case 'dateTime.iso8601':
+                return SDateTime::parse($value);
+                break;
+            case 'base64':
+                
+                break;
+            case 'array':
+                if (!$value instanceof SimpleXMLElement/* || empty($value->data)*/)
+                    throw new SXmlRpcValueException('Invalid XML string for array type');
+                
+                $values = array();
+                foreach ($value->data->value as $element)
+                    $values[] = self::typecast($element->asXML());
+                
+                return $values;
+                break;
+            case 'struct':
+                if (!$value instanceof SimpleXMLElement)
+                    throw new SXmlRpcValueException('Invalid XML string for struct type');
+                
+                $values = array();
+                foreach ($value->member as $member)
+                {
+                    if ((!$member->value instanceof SimpleXMLElement) || empty($member->value))
+                        throw new SXmlRpcValueException('Member of a struct must contain a <value> tag');
+                    
+                    $values[(string) $member->name] = self::typecast($member->value->asXML());
+                }
+                return $values;
+                break;
+            default:
+                throw new SXmlRpcValueException("$type is not a native XML-RPC type");
+                break;
+        }
     }
     
     public function toXml()

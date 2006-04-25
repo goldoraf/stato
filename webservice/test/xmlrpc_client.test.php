@@ -24,7 +24,8 @@ EOD;
     public function testClient()
     {
         $client = new SXmlRpcClient('http://xmlrpc-c.sourceforge.net/api/sample.php');
-        $client->sample->sumAndDifference(5, 3);
+        $this->assertEqual(array('sum' => 8, 'difference' => 2), $client->sample->sumAndDifference(5, 3));
+        print_r($client->system->methodSignature('sample.sumAndDifference'));
     }
 }
 
