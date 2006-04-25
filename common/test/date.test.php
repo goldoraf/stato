@@ -17,6 +17,16 @@ class DateTest extends UnitTestCase
         $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
         $this->assertEqual('19690721T20:35:05', $d->toIso8601());
     }
+    
+    public function testParsing()
+    {
+        $this->assertEqual(new SDate(1969, 7, 21),
+                           SDate::parse('1969-07-21'));
+        $this->assertEqual(new SDateTime(1969, 7, 21, 20, 35, 05),
+                           SDateTime::parse('19690721T20:35:05'));
+        $this->assertEqual(new SDateTime(1969, 7, 21, 20, 35, 05),
+                           SDateTime::parse('1969-07-21 20:35:05'));
+    }
 }
 
 ?>

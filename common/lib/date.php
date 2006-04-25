@@ -62,7 +62,7 @@ class SDate
             if (preg_match($regex, $string, $matches))
                 return new SDate($matches['year'], $matches['month'], $matches['day']);
         }
-        return False;
+        return false;
     }
 }
 
@@ -74,7 +74,8 @@ class SDateTime extends SDate
     
     private static $regex = array
     (
-        'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2}) (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/'
+        'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2}) (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/',
+        'iso8601' => '/^(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})T(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/'
     );
     
     public function __construct($year, $month, $day, $hour = 0, $min = 0, $sec = 0)
@@ -122,7 +123,7 @@ class SDateTime extends SDate
                 return new SDateTime($matches['year'], $matches['month'], $matches['day'], 
                                      $matches['hour'], $matches['min'], $matches['sec']);
         }
-        return False;
+        return false;
     }
 }
 
