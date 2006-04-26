@@ -3,49 +3,75 @@
 require_once(ROOT_DIR.'/core/model/model.php');
 require_once(ROOT_DIR.'/core/view/view.php');
 
+/**
+ * @ignore
+ */ 
 class SUnknownControllerException extends SException {}
 class SUnknownActionException extends SException {}
 class SUnknownProtocolException extends SException {}
 class SDoubleRenderException extends SException {}
 
+/**
+ * Front-web controller class
+ * 
+ * Action Controllers are made up of one or more actions that performs its purpose
+ * and then either renders a template or redirects to another action. An action 
+ * is defined as a public method on the controller, which will automatically be 
+ * made accessible to the web-server through a mod_rewrite mapping. 
+ * A sample controller could look like this:
+ * 
+ * <pre>class WeblogController extends SActionController
+ * {
+ *      public function index()
+ *      {
+ *          $this->posts = SActiveStore::findAll('Post');
+ *      }
+ *      
+ *      public function add_comment()
+ *      {
+ *          ...
+ *      }   
+ * }</pre>
+ * 
+ * @package Stato
+ * @subpackage controller
+ */    
 class SActionController
 {   
     public $request  = null;
     public $session  = null;
     public $response = null;
+    public $assigns  = null;
     public $params   = null;
     public $view     = null;
     public $flash    = null;
     public $logger   = null;
     
-    public $layout   = false;
-    public $models   = array();
-    public $helpers  = array();
+    protected $layout   = false;
+    protected $models   = array();
+    protected $helpers  = array();
     
-    public $cachedPages    = array();
-    public $cachedActions  = array();
-    public $pageCacheDir   = null;
-    public $pageCacheExt   = '.html';
-    public $performCaching = True;
+    protected $hiddenActions  = array();
     
-    public $beforeFilters = array();
-    public $afterFilters  = array();
-    public $aroundFilters = array();
+    protected $cachedPages    = array();
+    protected $cachedActions  = array();
+    protected $pageCacheDir   = null;
+    protected $pageCacheExt   = '.html';
+    protected $performCaching = True;
     
-    public $skipBeforeFilters = array();
-    public $skipAfterFilters  = array();
+    protected $beforeFilters = array();
+    protected $afterFilters  = array();
+    protected $aroundFilters = array();
     
-    public $autoCompleteFor = array();
+    protected $skipBeforeFilters = array();
+    protected $skipAfterFilters  = array();
     
-    protected $assigns = array();
+    private $subDirectory      = null;
     
-    protected $virtualMethods    = array();
-    protected $subDirectory      = null;
+    private $performedRender   = false;
+    private $performedRedirect = false;
     
-    protected $performedRender   = false;
-    protected $performedRedirect = false;
-    
-    protected static $defaultRenderStatusCode = '200 OK';
+    const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
     public static function factory($request, $response)
     {
@@ -59,16 +85,6 @@ class SActionController
     {
         $controller = new SActionController();
         return $controller->process($request, $response, 'rescueAction', $exception);
-    }
-    
-    public function __construct()
-    {
-        $this->view    = new SActionView($this);
-        $this->session = new SSession();
-        $this->flash   = new SFlash($this->session);
-        $this->logger  = SLogger::getInstance();
-        
-        $this->pageCacheDir = ROOT_DIR.'/public/cache';
     }
     
     public function process($request, $response, $method = 'performAction', $arguments = null)
@@ -86,45 +102,19 @@ class SActionController
         return $this->response;
     }
     
-    public function performAction()
+    public function invokeDirectWebService($request)
     {
-        $action = $this->actionName();
-        if (!$this->actionExists($action))
-            throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
-            
-        $this->initialize();
-            
-        SLocale::loadStrings(APP_DIR.'/i18n/'.SDependencies::subDirectory(get_class($this)));
-        SUrlRewriter::initialize($this->request);
+        return call_user_func_array(array(&$this, $request->method), $request->params);
+    }
+    
+    public function __construct()
+    {
+        $this->view    = new SActionView($this);
+        $this->session = new SSession();
+        $this->flash   = new SFlash($this->session);
+        $this->logger  = SLogger::getInstance();
         
-        foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
-        
-        SDependencies::requireDependencies('models', $this->models, get_class($this));
-        SDependencies::requireDependencies('helpers', $this->helpers, get_class($this));
-        
-        /*foreach($this->autoCompleteFor as $params)
-        {
-            $method = 'autoCompleteFor'.ucfirst($params[0]).ucfirst($params[1]);
-            $this->virtualMethods[$method] = array('autoCompleteFor', $params);
-        }*/
-        
-        if (!empty($this->cachedActions))
-            $this->aroundFilters[] = new SActionCacheFilter($this->cachedActions);
-        
-        $beforeResult = $this->processFilters('before');
-        foreach($this->aroundFilters as $filter) $filter->before($this);
-        
-        if ($beforeResult !== false && !$this->isPerformed())
-        {
-            $this->$action();
-            if (!$this->isPerformed()) $this->render();
-        }
-        
-        foreach($this->aroundFilters as $filter) $filter->after($this);
-        $this->processFilters('after');
-        
-        if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
-            $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
+        $this->pageCacheDir = ROOT_DIR.'/public/cache';
     }
     
     public function __get($name)
@@ -137,21 +127,17 @@ class SActionController
         $this->assigns[$name] = $value;
     }
     
-    public function __call($action, $args)
-    {
-        if (in_array($action, array_keys($this->virtualMethods)))
-        {
-            $method = $this->virtualMethods[$action][0];
-            $params = $this->virtualMethods[$action][1];
-            $this->$method($params);
-        }
-    }
-    
+    /**
+     * Converts the class name from something like "WeblogController" to "weblog"
+     */
     public function controllerName()
     {
         return str_replace('controller', '', strtolower(get_class($this)));
     }
     
+    /**
+     * Returns the class name
+     */
     public function controllerClassName()
     {
         return ucfirst($this->controllerName()).'Controller';
@@ -175,69 +161,17 @@ class SActionController
             $options['controller'] = $this->controllerPath();
             if (!isset($options['action'])) $options['action'] = $this->actionName();
         }
-        else
-        {
-            if (!isset($options['action'])) $options['action'] = 'index';
-        }   
+        elseif (!isset($options['action'])) $options['action'] = 'index';  
         
         return SUrlRewriter::rewrite($options);
     }
     
-    // Overwrite to perform initializations prior to action call
+    /**
+     * Overwrite to perform initializations prior to action call
+     */
     protected function initialize()
     {
     
-    }
-    
-    protected function actionExists($action)
-    {
-        try
-        {
-            $method = new ReflectionMethod(get_class($this), $action);
-            if ($method->isPublic() && !$method->isConstructor()
-                && $method->getDeclaringClass()->getName() != __CLASS__)
-                return true;
-            else
-                return false;
-        }
-        catch (ReflectionException $e)
-        {
-            if (in_array($action, array_keys($this->virtualMethods)))
-                return true;
-            else
-                return false;
-        }
-    }
-    
-    protected function processFilters($state)
-    {
-        $prop = $state.'Filters';
-        foreach ($this->$prop as $filter)
-        {
-            if (is_array($filter))
-            {
-                $method = $filter[0];
-                
-                if (isset($filter['only']) && !is_array($filter['only']))
-                    $filter['only'] = array($filter['only']);
-                if (isset($filter['except']) && !is_array($filter['except']))
-                    $filter['except'] = array($filter['except']);
-                
-                if ((isset($filter['only']) && in_array($this->actionName(), $filter['only']))
-                    || (isset($filter['except']) && !in_array($this->actionName(), $filter['except']))
-                    || (!isset($filter['only']) && !isset($filter['except'])))
-                    $result = $this->callFilter($method, $state);
-            }
-            else $result = $this->callFilter($filter, $state);
-            
-            if ($result === false) return false;
-        }
-    }
-    
-    protected function callFilter($method, $state)
-    {
-        $skipProp = 'skip'.ucfirst($state).'Filters';
-        if (!in_array($method, $this->$skipProp)) return $this->$method();
     }
     
     protected function render($status = null)
@@ -270,27 +204,34 @@ class SActionController
         $this->renderText($this->view->render($path, $this->assigns), $status);
     }
     
-    // public method because used by ActionCacheFilter
+    /**
+     * Renders text without the active layout. 
+     * 
+     * It is usually used for rendering prepared content by renderFile() and 
+     * Action Caching, but you can use it for tests.    
+     * Note that it must remain public instead of protected because SActionCacheFilter
+     * must be able to call it directly.
+     */
     public function renderText($str, $status = null)
     {
         if ($this->isPerformed())
             throw new SDoubleRenderException('Can only render or redirect once per action');
         
         $this->performedRender = true;
-        $this->response->headers['Status'] = (!empty($status)) ? $status : self::$defaultRenderStatusCode;
+        $this->response->headers['Status'] = (!empty($status)) ? $status : self::DEFAULT_RENDER_STATUS_CODE;
         $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->response->body = $str;
+    }
+    
+    protected function templatePath($controllerPath, $action)
+    {
+        return APP_DIR."/views/$controllerPath/$action.php";
     }
     
     protected function addVariablesToAssigns()
     {
         if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
         $this->flash->discard();
-    }
-    
-    protected function templatePath($controllerPath, $action)
-    {
-        return APP_DIR."/views/$controllerPath/$action.php";
     }
     
     protected function redirectTo($options)
@@ -360,7 +301,7 @@ class SActionController
     {
         $this->performedRedirect = false;
         $this->response->redirectedTo = null;
-        $this->response->headers['Status'] = self::$defaultRenderStatusCode;
+        $this->response->headers['Status'] = self::DEFAULT_RENDER_STATUS_CODE;
         unset($this->response->headers['location']);
     }
     
@@ -434,7 +375,97 @@ class SActionController
         return array($paginator, $paginator->currentPage());
     }
     
-    protected function logProcessing()
+    private function performAction()
+    {
+        $action = $this->actionName();
+        if (!$this->actionExists($action))
+            throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
+            
+        $this->initialize();
+        $this->requireDependencies();
+        
+        if (!empty($this->cachedActions))
+            $this->aroundFilters[] = new SActionCacheFilter($this->cachedActions);
+        
+        $beforeResult = $this->processFilters('before');
+        foreach($this->aroundFilters as $filter) $filter->before($this);
+        
+        if ($beforeResult !== false && !$this->isPerformed())
+        {
+            $this->$action();
+            if (!$this->isPerformed()) $this->render();
+        }
+        
+        foreach($this->aroundFilters as $filter) $filter->after($this);
+        $this->processFilters('after');
+        
+        if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
+            $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
+    }
+    
+    private function actionExists($action)
+    {
+        try
+        {
+            $method = new ReflectionMethod(get_class($this), $action);
+            return ($method->isPublic() && !$method->isConstructor()
+                    && $method->getDeclaringClass()->getName() != __CLASS__
+                    && !in_array($action, $this->hiddenActions));
+        }
+        catch (ReflectionException $e)
+        {
+             return in_array($action, array_keys($this->virtualMethods));
+        }
+    }
+    
+    private function requireDependencies()
+    {
+        SLocale::loadStrings(APP_DIR.'/i18n/'.SDependencies::subDirectory(get_class($this)));
+        SUrlRewriter::initialize($this->request);
+        
+        foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
+        
+        SDependencies::requireDependencies('models', $this->models, get_class($this));
+        SDependencies::requireDependencies('helpers', $this->helpers, get_class($this));
+    }
+    
+    private function processFilters($state)
+    {
+        $prop = $state.'Filters';
+        foreach ($this->$prop as $filter)
+        {
+            if (is_array($filter))
+            {
+                $method = $filter[0];
+                
+                if (isset($filter['only']) && !is_array($filter['only']))
+                    $filter['only'] = array($filter['only']);
+                if (isset($filter['except']) && !is_array($filter['except']))
+                    $filter['except'] = array($filter['except']);
+                
+                if ((isset($filter['only']) && in_array($this->actionName(), $filter['only']))
+                    || (isset($filter['except']) && !in_array($this->actionName(), $filter['except']))
+                    || (!isset($filter['only']) && !isset($filter['except'])))
+                    $result = $this->callFilter($method, $state);
+            }
+            else $result = $this->callFilter($filter, $state);
+            
+            if ($result === false) return false;
+        }
+    }
+    
+    private function callFilter($method, $state)
+    {
+        $skipProp = 'skip'.ucfirst($state).'Filters';
+        if (!in_array($method, $this->$skipProp)) return $this->$method();
+    }
+    
+    private function isPerformed()
+    {
+        return ($this->performedRender || $this->performedRedirect);
+    }
+    
+    private function logProcessing()
     {
         $log = 'Processing '.$this->controllerClassName().'::'.$this->actionName()
             .'() for '.$this->request->remoteIp().' at '
@@ -444,7 +475,7 @@ class SActionController
         $this->logger->info($log);
     }
     
-    protected function rescueAction($exception)
+    private function rescueAction($exception)
     {
         if ($this->isPerformed()) $this->eraseResults();
         $this->logError($exception);
@@ -452,7 +483,7 @@ class SActionController
         else $this->rescueActionInPublic($exception);
     }
     
-    protected function rescueActionInPublic($exception)
+    private function rescueActionInPublic($exception)
     {
         if (in_array(get_class($exception), array('SRoutingException', 
             'SUnknownControllerException', 'SUnknownActionException')))
@@ -460,7 +491,7 @@ class SActionController
         else $this->renderText(file_get_contents(ROOT_DIR.'/public/500.html'));
     }
     
-    protected function rescueActionLocally($exception)
+    private function rescueActionLocally($exception)
     {
         $this->assigns['exception']  = $exception;
         $this->assigns['controller'] = ucfirst($this->controllerName()).'Controller';
@@ -468,30 +499,10 @@ class SActionController
         $this->renderFile(ROOT_DIR.'/core/controller/lib/templates/rescue/exception.php');
     }
     
-    protected function logError($exception)
+    private function logError($exception)
     {
         $this->logger->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
         .implode("\n    ", $this->cleanBacktrace($exception))."\n");
-    }
-    
-    /*protected function autoCompleteFor($args)
-    {
-        $object = $args[0];
-        $method = $args[1];
-        if (!isset($args[2])) $options = array();
-        else $options = $args[2];
-        
-        $condition = "LOWER({$method}) LIKE '%".strtolower($this->params[$object][$method])."%'";
-        $options = array_merge(array('order' => "{$method} ASC", 'limit' => 10), $options);
-        $entities = $this->$object->findAll($condition, $options);
-        $items = '';
-        foreach($entities as $entity) $items.= "<li>{$entity->$method}</li>";
-        $this->renderText("<ul>{$items}</ul>");
-    }*/
-    
-    private function isPerformed()
-    {
-        return ($this->performedRender || $this->performedRedirect);
     }
     
     private function cleanBacktrace($exception)
@@ -549,11 +560,6 @@ class SActionController
             return self::instanciateController('api')->invokeDelegatedWebService($request);
         else
             return self::instanciateController($request->service)->invokeDirectWebService($request);
-    }
-    
-    public function invokeDirectWebService($request)
-    {
-        return call_user_func_array(array(&$this, $request->method), $request->params);
     }
     
     private static function instanciateController($controller)

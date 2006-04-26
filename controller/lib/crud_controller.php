@@ -2,11 +2,28 @@
 
 class SCrudController extends SActionController
 {
-    public $scaffold = Null;
+    public $scaffold = null;
+    
+    private $scaffoldActions = array('index', 'view', 'add', 'create', 
+                                     'edit', 'update', 'delete');
+    
+    public function __construct()
+    {
+        parent::__construct();
+        if ($this->scaffold === null)
+        {
+            foreach ($this->scaffoldActions as $action)
+            {
+                $method = new ReflectionMethod(get_class($this), $action);
+                if ($method->getDeclaringClass()->getName() == __CLASS__)
+                    $this->hiddenActions[] = $action;
+            }
+        }
+    }
     
     protected function initialize()
     {
-        if ($this->scaffold !== Null)
+        if ($this->scaffold !== null)
         {
             $this->models[] = $this->scaffold;
         
@@ -101,26 +118,6 @@ class SCrudController extends SActionController
     protected function scaffoldPath($templateName)
     {
         return ROOT_DIR."/core/controller/lib/templates/crud/{$templateName}.php";
-    }
-    
-    protected function actionExists($action)
-    {
-        if ($this->scaffold === null)
-        {
-            try
-            {
-                $method = new ReflectionMethod(get_class($this), $action);
-                if ($method->getDeclaringClass()->getName() == __CLASS__)
-                    return false;
-                else
-                    return parent::actionExists($action);
-            }
-            catch (ReflectionException $e)
-            {
-                return parent::actionExists($action);
-            }
-        }    
-        else return parent::actionExists($action);
     }
 }
 
