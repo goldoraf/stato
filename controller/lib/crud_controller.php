@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Scaffolding controller class
+ * 
+ * This controller provide a series of actions for C.R.U.D (Create, Update, Delete)
+ * operations on an Active Record class. Example :
+ *<code>class WeblogController extends SCrudController
+ *{
+ *    public $scaffold = 'post';
+ *}</code> 
+ * The <var>$scaffold</var> is automatically converted to a class name, and used
+ * for the instance variables names. The <var>renderScaffold()</var> method used by the controller
+ * will first check to see if you've made your own template (like "weblog/index.php" 
+ * for the index action) and if not, then render the generic template for that action.
+ *  
+ * @package Stato
+ * @subpackage controller
+ */
 class SCrudController extends SActionController
 {
     public $scaffold = null;

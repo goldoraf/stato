@@ -3,9 +3,6 @@
 require_once(ROOT_DIR.'/core/model/model.php');
 require_once(ROOT_DIR.'/core/view/view.php');
 
-/**
- * @ignore
- */ 
 class SUnknownControllerException extends SException {}
 class SUnknownActionException extends SException {}
 class SUnknownProtocolException extends SException {}
@@ -17,28 +14,37 @@ class SDoubleRenderException extends SException {}
  * Action Controllers are made up of one or more actions that performs its purpose
  * and then either renders a template or redirects to another action. An action 
  * is defined as a public method on the controller, which will automatically be 
- * made accessible to the web-server through a mod_rewrite mapping. 
+ * made accessible to the web-server through Routing. 
  * A sample controller could look like this:
  * 
- * <pre>class WeblogController extends SActionController
- * {
- *      public function index()
- *      {
- *          $this->posts = SActiveStore::findAll('Post');
- *      }
+ * <code>class WeblogController extends SActionController
+ *{
+ *     public function index()
+ *     {
+ *         $this->posts = SActiveStore::findAll('Post');
+ *     }
  *      
- *      public function add_comment()
- *      {
- *          ...
- *      }   
- * }</pre>
+ *     public function add_comment()
+ *     {
+ *         ...
+ *     }   
+ *}</code>
  * 
  * @package Stato
  * @subpackage controller
- */    
+ */
 class SActionController
 {   
+    /**
+     * Holds the request object that's primarily used to get variables set by the 
+     * web server or otherwise directly related to the execution environment.
+     * Examples : <var>$this->request->isPost(); $this->request->requestUri();</var>     
+     */
     public $request  = null;
+    /**
+     * Holds the session object that can be used to register variables to the session.
+     * Accessed like <var>$this->session['user']</var>.          
+     */
     public $session  = null;
     public $response = null;
     public $assigns  = null;
