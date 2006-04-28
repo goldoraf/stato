@@ -1,6 +1,7 @@
 <?php
 
 require_once('lib/action_view.php');
+require_once('lib/form_builder.php');
 
 require_once('lib/helpers/tag_helper.php');
 require_once('lib/helpers/asset_tag_helper.php');
