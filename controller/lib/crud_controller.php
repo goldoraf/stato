@@ -47,7 +47,7 @@ class SCrudController extends SActionController
             if (strpos($this->scaffold, '/') !== false)
                 list( , $this->scaffold) = explode('/', $this->scaffold);
             
-            $this->class_name = ucfirst($this->scaffold);
+            $this->class_name = SInflection::camelize($this->scaffold);
             $this->singular_name = strtolower($this->scaffold);
             $this->plural_name = SInflection::pluralize($this->singular_name);
         }
@@ -119,7 +119,7 @@ class SCrudController extends SActionController
     protected function renderScaffold($action = Null)
     {
         if ($action == Null) $action = $this->actionName();
-        $template = $this->templatePath($this->controllerName(), $action);
+        $template = $this->templatePath($this->controllerPath(), $action);
         if (file_exists($template)) $this->renderAction($action);
         else
         {
