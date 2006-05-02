@@ -138,7 +138,7 @@ class SActionController
      */
     public function controllerName()
     {
-        return str_replace('controller', '', strtolower(get_class($this)));
+        return SInflection::underscore(str_replace('Controller', '', $this->controllerClassName()));
     }
     
     /**
@@ -146,7 +146,7 @@ class SActionController
      */
     public function controllerClassName()
     {
-        return ucfirst($this->controllerName()).'Controller';
+        return get_class($this);
     }
     
     public function controllerPath()
@@ -500,8 +500,8 @@ class SActionController
     private function rescueActionLocally($exception)
     {
         $this->assigns['exception']  = $exception;
-        $this->assigns['controller'] = ucfirst($this->controllerName()).'Controller';
-        $this->assigns['action']     = $this->actionName();
+        $this->assigns['controller_name'] = self::controllerClass($this->request->controller);
+        $this->assigns['action_name']     = $this->actionName();
         $this->renderFile(ROOT_DIR.'/core/controller/lib/templates/rescue/exception.php');
     }
     
@@ -568,25 +568,30 @@ class SActionController
             return self::instanciateController($request->service)->invokeDirectWebService($request);
     }
     
-    private static function instanciateController($controller)
+    private static function instanciateController($reqController)
     {
-        if (!file_exists($path = self::controllerFile($controller)))
-    		throw new SUnknownControllerException(ucfirst($controller).'Controller not found !');
+        if (!file_exists($path = self::controllerFile($reqController)))
+    		throw new SUnknownControllerException(ucfirst($reqController).'Controller not found !');
     		
     	require_once($path);
     	
-    	if (strpos($controller, '/'))
-    	   list( , $controllerName) = explode('/', $controller);
-    	else
-    	   $controllerName = $controller;
-		
-        $className = SInflection::camelize($controllerName).'Controller';
+        $className = self::controllerClass($reqController);
 		return new $className();
     }
     
-    private static function controllerFile($controller)
+    private static function controllerClass($reqController)
+    {
+        if (strpos($reqController, '/'))
+    	   list( , $controllerName) = explode('/', $reqController);
+    	else
+    	   $controllerName = $reqController;
+    	   
+    	return SInflection::camelize($controllerName).'Controller';
+    }
+    
+    private static function controllerFile($reqController)
 	{
-        return APP_DIR.'/controllers/'.SInflection::underscore($controller).'_controller.php';
+        return APP_DIR.'/controllers/'.$reqController.'_controller.php';
     }
 }
 

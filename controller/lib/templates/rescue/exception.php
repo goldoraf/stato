@@ -37,7 +37,7 @@
   </style>
   </head>
   <body>
-        <h1><?php echo get_class($this->exception)." in {$this->controller}::{$this->action}()"; ?></h1>
+        <h1><?php echo get_class($this->exception)." in {$this->controller_name}::{$this->action_name}()"; ?></h1>
         <pre><?php echo $this->exception->getMessage(); ?></pre>
         <p><?php echo "Exception occured at : ".$this->exception->getFile()." : ".$this->exception->getLine(); ?></p>
         <table>
