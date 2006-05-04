@@ -5,7 +5,6 @@ class SAssociationTypeMismatch extends SException { }
 class SActiveRecord extends SRecord
 {
     public $tableName        = Null;
-    public $sqlMapping       = array();
     public $identityField    = 'id';
     public $inheritanceField = 'type';
     public $recordTimestamps = False;
@@ -171,7 +170,9 @@ class SActiveRecord extends SRecord
     
     protected function readAssociation($name)
     {
-        if ($this->relationships[$name]['type'] == 'to_one' || $this->relationships[$name] == 'to_one')
+        $rel  = $this->relationships[$name];
+        $type = (is_array($rel)) ? $rel['assoc_type'] : $rel;
+        if ($type == 'belongs_to' || $type == 'one_to_one')
             return $this->assocs[$name]->read();
         else
             return $this->assocs[$name];
@@ -235,15 +236,7 @@ class SActiveRecord extends SRecord
     private function initAssociations()
     {
         foreach($this->relationships as $name => $options)
-        {
-            $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $options, $this->sqlMapping($name));
-        }
-    }
-    
-    private function sqlMapping($attr)
-    {
-        if (isset($this->sqlMapping[$attr])) return $this->sqlMapping[$attr];
-        else return array();
+            $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $options);
     }
     
     /**

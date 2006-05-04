@@ -220,19 +220,19 @@ class SActiveStore
             {
                 $records[$id]->$key->setAsLoaded();
                 
-                if (isset($row[$pkTable[$assoc[2]['table_name']]]))
+                if (isset($row[$pkTable[$assoc['table_name']]]))
                 {
-                    $record = self::extractRecord($abbrv, $assoc[2]['table_name'], $row);
+                    $record = self::extractRecord($abbrv, $assoc['table_name'], $row);
                     if ($record)
                     {
-                        if ($assoc[0] == 'hasMany' || $assoc[0] == 'manyToMany')
+                        if ($assoc['assoc_type'] == 'has_many' || $assoc['assoc_type'] == 'many_to_many')
                         {
-                            $assoc = self::getInstance($assoc[1], $record);
+                            $assoc = self::getInstance($assoc['class_name'], $record);
                             if (!$records[$id]->$key->contains($assoc)) $records[$id]->$key->add($assoc);
                         }
                         else
                         {
-                            $records[$id]->$key = self::getInstance($assoc[1], $record);
+                            $records[$id]->$key = self::getInstance($assoc['class_name'], $record);
                         }
                     }
                 }
@@ -261,16 +261,15 @@ class SActiveStore
     
     private static function getSchemaAbbreviations($tableName, $assocs)
     {
-        $assocs[] = array(2 => array('table_name' => $tableName));
+        $assocs[] = array('table_name' => $tableName);
         $abbrv = array();
         foreach($assocs as $assoc)
         {
-            $table = $assoc[2]['table_name'];
+            $table = $assoc['table_name'];
             $columns = array_keys(self::connection()->columns($table));
+            
             foreach($columns as $column)
-            {
                 $abbrv[$table.'_'.$column] = array($table, $column);
-            }
         }
         return $abbrv;
     }
@@ -282,9 +281,9 @@ class SActiveStore
         {
             foreach($abbrvs as $abbrv => $options)
             {
-                if ($options[0] == $assoc[2]['table_name'] && $options[1] == $assoc[2]['primary_key'])
+                if ($options[0] == $assoc['table_name'] && $options[1] == $assoc['primary_key'])
                 {
-                    $lookup[$assoc[2]['table_name']] = $abbrv;
+                    $lookup[$assoc['table_name']] = $abbrv;
                     break;
                 }
             }
@@ -324,16 +323,16 @@ class SActiveStore
     
     private function associationJoin($instance, $association)
     {
-        $options = $association[2];
+        $options = $association;
         
-        switch($association[0])
+        switch($options['assoc_type'])
         {
-            case 'belongsTo':
+            case 'belongs_to':
                 return ' LEFT OUTER JOIN '.$options['table_name'].' ON '.
                 $options['table_name'].'.'.$options['primary_key'].' = '.
                 $instance->tableName.'.'.$options['foreign_key'];
                 
-            case 'manyToMany':
+            case 'many_to_many':
                 return ' LEFT OUTER JOIN '.$options['join_table'].' ON '.
                 $options['join_table'].'.'.$options['foreign_key'].' = '.
                 $instance->tableName.'.'.$instance->identityField.
@@ -341,12 +340,12 @@ class SActiveStore
                 $options['join_table'].'.'.$options['association_foreign_key'].' = '.
                 $options['table_name'].'.'.$options['primary_key'];
                 
-            case 'hasMany':
+            case 'has_many':
                 return ' LEFT OUTER JOIN '.$options['table_name'].' ON '.
                 $options['table_name'].'.'.$options['foreign_key'].' = '.
                 $instance->tableName.'.'.$instance->identityField;
                 
-            case 'oneToOne':
+            case 'one_to_one':
                 
         }
     }

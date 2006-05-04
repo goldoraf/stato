@@ -30,7 +30,7 @@ class Profile extends SActiveRecord
     public $tableName = 'profiles';
     public $relationships = array
     (
-        'employe' => array('type' => 'to_one', 'dest' => 'Employe')
+        'employe' => 'belongs_to'
     );
 }
 
@@ -45,7 +45,7 @@ class Company extends SActiveRecord
     public $tableName = 'companies';
     public $relationships = array
     (
-        'products' => array('type' => 'to_many', 'dest' => 'Product')
+        'products' => 'has_many'
     );
 }
 
@@ -61,7 +61,7 @@ class Developer extends SActiveRecord
     public $tableName = 'developers';
     public $relationships = array
     (
-        'projects' => array('type' => 'to_many', 'dest' => 'Project', 'inverse' => True)
+        'projects' => 'many_to_many'
     );
 }
 
@@ -70,7 +70,7 @@ class Project extends SActiveRecord
     public $tableName = 'projects';
     public $relationships = array
     (
-        'developers' => array('type' => 'to_many', 'dest' => 'Developer', 'inverse' => True)
+        'developers' => 'many_to_many'
     );
 }
 
@@ -80,7 +80,7 @@ class Client extends SActiveRecord
     public $tableName = 'clients';
     public $relationships = array
     (
-        'contract' => array('type' => 'to_one', 'dest' => 'Contract', 'inverse' => True)
+        'contract' => 'one_to_one'
     );
 }
 
@@ -90,7 +90,7 @@ class Contract extends SActiveRecord
     public $attrRequired = array('code');
     public $relationships = array
     (
-        'client' => array('type' => 'to_one', 'dest' => 'Client', 'inverse' => True)
+        'client' => 'one_to_one'
     );
 }
 
@@ -100,8 +100,8 @@ class Article extends SActiveRecord
     public $tableName = 'articles';
     public $relationships = array
     (
-        'comments' => array('type' => 'to_many', 'dest' => 'Comment'),
-        'categories' => array('type' => 'to_many', 'dest' => 'Category', 'inverse' => True)
+        'comments' => 'has_many',
+        'categories' => 'many_to_many'
     );
 }
 
@@ -110,7 +110,7 @@ class Comment extends SActiveRecord
     public $tableName = 'comments';
     public $relationships = array
     (
-        'article' => array('type' => 'to_one', 'dest' => 'Article')
+        'article' => 'belongs_to'
     );
 }
 
@@ -119,7 +119,7 @@ class Category extends SActiveRecord
     public $tableName = 'categories';
     public $relationships = array
     (
-        'articles' => array('type' => 'to_many', 'dest' => 'Article', 'inverse' => True)
+        'articles' => 'many_to_many'
     );
 }
 
@@ -129,7 +129,7 @@ class Forum extends SActiveRecord
     public $tableName = 'forums';
     public $relationships = array
     (
-        'topics' => array('type' => 'to_many', 'dest' => 'Topic')
+        'topics' => 'has_many'
     );
 }
 
