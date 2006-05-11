@@ -29,7 +29,7 @@ class SAssociationProxy
                 $options['class_name'] = $name;
         }
         
-        $dest = strtolower($options['class_name']);
+        $dest = $options['class_name'];
         // we instanciate the dest class without associations to avoid an infinite loop
         if (!class_exists($dest))
             SDependencies::requireDependency('models', $dest, get_class($owner));
