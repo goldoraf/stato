@@ -340,13 +340,10 @@ class SActiveStore
                 $options['join_table'].'.'.$options['association_foreign_key'].' = '.
                 $options['table_name'].'.'.$options['primary_key'];
                 
-            case 'has_many':
+            default: // has_one, has_many
                 return ' LEFT OUTER JOIN '.$options['table_name'].' ON '.
                 $options['table_name'].'.'.$options['foreign_key'].' = '.
                 $instance->tableName.'.'.$instance->identityField;
-                
-            case 'one_to_one':
-                
         }
     }
     
