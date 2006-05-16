@@ -172,7 +172,7 @@ class SActiveRecord extends SRecord
     {
         $rel  = $this->relationships[$name];
         $type = (is_array($rel)) ? $rel['assoc_type'] : $rel;
-        if ($type == 'belongs_to' || $type == 'one_to_one')
+        if ($type == 'belongs_to' || $type == 'has_one')
             return $this->assocs[$name]->read();
         else
             return $this->assocs[$name];

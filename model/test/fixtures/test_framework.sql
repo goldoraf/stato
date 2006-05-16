@@ -78,7 +78,6 @@ CREATE TABLE `contracts` (
 
 CREATE TABLE `clients` (
   `id` int(10) unsigned NOT NULL auto_increment,
-  `contract_id` int(11) default NULL,
   `name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;

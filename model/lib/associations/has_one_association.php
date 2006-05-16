@@ -1,16 +1,8 @@
 <?php
 
-class SOneToOneAssociation extends SBelongsToAssociation
+class SHasOneAssociation extends SBelongsToAssociation
 {
-    public $assocForeignKey = Null;
-    
     protected $ownerNewBeforeSave = false;
-    
-    public function __construct($owner, $name, $class, $options = array())
-    {
-        parent::__construct($owner, $name, $class, $options);
-        $this->assocForeignKey = $options['association_foreign_key'];
-    }
     
     public function replace($record)
     {
@@ -22,12 +14,10 @@ class SOneToOneAssociation extends SBelongsToAssociation
         if ($record === Null)
         {
             $this->target = Null;
-            $this->owner[$this->assocForeignKey] = Null;
         }
         else
         {
             $this->checkRecordType($record);
-            if (!$record->isNewRecord()) $this->owner[$this->assocForeignKey] = $record->id;
             if (!$this->owner->isNewRecord()) $record[$this->foreignKey] = $this->owner->id;
             $this->target = $record;
         }
@@ -36,19 +26,15 @@ class SOneToOneAssociation extends SBelongsToAssociation
     
     public function beforeOwnerSave()
     {
-        if ($this->target !== null)
-        {
-            if ($this->target->isNewRecord()) $this->target->save();
-            $this->owner[$this->assocForeignKey] = $this->target->id;
-            if ($this->owner->isNewRecord()) $this->ownerNewBeforeSave = true;
-        }
+        if ($this->owner->isNewRecord() && $this->target !== null)
+            $this->ownerNewBeforeSave = true;
     }
     
     public function afterOwnerSave()
     {
-        if ($this->ownerNewBeforeSave && $this->target !== null)
+        if ($this->target !== null)
         {
-            $this->target[$this->foreignKey] = $this->owner->id;
+            if ($this->ownerNewBeforeSave) $this->target[$this->foreignKey] = $this->owner->id;
             $this->target->save();
         }
     }
@@ -60,12 +46,6 @@ class SOneToOneAssociation extends SBelongsToAssociation
     protected function findTarget()
     {
         return SActiveStore::findFirst($this->assocClass, $this->constructSql());
-    }
-    
-    protected function isFkPresent()
-    {
-        if ($this->owner[$this->assocForeignKey] === null) return false;
-        return true;
     }
     
     private function constructSql()

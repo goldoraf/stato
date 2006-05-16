@@ -74,13 +74,13 @@ class Project extends SActiveRecord
     );
 }
 
-// For oneToOne tests
+// For hasOne tests
 class Client extends SActiveRecord
 {
     public $tableName = 'clients';
     public $relationships = array
     (
-        'contract' => 'one_to_one'
+        'contract' => 'has_one'
     );
 }
 
@@ -88,10 +88,6 @@ class Contract extends SActiveRecord
 {
     public $tableName = 'contracts';
     public $attrRequired = array('code');
-    public $relationships = array
-    (
-        'client' => 'one_to_one'
-    );
 }
 
 // For eager loading tests

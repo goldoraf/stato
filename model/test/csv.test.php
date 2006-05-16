@@ -5,13 +5,13 @@ class CsvTest extends UnitTestCase
     public function testIteratorWithFile()
     {
         $csv = new SCsvIterator(fopen(CORE_DIR.'/model/test/fixtures/clients.csv', 'r'));
-        $this->assertEqual(array('id', 'contract_id', 'name'), $csv->fields());
+        $this->assertEqual(array('id', 'name'), $csv->fields());
         $csv->rewind();
-        $this->assertEqual(array('id' => 1, 'contract_id' => 1, 'name' => 'apple'), $csv->current());
+        $this->assertEqual(array('id' => 1, 'name' => 'apple'), $csv->current());
         $csv->next();
-        $this->assertEqual(array('id' => 2, 'contract_id' => 2, 'name' => 'ibm'), $csv->current());
+        $this->assertEqual(array('id' => 2, 'name' => 'ibm'), $csv->current());
         $csv->next();
-        $this->assertEqual(array('id' => 3, 'contract_id' => 0, 'name' => 'mozilla corp.'), $csv->current());
+        $this->assertEqual(array('id' => 3, 'name' => 'mozilla corp.'), $csv->current());
         $csv->next();
         $this->assertFalse($csv->valid());
     }

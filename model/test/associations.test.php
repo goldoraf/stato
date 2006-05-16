@@ -273,7 +273,7 @@ class SManyToManyTest extends ActiveTestCase
     }
 }
 
-class SOneToOneTest extends ActiveTestCase
+class SHasOneTest extends ActiveTestCase
 {
     public $fixtures = array('clients', 'contracts');
     

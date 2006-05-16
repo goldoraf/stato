@@ -28,7 +28,7 @@ require_once('lib/associations/association_proxy.php');
 require_once('lib/associations/association.php');
 require_once('lib/associations/association_collection.php');
 require_once('lib/associations/belongs_to_association.php');
-require_once('lib/associations/one_to_one_association.php');
+require_once('lib/associations/has_one_association.php');
 require_once('lib/associations/has_many_association.php');
 require_once('lib/associations/many_to_many_association.php');
 

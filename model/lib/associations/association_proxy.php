@@ -78,14 +78,12 @@ class SAssociationProxy
         return $options;
     }
     
-    public static function oneToOne($owner, $name, $dest, $options = array())
+    public static function hasOne($owner, $name, $dest, $options = array())
     {
         self::assertValidOptions($options, array('foreign_key'));
         self::registerToOneMethods($owner, $name, $dest);
         if (!isset($options['foreign_key']))
             $options['foreign_key'] = strtolower(get_class($owner)).'_id';
-        if (!isset($options['association_foreign_key'])) 
-            $options['association_foreign_key'] = $dest.'_id';
         
         return $options;
     }
