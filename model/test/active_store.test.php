@@ -37,6 +37,13 @@ class ActiveStoreTest extends ActiveTestCase
         foreach ($values as $key => $value) $stmt = preg_replace('/'.$key.'/i', "'$value'", $stmt, 1);
         $this->assertEqual("SELECT * FROM test WHERE name = 'test1' AND profession = 'test2'", $stmt);
     }
+    
+    function testGeneratedClass()
+    {
+        $companies = GeneratedCompany::findAll("name = 'Groupe W'");
+        $this->assertEqual(1, count($companies));
+        $this->assertEqual('GeneratedCompany', get_class($companies[0]));
+    }
 }
 
 ?>

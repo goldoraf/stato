@@ -17,6 +17,16 @@ class Bill extends SRecord
     }
 }
 
+// For class generation tests
+class GeneratedCompany extends SActiveRecord
+{
+    public $tableName = 'companies';
+    
+    public static function findAll($conditions=null, $options=array()) {
+        return SActiveStore::findAll('GeneratedCompany', $conditions, $options);
+    }
+}
+
 // For boolean et timestamps attributes tests
 class Post extends SActiveRecord
 {
@@ -39,7 +49,7 @@ class Employe extends SActiveRecord
     public $tableName = 'employes';
 }
 
-// For hasMany tests
+// For hasMany (and SActiveStore) tests
 class Company extends SActiveRecord
 {
     public $tableName = 'companies';
