@@ -420,7 +420,7 @@ class SActionController
         }
         catch (ReflectionException $e)
         {
-             return in_array($action, array_keys($this->virtualMethods));
+             return false;
         }
     }
     
