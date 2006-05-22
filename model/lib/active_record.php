@@ -46,28 +46,36 @@ class SActiveRecord extends SRecord
         return $this->id;
     }
     
-    public function contentAttributes()
-    {
-        $attributes = array();
-        foreach($this->attributes as $key => $attr)
-        {
-            if ($key != $this->identityField && !preg_match('/_id|_count/', $key)
-                && !in_array($key, $this->metaAttributes))
-            {
-                $attributes[$key] = $attr;
-            }
-        }
-        return $attributes;
-    }
-    
     public function save()
     {
         if (!$this->isValid()) return false;
         $this->setState('beforeSave');
-        if ($this->isNewRecord()) $this->create();
-        else $this->update();
+        if ($this->isNewRecord()) $this->createRecord();
+        else $this->updateRecord();
         $this->setState('afterSave');
         return true;
+    }
+    
+    public function delete()
+    {
+        $this->setState('beforeDelete');
+        if ($this->isNewRecord()) return false;
+        $sql = 'DELETE FROM '.$this->tableName.
+               ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
+        $this->conn()->update($sql);
+        $this->setState('afterDelete');
+    }
+    
+    public function updateAttributes($values)
+    {
+        $this->populate($values);
+        return $this->save();
+    }
+    
+    public function updateAttribute($name, $value)
+    {
+        $this->$name = $value;
+        return $this->save();
     }
     
     public function isNewRecord()
@@ -111,61 +119,33 @@ class SActiveRecord extends SRecord
     
     }
     
-    public function readId()
+    public function contentAttributes()
     {
-        return $this->values[$this->identityField];
-    }
-    
-    public function writeId($value)
-    {
-        $this->values[$this->identityField] = $value;
-    }
-    
-    public function create()
-    {
-        $this->setState('beforeCreate');
-        $sql = 'INSERT INTO '.$this->tableName.' '.
-               $this->prepareSqlSet();
-        $this->id = $this->conn()->insert($sql);
-        $this->newRecord = False;
-        $this->setState('afterCreate');
-    }
-    
-    public function update()
-    {
-        $this->setState('beforeUpdate');
-        $sql = 'UPDATE '.$this->tableName.' '.
-               $this->prepareSqlSet().
-               ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
-        $this->conn()->update($sql);
-        $this->setState('afterUpdate');
-    }
-    
-    public function delete()
-    {
-        $this->setState('beforeDelete');
-        if ($this->isNewRecord()) return false;
-        $sql = 'DELETE FROM '.$this->tableName.
-               ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
-        $this->conn()->update($sql);
-        $this->setState('afterDelete');
-    }
-    
-    public function updateAttributes($values)
-    {
-        $this->populate($values);
-        return $this->save();
-    }
-    
-    public function updateAttribute($name, $value)
-    {
-        $this->$name = $value;
-        return $this->save();
+        $attributes = array();
+        foreach($this->attributes as $key => $attr)
+        {
+            if ($key != $this->identityField && !preg_match('/_id|_count/', $key)
+                && !in_array($key, $this->metaAttributes))
+            {
+                $attributes[$key] = $attr;
+            }
+        }
+        return $attributes;
     }
     
     public function registerAssociationMethod($virtualMethod, $assoc, $method)
     {
         $this->assocMethods[$virtualMethod] = array('assoc' => $assoc, 'method' => $method);
+    }
+    
+    protected function readId()
+    {
+        return $this->values[$this->identityField];
+    }
+    
+    protected function writeId($value)
+    {
+        $this->values[$this->identityField] = $value;
     }
     
     protected function readAssociation($name)
@@ -232,6 +212,26 @@ class SActiveRecord extends SRecord
     protected function beforeValidate() {}
     
     protected function afterValidate() {}
+    
+    private function createRecord()
+    {
+        $this->setState('beforeCreate');
+        $sql = 'INSERT INTO '.$this->tableName.' '.
+               $this->prepareSqlSet();
+        $this->id = $this->conn()->insert($sql);
+        $this->newRecord = False;
+        $this->setState('afterCreate');
+    }
+    
+    private function updateRecord()
+    {
+        $this->setState('beforeUpdate');
+        $sql = 'UPDATE '.$this->tableName.' '.
+               $this->prepareSqlSet().
+               ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
+        $this->conn()->update($sql);
+        $this->setState('afterUpdate');
+    }
     
     private function initAssociations()
     {
