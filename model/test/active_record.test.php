@@ -45,6 +45,14 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual('1962-09-12', $emp->date_of_birth->__toString());
     }
     
+    function testNullDate()
+    {
+        $emp = new Employe(array('firstname'=>'Steve', 'lastname'=>'Austin'));
+        $emp->save();
+        $emp = SActiveStore::findFirst('Employe');
+        $this->assertNull($emp->date_of_birth);
+    }
+    
     function testReadWriteBooleanAttribute()
     {
         $post = SActiveStore::findByPk('Post', 1);

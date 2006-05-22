@@ -57,24 +57,18 @@ class SAttribute
     
     public function stringToDate($data)
     {
-        if (is_string($data))
-        {
-            try { $date = SDate::parse($data); }
-            catch (Exception $e) { return null; }
-            return $date;
-        }
-        return $data;
+        if (get_class($data) == 'SDate') return $data;
+        try { $date = SDate::parse($data); }
+        catch (Exception $e) { return null; }
+        return $date;
     }
     
     public function stringToDateTime($data)
     {
-        if (is_string($data))
-        {
-            try { $date = SDateTime::parse($data); }
-            catch (Exception $e) { return null;  }
-            return $date;
-        }
-        return $data;
+        if (get_class($data) == 'SDateTime') return $data;
+        try { $date = SDateTime::parse($data); }
+        catch (Exception $e) { return null;  }
+        return $date;
     }
 }
 

@@ -2,6 +2,8 @@
 
 require_once(ROOT_DIR.'/lib/adodb-time.class.php');
 
+class SDateParsingException extends SException {}
+
 class SDate
 {
     public $day   = Null;
@@ -62,7 +64,7 @@ class SDate
             if (preg_match($regex, $string, $matches))
                 return new SDate($matches['year'], $matches['month'], $matches['day']);
         }
-        return false;
+        throw new SDateParsingException();
     }
 }
 
@@ -123,7 +125,7 @@ class SDateTime extends SDate
                 return new SDateTime($matches['year'], $matches['month'], $matches['day'], 
                                      $matches['hour'], $matches['min'], $matches['sec']);
         }
-        return false;
+        throw new SDateParsingException();
     }
 }
 
