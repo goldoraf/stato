@@ -1,0 +1,32 @@
+    // --------- GENERATED CODE ------------------------------------------------
+    public static function findAll($conditions=null, $options=array()) {
+        return SActiveStore::findAll('<?php echo $className; ?>', $conditions, $options);
+    }
+    public static function findFirst($conditions=null, $options=array()) {
+        return SActiveStore::findFirst('<?php echo $className; ?>', $conditions, $options);
+    }
+    public static function findByPk($value, $options=array()) {
+        return SActiveStore::findByPk('<?php echo $className; ?>', $value, $options);
+    }
+    public static function findBySql($sql) {
+        return SActiveStore::findBySql('<?php echo $className; ?>', $sql);
+    }
+    public static function create($attributes = array()) {
+        return SActiveStore::create('<?php echo $className; ?>', $attributes);
+    }
+    public static function update($id, $attributes) {
+        return SActiveStore::update('<?php echo $className; ?>', $id, $attributes);
+    }
+    public static function updateAll($updates, $conditions = Null) {
+        return SActiveStore::updateAll('<?php echo $className; ?>', $updates, $conditions);
+    }
+    public static function deleteAll($conditions = Null) {
+        return SActiveStore::deleteAll('<?php echo $className; ?>', $conditions);
+    }
+    public static function count($conditions = Null) {
+        return SActiveStore::count('<?php echo $className; ?>', $conditions);
+    }
+    public static function insertId() {
+        return SActiveStore::insertId('<?php echo $className; ?>');
+    }
+    // --------- END OF GENERATED CODE -----------------------------------------
