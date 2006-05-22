@@ -50,7 +50,7 @@ class SHasOneAssociation extends SBelongsToAssociation
     
     private function constructSql()
     {
-        return "{$this->assocTableName}.{$this->foreignKey} = '{$this->owner->readId()}'";
+        return "{$this->assocTableName}.{$this->foreignKey} = '{$this->owner->id}'";
     }
 }
 
