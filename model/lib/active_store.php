@@ -92,13 +92,6 @@ class SActiveStore
         return $set;
     }
     
-    public static function create($class, $attributes = array())
-    {
-        $object = new $class($attributes);
-        $object->save();
-        return $object;
-    }
-    
     public static function update($class, $id, $attributes)
     {
         $object = self::findByPk($class, $id);
