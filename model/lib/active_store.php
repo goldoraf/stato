@@ -363,7 +363,7 @@ class SActiveStore
     {
         foreach ($values as $key => $value)
         {
-            if (!strpos($key, ':')) $key = ':'.$key;
+            if (strpos($key, ':') === false) $key = ':'.$key;
             $stmt = preg_replace('/'.$key.'/i', self::connection()->quote($value), $stmt, 1);
         }
         return $stmt;
