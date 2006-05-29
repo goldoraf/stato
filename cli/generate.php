@@ -35,6 +35,10 @@ if ($_SERVER['argc'] == 3)
                 else
                     $content = SCodeGenerator::generateClass($assigns['className'], $content);
             }
+            else
+            {
+                $content = SCodeGenerator::generateClass($assigns['className'], $content, 'SActiveRecord');
+            }
             file_put_contents($path, $content);
             break;
     }

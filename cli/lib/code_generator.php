@@ -7,7 +7,7 @@ class SCodeGenerator
     
     public static function generateClass($name, $content, $extends = null)
     {
-        return self::phpStart()."class $name".(($extends === null) ? " extends $extends" : '')
+        return self::phpStart()."class $name".(($extends !== null) ? " extends $extends" : '')
         ."\n{\n$content\n}\n".self::phpStop();
     }
     
