@@ -4,7 +4,7 @@ class SMySqlDriver extends SAbstractDriver
 {
     public $nativeDbTypes = array
     (
-        'primary_key'   => 'int(11) DEFAULT NULL auto_increment PRIMARY KEY',
+        'primary_key'   => 'int(11) DEFAULT NULL auto_increment',
         'string'        => array('name' => 'varchar', 'limit' => 255),
         'text'          => array('name' => 'text'),
         'float'         => array('name' => 'float'),

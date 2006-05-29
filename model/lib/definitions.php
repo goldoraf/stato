@@ -6,9 +6,10 @@ class SColumn
     public $type    = Null;
     public $limit   = Null;
     public $default = Null;
-    public $null    = True;
+    public $null    = true;
+    public $primary = false;
     
-    public function __construct($name, $type, $limit = Null, $default = Null, $null = True)
+    public function __construct($name, $type, $limit = Null, $default = Null, $null = true)
     {
         $this->name    = $name;
         $this->type    = $type;
@@ -22,6 +23,7 @@ class SColumn
         $db = SActiveRecord::connection();
         $sql = $db->quoteColumnName($this->name).' '.$db->typeToSql($this->type, $this->limit);
         $sql = $db->addColumnOptions($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
+        if ($this->primary) $sql.= ' PRIMARY KEY';
         return $sql;
     }
 }
@@ -29,7 +31,7 @@ class SColumn
 class STable
 {
     private $columns = array();
-    private $hasPk = false;
+    private $hasPk   = false;
     
     public function __construct()
     {
@@ -40,6 +42,7 @@ class STable
     {
         $this->addColumn($name, $type, $options);
         $this->hasPk = true;
+        $this->columns[$name]->primary = true;
     }
     
     public function addColumn($name, $type, $options = array())
@@ -53,7 +56,7 @@ class STable
         }
         else $column = $name;
         
-        $this->columns[] = $column;
+        $this->columns[$name] = $column;
     }
     
     public function toSql()
