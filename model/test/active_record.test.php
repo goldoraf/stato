@@ -45,12 +45,13 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual('1962-09-12', $emp->date_of_birth->__toString());
     }
     
-    function testNullDate()
+    function testNullValues()
     {
-        $emp = new Employe(array('firstname'=>'Steve', 'lastname'=>'Austin'));
+        $emp = new Employe(array('firstname'=>'Steve'));
         $emp->save();
         $emp = SActiveStore::findFirst('Employe');
         $this->assertNull($emp->date_of_birth);
+        $this->assertNull($emp->lastname);
     }
     
     function testReadWriteBooleanAttribute()

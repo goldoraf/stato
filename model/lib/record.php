@@ -165,7 +165,7 @@ class SRecord extends SObservable implements ArrayAccess
             if (is_array($value)) $multiParamsAttributes[$key] = $value;
             elseif (!in_array($key, $this->attrProtected))
             {
-                if (!is_object($value)) $this->$key = stripslashes($value);
+                if (!is_object($value) && $value !== null) $this->$key = stripslashes($value);
                 else $this->$key = $value;
             }
         }
