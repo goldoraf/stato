@@ -143,7 +143,12 @@ class SMySqlDriver extends SAbstractDriver
         $rs = $this->execute('SHOW TABLES');
         while ($row = $rs->fetch(false)) $tables[] = $row[0];
         return $tables;
-    } 
+    }
+    
+    public function tableExists($name)
+    {
+        return in_array($name, $this->tables());
+    }
     
     public function createTable($name, $tableDef, $options = array())
     {
