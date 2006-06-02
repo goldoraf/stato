@@ -17,11 +17,12 @@ class SActiveRecord extends SRecord
     
     public function __construct($values = Null, $dontInitAssocs=false, $newRecord = True)
     {
-        if ($this->tableName == Null) $this->tableName = SInflection::pluralize(strtolower(get_class($this)));
+        if ($this->tableName == Null) $this->resetTableName();
         if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
         else $this->initAttributes();
         
         $this->initValues();
+        $this->ensureProperType();
         if ($values != Null && is_array($values)) $this->populate($values);
         
         $this->newRecord = $newRecord;
@@ -237,6 +238,26 @@ class SActiveRecord extends SRecord
     {
         foreach($this->relationships as $name => $options)
             $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $options);
+    }
+    
+    private function ensureProperType()
+    {
+        if ($this->descendsFrom != 'SActiveRecord')
+            $this->writeAttribute($this->inheritanceField, strtolower(get_class($this)));
+    }
+    
+    private function resetTableName()
+    {
+        if (($class = $this->descendsFrom()) == 'SActiveRecord')
+            $this->tableName = SInflection::pluralize(strtolower(get_class($this)));
+        else
+            $this->tableName = SInflection::pluralize(strtolower($class));
+    }
+    
+    private function descendsFrom()
+    {
+        $class = new ReflectionClass(get_class($this));
+        return $class->getParentClass()->getName();
     }
     
     /**

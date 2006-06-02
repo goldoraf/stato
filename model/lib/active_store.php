@@ -21,10 +21,7 @@ class SActiveStore
      **/
     public static function findAll($class, $conditions=null, $options=array())
     {
-        if (isset($options['include']))
-        {
-            return self::findWithAssociations($class, $conditions, $options);
-        }
+        if (isset($options['include'])) return self::findWithAssociations($class, $conditions, $options);
         else
         {
             $sql = self::prepareSelect($class, $conditions, $options);
@@ -69,10 +66,8 @@ class SActiveStore
                 $opt['include'] = $options['include'];
                 $condition = $instance->tableName.'.'.$instance->identityField.' = \''.$value.'\'';
             }
-            else
-            {
-                $condition = $instance->identityField.' = \''.$value.'\'';
-            }
+            else $condition = $instance->identityField.' = \''.$value.'\'';
+            
             $set = self::findAll($class, $condition, $opt);
             if (empty($set)) return False;
             return array_pop($set);
@@ -81,14 +76,10 @@ class SActiveStore
     
     public static function findBySql($class, $sql)
     {
-        $rs = self::connection()->select($sql);
+        $rs = self::connection()->select($sql);echo $sql;
         if (!$rs) return false;
         $set = array();
-        while($row = $rs->fetch())
-        {
-            $set[] = self::getInstance($class, $row);
-        }
-        //if (count($set) == 1) return $set[0];
+        while($row = $rs->fetch()) $set[] = self::getInstance($class, $row);
         return $set;
     }
     
@@ -103,7 +94,7 @@ class SActiveStore
     {
         $instance = self::getInstance($class);
         $sql = 'UPDATE '.$instance->tableName.' SET '.self::sanitizeSql($updates);
-        $sql.= self::addConditions($conditions);
+        $sql.= self::addConditions($class, $conditions);
         self::connection()->update($sql);
     }
     
@@ -111,7 +102,7 @@ class SActiveStore
     {
         $instance = self::getInstance($class);
         $sql = 'DELETE FROM '.$instance->tableName;
-        $sql.= self::addConditions($conditions);
+        $sql.= self::addConditions($class, $conditions);
         self::connection()->update($sql);
     }
     
@@ -119,7 +110,7 @@ class SActiveStore
     {
         $instance = self::getInstance($class);
         $sql = 'SELECT COUNT(*) AS count FROM '.$instance->tableName;
-        $sql.= self::addConditions($conditions);
+        $sql.= self::addConditions($class, $conditions);
         $rs = self::connection()->select($sql);
         $row = $rs->fetch();
         return $row['count'];
@@ -164,7 +155,7 @@ class SActiveStore
     {
         $instance = self::getInstance($class);
         $sql = 'SELECT * FROM '.$instance->tableName;
-        $sql.= self::addConditions($conditions);
+        $sql.= self::addConditions($class, $conditions);
         if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
         if (isset($options['limit']))
         {
@@ -175,19 +166,19 @@ class SActiveStore
         return $sql;
     }
     
-    protected static function addConditions($conditions)
+    protected static function addConditions($class, $conditions)
     {
         $segments = array();
         if ($conditions !== Null) $segments[] = self::sanitizeSql($conditions);
-        //if (!self::descentsFromActiveEntity()) $segments[] = self::typeCondition();
+        if (self::descendsFrom($class) != 'SActiveRecord') $segments[] = self::typeCondition($class);
         if (!empty($segments)) return ' WHERE ('.implode(") AND (", $segments).')';
         return;
     }
     
-    // Returns a special SQL condition for inheritance hierarchies
-    protected static function typeCondition()
+    protected static function typeCondition($class)
     {
-    
+        $o = new $class(null, false);
+        return $o->inheritanceField.' = \''.strtolower($class).'\'';
     }
     
     protected static function findWithAssociations($class, $conditions, $options)
@@ -223,10 +214,7 @@ class SActiveStore
                             $assoc = self::getInstance($assoc['class_name'], $record);
                             if (!$records[$id]->$key->contains($assoc)) $records[$id]->$key->add($assoc);
                         }
-                        else
-                        {
-                            $records[$id]->$key = self::getInstance($assoc['class_name'], $record);
-                        }
+                        else $records[$id]->$key = self::getInstance($assoc['class_name'], $record);
                     }
                 }
             }
@@ -287,10 +275,7 @@ class SActiveStore
     private static function columnAliases($abbrv)
     {
         $aliases = array();
-        foreach($abbrv as $alias => $arr)
-        {
-            $aliases[] = join($arr, '.').' AS '.$alias;
-        }
+        foreach($abbrv as $alias => $arr) $aliases[] = join($arr, '.').' AS '.$alias;
         return join($aliases, ', ');
     }
     
@@ -309,7 +294,7 @@ class SActiveStore
     {
         $sql = 'SELECT '.self::columnAliases($abbrv).' FROM '.$instance->tableName;
         foreach($associations as $key => $assoc) $sql.= self::associationJoin($instance, $assoc);
-        if ($conditions !== Null) $sql.= self::addConditions($conditions);
+        if ($conditions !== Null) $sql.= self::addConditions(get_class($instance), $conditions);
         if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
         return $sql;
     }
@@ -371,11 +356,14 @@ class SActiveStore
     
     private static function getInstance($class, $values=array(), $dontInit=false)
     {
-        if (class_exists($class))
-        {
-            return new $class($values, $dontInit, False);
-        }
+        if (class_exists($class)) return new $class($values, $dontInit, False);
         throw new SException("SActiveStore : $class class not found.");
+    }
+    
+    private static function descendsFrom($class)
+    {
+        $ref = new ReflectionClass($class);
+        return $ref->getParentClass()->getName();
     }
     
     private static function connection()
