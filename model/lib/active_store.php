@@ -76,7 +76,7 @@ class SActiveStore
     
     public static function findBySql($class, $sql)
     {
-        $rs = self::connection()->select($sql);echo $sql;
+        $rs = self::connection()->select($sql);
         if (!$rs) return false;
         $set = array();
         while($row = $rs->fetch()) $set[] = self::getInstance($class, $row);
