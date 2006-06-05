@@ -64,7 +64,7 @@ function auto_complete_field($id, $options = array())
     if (isset($options['indicator'])) $jsOptions['indicator'] = "'".$options['indicator']."'";
     $js.= ', '.options_for_js($jsOptions).')';
     
-    return js_tag($js);
+    return javascript_tag($js);
 }
 
 function remote_function($options)
@@ -139,7 +139,7 @@ function build_observer($class, $id, $options = array())
     $js.= "function(element, value) {";
     $js.= "$callback})";
     
-    return js_tag($js);
+    return javascript_tag($js);
 }
 
 function auto_complete_css()
