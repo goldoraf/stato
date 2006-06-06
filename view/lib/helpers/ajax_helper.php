@@ -124,7 +124,7 @@ function build_callbacks($options)
     foreach($options as $event => $code)
     {
         $event = ucfirst($event);
-        if (in_array($event, $events)) $callbacks['on'.$event] = "function(request){$code}";
+        if (in_array($event, $events)) $callbacks['on'.$event] = "function(request){{$code}}";
     }
     return $callbacks;
 }
