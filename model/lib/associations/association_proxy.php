@@ -49,7 +49,7 @@ class SAssociationProxy
         self::assertValidOptions($options, array('foreign_key'));
         self::registerToManyMethods($owner, $name, $dest);
         if (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = strtolower(get_class($owner)).'_id';
+            $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
         
         return $options;
     }
@@ -59,7 +59,7 @@ class SAssociationProxy
         self::assertValidOptions($options, array('foreign_key'));
         self::registerToOneMethods($owner, $name, $dest);
         if (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = strtolower($dest).'_id';
+            $options['foreign_key'] = SInflection::underscore($dest).'_id';
         
         return $options;
     }
@@ -69,9 +69,9 @@ class SAssociationProxy
         self::assertValidOptions($options, array('foreign_key', 'association_foreign_key', 'join_table'));
         self::registerToManyMethods($owner, $name, $dest);
         if (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = strtolower(get_class($owner)).'_id';
+            $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
         if (!isset($options['association_foreign_key'])) 
-            $options['association_foreign_key'] = strtolower($dest).'_id';
+            $options['association_foreign_key'] = SInflection::underscore($dest).'_id';
         if (!isset($options['join_table']))
             $options['join_table'] = self::joinTableName($owner->tableName, $options['table_name']);
         
@@ -83,7 +83,7 @@ class SAssociationProxy
         self::assertValidOptions($options, array('foreign_key'));
         self::registerToOneMethods($owner, $name, $dest);
         if (!isset($options['foreign_key']))
-            $options['foreign_key'] = strtolower(get_class($owner)).'_id';
+            $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
         
         return $options;
     }
