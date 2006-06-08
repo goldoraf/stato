@@ -24,9 +24,9 @@ class SAssociationProxy
         if (!isset($options['class_name']))
         {
             if ($options['assoc_type'] == 'has_many' || $options['assoc_type'] == 'many_to_many') 
-                $options['class_name'] = SInflection::singularize($name);
+                $options['class_name'] = SInflection::camelize(SInflection::singularize($name));
             else 
-                $options['class_name'] = $name;
+                $options['class_name'] = SInflection::camelize($name);
         }
         
         $dest = $options['class_name'];
@@ -59,7 +59,7 @@ class SAssociationProxy
         self::assertValidOptions($options, array('foreign_key'));
         self::registerToOneMethods($owner, $name, $dest);
         if (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = $dest.'_id';
+            $options['foreign_key'] = strtolower($dest).'_id';
         
         return $options;
     }
@@ -71,7 +71,7 @@ class SAssociationProxy
         if (!isset($options['foreign_key'])) 
             $options['foreign_key'] = strtolower(get_class($owner)).'_id';
         if (!isset($options['association_foreign_key'])) 
-            $options['association_foreign_key'] = $dest.'_id';
+            $options['association_foreign_key'] = strtolower($dest).'_id';
         if (!isset($options['join_table']))
             $options['join_table'] = self::joinTableName($owner->tableName, $options['table_name']);
         
