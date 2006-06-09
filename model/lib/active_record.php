@@ -139,6 +139,11 @@ class SActiveRecord extends SRecord
         $this->assocMethods[$virtualMethod] = array('assoc' => $assoc, 'method' => $method);
     }
     
+    public function setAssocAsLoaded($name)
+    {
+        $this->assocs[$name]->setAsloaded();
+    }
+    
     protected function readId()
     {
         return $this->values[$this->identityField];

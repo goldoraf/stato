@@ -36,7 +36,7 @@ class SActiveStore
      **/
     public static function findFirst($class, $conditions=null, $options=array())
     {
-        $options = array_merge($options, array('limit' => 1));
+        if (!isset($options['include'])) $options = array_merge($options, array('limit' => 1));
         $set = self::findAll($class, $conditions, $options);
         return array_pop($set);
     }
@@ -156,13 +156,7 @@ class SActiveStore
         $instance = self::getInstance($class);
         $sql = 'SELECT * FROM '.$instance->tableName;
         $sql.= self::addConditions($class, $conditions);
-        if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
-        if (isset($options['limit']))
-        {
-            $offset = 0;
-            if (isset($options['offset'])) $offset = $options['offset'];
-            $sql.= self::connection()->limit($options['limit'], $offset);
-        }
+        $sql.= self::addOptions($options);
         return $sql;
     }
     
@@ -173,6 +167,19 @@ class SActiveStore
         if (self::descendsFrom($class) != 'SActiveRecord') $segments[] = self::typeCondition($class);
         if (!empty($segments)) return ' WHERE ('.implode(") AND (", $segments).')';
         return;
+    }
+    
+    protected static function addOptions($options)
+    {
+        $sql = '';
+        if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
+        if (isset($options['limit']))
+        {
+            $offset = 0;
+            if (isset($options['offset'])) $offset = $options['offset'];
+            $sql.= self::connection()->limit($options['limit'], $offset);
+        }
+        return $sql;
     }
     
     protected static function typeCondition($class)
@@ -202,7 +209,7 @@ class SActiveStore
             }
             foreach($assocs as $key => $assoc)
             {
-                $records[$id]->$key->setAsLoaded();
+                $records[$id]->setAssocAsLoaded($key);
                 
                 if (isset($row[$pkTable[$assoc['table_name']]]))
                 {
@@ -295,7 +302,7 @@ class SActiveStore
         $sql = 'SELECT '.self::columnAliases($abbrv).' FROM '.$instance->tableName;
         foreach($associations as $key => $assoc) $sql.= self::associationJoin($instance, $assoc);
         if ($conditions !== Null) $sql.= self::addConditions(get_class($instance), $conditions);
-        if (isset($options['order'])) $sql.= ' ORDER BY '.$options['order'];
+        $sql.= self::addOptions($options);
         return $sql;
     }
     
