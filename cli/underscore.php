@@ -22,16 +22,13 @@ function iterate_files($dir, $exceptions)
         {
             $path = $dir->getPath()."/$file";
             echo "Processing $path\n";
-            underscore($path);
+            underscore_file($path);
         }
     }
 }
 
-function underscore($class_file)
+function underscore_file($class_file)
 {
-    $exceptions = array('assertEqual', 'assertNull', 'assertTrue', 'assertFalse', 'offsetExists', 
-    'offsetSet', 'offsetGet', 'offsetUnset', '__toString');
-    
     $code = file_get_contents($class_file);
     $new_code = '';
     $function_opened = false;
@@ -51,7 +48,7 @@ function underscore($class_file)
             elseif ($function_opened && $id == T_STRING)
             {
                 $function_opened = false;
-                $new_code.= SInflection::underscore($text);
+                $new_code.= underscore($text);
             }
             elseif ($id == T_OBJECT_OPERATOR || $id == T_PAAMAYIM_NEKUDOTAYIM)
             {
@@ -61,15 +58,23 @@ function underscore($class_file)
             elseif ($method_or_prop && $id == T_STRING)
             {
                 $method_or_prop = false;
-                if (!in_array($text, $exceptions) $new_code.= SInflection::underscore($text);
-                else $new_code.= $text;
+                $new_code.= underscore($text);
             }
-            elseif ($id == T_VARIABLE) $new_code.= SInflection::underscore($text);
+            elseif ($id == T_VARIABLE) $new_code.= underscore($text);
             else $new_code.= $text;
         }
     }
     
     file_put_contents($class_file, $new_code);
+}
+
+function underscore($text)
+{
+    $exceptions = array('assertEqual', 'assertDomEqual', 'assertException', 'assertNull', 'assertTrue', 'assertFalse', 'offsetExists', 
+    'offsetSet', 'offsetGet', 'offsetUnset', '__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER');
+    
+    if (!in_array($text, $exceptions)) return SInflection::underscore($text);
+    else return $text;
 }
 
 ?>
