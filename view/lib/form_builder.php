@@ -65,7 +65,7 @@ class SFormBuilder
         return select($this->objectName, $method, $this->object, $choices, $options, $htmlOptions);
     }
     
-    public function collection_select($method, $collection, $valueProp, $textProp, $options=array(), $htmlOptions = array())
+    public function collection_select($method, $collection, $valueProp='id', $textProp=null, $options=array(), $htmlOptions = array())
     {
         return collection_select($this->objectName, $method, $this->object, $collection, 
                                  $valueProp, $textProp, $options, $htmlOptions);

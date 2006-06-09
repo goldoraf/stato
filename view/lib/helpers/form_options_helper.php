@@ -8,7 +8,7 @@ function select($objectName, $method, $object, $choices, $options = array(), $ht
 }
 
 
-function collection_select($objectName, $method, $object, $collection, $valueProp, $textProp, $options=array(), $htmlOptions = array())
+function collection_select($objectName, $method, $object, $collection, $valueProp='id', $textProp=null, $options=array(), $htmlOptions = array())
 {
     list($name, $value, $htmlOptions) = default_options($objectName, $method, $object, $htmlOptions);
     $optionsBlock = add_select_options(options_from_collection_for_select($collection, $valueProp, $textProp, $value), $options, $value);
@@ -41,7 +41,11 @@ function options_for_select($set, $selected=Null)
 function options_from_collection_for_select($collection, $valueProp, $textProp, $selected=null)
 {
     $set = array();
-    foreach ($collection as $entity) $set[$entity->$textProp] = $entity->$valueProp;
+    foreach ($collection as $entity)
+    {
+        if ($textProp === null) $set[$entity->__repr()] = $entity->$valueProp;
+        else $set[$entity->$textProp] = $entity->$valueProp;
+    }
     return options_for_select($set, $selected);
 }
 
