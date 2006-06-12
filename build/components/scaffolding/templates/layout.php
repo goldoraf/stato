@@ -3,7 +3,7 @@
 <head>
 <title>CRUD</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<?= js_include_tag(array('prototype.js')); ?>
+<?= javascript_include_tag(array('prototype.js')); ?>
 <style>
     body
     {

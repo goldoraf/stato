@@ -399,8 +399,15 @@ class SActionController
     private function performAction()
     {
         $action = $this->actionName();
-        if (!$this->actionExists($action))
+        if (!$this->actionExists($action) && $this->scaffold === null)
             throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
+            
+        if ($this->scaffold !== null)
+        {
+            $this->renderComponent(array('controller' => 'scaffolding', 'action' => $action,
+                                         'scaffold' => $this->scaffold));
+            return;
+        }
             
         $this->initialize();
         $this->requireDependencies();

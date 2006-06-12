@@ -17,32 +17,16 @@
  * @package Stato
  * @subpackage controller
  */
-class SCrudController extends SActionController
+class ScaffoldingController extends SActionController
 {
     public $scaffold = null;
     
-    private $scaffoldActions = array('index', 'view', 'add', 'create', 
-                                     'edit', 'update', 'delete');
-    
-    public function __construct()
-    {
-        parent::__construct();
-        if ($this->scaffold === null)
-        {
-            foreach ($this->scaffoldActions as $action)
-            {
-                $method = new ReflectionMethod(get_class($this), $action);
-                if ($method->getDeclaringClass()->getName() == __CLASS__)
-                    $this->hiddenActions[] = $action;
-            }
-        }
-    }
-    
     protected function initialize()
     {
-        if ($this->scaffold !== null)
+        if ($this->params['scaffold'] !== null)
         {
-            $this->models[] = $this->scaffold;
+            $this->scaffold = $this->params['scaffold'];
+            SDependencies::requireDependencies('models', array($this->scaffold), get_class($this->parentController));
         
             if (strpos($this->scaffold, '/') !== false)
                 list( , $this->scaffold) = explode('/', $this->scaffold);
@@ -77,7 +61,8 @@ class SCrudController extends SActionController
         if ($this->{$this->singular_name}->save())
         {
             $this->flash['notice'] = $this->class_name.' was successfully created !';
-            $this->redirectTo(array('action' => 'index'));
+            $this->redirectTo(array('controller' => $this->parentController->controllerPath(),
+                                    'action' => 'index'));
         }
         else
         {
@@ -97,7 +82,8 @@ class SCrudController extends SActionController
         if ($this->{$this->singular_name}->updateAttributes($this->params[$this->singular_name]))
         {
             $this->flash['notice'] = $this->class_name.' was successfully updated !';
-            $this->redirectTo(array('action' => 'index'));
+            $this->redirectTo(array('controller' => $this->parentController->controllerPath(),
+                                    'action' => 'index'));
         }
         else
         {
@@ -108,7 +94,9 @@ class SCrudController extends SActionController
     public function delete()
     {
         SActiveStore::findByPk($this->class_name, $this->params['id'])->delete();
-        $this->redirectTo(array('action' => 'index'));
+        $this->flash['notice'] = $this->class_name.' was successfully deleted !';
+        $this->redirectTo(array('controller' => $this->parentController->controllerPath(),
+                                'action' => 'index'));
     }
     
     protected function instantiate($class, $values = Null)
@@ -119,22 +107,23 @@ class SCrudController extends SActionController
     protected function renderScaffold($action = Null)
     {
         if ($action == Null) $action = $this->actionName();
-        $template = $this->templatePath($this->controllerPath(), $action);
-        if (file_exists($template)) $this->renderAction($action);
+        $this->addVariablesToAssigns();
+        
+        $template = $this->templatePath($this->parentController->controllerPath(), $action);
+        if (file_exists($template)) 
+            $this->assigns['layout_content'] = $this->view->render($template, $this->assigns);
         else
-        {
-            $this->addVariablesToAssigns();
             $this->assigns['layout_content'] = $this->view->render($this->scaffoldPath($action), $this->assigns);
-            if (!$this->layout)
-                $this->renderFile($this->scaffoldPath('layout'));
-            else
-                $this->renderFile(APP_DIR.'/views/layouts/'.$this->layout.'.php');
-        }
+        
+        if (!$this->parentController->layout)
+            $this->renderFile($this->scaffoldPath('layout'));
+        else
+            $this->renderFile(APP_DIR.'/views/layouts/'.$this->parentController->layout.'.php');
     }
     
     protected function scaffoldPath($templateName)
     {
-        return ROOT_DIR."/core/controller/lib/templates/crud/{$templateName}.php";
+        return APP_DIR."/components/scaffolding/templates/{$templateName}.php";
     }
 }
 
