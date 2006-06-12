@@ -56,6 +56,7 @@ class SActionController
     protected $layout   = false;
     protected $models   = array();
     protected $helpers  = array();
+    protected $scaffold = null;
     
     protected $hiddenActions  = array();
     
@@ -77,6 +78,8 @@ class SActionController
     private $performedRender   = false;
     private $performedRedirect = false;
     
+    public $parentController  = null;
+    
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
     public static function factory($request, $response)
@@ -91,6 +94,13 @@ class SActionController
     {
         $controller = new SActionController();
         return $controller->process($request, $response, 'rescueAction', $exception);
+    }
+    
+    public static function processWithComponent($class, $request, $response, $parentController = null)
+    {
+        $controller = new $class();
+        $controller->parentController = $parentController;
+        return $controller->process($request, $response);
     }
     
     public function process($request, $response, $method = 'performAction', $arguments = null)
@@ -208,6 +218,11 @@ class SActionController
     {
         $this->addVariablesToAssigns();
         $this->renderText($this->view->render($path, $this->assigns), $status);
+    }
+    
+    protected function renderComponent($options = array())
+    {
+        $this->renderText($this->componentResponse($options, true)->body); 
     }
     
     /**
@@ -433,6 +448,28 @@ class SActionController
         
         SDependencies::requireDependencies('models', $this->models, get_class($this));
         SDependencies::requireDependencies('helpers', $this->helpers, get_class($this));
+    }
+    
+    private function componentResponse($options, $reuseResponse)
+    {
+        $controller = $options['controller'];
+        $class = SInflection::camelize($controller).'Controller';
+        
+        if (!file_exists($path = APP_DIR."/components/{$controller}/{$controller}_controller.php"))
+    		throw new SUnknownControllerException(ucfirst($reqController).' Component not found !');
+    		
+    	require_once($path);
+        
+        $request = $this->requestForComponent($options);
+        $response = ($reuseResponse) ? $this->response : new SResponse();
+        return SActionController::processWithComponent($class, $request, $response, $this);
+    }
+    
+    private function requestForComponent($options)
+    {
+        $request = clone $this->request;
+        $request->params = array_merge($request->params, $options);
+        return $request;
     }
     
     private function processFilters($state)
