@@ -1,8 +1,5 @@
 <?php
 
-require_once(ROOT_DIR.'/core/model/model.php');
-require_once(ROOT_DIR.'/core/view/view.php');
-
 class SUnknownControllerException extends SException {}
 class SUnknownActionException extends SException {}
 class SUnknownProtocolException extends SException {}
@@ -583,8 +580,6 @@ class SActionController
     
     private static function dispatchWebServiceRequest($request, $response)
     {
-        require_once(ROOT_DIR.'/core/webservice/webservice.php');
-        
         $protocol = $request->action;
         if (!in_array($protocol, array('xmlrpc')))
             throw new SUnknownProtocolException($protocol);
