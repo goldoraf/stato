@@ -1,7 +1,6 @@
 <?php
 
 require_once('lib/action_controller.php');
-require_once('lib/crud_controller.php');
 require_once('lib/dispatcher.php');
 require_once('lib/cookie.php');
 require_once('lib/flash.php');
