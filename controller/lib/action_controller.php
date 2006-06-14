@@ -250,6 +250,7 @@ class SActionController
     {
         if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
         $this->flash->discard();
+        $this->assigns['params'] = $this->params;
     }
     
     protected function redirectTo($options)
