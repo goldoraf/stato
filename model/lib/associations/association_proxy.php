@@ -73,7 +73,7 @@ class SAssociationProxy
         if (!isset($options['association_foreign_key'])) 
             $options['association_foreign_key'] = SInflection::underscore($dest).'_id';
         if (!isset($options['join_table']))
-            $options['join_table'] = self::joinTableName($owner->tableName, $options['table_name']);
+            $options['join_table'] = self::joinTableName(get_class($owner), $dest);
         
         return $options;
     }
@@ -107,10 +107,25 @@ class SAssociationProxy
     
     private static function joinTableName($firstName, $secondName)
     {
+        $firstName  = self::undecoratedTableName($firstName);
+        $secondName = self::undecoratedTableName($secondName);
+        
         if ($firstName < $secondName)
-            return "${firstName}_${secondName}";
+            $tableName = "${firstName}_${secondName}";
         else
-            return "${secondName}_${firstName}";
+            $tableName = "${secondName}_${firstName}";
+            
+        if (SActiveRecord::$tableNamePrefix !== null)
+            $tableName = SActiveRecord::$tableNamePrefix.'_'.$tableName;
+        if (SActiveRecord::$tableNameSuffix !== null)
+            $tableName.= '_'.SActiveRecord::$tableNameSuffix;
+            
+        return $tableName;
+    }
+    
+    private static function undecoratedTableName($className)
+    {
+        return SInflection::pluralize(SInflection::underscore($className));
     }
     
     private static function assertValidOptions($options, $validOptions)

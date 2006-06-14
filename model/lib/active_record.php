@@ -4,7 +4,7 @@ class SAssociationTypeMismatch extends SException { }
 
 class SActiveRecord extends SRecord
 {
-    public $tableName        = Null;
+    public $tableName        = null;
     public $identityField    = 'id';
     public $inheritanceField = 'type';
     public $recordTimestamps = False;
@@ -13,17 +13,20 @@ class SActiveRecord extends SRecord
     protected $assocMethods = array();
     protected $newRecord = False;
     
-    protected static $conn = Null;
+    public static $tableNamePrefix = null;
+    public static $tableNameSuffix = null;
     
-    public function __construct($values = Null, $dontInitAssocs=false, $newRecord = True)
+    protected static $conn = null;
+    
+    public function __construct($values = null, $dontInitAssocs=false, $newRecord = True)
     {
-        if ($this->tableName == Null) $this->resetTableName();
+        if ($this->tableName == null) $this->resetTableName();
         if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
         else $this->initAttributes();
         
         $this->initValues();
         $this->ensureProperType();
-        if ($values != Null && is_array($values)) $this->populate($values);
+        if ($values != null && is_array($values)) $this->populate($values);
         
         $this->newRecord = $newRecord;
         
@@ -248,15 +251,20 @@ class SActiveRecord extends SRecord
     private function ensureProperType()
     {
         if ($this->descendsFrom != 'SActiveRecord')
-            $this->writeAttribute($this->inheritanceField, strtolower(get_class($this)));
+            $this->writeAttribute($this->inheritanceField, SInflection::underscore(get_class($this)));
     }
     
     private function resetTableName()
     {
         if (($class = $this->descendsFrom()) == 'SActiveRecord')
-            $this->tableName = SInflection::pluralize(strtolower(get_class($this)));
+            $this->tableName = SInflection::pluralize(SInflection::underscore(get_class($this)));
         else
-            $this->tableName = SInflection::pluralize(strtolower($class));
+            $this->tableName = SInflection::pluralize(SInflection::underscore($class));
+            
+        if (self::$tableNamePrefix !== null)
+            $this->tableName = self::$tableNamePrefix.'_'.$this->tableName;
+        if (self::$tableNameSuffix !== null)
+            $this->tableName.= '_'.self::$tableNameSuffix;
     }
     
     private function descendsFrom()
