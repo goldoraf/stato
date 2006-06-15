@@ -6,11 +6,13 @@ class SHttpClient
     
     private $uri     = null;
     private $headers = array();
+    private $credentials = null;
     
-    public function __construct($uri, $headers = array())
+    public function __construct($uri, $headers = array(), $credentials = null)
     {
         $this->uri = $uri;
         $this->headers = $headers;
+        $this->credentials = $credentials;
     }
     
     public function get($redirectMax = 5)
@@ -37,6 +39,8 @@ class SHttpClient
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
         if (!empty($this->headers))
             curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+        if ($this->credentials !== null)
+            curl_setopt($ch, CURLOPT_USERPWD, $this->credentials);
         return $ch;
     }
     

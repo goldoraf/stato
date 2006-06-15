@@ -9,6 +9,8 @@ class SXmlRpcClient
     private $userAgent  = null;
     private $namespaces = array();
     
+    private $credentials = null;
+    
     public function __construct($uri, $api = null, $userAgent = 'Stato XML-RPC Client')
     {
         $this->uri = $uri;
@@ -32,6 +34,11 @@ class SXmlRpcClient
         return $this->sendRequest($method, $args);
     }
     
+    public function setHttpCredentials($username, $password)
+    {
+        $this->credentials = "$username:$password";
+    }
+    
     private function sendRequest($method, $args)
     {
         $request = new SXmlRpcRequest($method, $args);
@@ -41,7 +48,7 @@ class SXmlRpcClient
             "User-Agent: {$this->userAgent}",
             "Content-length: ".$request->length()
         );
-        $client = new SHttpClient($this->uri, $headers);
+        $client = new SHttpClient($this->uri, $headers, $this->credentials);
         $response = $client->post($request->toXml());
         
         if ($response->code != 200)
