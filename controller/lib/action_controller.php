@@ -204,7 +204,7 @@ class SActionController
     protected function renderWithLayout($template, $status = null)
     {
         $this->addVariablesToAssigns();
-        $this->assigns['layout_content'] = $this->view->render($template, $this->assigns);
+        $this->assigns['layout_content'] = $this->view->render($template);
         
         $layout = APP_DIR.'/views/layouts/'.$this->layout.'.php';
         if (!file_exists($layout)) throw new SException('Layout not found');
@@ -214,12 +214,18 @@ class SActionController
     protected function renderFile($path, $status = null)
     {
         $this->addVariablesToAssigns();
-        $this->renderText($this->view->render($path, $this->assigns), $status);
+        $this->renderText($this->view->render($path), $status);
     }
     
     protected function renderComponent($options = array())
     {
         $this->renderText($this->componentResponse($options, true)->body); 
+    }
+    
+    protected function renderPartial($partial, $localAssigns = array())
+    {
+        $this->addVariablesToAssigns();
+        $this->renderText($this->view->renderPartial($this->controllerPath().'/'.$partial, $localAssigns));
     }
     
     /**

@@ -2,7 +2,7 @@
 
 class SActionView
 {
-    private $assigns     = array();
+    //private $assigns     = array();
     private $controller  = null;
     private $templateDir = null;
     private $tmpCacheKey = null;
@@ -14,7 +14,7 @@ class SActionView
     
     public function __get($name)
     {
-        if (isset($this->assigns[$name])) return $this->assigns[$name];
+        if (isset($this->controller->assigns[$name])) return $this->controller->assigns[$name];
     }
     
     public function __set($name, $value)
@@ -22,18 +22,20 @@ class SActionView
         throw new SException('You\'re not allowed to reassign template variables !');
     }
     
-    public function render($template, $assigns)
+    public function render($template, $localAssigns = array())
     {
         if (!is_readable($template))
             throw new SException('Template not found : '.$template);
             
-        $this->assigns = $assigns;
+        //$this->assigns = $assigns;
         $this->templateDir = dirname($template);
         
         $compiled = $this->compiledTemplatePath($template);
         
         if (!$this->isCompiledTemplate($template, $compiled))
             $this->compile($template, $compiled);
+            
+        extract($localAssigns);
         
         ob_start();
         include ($compiled);
@@ -43,7 +45,15 @@ class SActionView
         return $str;
     }
     
-    public function renderPartial($partialPath, $localAssigns = Null)
+    public function renderPartial($partialPath, $localAssigns = array())
+    {
+        list($path, $partial) = $this->partialPieces($partialPath);
+        $template = "$path/_$partial.php";
+        
+        return $this->render($template, $localAssigns);
+    }
+    
+    /*public function renderPartial($partialPath, $localAssigns = Null)
     {
         list($path, $partial) = $this->partialPieces($partialPath);
         $template = "$path/_$partial.php";
@@ -53,7 +63,7 @@ class SActionView
         
         $view = new SActionView($this->controller);
         return $view->render($template, $localAssigns);
-    }
+    }*/
     
     public function renderPartialCollection($partialPath, $collection, $spacerTemplate = Null)
     {
@@ -156,7 +166,9 @@ class SActionView
             return array($this->templateDir, $partialPath);
         else
         {
-            list($subPath, $partial) = explode('/', $partialPath);
+            $partial = substr(strrchr($partialPath, '/'), 1);
+            $subPath = substr($partialPath, 0, - strlen($partial));
+            //list($subPath, $partial) = explode('/', $partialPath);
             return array(APP_DIR."/views/$subPath", $partial);
         }
     }
