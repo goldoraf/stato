@@ -114,6 +114,7 @@ function options_for_ajax($options)
     }
     if ($options['form']) $jsOptions['parameters'] = 'Form.serialize(this)';
     elseif ($options['with']) $jsOptions['parameters'] = $options['with'];
+    
     return options_for_js($jsOptions);
 }
 
@@ -131,7 +132,11 @@ function build_callbacks($options)
 
 function build_observer($class, $id, $options = array())
 {
-    if (isset($options['update']) && !isset($options['with'])) $options['with'] = 'value';
+    if (isset($options['with']) && strpos($options['with'], '=') === false)
+        $options['with'] = "'".$options['with']."='+value";
+    elseif (isset($options['update']))
+        $options['with'] = 'value';
+        
     $callback = remote_function($options);
     
     $js = "new $class('$id', ";
