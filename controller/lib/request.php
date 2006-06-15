@@ -30,6 +30,17 @@ class SRequest
         return $_SERVER['HTTPS'] == 'on';
     }
     
+    public function isXmlHttpRequest()
+    {
+        if (preg_match('/XMLHttpRequest/i', $_SERVER['HTTP_X_REQUESTED_WITH'])) return true;
+        return false;
+    }
+    
+    public function isXhr()
+    {
+        return $this->isXmlHttpRequest();
+    }
+    
     public function method()
     {
         return $_SERVER['REQUEST_METHOD'];
