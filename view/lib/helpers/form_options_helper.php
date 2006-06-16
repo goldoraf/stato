@@ -38,7 +38,7 @@ function options_for_select($set, $selected=Null)
     return $str;
 }
 
-function options_from_collection_for_select($collection, $valueProp, $textProp, $selected=null)
+function options_from_collection_for_select($collection, $valueProp='id', $textProp=null, $selected=null)
 {
     $set = array();
     foreach ($collection as $entity)
