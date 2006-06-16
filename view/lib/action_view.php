@@ -53,18 +53,6 @@ class SActionView
         return $this->render($template, $localAssigns);
     }
     
-    /*public function renderPartial($partialPath, $localAssigns = Null)
-    {
-        list($path, $partial) = $this->partialPieces($partialPath);
-        $template = "$path/_$partial.php";
-        
-        if ($localAssigns == Null)
-            $localAssigns = array($partial => $this->assigns[$partial]);
-        
-        $view = new SActionView($this->controller);
-        return $view->render($template, $localAssigns);
-    }*/
-    
     public function renderPartialCollection($partialPath, $collection, $spacerTemplate = Null)
     {
         list($path, $partial) = $this->partialPieces($partialPath);
@@ -77,8 +65,7 @@ class SActionView
         {
             $localAssigns[$counterName] = $counter;
             $localAssigns[$partial] = $element;
-            $view = new SActionView($this->controller);
-            $partialsCollec[] = $view->render($template, $localAssigns);
+            $partialsCollec[] = $this->render($template, $localAssigns);
             $counter++;
         }
         return implode('', $partialsCollec);
