@@ -53,7 +53,7 @@ class SActionView
         return $this->render($template, $localAssigns);
     }
     
-    public function renderPartialCollection($partialPath, $collection, $spacerTemplate = Null)
+    public function renderPartialCollection($partialPath, $collection, $spacerTemplate = null)
     {
         list($path, $partial) = $this->partialPieces($partialPath);
         $template = "$path/_$partial.php";
@@ -68,7 +68,14 @@ class SActionView
             $partialsCollec[] = $this->render($template, $localAssigns);
             $counter++;
         }
-        return implode('', $partialsCollec);
+        
+        if ($spacerTemplate !== null)
+        {
+            list($spacerPath, $spacerPartial) = $this->partialPieces($spacerTemplate);
+            $spacer = "$spacerPath/_$spacerPartial.php";
+            return implode($this->render($spacer), $partialsCollec);
+        }
+        else return implode('', $partialsCollec);
     }
     
     public function cacheStart($id = null, $lifetime = 30)
@@ -155,7 +162,6 @@ class SActionView
         {
             $partial = substr(strrchr($partialPath, '/'), 1);
             $subPath = substr($partialPath, 0, - strlen($partial));
-            //list($subPath, $partial) = explode('/', $partialPath);
             return array(APP_DIR."/views/$subPath", $partial);
         }
     }
