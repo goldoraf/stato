@@ -10,7 +10,7 @@ require_once('lib/helpers/form_tag_helper.php');
 require_once('lib/helpers/form_options_helper.php');
 require_once('lib/helpers/form_helper.php');
 require_once('lib/helpers/date_helper.php');
-require_once('lib/helpers/pager_helper.php');
+require_once('lib/helpers/pagination_helper.php');
 require_once('lib/helpers/ajax_helper.php');
 require_once('lib/helpers/record_helper.php');
 require_once('lib/helpers/text_helper.php');
