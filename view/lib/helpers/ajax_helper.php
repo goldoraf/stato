@@ -7,7 +7,7 @@ function javascript_tag($code)
 
 function link_to_function($content, $function, $htmlOptions = array())
 {
-    $options = array_merge($htmlOptions, array('href' => '#', 'onclick' => $function.'; return false;'));
+    $options = array_merge(array('href' => '#', 'onclick' => $function.'; return false;'), $htmlOptions);
     return content_tag('a', $content, $options);
 }
 
