@@ -50,14 +50,14 @@ function observe_form($id, $options = array())
         return build_observer('Form.EventObserver', $id, $options);
 }
 
-function auto_complete_text_field($entity, $field, $tagOptions = array(), $completionOptions = array())
+function text_field_with_auto_complete($objectName, $method, $object, $tagOptions = array(), $completionOptions = array())
 {
     $tagOptions['autocomplete'] = "off";
     
     $html = auto_complete_css()
-    .text_field($entity, $field, $tagOptions)
-    .content_tag('div', '', array('id' => "${entity}_${field}_auto_complete", 'class' => "auto_complete"))
-    .auto_complete_field("${entity}_${field}", array('url' => array('action' => 'autoCompleteFor'.ucfirst($entity).ucfirst($field))));
+    .text_field($objectName, $method, $object, $tagOptions)
+    .content_tag('div', '', array('id' => "${objectName}_${method}_auto_complete", 'class' => "auto_complete"))
+    .auto_complete_field("${objectName}_${method}", array('url' => array('action' => "auto_complete_for_${objectName}_${method}")));
     
     return $html;
 }
