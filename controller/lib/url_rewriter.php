@@ -11,6 +11,11 @@ class SUrlRewriter
         self::$request = $request;
     }
     
+    public static function currentParams()
+    {
+        return self::$request->params;
+    }
+    
     public static function isCurrentPage($options)
     {
         $options['only_path'] = true;
