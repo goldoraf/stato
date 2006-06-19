@@ -36,10 +36,18 @@ function form_remote_tag($options = array())
 
 function observe_field($id, $options = array())
 {
-    if (isset($options['frequency']))
+    if (isset($options['frequency']) && $options['frequency'] > 0)
         return build_observer('Form.Element.Observer', $id, $options);
     else
         return build_observer('Form.Element.EventObserver', $id, $options);
+}
+
+function observe_form($id, $options = array())
+{
+    if (isset($options['frequency']) && $options['frequency'] > 0)
+        return build_observer('Form.Observer', $id, $options);
+    else
+        return build_observer('Form.EventObserver', $id, $options);
 }
 
 function auto_complete_text_field($entity, $field, $tagOptions = array(), $completionOptions = array())
@@ -140,9 +148,11 @@ function build_observer($class, $id, $options = array())
     $callback = remote_function($options);
     
     $js = "new $class('$id', ";
-    if (isset($options['frequency'])) $js.= $options['frequency'].", ";
+    if (isset($options['frequency']) && $options['frequency'] > 0) $js.= $options['frequency'].", ";
     $js.= "function(element, value) {";
-    $js.= "$callback})";
+    $js.= "$callback}";
+    if (isset($options['on'])) $js.= ", '".$options['on']."'";
+    $js.= ")";
     
     return javascript_tag($js);
 }
