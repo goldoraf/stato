@@ -50,6 +50,46 @@ function observe_form($id, $options = array())
         return build_observer('Form.EventObserver', $id, $options);
 }
 
+function in_place_editor_field($objectName, $method, $object, $tagOptions = array(), $editorOptions = array())
+{
+    $tagOptions = array_merge(array('id' => "${objectName}_${method}_".$object->id."_in_place_editor",
+    'class' => 'in_place_editor'), $tagOptions);
+    
+    if (!isset($editorOptions['url'])) 
+        $editorOptions['url'] = array('action' => "set_${objectName}_${method}", 'id' => $object->id);
+        
+    $tag = $tagOptions['tag'];
+    unset($tagOptions['tag']);
+    
+    return content_tag($tag, $object->$method, $tagOptions)
+    .in_place_editor($tagOptions['id'], $editorOptions);
+}
+
+function in_place_editor($fieldId, $options = array())
+{
+    $js = "new Ajax.InPlaceEditor(";
+    $js.= "'{$fieldId}',";
+    $js.= "'".url_for($options['url'])."'";
+    
+    $jsOptions = array();
+    if (isset($options['cancel_text'])) $jsOptions['cancelText'] = "'".$options['cancel_text']."'";
+    if (isset($options['save_text'])) $jsOptions['okText'] = "'".$options['save_text']."'";
+    if (isset($options['loading_text'])) $jsOptions['loadingText'] = "'".$options['loading_text']."'";
+    if (isset($options['rows'])) $jsOptions['rows'] = $options['rows'];
+    if (isset($options['cols'])) $jsOptions['cols'] = $options['cols'];
+    if (isset($options['size'])) $jsOptions['size'] = $options['size'];
+    if (isset($options['external_control'])) $jsOptions['externalControl'] = "'".$options['external_control']."'";
+    if (isset($options['load_text_url'])) $jsOptions['loadTextURL'] = "'".url_for($options['load_text_url'])."'";
+    if (isset($options['options'])) $jsOptions['ajaxOptions'] = $options['options'];
+    if (isset($options['script'])) $jsOptions['evalScripts'] = $options['script'];
+    if (isset($options['with'])) $jsOptions['callback'] = "function(form) { return ".$options['with']." }";
+    
+    if (!empty($jsOptions)) $js.= ', '.options_for_js($jsOptions);
+    $js.= ')';
+    
+    return javascript_tag($js);
+}
+
 function text_field_with_auto_complete($objectName, $method, $object, $tagOptions = array(), $completionOptions = array())
 {
     $tagOptions['autocomplete'] = "off";
