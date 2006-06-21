@@ -8,7 +8,7 @@ class SActiveStore
      * Returns all the records matched by the options used.
      *
      * @param $conditions : SQL string or array('id = :id AND name = :name',
-     *                                          array(':id' => 3, ':name' => "37signals"))
+     *                                          ':id' => 3, ':name' => "37signals")
      * @param $options : array
      * The options are :
      * 'include' => array('user', 'photos') # forces the loading of relationships
@@ -337,8 +337,8 @@ class SActiveStore
         if (!is_array($sql)) return $sql;
         else
         {
-            $values = $sql[1];
-            $stmt   = $sql[0];
+            $stmt   = array_shift($sql);
+            $values = $sql;
             if (strpos($stmt, ':')) return self::replaceNamedBindVariables($stmt, $values);
             elseif (strpos($stmt, '?')) return self::replaceBindVariables($stmt, $values);
             else return vsprintf($stmt, $values);
