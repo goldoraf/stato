@@ -210,7 +210,7 @@ Ajax.Request.prototype = (new Ajax.Base()).extend({
 
   request: function(url) {
     var parameters = this.options.parameters || '';
-    if (parameters.length > 0) parameters += '&_=';
+    //if (parameters.length > 0) parameters += '&_=';
 
     try {
       if (this.options.method == 'get')
