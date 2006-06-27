@@ -1,7 +1,5 @@
 <?php
 
-require_once(ROOT_DIR.'/lib/adodb-time.class.php');
-
 class SDateParsingException extends SException {}
 
 class SDate
@@ -43,12 +41,12 @@ class SDate
     
     public function format($strf)
     {
-        return utf8_encode(adodb_strftime($strf, $this->ts()));
+        return utf8_encode(strftime($strf, $this->ts()));
     }
     
     public function ts()
     {
-        return adodb_mktime(0, 0, 0, $this->month, $this->day, $this->year);
+        return mktime(0, 0, 0, $this->month, $this->day, $this->year);
     }
     
     public static function today()
@@ -107,7 +105,7 @@ class SDateTime extends SDate
     
     public function ts()
     {
-        return adodb_mktime($this->hour, $this->min, $this->sec, $this->month, $this->day, $this->year);
+        return mktime($this->hour, $this->min, $this->sec, $this->month, $this->day, $this->year);
     }
     
     public static function today()
