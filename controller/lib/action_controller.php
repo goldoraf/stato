@@ -332,20 +332,30 @@ class SActionController
     
     protected function sendFile($path, $params=array())
     {
-        $fp = @fopen($path, "rb");
-        if ($fp)
+        if (!file_exists($path) || !is_readable($path)) 
+            throw new SException('Cannot read file : '.$path);
+        
+        $defaults = array
+        (
+            'type' => 'application/octet-stream',
+            'disposition' => 'attachment',
+            'stream' => true
+        );
+        $params = array_merge($defaults, $params);
+        
+        if (!isset($params['filename'])) $params['filename'] = basename($path);
+        if (!isset($params['length']))   $params['length']   = filesize($path);
+        
+        $this->sendFileHeaders($params);
+        
+        if ($params['stream'] === true)
         {
-            if (isset($params['type'])) 
-                header("Content-Type: ".$params['type']);
-            if (isset($params['disposition'])) 
-                header("Content-disposition: ".$params['disposition']);
+            $this->response->sendHeaders();
+            $fp = @fopen($path, "rb");
             fpassthru($fp);
             exit();
         }
-        else
-        {
-            throw new SException('File not found : '.$path);
-        }
+        else $this->renderText(file_get_contents($path));
     }
     
     protected function cachePage($content = null, $options = array())
@@ -517,6 +527,23 @@ class SActionController
     private function isPerformed()
     {
         return ($this->performedRender || $this->performedRedirect);
+    }
+    
+    private function sendFileHeaders($params = array())
+    {
+        $disposition = $params['disposition'];
+        if (isset($params['filename'])) $disposition.= '; filename='.$params['filename'];
+        $headers = array
+        (
+            'Content-Length'      => $params['length'],
+            'Content-Type'        => $params['type'],
+            'Content-Disposition' => $disposition,
+            'Content-Transfer-Encoding' => 'binary'
+        );
+        $this->response->headers = array_merge($this->response->headers, $headers);
+        // IE6 fix on opening downloaded files
+        /*if ($this->response->headers['Cache-Control'] == 'no-cache')
+            $this->response->headers['Cache-Control'] = 'private';*/
     }
     
     private function logProcessing()

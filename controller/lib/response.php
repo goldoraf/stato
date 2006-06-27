@@ -23,9 +23,14 @@ class SResponse
         $this->body = "<html><body>You are being <a href=\"{$url}\">redirected</a>.</body></html>";
     }
     
+    public function sendHeaders()
+    {
+        foreach($this->headers as $key => $value) header($key.': '.$value);
+    }
+    
     public function out()
 	{
-        foreach($this->headers as $key => $value) header($key.': '.$value);
+        $this->sendHeaders();
         echo $this->body;
     }
 }
