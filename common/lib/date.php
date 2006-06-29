@@ -31,17 +31,22 @@ class SDate
     
     public function __toString()
     {
-        return sprintf('%04d-%02d-%02d', $this->year, $this->month, $this->day);
+        $this->sprintf('%04d-%02d-%02d');
     }
     
     public function toIso8601()
     {
-        return sprintf('%04d%02d%02dT00:00:00', $this->year, $this->month, $this->day);
+        $this->sprintf('%04d%02d%02dT00:00:00');
     }
     
     public function format($strf)
     {
         return utf8_encode(strftime($strf, $this->ts()));
+    }
+    
+    public function sprintf($format)
+    {
+        return sprintf($format, $this->year, $this->month, $this->day);
     }
     
     public function ts()
@@ -93,13 +98,17 @@ class SDateTime extends SDate
     
     public function __toString()
     {
-        return sprintf('%04d-%02d-%02d %02d:%02d:%02d', $this->year, $this->month, 
-                       $this->day, $this->hour, $this->min, $this->sec);
+        return $this->sprintf('%04d-%02d-%02d %02d:%02d:%02d');
     }
     
     public function toIso8601()
     {
-        return sprintf('%04d%02d%02dT%02d:%02d:%02d', $this->year, $this->month, 
+        return $this->sprintf('%04d%02d%02dT%02d:%02d:%02d');
+    }
+    
+    public function sprintf($format)
+    {
+        return sprintf($format, $this->year, $this->month, 
                        $this->day, $this->hour, $this->min, $this->sec);
     }
     
