@@ -31,12 +31,12 @@ class SDate
     
     public function __toString()
     {
-        $this->sprintf('%04d-%02d-%02d');
+        return $this->sprintf('%04d-%02d-%02d');
     }
     
     public function toIso8601()
     {
-        $this->sprintf('%04d%02d%02dT00:00:00');
+        return $this->sprintf('%04d%02d%02dT00:00:00');
     }
     
     public function format($strf)
