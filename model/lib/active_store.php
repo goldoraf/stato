@@ -80,6 +80,7 @@ class SActiveStore
         if (!$rs) return false;
         $set = array();
         while($row = $rs->fetch()) $set[] = self::getInstance($class, $row);
+        $rs->free();
         return $set;
     }
     
@@ -226,6 +227,7 @@ class SActiveStore
                 }
             }
         }
+        $rs->free();
         return $recordsInOrder;
     }
     

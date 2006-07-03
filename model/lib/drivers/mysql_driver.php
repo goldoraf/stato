@@ -96,6 +96,11 @@ class SMySqlDriver extends SAbstractDriver
         return @mysql_num_rows($resource);
     }
     
+    public static function freeResult($resource)
+    {
+        return @mysql_free_result($resource);
+    }
+    
     public static function fetch($resource, $associative = true)
     {
         if ($associative) return @mysql_fetch_assoc($resource);

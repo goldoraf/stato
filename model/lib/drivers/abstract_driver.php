@@ -33,6 +33,7 @@ abstract class SAbstractDriver
         $rs = $this->select($sql);
         $set = array();
         while($row = $rs->fetch()) $set[] = $row;
+        $rs->free();
         return $set;
     }
     

@@ -20,6 +20,11 @@ class SRecordset
     {
         return call_user_func(array($this->class, 'rowCount'), $this->resource);
     }
+    
+    public function free()
+    {
+        return call_user_func(array($this->class, 'freeResult'), $this->resource);
+    }
 }
 
 ?>
