@@ -98,6 +98,9 @@ class SCsvIterator implements Iterator
     }
 }
 
+// Usage : 
+// $str = "php,stato,framework";
+// $fp = fopen("csvstr://str", "r+");
 class SCsvStream
 {
     private $position;
