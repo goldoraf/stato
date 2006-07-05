@@ -161,7 +161,7 @@ class SActionView
         else
         {
             $partial = substr(strrchr($partialPath, '/'), 1);
-            $subPath = substr($partialPath, 0, - strlen($partial));
+            $subPath = substr($partialPath, 0, - (strlen($partial) + 1));
             return array(APP_DIR."/views/$subPath", $partial);
         }
     }
