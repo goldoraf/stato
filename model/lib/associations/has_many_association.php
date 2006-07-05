@@ -12,6 +12,29 @@ class SHasManyAssociation extends SAssociationCollection
         return $record;
     }
     
+    public function beforeOwnerDelete()
+    {
+        if (!isset($this->options['dependent'])) return;
+        
+        switch ($this->options['dependent'])
+        {
+            case 'delete':
+                $this->loadTarget();
+                foreach ($this->target as $r) $r->delete();
+                break;
+            case 'delete_all':
+                SActiveStore::deleteAll($this->assocClass, $this->constructSql());
+                break;
+            case 'nullify':
+                SActiveStore::updateAll($this->assocClass, 
+                                        "{$this->assocTableName}.{$this->foreignKey} = NULL",
+                                        $this->constructSql());
+                break;
+            default:
+                throw new SException("The 'dependent' option expects either 'delete', 'delete_all', or 'nullify'");
+        }
+    }
+    
     protected function findTarget()
     {
         return SActiveStore::findAll($this->assocClass, $this->constructSql());
@@ -26,12 +49,13 @@ class SHasManyAssociation extends SAssociationCollection
     
     protected function deleteRecord($record)
     {
-        // si 'dependent', on delete l'entity ... (to do)
-        $sql = 'UPDATE '.$this->assocTableName.
-                ' SET '.$this->foreignKey.' = \'NULL\''.
-                ' WHERE '.$this->foreignKey.' = \''.$this->owner->id.'\''.
-                ' AND '.$this->assocPrimaryKey.' = \''.$record->id.'\'';
-        SActiveRecord::connection()->execute($sql);
+        if (isset($this->options['dependent'])) $r->delete();
+        else
+        {
+            SActiveStore::updateAll($this->assocClass, 
+                                    "{$this->assocTableName}.{$this->foreignKey} = NULL",
+                                    $this->constructSql("{$this->assocTableName}.{$this->assocPrimaryKey} = '{$record->id}'"));
+        }
     }
     
     protected function countRecords($condition)

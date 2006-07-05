@@ -46,7 +46,7 @@ class SAssociationProxy
     
     public static function hasMany($owner, $name, $dest, $options = array())
     {
-        self::assertValidOptions($options, array('foreign_key'));
+        self::assertValidOptions($options, array('foreign_key', 'dependent'));
         self::registerToManyMethods($owner, $name, $dest);
         if (!isset($options['foreign_key'])) 
             $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
