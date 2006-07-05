@@ -74,9 +74,11 @@ function text_area($objectName, $method, $object, $options = array())
 /**
  * Returns a checkbox tag.
  * 
- * The checkbox will be checked if <var>$method</var> returns true. The <var>$checkedValue</var> 
- * defaults to 1 while the default <var>$uncheckedValue</var> is set to 0 because this
- * value will be typecasted to a boolean by the Active Record. Due to the fact that 
+ * By default, the checkbox will be checked if <var>$method</var> returns true. 
+ * The <var>$checkedValue</var> defaults to 1 while the default <var>$uncheckedValue</var> 
+ * is set to 0 because this value will be typecasted to a boolean by the Active Record. 
+ * But if you set <var>$boolean</var> option to false, the checkbox will be checked 
+ * only if <var>$method</var> returns <var>$checkedValue</var>. Due to the fact that 
  * usually unchecked checkboxes don’t post anything, a hidden value is added with 
  * the same name as the checkbox. 
  * Example :
@@ -85,11 +87,12 @@ function text_area($objectName, $method, $object, $options = array())
  *      <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />
  *       
  */
-function check_box($objectName, $method, $object, $options = array(), $checkedValue = '1', $uncheckedValue = '0')
+function check_box($objectName, $method, $object, $options = array(), $checkedValue = '1', $uncheckedValue = '0', $boolean = true)
 {
     list($name, $value, $options) = default_options($objectName, $method, $object, $options);
-    if ($value) $checked = True;
-    else $checked = False;
+    if ($boolean && $value) $checked = true;
+    elseif ($value == $checkedValue) $checked = true;
+    else $checked = false;
     return tag('input', array('type' => 'hidden', 'name' => $name, 'value' => $uncheckedValue))
     .check_box_tag($name, $checkedValue, $checked, $options);
 }
@@ -107,8 +110,8 @@ function radio_button($objectName, $method, $object, $tagValue, $options = array
 {
     list($name, $value, $options) = default_options($objectName, $method, $object, $options);
     $options['id'].= '_'.SInflection::wikify($tagValue);
-    if ($value == $tagValue) $checked = True;
-    else $checked = False;
+    if ($value == $tagValue) $checked = true;
+    else $checked = false;
     return radio_button_tag($name, $tagValue, $checked, $options);
 }
 

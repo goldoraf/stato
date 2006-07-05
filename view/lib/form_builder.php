@@ -52,9 +52,9 @@ class SFormBuilder
         return text_area($this->objectName, $method, $this->object, array_merge($this->options, $options));
     }
     
-    public function check_box($method, $options = array(), $checkedValue = '1', $uncheckedValue = '0')
+    public function check_box($method, $options = array(), $checkedValue = '1', $uncheckedValue = '0', $boolean = true)
     {
-        return check_box($this->objectName, $method, $this->object, array_merge($this->options, $options), $checkedValue, $uncheckedValue);
+        return check_box($this->objectName, $method, $this->object, array_merge($this->options, $options), $checkedValue, $uncheckedValue, $boolean);
     }
     
     public function radio_button($method, $tagValue, $options = array())
