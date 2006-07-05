@@ -21,7 +21,7 @@ class SManyToManyAssociation extends SAssociationCollection
         return $record;
     }
     
-    public function beforeOwnerDestroy()
+    public function beforeOwnerDelete()
     {
         $sql = "DELETE FROM {$this->joinTable} WHERE "
         ."{$this->foreignKey} = '{$this->owner->id}'";
