@@ -170,6 +170,28 @@ class SHasManyTest extends ActiveTestCase
         $company->products(True);
         $this->assertEqual($nb_products - 1, $company->countProducts());
     }
+    
+    function testDeleteDependency()
+    {
+        $company = SActiveStore::findByPk('DependentCompany1', 1);
+        $company->delete();
+        $this->assertEqual(0, SActiveStore::count('Product'));
+    }
+    
+    function testDeleteAllDependency()
+    {
+        $company = SActiveStore::findByPk('DependentCompany2', 1);
+        $company->delete();
+        $this->assertEqual(0, SActiveStore::count('Product'));
+    }
+    
+    function testNullifyDependency()
+    {
+        $company = SActiveStore::findByPk('DependentCompany3', 1);
+        $company->delete();
+        $product = SActiveStore::findByPk('Product', 1);
+        $this->assertNull($product->company_id);
+    }
 }
 
 class SManyToManyTest extends ActiveTestCase

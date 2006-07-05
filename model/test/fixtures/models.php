@@ -58,6 +58,30 @@ class Company extends SActiveRecord
         'products' => 'has_many'
     );
 }
+class DependentCompany1 extends SActiveRecord
+{
+    public $tableName = 'companies';
+    public $relationships = array
+    (
+        'products' => array('assoc_type' => 'has_many', 'dependent' => 'delete', 'foreign_key' => 'company_id')
+    );
+}
+class DependentCompany2 extends SActiveRecord
+{
+    public $tableName = 'companies';
+    public $relationships = array
+    (
+        'products' => array('assoc_type' => 'has_many', 'dependent' => 'delete_all', 'foreign_key' => 'company_id')
+    );
+}
+class DependentCompany3 extends SActiveRecord
+{
+    public $tableName = 'companies';
+    public $relationships = array
+    (
+        'products' => array('assoc_type' => 'has_many', 'dependent' => 'nullify', 'foreign_key' => 'company_id')
+    );
+}
 
 class Product extends SActiveRecord
 {
