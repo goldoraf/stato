@@ -79,6 +79,27 @@ class SRecord extends SObservable implements ArrayAccess
         return '['.get_class($this)."]\n".$str;
     }
     
+    /**
+     * Sets all attributes at once by passing in an array with keys matching the
+     * attribute names.
+     */
+    public function populate($values=array())
+    {
+        $multiParamsAttributes = array();
+        
+        foreach($values as $key => $value)
+        {
+            if (is_array($value)) $multiParamsAttributes[$key] = $value;
+            elseif (!in_array($key, $this->attrProtected))
+            {
+                if (!is_object($value) && $value !== null) $this->$key = stripslashes($value);
+                else $this->$key = $value;
+            }
+        }
+        
+        if (!empty($multiParamsAttributes)) $this->assignMultiparamsAttributes($multiParamsAttributes);
+    }
+    
     public function isValid()
     {
         $this->errors = array();
@@ -150,27 +171,6 @@ class SRecord extends SObservable implements ArrayAccess
         // ou bien $value doit être un array si la relation est de type 'to_many'
         $this->assocs[$name] = $value;
         return true;
-    }
-    
-    /**
-     * Sets all attributes at once by passing in an array with keys matching the
-     * attribute names.
-     */
-    protected function populate($values=array())
-    {
-        $multiParamsAttributes = array();
-        
-        foreach($values as $key => $value)
-        {
-            if (is_array($value)) $multiParamsAttributes[$key] = $value;
-            elseif (!in_array($key, $this->attrProtected))
-            {
-                if (!is_object($value) && $value !== null) $this->$key = stripslashes($value);
-                else $this->$key = $value;
-            }
-        }
-        
-        if (!empty($multiParamsAttributes)) $this->assignMultiparamsAttributes($multiParamsAttributes);
     }
     
     protected function convertNumberValue($value)
