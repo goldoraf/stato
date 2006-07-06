@@ -99,8 +99,8 @@ class SAssociationProxy
     {
         $owner->registerAssociationMethod($name, $name, 'read');
         $owner->registerAssociationMethod('count'.ucfirst($name), $name, 'count');
-        $owner->registerAssociationMethod('build'.ucfirst($name), $name, 'build');
-        $owner->registerAssociationMethod('create'.ucfirst($name), $name, 'create');
+        $owner->registerAssociationMethod('build'.ucfirst(SInflection::singularize($name)), $name, 'build');
+        $owner->registerAssociationMethod('create'.ucfirst(SInflection::singularize($name)), $name, 'create');
         $owner->registerAssociationMethod('delete'.ucfirst($name), $name, 'delete');
         $owner->registerAssociationMethod('clear'.ucfirst($name), $name, 'clear');
     }
