@@ -5,6 +5,13 @@ function javascript_tag($code)
     return '<script type="text/javascript">'.$code.'</script>';
 }
 
+function escape_javascript($javascript)
+{
+    $javascript = preg_replace('/\r\n|\n|\r/', '\\n', $javascript);
+    $javascript = str_replace(array('"', "'"), array('\\\"', "\\\'"), $javascript);
+    return $javascript;
+}
+
 function link_to_function($content, $function, $htmlOptions = array())
 {
     $options = array_merge(array('href' => '#', 'onclick' => $function.'; return false;'), $htmlOptions);
@@ -22,6 +29,38 @@ function link_to_function($content, $function, $htmlOptions = array())
 function link_to_remote($content, $options = array(), $htmlOptions = array())
 {
     return link_to_function($content, remote_function($options), $htmlOptions);
+}
+
+function update_element_function($elementId, $options = array())
+{
+    if (!isset($options['action'])) $options['action'] = 'update';
+    if (!isset($options['escape'])) $options['escape'] = true;
+    if (!isset($options['content'])) $options['content'] = '';
+    
+    if ($options['escape'] === true) $content = escape_javascript($options['content']);
+    else $content = $options['content'];
+    
+    switch ($options['action'])
+    {
+        case 'update':
+            if (isset($options['position']))
+                $js = 'new Insertion.'.SInflection::camelize($options['position'])."('$elementId', '$content')";
+            else
+                $js = "$('$elementId').innerHTML = '$content'";
+            break;
+        case 'empty':
+            $js = "$('$elementId').innerHTML = ''";
+            break;
+        case 'remove':
+            "Element.remove('$elementId')";
+            break;
+        default:
+            throw new SException("Invalid action, choose one of 'update', 'remove', 'empty'");
+    }
+    
+    $js.= ";\n";
+    return $js;
+    
 }
 
 function form_remote_tag($options = array())
