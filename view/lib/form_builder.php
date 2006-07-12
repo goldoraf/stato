@@ -27,6 +27,16 @@ class SFormBuilder
         $this->options = $options;
     }
     
+    public function label($method, $text = null)
+    {
+        if ($text === null) $text = ucfirst($method);
+        if (isset($this->options['index']))
+            $id = $this->objectName.'_'.$this->options['index']."_{$method}";
+        else
+            $id = $this->objectName."_{$method}";
+        return content_tag('label', $text, array('for' => $id));
+    }
+    
     public function text_field($method, $options = array())
     {
         return text_field($this->objectName, $method, $this->object, array_merge($this->options, $options));
