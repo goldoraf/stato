@@ -203,12 +203,12 @@ class SXmlRpcValue
         }
     }
     
-    private function arrayToXml($value)
+    private function arrayToXml($array)
     {
-        if ($this->isStruct($value))
+        if ($this->isStruct($array))
         {
             $xml = "<struct>\n";
-            foreach ($this->data as $name => $value)
+            foreach ($array as $name => $value)
             {
                 $v = new SXmlRpcValue($value);
                 $xml.= "  <member><name>$name</name><value>";
@@ -220,7 +220,7 @@ class SXmlRpcValue
         else
         {
             $xml = "<array><data>\n";
-            foreach ($this->data as $value)
+            foreach ($array as $value)
             {
                 $v = new SXmlRpcValue($value);
                 $xml.= '  <value>'.$v->toXml()."</value>\n";
