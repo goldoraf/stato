@@ -1,6 +1,7 @@
 <?php
 
 class SXmlRpcClientException extends SException {}
+class SXmlRpcRequestFailedException extends SException {}
 
 class SXmlRpcClient
 {
@@ -52,7 +53,7 @@ class SXmlRpcClient
         $response = $client->post($request->toXml());
         
         if ($response->code != 200)
-            throw new SXmlRpcClientException("Request failed with code {$response->code}");
+            throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
         
         return $this->parseResponse($response->body);
     }
@@ -72,8 +73,8 @@ class SXmlRpcClient
                 throw new SXmlRpcClientException('Invalid fault response');
             }
             
-            throw new SXmlRpcClientException('Request failed, '.$fault['faultCode']
-                                             .': '.$fault['faultString']);
+            throw new SXmlRpcRequestFailedException('Request failed, '.$fault['faultCode']
+                                                    .': '.$fault['faultString']);
         }
         elseif (empty($xml->params))
             throw new SXmlRpcClientException('Invalid fault response : no <params> tag');

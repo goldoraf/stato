@@ -1,5 +1,7 @@
 <?php
 
+class SHttpClientException extends SException {}
+
 class SHttpClient
 {   
     public $timeout  = 10;
@@ -56,7 +58,7 @@ class SHttpClient
         $response->body = curl_exec($ch);
         
         if (curl_errno($ch) != 0)
-            throw new SException("cURL error : ".curl_error($ch));
+            throw new SHttpClientException("cURL error : ".curl_error($ch));
         
         $response->code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $response->headers['Content-Type']   = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
