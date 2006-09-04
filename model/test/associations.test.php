@@ -147,7 +147,7 @@ class SHasManyTest extends ActiveTestCase
     function testBuild()
     {
         $company = SActiveStore::findByPk('Company', 1);
-        $new_product = $company->buildProducts(array('name'=>'toaster', 'price'=>'15.00'));
+        $new_product = $company->buildProduct(array('name'=>'toaster', 'price'=>'15.00'));
         $this->assertEqual('toaster', $new_product->name);
         $this->assertTrue($new_product->isNewRecord());
         $nb_products = $company->countProducts();
@@ -161,7 +161,7 @@ class SHasManyTest extends ActiveTestCase
     function testInvalidBuild()
     {
         $company = SActiveStore::findByPk('Company', 1);
-        $new_product = $company->buildProducts();
+        $new_product = $company->buildProduct();
         $this->assertTrue($new_product->isNewRecord());
         $this->assertFalse($new_product->isValid());
         $nb_products = $company->countProducts();
@@ -248,7 +248,7 @@ class SManyToManyTest extends ActiveTestCase
     function testBuild()
     {
         $richard = SActiveStore::findByPk('Developer', 2);
-        $proj = $richard->buildProjects(array('name' => 'BlueProjectOfDeath'));
+        $proj = $richard->buildProject(array('name' => 'BlueProjectOfDeath'));
         $this->assertEqual($richard->projects[1], $proj);
         $this->assertTrue($proj->isNewRecord());
         $richard->save();
@@ -259,7 +259,7 @@ class SManyToManyTest extends ActiveTestCase
     function testCreate()
     {
         $richard = SActiveStore::findByPk('Developer', 2);
-        $proj = $richard->createProjects(array('name' => 'PlzNotAnotherRecursiveAcronym'));
+        $proj = $richard->createProject(array('name' => 'PlzNotAnotherRecursiveAcronym'));
         $this->assertEqual($richard->projects[1], $proj);
         $this->assertFalse($proj->isNewRecord());
     }
