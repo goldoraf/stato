@@ -149,12 +149,12 @@ class SActiveRecord extends SRecord
     
     protected function readId()
     {
-        return $this->values[$this->identityField];
+        return $this->readAttribute($this->identityField);
     }
     
     protected function writeId($value)
     {
-        $this->values[$this->identityField] = $value;
+        $this->writeAttribute($this->identityField, $value);
     }
     
     protected function readAssociation($name)
