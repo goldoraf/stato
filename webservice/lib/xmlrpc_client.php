@@ -77,11 +77,11 @@ class SXmlRpcClient
                                                     .': '.$fault['faultString']);
         }
         elseif (empty($xml->params))
-            throw new SXmlRpcClientException('Invalid fault response : no <params> tag');
+            throw new SXmlRpcClientException('Invalid response : no <params> tag');
         elseif (empty($xml->params->param))
-            throw new SXmlRpcClientException('Invalid fault response : no <param> tag');
+            throw new SXmlRpcClientException('Invalid response : no <param> tag');
         elseif (empty($xml->params->param->value))
-            throw new SXmlRpcClientException('Invalid fault response : no <value> tag');
+            throw new SXmlRpcClientException('Invalid response : no <value> tag');
             
         return SXmlRpcValue::typecast($xml->params->param->value->asXML());
     }
