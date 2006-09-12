@@ -93,6 +93,7 @@ class SAssociationProxy
         $owner->registerAssociationMethod($name, $name, 'read');
         $owner->registerAssociationMethod('build'.ucfirst($dest), $name, 'build');
         $owner->registerAssociationMethod('create'.ucfirst($dest), $name, 'create');
+        $owner->registerAssociationMethod('replace'.ucfirst($dest), $name, 'replace');
     }
     
     private static function registerToManyMethods($owner, $name, $dest)
@@ -103,6 +104,7 @@ class SAssociationProxy
         $owner->registerAssociationMethod('create'.ucfirst(SInflection::singularize($name)), $name, 'create');
         $owner->registerAssociationMethod('delete'.ucfirst($name), $name, 'delete');
         $owner->registerAssociationMethod('clear'.ucfirst($name), $name, 'clear');
+        $owner->registerAssociationMethod('replace'.ucfirst($name), $name, 'replace');
     }
     
     private static function joinTableName($firstName, $secondName)

@@ -61,7 +61,7 @@ class STable
     
     public function toSql()
     {
-        if (!$this->hasPk) $this->addPrimaryKey('id');
+        //if (!$this->hasPk) $this->addPrimaryKey('id');
         $cols = array();
         foreach($this->columns as $column) $cols[] = $column->toSql();
         return implode(', ', $cols);

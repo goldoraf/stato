@@ -116,9 +116,8 @@ abstract class SAssociationCollection extends SAssociation implements ArrayAcces
     
     public function replace($records)
     {
-        foreach($records as $record) $this->checkRecordType($record);
-        $this->target = $records;
-        $this->loaded = true;
+        $this->clear();
+        $this->add($records);
     }
     
     public function count($condition=Null)
@@ -131,10 +130,7 @@ abstract class SAssociationCollection extends SAssociation implements ArrayAcces
     {
         $this->loadTarget();
         if (count($this->target) == 0) return;
-        /*if (isset($this->options['exclusively_dependent']))
-            $this->deleteAll();
-        else*/
-            $this->unsetAll();
+        $this->deleteAll();
     }
     
     public function find()
@@ -202,14 +198,9 @@ abstract class SAssociationCollection extends SAssociation implements ArrayAcces
         $this->loaded = false;
     }
     
-    protected function unsetAll()
-    {
-        $this->target = array();
-    }
-    
     protected function deleteAll()
     {
-        foreach($this->target as $record) $record->delete();
+        foreach($this->target as $record) $this->deleteRecord($record);
         $this->target = array();
     }
 }
