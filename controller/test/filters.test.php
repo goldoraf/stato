@@ -1,6 +1,7 @@
 <?php
 
 require_once(CORE_DIR.'/controller/controller.php');
+require_once(ROOT_DIR.'/core/view/view.php');
 require_once('controller_mocks.php');
 
 class BasicController extends SActionController
