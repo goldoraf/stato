@@ -1,12 +1,12 @@
 <?php
 
+class SDateException extends SException {}
+class SDateConstructException extends SException {}
 class SDateParsingException extends SException {}
 
 class SDate
 {
-    public $day   = Null;
-    public $month = Null;
-    public $year  = Null;
+    protected $attributes = array();
     
     private static $regex = array
     (
@@ -16,12 +16,42 @@ class SDate
     
     public function __construct($year, $month, $day)
     {
-        if ($day == 0 || $month == 0 || $year ==0)
-            throw new SException('Date class constructor needs not null values.');
-            
-        $this->day   = $day;
-        $this->month = $month;
-        $this->year  = $year;
+        $ts = mktime(0, 0, 0, $month, $day, $year);
+        if ($ts === false)
+            throw new SDateConstructException('Invalid parameters.');
+        $date = getdate($ts);
+        $this->attributes = array
+        (
+            'year'  => $date['year'],
+            'month' => $date['mon'],
+            'mon'   => $date['mon'],
+            'day'   => $date['mday'],
+            'yday'  => $date['yday'],
+            'mday'  => $date['mday'],
+            'wday'  => $date['wday']
+        );
+    }
+    
+    public function __get($key)
+    {
+        if (!isset($this->attributes[$key]))
+            throw new SDateException("Property $key does not exist.");
+        return $this->attributes[$key];
+    }
+    
+    public function __set($key, $value)
+    {
+        throw new SDateException("Properties are read-only.");
+    }
+    
+    public function isLeap()
+    {
+        return $this->year % 4 == 0 && ($this->year % 400 == 0 || $this->year % 100 != 0);
+    }
+    
+    public function step($step=1)
+    {
+        return new SDate($this->year, $this->month, $this->day + $step);
     }
     
     public function locale()
@@ -73,10 +103,6 @@ class SDate
 
 class SDateTime extends SDate
 {
-    public $hour = Null;
-    public $min  = Null;
-    public $sec  = Null;
-    
     private static $regex = array
     (
         'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2}) (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/',
@@ -85,10 +111,23 @@ class SDateTime extends SDate
     
     public function __construct($year, $month, $day, $hour = 0, $min = 0, $sec = 0)
     {
-        parent::__construct($year, $month, $day);
-        $this->hour = $hour;
-        $this->min  = $min;
-        $this->sec  = $sec;
+        $ts = mktime($hour, $min, $sec, $month, $day, $year);
+        if ($ts === false)
+            throw new SDateConstructException('Invalid parameters.');
+        $date = getdate($ts);
+        $this->attributes = array
+        (
+            'year'  => $date['year'],
+            'month' => $date['mon'],
+            'mon'   => $date['mon'],
+            'day'   => $date['mday'],
+            'yday'  => $date['yday'],
+            'mday'  => $date['mday'],
+            'wday'  => $date['wday'],
+            'hour'  => $date['hours'],
+            'min'   => $date['minutes'],
+            'sec'   => $date['seconds']
+        );
     }
     
     public function locale()
