@@ -84,6 +84,13 @@ class SActiveStore
         return $set;
     }
     
+    public static function create($class, $attributes)
+    {
+        $object = self::getInstance($class, $attributes, true, true);
+        $object->save();
+        return $object;
+    }
+    
     public static function update($class, $id, $attributes)
     {
         $object = self::findByPk($class, $id);
@@ -363,9 +370,9 @@ class SActiveStore
         return $stmt;
     }
     
-    private static function getInstance($class, $values=array(), $dontInit=false)
+    private static function getInstance($class, $values=array(), $dontInit=false, $newRecord=false)
     {
-        if (class_exists($class)) return new $class($values, $dontInit, False);
+        if (class_exists($class)) return new $class($values, $dontInit, $newRecord);
         throw new SException("SActiveStore : $class class not found.");
     }
     
