@@ -1,12 +1,12 @@
 <?php
 
-require_once('lib/dependencies.php');
-require_once('lib/exception.php');
-require_once('lib/date.php');
-require_once('lib/locale.php');
-require_once('lib/encryption.php');
-require_once('lib/logger.php');
-require_once('lib/fileutils.php');
-require_once('lib/inflection.php');
+require('lib/dependencies.php');
+require('lib/exception.php');
+require('lib/date.php');
+require('lib/locale.php');
+require('lib/encryption.php');
+require('lib/logger.php');
+require('lib/fileutils.php');
+require('lib/inflection.php');
 
 ?>

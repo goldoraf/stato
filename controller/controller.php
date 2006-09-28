@@ -1,14 +1,14 @@
 <?php
 
-require_once('lib/action_controller.php');
-require_once('lib/dispatcher.php');
-require_once('lib/cookie.php');
-require_once('lib/flash.php');
-require_once('lib/request.php');
-require_once('lib/response.php');
-require_once('lib/routes.php');
-require_once('lib/session.php');
-require_once('lib/upload.php');
-require_once('lib/url_rewriter.php');
+require('lib/action_controller.php');
+require('lib/dispatcher.php');
+require('lib/cookie.php');
+require('lib/flash.php');
+require('lib/request.php');
+require('lib/response.php');
+require('lib/routes.php');
+require('lib/session.php');
+require('lib/upload.php');
+require('lib/url_rewriter.php');
 
 ?>
