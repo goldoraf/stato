@@ -9,6 +9,7 @@ abstract class SAbstractDriver
     protected $nativeDbTypes   = array();
     protected $simplifiedTypes = array();
     
+    public $runtime = 0;
     public $config = array
     (
         'host'   => null,
@@ -95,6 +96,12 @@ abstract class SAbstractDriver
     protected function quoteString($value)
     {
         return "'".$this->escapeStr($value)."'";
+    }
+    
+    protected function log($sql, $time, $name = null)
+    {
+        SLogger::getInstance()->debug((($name === null) ? 'SQL' : $name)
+            ." (".sprintf("%.5f", $time).")\n    $sql");
     }
     
     abstract protected function connect();

@@ -443,6 +443,8 @@ class SActionController
         
         if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
             $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
+            
+        $this->logBenchmarking();
     }
     
     private function actionExists($action)
@@ -548,12 +550,21 @@ class SActionController
     
     private function logProcessing()
     {
-        $log = 'Processing '.$this->controllerClassName().'::'.$this->actionName()
+        $log = "\n\nProcessing ".$this->controllerClassName().'::'.$this->actionName()
             .'() for '.$this->request->remoteIp().' at '
             .SDateTime::today()->__toString().' ['.$this->request->method().']';
         if (($sessId = $this->session->sessionId()) != '') $log.= "\n    Session ID: ".$sessId;
-        $log.= "\n    Parameters: ".serialize($this->params)."\n";
+        $log.= "\n    Parameters: ".serialize($this->params);
         $this->logger->info($log);
+    }
+    
+    private function logBenchmarking()
+    {
+        $runtime = microtime(true) - STATO_TIME_START;
+        $dbRuntime = SActiveRecord::connection()->runtime;
+        $dbPercentage = ($dbRuntime * 100) / $runtime;
+        $this->logger->info('Completed in '.sprintf("%.5f", $runtime)
+                            .' seconds | DB: '.sprintf("%.5f", $dbRuntime).' ('.sprintf("%d", $dbPercentage).' %)');
     }
     
     private function rescueAction($exception)

@@ -48,8 +48,14 @@ class SLogger
     {
         if ($this->fp === false) $this->open();
         if ($type === null) $type = 'info';
-        $line = '['.strftime('%Y-%m-%d %H:%M:%S').']'." [$type] $message".$this->eol;
+        $line = $message.$this->eol;
         return (fwrite($this->fp, $line) !== false);
+    }
+    
+    public function logWithTime($message, $type = null)
+    {
+        $line = '['.strftime('%Y-%m-%d %H:%M:%S').']'." [$type] $message".$this->eol;
+        return $this->log($line, $type);
     }
     
     public function fatal($message)

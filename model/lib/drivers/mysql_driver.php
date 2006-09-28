@@ -47,9 +47,16 @@ class SMySqlDriver extends SAbstractDriver
         return mysql_errno($this->conn) . ": " . mysql_error($this->conn). "\n";
     }
 
-    public function execute($strsql)
+    public function execute($strsql, $name = null)
     {
+        $start = microtime(true);
+        
         $result = @mysql_query($strsql,$this->conn);
+        
+        $time = microtime(true) - $start;
+        $this->log($strsql, $time, $name);
+        $this->runtime += $time;
+        
         if (is_resource($result)) return new SRecordset($result, get_class($this));
         
         if (!$result)
