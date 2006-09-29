@@ -40,7 +40,7 @@ class SActiveRecord extends SRecord
             $name   = $this->assocMethods[$methodMissing]['assoc'];
             $method = $this->assocMethods[$methodMissing]['method'];
             
-            return $this->assocs[$name]->$method($args[0]);
+            return $this->getAssociation($name)->$method($args[0]);
         }
         return;
     }
@@ -144,7 +144,7 @@ class SActiveRecord extends SRecord
     
     public function setAssocAsLoaded($name)
     {
-        $this->assocs[$name]->setAsloaded();
+        $this->getAssociation($name)->setAsloaded();
     }
     
     protected function readId()
@@ -162,14 +162,21 @@ class SActiveRecord extends SRecord
         $rel  = $this->relationships[$name];
         $type = (is_array($rel)) ? $rel['assoc_type'] : $rel;
         if ($type == 'belongs_to' || $type == 'has_one')
-            return $this->assocs[$name]->read();
+            return $this->getAssociation($name)->read();
         else
-            return $this->assocs[$name];
+            return $this->getAssociation($name);
     }
     
     protected function writeAssociation($name, $value)
     {
-        return $this->assocs[$name]->replace($value);
+        return $this->getAssociation($name)->replace($value);
+    }
+    
+    protected function getAssociation($name)
+    {
+        if (!isset($this->assocs[$name]))
+            $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $this->relationships[$name]);
+        return $this->assocs[$name];
     }
     
     protected function prepareSqlSet()
@@ -242,10 +249,15 @@ class SActiveRecord extends SRecord
         $this->setState('afterUpdate');
     }
     
-    private function initAssociations()
+    public function initAssociations()
     {
         foreach($this->relationships as $name => $options)
             $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $options);
+    }
+    
+    public function initAssociationsOwner()
+    {
+        foreach($this->assocs as $assoc) $assoc->setOwner($this);
     }
     
     private function ensureProperType()

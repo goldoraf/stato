@@ -34,10 +34,13 @@ class SRecord extends SObservable implements ArrayAccess
     
     public function __set($name, $value)
     {
-        $accMethod = 'write'.ucfirst($name);
-        if (method_exists($this, $accMethod)) return $this->$accMethod($value);
-        elseif ($this->assocExists($name)) return $this->writeAssociation($name, $value);
-        else return $this->writeAttribute($name, $value);
+        if ($this->attrExists($name)) return $this->writeAttribute($name, $value);
+        else
+        {
+            $accMethod = 'write'.ucfirst($name);
+            if (method_exists($this, $accMethod)) return $this->$accMethod($value);
+            elseif ($this->assocExists($name)) return $this->writeAssociation($name, $value);
+        }
     }
     
     public function offsetExists($offset)
@@ -151,8 +154,7 @@ class SRecord extends SObservable implements ArrayAccess
     
     protected function writeAttribute($name, $value)
     {
-        if ($this->attrExists($name) 
-            && in_array($this->attributes[$name]->type, array('boolean', 'integer', 'float')))
+        if (in_array($this->attributes[$name]->type, array('boolean', 'integer', 'float')))
             $this->values[$name] = $this->convertNumberValue($value);
         else
             $this->values[$name] = $value;
