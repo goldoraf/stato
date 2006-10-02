@@ -225,7 +225,8 @@ class SActionController
     protected function renderPartial($partial, $localAssigns = array())
     {
         $this->addVariablesToAssigns();
-        $this->renderText($this->view->renderPartial($this->controllerPath().'/'.$partial, $localAssigns));
+        if (strpos($partial, '/') === false) $partial = $this->controllerPath().'/'.$partial;
+        $this->renderText($this->view->renderPartial($partial, $localAssigns));
     }
     
     /**
