@@ -38,6 +38,16 @@ class SInflection
 		'/s$/'						=> ''
     );
     
+    public static function addSingularRule($regex, $singular)
+    {
+        self::$singularRules = array($regex => $singular) + self::$singularRules;
+    }
+    
+    public static function addPluralRule($regex, $plural)
+    {
+        self::$pluralRules = array($regex => $plural) + self::$pluralRules;
+    }
+    
     public static function pluralize($word)
     {
         foreach (self::$pluralRules as $rule => $replace)
