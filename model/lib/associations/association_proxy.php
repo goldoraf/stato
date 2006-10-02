@@ -127,6 +127,7 @@ class SAssociationProxy
         $owner->registerAssociationMethod('delete'.ucfirst($name), $name, 'delete');
         $owner->registerAssociationMethod('clear'.ucfirst($name), $name, 'clear');
         $owner->registerAssociationMethod('replace'.ucfirst($name), $name, 'replace');
+        $owner->registerAssociationMethod('set'.ucfirst(SInflection::singularize($name)).'Ids', $name, 'replaceWithIds');
     }
     
     private static function joinTableName($firstName, $secondName)

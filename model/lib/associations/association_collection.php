@@ -120,6 +120,11 @@ abstract class SAssociationCollection extends SAssociation implements ArrayAcces
         $this->add($records);
     }
     
+    public function replaceWithIds($ids)
+    {
+        $this->replace(SActiveStore::findByPk($this->assocClass, $ids));
+    }
+    
     public function count($condition=Null)
     {
         if ($this->loaded && $condition == Null) return count($this->target);
