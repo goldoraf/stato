@@ -30,6 +30,7 @@ require('lib/associations/association_collection.php');
 require('lib/associations/belongs_to_association.php');
 require('lib/associations/has_one_association.php');
 require('lib/associations/has_many_association.php');
+require('lib/associations/has_many_through_association.php');
 require('lib/associations/many_to_many_association.php');
 
 ?>

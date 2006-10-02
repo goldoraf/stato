@@ -63,7 +63,7 @@ class SHasManyAssociation extends SAssociationCollection
         return SActiveStore::count($this->assocClass, $this->constructSql($condition));
     }
     
-    private function constructSql($condition = Null)
+    protected function constructSql($condition = Null)
     {
         $sql = "{$this->assocTableName}.{$this->foreignKey} = '{$this->owner->id}'";
         if ($condition != Null) $sql.= " AND $condition";

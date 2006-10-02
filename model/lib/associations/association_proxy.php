@@ -34,7 +34,7 @@ class SAssociationProxy
         if (!class_exists($dest))
             SDependencies::requireDependency('models', $dest, get_class($owner));
         
-        $destInstance = new $dest(Null, True);
+        $destInstance = new $dest(null, True);
         
         $options['table_name']  = $destInstance->tableName;
         $options['primary_key'] = $destInstance->identityField;
@@ -46,9 +46,31 @@ class SAssociationProxy
     
     public static function hasMany($owner, $name, $dest, $options = array())
     {
-        self::assertValidOptions($options, array('foreign_key', 'dependent'));
+        self::assertValidOptions($options, array('foreign_key', 'dependent', 'through'));
         self::registerToManyMethods($owner, $name, $dest);
-        if (!isset($options['foreign_key'])) 
+        
+        if (isset($options['through']))
+        {
+            $options['assoc_type'] = 'has_many_through';
+            $throughClass = SInflection::camelize(SInflection::singularize($options['through']));
+            $throughInstance = new $throughClass(null, true);
+            $options['through_table_name'] = $throughInstance->tableName;
+            $options['through_foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
+            
+            if (isset($throughInstance->relationships[SInflection::underscore($dest)]))
+                $r = $throughInstance->relationships[SInflection::underscore($dest)];
+            elseif (isset($throughInstance->relationships[SInflection::underscore(SInflection::pluralize($dest))]))
+                $r = $throughInstance->relationships[SInflection::underscore(SInflection::pluralize($dest))];
+            
+            if ($r == 'belongs_to' || $r['assoc_type'] == 'belongs_to')
+                $options['foreign_key'] = SInflection::underscore($dest).'_id';
+            elseif ($r == 'has_many' || $r['assoc_type'] == 'has_many')
+            {
+                $options['primary_key'] = $throughInstance->identityField;
+                $options['foreign_key'] = SInflection::underscore($throughInstance).'_id';
+            }
+        }
+        elseif (!isset($options['foreign_key'])) 
             $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
         
         return $options;
