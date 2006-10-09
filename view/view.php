@@ -12,6 +12,7 @@ require('lib/helpers/form_helper.php');
 require('lib/helpers/date_helper.php');
 require('lib/helpers/pagination_helper.php');
 require('lib/helpers/ajax_helper.php');
+require('lib/helpers/behaviour_helper.php');
 require('lib/helpers/record_helper.php');
 require('lib/helpers/text_helper.php');
 require('lib/helpers/utf8_helper.php');
