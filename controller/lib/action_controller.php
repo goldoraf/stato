@@ -107,8 +107,6 @@ class SActionController
         $this->params   =& $this->request->params;
         $this->assigns  =& $this->response->assigns;
         
-        $this->logProcessing();
-        
         if ($arguments != null) $this->$method($arguments);
         else $this->$method();
         
@@ -123,8 +121,6 @@ class SActionController
     public function __construct()
     {
         $this->view    = new SActionView($this);
-        $this->session = new SSession();
-        $this->flash   = new SFlash($this->session);
         $this->logger  = SLogger::getInstance();
         
         $this->pageCacheDir = ROOT_DIR.'/public/cache';
@@ -258,6 +254,7 @@ class SActionController
         if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
         $this->flash->discard();
         $this->assigns['params'] = $this->params;
+        $this->assigns['session'] = $this->session;
     }
     
     protected function redirectTo($options)
@@ -423,9 +420,12 @@ class SActionController
                                          'scaffold' => $this->scaffold));
             return;
         }
-            
+        
+        $this->requireDependencies();  
         $this->initialize();
-        $this->requireDependencies();
+        
+        $this->session = new SSession();
+        $this->flash   = new SFlash($this->session);
         
         if (!empty($this->cachedActions))
             $this->aroundFilters[] = new SActionCacheFilter($this->cachedActions);
@@ -445,6 +445,7 @@ class SActionController
         if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
             $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
             
+        $this->logProcessing();
         $this->logBenchmarking();
     }
     
