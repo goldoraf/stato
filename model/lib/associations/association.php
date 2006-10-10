@@ -48,11 +48,6 @@ abstract class SAssociation
         $this->loaded = True;
     }
     
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
-    }
-    
     abstract public function replace($value);
     
     abstract public function create($attributes=array());

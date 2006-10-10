@@ -76,15 +76,6 @@ class MigrationTest extends UnitTestCase
         $this->assertNothingThrown();
     }
     
-    /*public function testCreateTableAddsId()
-    {
-        $t = new STable();
-        $t->addColumn('foo', 'string');
-        SActiveRecord::connection()->createTable('testings', $t);
-        $this->assertNothingThrown();
-        $this->assertTrue(in_array('id', array_keys(SActiveRecord::connection()->columns('testings'))));
-    }*/
-    
     public function testCreateTableWithNotNullColumn()
     {
         $t = new STable();
@@ -135,7 +126,6 @@ class MigrationTest extends UnitTestCase
         Person::connection()->addColumn('people', 'favorite_day', 'date');
         Person::connection()->addColumn('people', 'male', 'boolean');
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         
         $p = new Person(array('first_name'=>'Neil', 'last_name'=>'Armstrong', 
         'bio'=>'First man on the moon...', 'age'=>76, 'height'=>1.72, /*'birthday'=>new SDateTime(1930,8,5),
@@ -166,13 +156,11 @@ class MigrationTest extends UnitTestCase
         SActiveStore::deleteAll('person');
         SActiveRecord::connection()->addColumn('people', 'girlfriend', 'string');
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $p = new Person(array('girlfriend' => 'bobette'));
         $p->save();
         
         SActiveRecord::connection()->renameColumn('people', 'girlfriend', 'exgirlfriend');
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $p = SActiveStore::findFirst('person');
         $this->assertEqual('bobette', $p->exgirlfriend);
         
@@ -216,14 +204,12 @@ class MigrationTest extends UnitTestCase
     {
         SActiveRecord::connection()->addColumn('people', 'administrator', 'boolean', array('default'=>true));
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $p = new Person();
         $this->assertTrue($p->administrator);
         
         SActiveRecord::connection()->changeColumn('people', 'administrator', 'boolean', array('default'=>false));
         $this->assertNothingThrown();
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $p = new Person();
         $this->assertFalse($p->administrator);
     }
@@ -237,7 +223,6 @@ class MigrationTest extends UnitTestCase
         
         $this->assertEqual(2, SMigrator::currentVersion());
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $r = new Reminder(array('content'=>'hello world', 'remind_at'=>SDateTime::today()));
         $r->save();
@@ -247,7 +232,6 @@ class MigrationTest extends UnitTestCase
         
         $this->assertEqual(0, SMigrator::currentVersion());
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $this->assertFalse(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $this->assertFalse(SActiveStore::tableExists('reminders'));
     }
@@ -260,7 +244,6 @@ class MigrationTest extends UnitTestCase
         SMigrator::up(dirname(__FILE__).'/fixtures/migrate', 1);
         
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $this->assertFalse(SActiveStore::tableExists('reminders'));
         
@@ -276,7 +259,6 @@ class MigrationTest extends UnitTestCase
         SMigrator::up(dirname(__FILE__).'/fixtures/migrate');
         SMigrator::down(dirname(__FILE__).'/fixtures/migrate', 1);
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $this->assertFalse(SActiveStore::tableExists('reminders'));
     }
@@ -302,7 +284,6 @@ class MigrationTest extends UnitTestCase
         
         $this->assertEqual(2, SMigrator::currentVersion());
         SActiveStore::resetAttributeInformation('people');
-        SActiveStore::resetNewRecordCache('Person');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $r = new Reminder(array('content'=>'hello world', 'remind_at'=>SDateTime::today()));
         $r->save();

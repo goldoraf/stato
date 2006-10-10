@@ -3,7 +3,6 @@
 class SActiveStore
 {
     private static $tables = array();
-    private static $newRecordsCache = array();
     
     /**
      * Returns all the records matched by the options used.
@@ -151,11 +150,6 @@ class SActiveStore
     public static function resetAttributeInformation($tableName)
     {
         unset(self::$tables[$tableName]);
-    }
-    
-    public static function resetNewRecordCache($class)
-    {
-        unset(self::$newRecordsCache[strtolower($class)]);
     }
     
     // must be public because Fixture uses it
@@ -378,16 +372,8 @@ class SActiveStore
     
     private static function getInstance($class, $values=array(), $dontInit=false, $newRecord=false)
     {
-        if (!class_exists($class)) throw new SException("SActiveStore : $class class not found.");
-        if ($newRecord) return new $class($values, $dontInit, $newRecord);
-        
-        $class = strtolower($class);
-        if (!isset(self::$newRecordsCache[$class])) 
-            self::$newRecordsCache[$class] = new $class(array(), false, false);
-        $object = clone self::$newRecordsCache[$class];
-        $object->initAssociationsOwner();
-        $object->populate($values);
-        return $object;
+        if (class_exists($class)) return new $class($values, $dontInit, $newRecord);
+        throw new SException("SActiveStore : $class class not found.");
     }
     
     private static function descendsFrom($class)
