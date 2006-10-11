@@ -424,8 +424,8 @@ class SActionController
             return;
         }
         
-        $this->requireDependencies();  
         $this->initialize();
+        $this->requireDependencies();
         
         $this->session = new SSession();
         $this->flash   = new SFlash($this->session);
