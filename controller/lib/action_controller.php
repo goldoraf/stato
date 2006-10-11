@@ -251,10 +251,13 @@ class SActionController
     
     protected function addVariablesToAssigns()
     {
-        if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
-        $this->flash->discard();
         $this->assigns['params'] = $this->params;
-        $this->assigns['session'] = $this->session;
+        if (isset($this->flash) && isset($this->session))
+        {
+            if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
+            $this->flash->discard();
+            $this->assigns['session'] = $this->session;
+        }
     }
     
     protected function redirectTo($options)
