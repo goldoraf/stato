@@ -4,8 +4,10 @@ require_once(CORE_DIR.'/common/common.php');
 
 class DateTest extends UnitTestCase
 {
-    public function testDateConstruct()
+    public function testDate()
     {
+        $d = new SDate(2006, 4, 15);
+        $this->assertEqual('2006-04-15', $d->__toString());
         $d = new SDate(2006, 4, 0);
         $this->assertEqual('2006-03-31', $d->__toString());
         $d = new SDate(2006, 4, -1);
@@ -18,15 +20,21 @@ class DateTest extends UnitTestCase
         $this->assertEqual('2006-05-01', $d->__toString());
     }
     
-    public function testDate()
+    public function testDateTime()
+    {
+        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
+        $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
+        $d = new SDateTime(1969, 7, 21, 20, 65, 05);
+        $this->assertEqual('1969-07-21 21:05:05', $d->__toString());
+        $d = new SDateTime(1969, 7, 21, 20, 125, 05);
+        $this->assertEqual('1969-07-21 22:05:05', $d->__toString());
+    }
+    
+    public function testDateIso8601()
     {
         $d = new SDate(1969, 7, 21);
         $this->assertEqual('1969-07-21', $d->__toString());
         $this->assertEqual('19690721T00:00:00', $d->toIso8601());
-    }
-    
-    public function testDateTime()
-    {
         $d = new SDateTime(1969, 7, 21, 20, 35, 05);
         $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
         $this->assertEqual('19690721T20:35:05', $d->toIso8601());

@@ -28,7 +28,8 @@ class SDate
             'day'   => $date['mday'],
             'yday'  => $date['yday'],
             'mday'  => $date['mday'],
-            'wday'  => $date['wday']
+            'wday'  => $date['wday'],
+            'week'  => date('W', $ts)
         );
     }
     
@@ -126,7 +127,8 @@ class SDateTime extends SDate
             'wday'  => $date['wday'],
             'hour'  => $date['hours'],
             'min'   => $date['minutes'],
-            'sec'   => $date['seconds']
+            'sec'   => $date['seconds'],
+            'week'  => date('W', $ts)
         );
     }
     
