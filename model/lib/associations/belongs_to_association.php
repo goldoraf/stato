@@ -29,23 +29,6 @@ class SBelongsToManager extends SAssociationManager
         $this->loaded = true;
     }
     
-    public function create($attributes=array())
-    {
-        $class = $this->meta->class;
-        $record = new $class($attributes);
-        $record->save();
-        $this->replace($record);
-        return $record;
-    }
-    
-    public function build($attributes=array())
-    {
-        $class = $this->meta->class;
-        $record = new $class($attributes);
-        $this->replace($record);
-        return $record;
-    }
-    
     public function beforeOwnerSave()
     {
         if ($this->target !== null)

@@ -123,6 +123,15 @@ abstract class SAssociationManager
         return call_user_func_array(array($this->target(), $method), $args);
     }
     
+    public function create($attributes=array())
+    {
+        $class = $this->meta->class;
+        $record = new $class($attributes);
+        $record->save();
+        $this->replace($record);
+        return $record;
+    }
+    
     public function target()
     {
         if (!$this->owner->isNewRecord() || $this->isFkPresent())
@@ -175,10 +184,10 @@ abstract class SAssociationManager
 
 abstract class SManyAssociationManager
 {
-    protected $owner  = null;
-    protected $meta   = null;
-    protected $qs     = null;
-    protected $ownerNewBeforeSave = false;
+    protected $owner   = null;
+    protected $meta    = null;
+    protected $qs      = null;
+    protected $unsaved = array();
     
     public function __construct($owner, $meta)
     {
@@ -212,18 +221,17 @@ abstract class SManyAssociationManager
     public function add($records)
     {
         if (!is_array($records)) $records = array($records);
-        if ($this->owner->isNewRecord()) $this->owner->save();
         foreach($records as $record)
         {
             $this->checkRecordType($record);
-            $this->insertRecord($record);
+            if ($this->owner->isNewRecord()) $this->unsaved[] = $record;
+            else $this->insertRecord($record);
         }
     }
     
     public function delete($records)
     {
         if (!is_array($records)) $records = array($records);
-        if ($this->owner->isNewRecord()) $this->owner->save();
         foreach($records as $record)
         {
             $this->checkRecordType($record);
@@ -251,7 +259,10 @@ abstract class SManyAssociationManager
     
     public function beforeOwnerSave() {}
     
-    public function afterOwnerSave() {}
+    public function afterOwnerSave()
+    {
+        foreach ($this->unsaved as $record) $this->insertRecord($record);
+    }
     
     public function beforeOwnerDelete() {}
     
@@ -267,6 +278,10 @@ abstract class SManyAssociationManager
     {
         return SActiveRecord::connection();
     }
+    
+    abstract protected function insertRecord($record);
+    
+    abstract protected function deleteRecord($record);
     
     abstract protected function getQuerySet();
 }

@@ -80,6 +80,9 @@ class SHasManyTest extends ActiveTestCase
         $product1 = new Product(array('name'=>'mouse', 'price'=>'14.95'));
         $product2 = new Product(array('name'=>'screen', 'price'=>'350.00'));
         $new_company->products->add(array($product2, $product1));
+        $this->assertTrue($new_company->isNewRecord());
+        $this->assertTrue($product1->isNewRecord());
+        $new_company->save();
         $this->assertFalse($new_company->isNewRecord());
         $this->assertFalse($product1->isNewRecord());
         $this->assertEqual($nb_companies+1, Company::$objects->count());
@@ -93,6 +96,7 @@ class SHasManyTest extends ActiveTestCase
         $new_company = new Company(array('name'=>'MegaGeek corp.'));
         $new_company->products->add(new Product(array('name'=>'usb key', 'price'=>'34.95')));
         $new_company->products->add(new Product(array('name'=>'keyboard', 'price'=>'50.00')));
+        $new_company->save();
         $i = 0;
         foreach($new_company->products->all() as $product)
         {
@@ -165,57 +169,49 @@ class SManyToManyTest extends ActiveTestCase
     
     }
     
-    /*function testAddBeforeSave()
+    function testAddBeforeSave()
     {
-        $nb_devels = SActiveStore::count('Developer');
-        $nb_projs  = SActiveStore::count('Project');
+        $nb_devels = Developer::$objects->count();
+        $nb_projs  = Project::$objects->count();
         $peter = new Developer(array('name' => 'peter'));
         $proj1 = new Project(array('name' => 'WebNuked2.0'));
         $proj2 = new Project(array('name' => 'TotalWebInnov'));
-        $peter->projects[] = $proj1;
-        $peter->projects[] = $proj2;
+        $peter->projects->add($proj1);
+        $peter->projects->add($proj2);
         $this->assertTrue($peter->isNewRecord());
         $this->assertTrue($proj1->isNewRecord());
+        $this->assertEqual(0, $peter->projects->count());
         $peter->save();
         $this->assertFalse($peter->isNewRecord());
-        $this->assertEqual($nb_devels+1, SActiveStore::count('Developer'));
-        $this->assertEqual($nb_projs+2, SActiveStore::count('Project'));
-        $this->assertEqual(2, $peter->countProjects());
-        $peter->projects(True);
-        $this->assertEqual(2, $peter->countProjects());
-    }
-    
-    function testBuild()
-    {
-        $richard = SActiveStore::findByPk('Developer', 2);
-        $proj = $richard->buildProject(array('name' => 'BlueProjectOfDeath'));
-        $this->assertEqual($richard->projects[1], $proj);
-        $this->assertTrue($proj->isNewRecord());
-        $richard->save();
-        $this->assertFalse($proj->isNewRecord());
-        $this->assertEqual($richard->projects[1], $proj);
+        $this->assertFalse($proj1->isNewRecord());
+        $this->assertEqual($nb_devels+1, Developer::$objects->count());
+        $this->assertEqual($nb_projs+2, Project::$objects->count());
+        $this->assertEqual(2, $peter->projects->count());
+        $peter2 = Developer::$objects->get($peter->id);
+        $this->assertEqual(2, $peter2->projects->count());
     }
     
     function testCreate()
     {
-        $richard = SActiveStore::findByPk('Developer', 2);
-        $proj = $richard->createProject(array('name' => 'PlzNotAnotherRecursiveAcronym'));
-        $this->assertEqual($richard->projects[1], $proj);
+        $richard = Developer::$objects->get(2);
+        $proj = $richard->projects->create(array('name' => 'PlzNotAnotherRecursiveAcronym'));
+        $projects = $richard->projects->all()->dump();
+        $this->assertEqual($projects[1]->name, $proj->name);
         $this->assertFalse($proj->isNewRecord());
     }
     
     function testDelete()
     {
-        $ben = SActiveStore::findByPk('Developer', 1);
-        $proj = SActiveStore::findByPk('Project', 1);
-        $this->assertEqual(2, $ben->countProjects());
-        $this->assertEqual(1, $proj->countDevelopers());
-        $ben->deleteProjects($proj);
-        $this->assertEqual(1, $ben->countProjects());
-        $ben->projects(True);
-        $this->assertEqual(1, $ben->countProjects());
-        $proj->developers(True);
-        $this->assertEqual(0, $proj->countDevelopers());
+        $ben = Developer::$objects->get(1);
+        $proj = Project::$objects->get(1);
+        $this->assertEqual(2, $ben->projects->count());
+        $this->assertEqual(1, $proj->developers->count());
+        $ben->projects->delete($proj);
+        $this->assertEqual(1, $ben->projects->count());
+        $ben2 = Developer::$objects->get(1);
+        $this->assertEqual(1, $ben2->projects->count());
+        $proj2 = Project::$objects->get(1);
+        $this->assertEqual(0, $proj2->developers->count());
     }
     
     function testDeleteCollection()
@@ -225,14 +221,10 @@ class SManyToManyTest extends ActiveTestCase
     
     function testClear()
     {
-        $richard = SActiveStore::findByPk('Developer', 2);
-        $richard->clearProjects();
-        $this->assertEqual(0, $richard->countProjects());
-        $richard->projects(True);
-        //$this->assertEqual(0, $richard->countProjects());
-        // clear() n'est pas censé détruire les objets dans le cas d'une assoc ManyToMany
-        // les tests de Rails font pourtant comme si...
-    }*/
+        $richard = Developer::$objects->get(2);
+        $richard->projects->clear();
+        $this->assertEqual(0, $richard->projects->count());
+    }
 }
 
 /*class SHasOneTest extends ActiveTestCase

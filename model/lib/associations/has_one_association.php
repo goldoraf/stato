@@ -1,24 +1,33 @@
 <?php
 
-class SHasOneAssociation extends SBelongsToAssociation
+class SHasOneMeta extends SAssociationMeta
+{
+    public function __construct($ownerMeta, $assocName, $options)
+    {
+        parent::__construct($ownerMeta, $assocName, $options);
+        $this->assertValidOptions($options);
+        if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
+        else $this->foreignKey = $ownerMeta->underscored.'_id';
+    }
+}
+
+class SHasOneManager extends SAssociationManager
 {
     protected $ownerNewBeforeSave = false;
     
     public function replace($record)
     {
-        if ($this->target !== Null)
+        if ($this->target !== null)
         {
-            $this->target[$this->foreignKey] = Null;
+            $this->target[$this->meta->foreignKey] = null;
             $this->target->save(); // ou remplacer l'ensemble par $this->target->delete() ???
         }
-        if ($record === Null)
-        {
-            $this->target = Null;
-        }
+        
+        if ($record === null) $this->target = null;
         else
         {
             $this->checkRecordType($record);
-            if (!$this->owner->isNewRecord()) $record[$this->foreignKey] = $this->owner->id;
+            if (!$this->owner->isNewRecord()) $record[$this->meta->foreignKey] = $this->owner->id;
             $this->target = $record;
         }
         $this->loaded = true;
@@ -34,23 +43,15 @@ class SHasOneAssociation extends SBelongsToAssociation
     {
         if ($this->target !== null)
         {
-            if ($this->ownerNewBeforeSave) $this->target[$this->foreignKey] = $this->owner->id;
+            if ($this->ownerNewBeforeSave) $this->target[$this->meta->foreignKey] = $this->owner->id;
             $this->target->save();
         }
     }
     
-    public function beforeOwnerDelete() {}
-    
-    public function afterOwnerDelete() {}
-    
     protected function findTarget()
     {
-        return SActiveStore::findFirst($this->assocClass, $this->constructSql());
-    }
-    
-    private function constructSql()
-    {
-        return "{$this->assocTableName}.{$this->foreignKey} = '{$this->owner->id}'";
+        $qs = new SQuerySet($this->meta);
+        return $qs->get("{$this->meta->foreignKey} = '{$this->owner->id}'");
     }
 }
 

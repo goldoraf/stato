@@ -57,6 +57,7 @@ class SManyToManyManager extends SManyAssociationManager
     
     protected function insertRecord($record)
     {
+        if ($record->id === null) $record->save();
         $this->connection()->execute("INSERT INTO {$this->meta->joinTable} 
                                       SET {$this->meta->assocForeignKey} = '{$record->id}', 
                                       {$this->meta->foreignKey} = '{$this->owner->id}'");
