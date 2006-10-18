@@ -15,6 +15,7 @@ require_once(ST_DIR.'/reporter.php');
 define('TESTS_DIR', CORE_DIR.'/cli/testing');
 require_once(TESTS_DIR.'/showpasses.php');
 require_once(TESTS_DIR.'/colortextreporter.php');
+require_once(TESTS_DIR.'/statotestcase.php');
 require_once(TESTS_DIR.'/activetestcase.php');
 require_once(TESTS_DIR.'/helpertestcase.php');
 

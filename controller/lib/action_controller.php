@@ -397,17 +397,14 @@ class SActionController
         if (file_exists($file)) unlink($file);
     }
     
-    protected function paginate($className, $perPage=10, $options=array())
+    protected function paginate($querySet, $perPage=10, $param='page')
     {
-        if (isset($options['parameter']))  $param = $options['parameter'];
-        else $param = 'page';
-        
         if (isset($this->request->params[$param]))
             $currentPage = $this->request->params[$param];
         else
             $currentPage = 1;
         
-        $paginator = new SPaginator($className, $perPage, $currentPage, $options);
+        $paginator = new SPaginator($querySet, $perPage, $currentPage, $param);
         return array($paginator, $paginator->currentPage());
     }
     

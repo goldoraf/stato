@@ -30,12 +30,13 @@ class SFixture
         $this->db = $db;
         $this->mode = $mode;
         $this->className = ucfirst(SInflection::singularize($tableName));
+        if (class_exists($this->className)) SActiveRecordMeta::addManagerToClass($this->className);
         $this->tableName = $tableName;
         $this->fixturePath = $fixturePath;
         $this->readFixtureFile();
     }
     
-    public function instanciateFixtures()
+    /*public function instanciateFixtures()
     {
         $instances = array();
         $class = $this->className;
@@ -50,7 +51,7 @@ class SFixture
             return $instances;
         }
         return false;
-    }
+    }*/
     
     public function deleteExistingFixtures()
     {
@@ -62,7 +63,7 @@ class SFixture
         foreach($this->values as $obj => $values)
         {
             $this->db->execute("INSERT INTO {$this->tableName} (".implode(', ', array_keys($values)).")"
-                ." VALUES (".implode(', ', SActiveStore::arrayQuote(array_values($values))).")");
+                ." VALUES (".implode(', ', $this->db->arrayQuote(array_values($values))).")");
         }
     }
     

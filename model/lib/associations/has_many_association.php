@@ -1,73 +1,101 @@
 <?php
 
-class SHasManyAssociation extends SAssociationCollection
+class SHasManyMeta extends SAssociationMeta
 {
-    public function build($attributes = array())
-    {
-        $this->loadTarget();
-        $class = $this->assocClass;
-        $record = new $class($attributes);
-        if (!$this->owner->isNewRecord()) $record[$this->foreignKey] = $this->owner->id;
-        $this->target[] = $record;
-        return $record;
-    }
+    public $dependent = null;
+    public $throughTableName = null;
+    public $throughForeignKey = null;
     
+    public function __construct($ownerMeta, $assocName, $options)
+    {
+        parent::__construct($ownerMeta, $assocName, $options);
+        $this->assertValidOptions($options, array('dependent', 'through'));
+        
+        if (isset($options['through']))
+        {
+            $this->type = 'SHasManyThrough';
+            $throughClass = SInflection::camelize(SInflection::singularize($options['through']));
+            $throughMeta = SMetaManager::retrieve($throughClass);;
+            $this->throughTableName = $throughMeta->tableName;
+            $this->throughForeignKey = $ownerMeta->underscored.'_id';
+            
+            if (isset($throughMeta->relationships[SInflection::underscore($this->class)]))
+                $r = $throughMeta->relationships[SInflection::underscore($this->class)];
+            elseif (isset($throughMeta->relationships[SInflection::underscore(SInflection::pluralize($this->class))]))
+                $r = $throughMeta->relationships[SInflection::underscore(SInflection::pluralize($this->class))];
+            
+            if ($r == 'belongs_to' || $r['assoc_type'] == 'belongs_to')
+                $this->foreignKey = SInflection::underscore($dest).'_id';
+            elseif ($r == 'has_many' || $r['assoc_type'] == 'has_many')
+                $this->foreignKey = $throughMeta->underscored.'_id';
+        }
+        else
+        {
+            if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
+            else $this->foreignKey = $ownerMeta->underscored.'_id';
+            
+            if (isset($options['dependent'])) $this->dependent = $options['dependent'];
+        }
+    }
+}
+
+class SHasManyManager extends SManyAssociationManager
+{
     public function beforeOwnerDelete()
     {
-        if (!isset($this->options['dependent'])) return;
+        if ($this->meta->dependent === null) return;
         
-        switch ($this->options['dependent'])
+        switch ($this->meta->dependent)
         {
             case 'delete':
-                $this->loadTarget();
-                foreach ($this->target as $r) $r->delete();
+                foreach ($this->all() as $r) $r->delete();
                 break;
             case 'delete_all':
-                SActiveStore::deleteAll($this->assocClass, $this->constructSql());
+                $this->connection()->execute("DELETE FROM {$this->meta->tableName} WHERE ".$this->getSqlFilter());
                 break;
             case 'nullify':
-                SActiveStore::updateAll($this->assocClass, 
-                                        "{$this->assocTableName}.{$this->foreignKey} = NULL",
-                                        $this->constructSql());
+                $this->clear();
                 break;
             default:
                 throw new SException("The 'dependent' option expects either 'delete', 'delete_all', or 'nullify'");
         }
     }
     
-    protected function findTarget()
+    public function clear()
     {
-        return SActiveStore::findAll($this->assocClass, $this->constructSql());
+        $this->connection()->execute("UPDATE {$this->meta->tableName} 
+                                     SET {$this->meta->tableName}.{$this->meta->foreignKey} = NULL
+                                     WHERE ".$this->getSqlFilter());
     }
     
     protected function insertRecord($record)
     {
-        $fk = $this->foreignKey;
+        $fk = $this->meta->foreignKey;
         $record->$fk = $this->owner->id;
         $record->save();
     }
     
     protected function deleteRecord($record)
     {
-        if (isset($this->options['dependent'])) $r->delete();
+        if ($this->meta->dependent == 'delete') $record->delete();
         else
         {
-            SActiveStore::updateAll($this->assocClass, 
-                                    "{$this->assocTableName}.{$this->foreignKey} = NULL",
-                                    $this->constructSql("{$this->assocTableName}.{$this->assocPrimaryKey} = '{$record->id}'"));
+            $this->connection()->execute("UPDATE {$this->meta->tableName} 
+                                         SET {$this->meta->tableName}.{$this->meta->foreignKey} = NULL
+                                         WHERE ".$this->getSqlFilter()." 
+                                         AND {$this->meta->tableName}.{$this->meta->identityField} = '{$record->id}'");
         }
     }
     
-    protected function countRecords($condition)
+    protected function getQuerySet()
     {
-        return SActiveStore::count($this->assocClass, $this->constructSql($condition));
+        $qs = new SQuerySet($this->meta);
+        return $qs->filter($this->getSqlFilter());
     }
     
-    protected function constructSql($condition = Null)
+    protected function getSqlFilter()
     {
-        $sql = "{$this->assocTableName}.{$this->foreignKey} = '{$this->owner->id}'";
-        if ($condition != Null) $sql.= " AND $condition";
-        return $sql;
+        return "{$this->meta->tableName}.{$this->meta->foreignKey} = '{$this->owner->id}'";
     }
 }
 

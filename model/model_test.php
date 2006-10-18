@@ -3,12 +3,12 @@
 return array
 (
     'active_record',
-    'active_store',
+    'queryset',
     'eager_loading',
     'associations',
     'callbacks',
-    'decorators',
-    'list_decorator',
+    //'decorators',
+    //'list_decorator',
     'migration',
     'csv'
 );

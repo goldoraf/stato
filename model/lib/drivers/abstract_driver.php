@@ -33,14 +33,14 @@ abstract class SAbstractDriver
     {
         $rs = $this->select($sql);
         $set = array();
-        while($row = $rs->fetch()) $set[] = $row;
-        $rs->free();
+        while($row = $this->fetch($rs)) $set[] = $row;
+        $this->free($rs);
         return $set;
     }
     
     public function selectOne($sql)
     {
-        return $this->select($sql)->fetch();
+        return $this->fetch($this->select($sql));
     }
     
     public function insert($sql)
@@ -93,6 +93,12 @@ abstract class SAbstractDriver
         return $name;
     }
     
+    public function arrayQuote($array)
+    {
+        foreach($array as $key => $value) $array[$key] = $this->quote($value);
+        return $array;
+    }
+    
     protected function quoteString($value)
     {
         return "'".$this->escapeStr($value)."'";
@@ -120,9 +126,9 @@ abstract class SAbstractDriver
     
     abstract protected function affectedRows();
     
-    abstract protected static function rowCount($resource);
+    abstract protected function rowCount($resource);
     
-    abstract protected static function fetch($resource, $associative = true);
+    abstract protected function fetch($resource, $associative = true);
     
     abstract protected function escapeStr($str);
 }

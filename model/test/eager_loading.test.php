@@ -3,30 +3,36 @@
 class EagerLoadingTest extends ActiveTestCase
 {
     public $fixtures = array('articles', 'comments', 'categories', 'articles_categories');
-    public $useInstantiatedFixtures = True;
                              
-    function testLoadingWithOneAssociation()
+    public function testLoadingWithOneAssociation()
     {
-        $articles = SActiveStore::findAll('Article', Null, array('include' => array('comments')));
+        $articles = Article::$objects->includes('comments')->dump();
         $this->assertTrue($articles[0]->comments->isLoaded());
         $this->assertTrue($articles[1]->comments->isLoaded()); // the assoc must be flagged as loaded even if empty
-        $this->assertEqual(2, $articles[0]->countComments());
-        $this->assertEqual(0, $articles[1]->countComments());
-        $this->assertTrue($articles[0]->comments->contains($this->comments['comment_1']));
+        $this->assertEqual(2, $articles[0]->comments->count());
+        $this->assertEqual(0, $articles[1]->comments->count());
         
-        $article = SActiveStore::findFirst('Article', "articles.title='PHP6 overview'", array('include' => array('comments')));
+        $i = 0;
+        foreach ($articles[0]->comments->all() as $c) { $i++; }
+        $this->assertEqual(2, $i);
+        
+        $comments = $articles[0]->comments->dump();
+        $this->assertEqual('xxx@yyy.com', array_shift($comments)->author);
+        
+        $article = Article::$objects->includes('comments')->get("articles.title='PHP6 overview'");
         $this->assertTrue($article->comments->isLoaded());
-        $this->assertEqual(2, $article->countComments());
-        $this->assertTrue($article->comments->contains($this->comments['comment_1']));
+        $this->assertEqual(2, $article->comments->count());
+        $comments = $article->comments->dump();
+        $this->assertEqual('xxx@yyy.com', array_shift($comments)->author);
     }
     
-    function testLoadingWithMultipleAssociations()
+    public function testLoadingWithMultipleAssociations()
     {
-        $articles = SActiveStore::findAll('Article', Null, array('include' => array('comments', 'categories')));
+        $articles = Article::$objects->includes('comments', 'categories')->dump();
         $this->assertTrue($articles[0]->comments->isLoaded());
-        $this->assertEqual(2, $articles[0]->countComments());
+        $this->assertEqual(2, $articles[0]->comments->count());
         $this->assertTrue($articles[0]->categories->isLoaded());
-        $this->assertEqual(3, $articles[0]->countCategories());
+        $this->assertEqual(3, $articles[0]->categories->count());
     }
 }
 

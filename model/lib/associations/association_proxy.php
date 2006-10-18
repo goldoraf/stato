@@ -2,15 +2,19 @@
 
 class SAssociationProxy
 {
-    public static function getInstance($owner, $name, $options)
+    public static function retrieveInstances($meta, $relationships)
     {
-        $options = self::getOptions($owner, $name, $options);
-        
-        $assocClass = 'S'.SInflection::camelize($options['assoc_type']).'Association';
-        return new $assocClass($owner, $name, $options['class_name'], $options);
+        $associations = array();
+        foreach ($relationships as $name => $options)
+        {
+            $options = self::getOptions($meta, $name, $options);
+            $class = 'S'.SInflection::camelize($options['assoc_type']).'Association';
+            $associations[$name] = new $class($options);
+        }
+        return $associations;
     }
     
-    public static function getOptions($owner, $name, $options)
+    public static function getOptions($meta, $name, $options)
     {
         if (!is_array($options))
         {
@@ -18,6 +22,8 @@ class SAssociationProxy
             $options = array();
             $options['assoc_type'] = $type;
         }
+        
+        $options['owner_class'] = $meta->class;
         
         if (!isset($options['assoc_type'])) throw new SException('Type of relationship is required.');
         
@@ -30,104 +36,75 @@ class SAssociationProxy
         }
         
         $dest = $options['class_name'];
-        // we instanciate the dest class without associations to avoid an infinite loop
+        
         if (!class_exists($dest))
-            SDependencies::requireDependency('models', $dest, get_class($owner));
-        
-        $destInstance = new $dest(null, True);
-        
-        $options['table_name']  = $destInstance->tableName;
-        $options['primary_key'] = $destInstance->identityField;
+            SDependencies::requireDependency('models', $dest, $meta->class);
         
         $assocMethod = SInflection::camelize($options['assoc_type']);
         
-        return self::$assocMethod($owner, $name, $dest, $options);
+        return self::$assocMethod($meta, $name, $dest, $options);
     }
     
-    public static function hasMany($owner, $name, $dest, $options = array())
+    public static function hasMany($meta, $name, $dest, $options)
     {
         self::assertValidOptions($options, array('foreign_key', 'dependent', 'through'));
-        self::registerToManyMethods($owner, $name, $dest);
         
         if (isset($options['through']))
         {
             $options['assoc_type'] = 'has_many_through';
             $throughClass = SInflection::camelize(SInflection::singularize($options['through']));
-            $throughInstance = new $throughClass(null, true);
-            $options['through_table_name'] = $throughInstance->tableName;
-            $options['through_foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
+            $throughMeta = SMetaManager::retrieve($throughClass);;
+            $options['through_table_name'] = $throughMeta->tableName;
+            $options['through_foreign_key'] = $meta->underscored.'_id';
             
-            if (isset($throughInstance->relationships[SInflection::underscore($dest)]))
-                $r = $throughInstance->relationships[SInflection::underscore($dest)];
-            elseif (isset($throughInstance->relationships[SInflection::underscore(SInflection::pluralize($dest))]))
-                $r = $throughInstance->relationships[SInflection::underscore(SInflection::pluralize($dest))];
+            if (isset($throughMeta->relationships[SInflection::underscore($dest)]))
+                $r = $throughMeta->relationships[SInflection::underscore($dest)];
+            elseif (isset($throughMeta->relationships[SInflection::underscore(SInflection::pluralize($dest))]))
+                $r = $throughMeta->relationships[SInflection::underscore(SInflection::pluralize($dest))];
             
             if ($r == 'belongs_to' || $r['assoc_type'] == 'belongs_to')
                 $options['foreign_key'] = SInflection::underscore($dest).'_id';
             elseif ($r == 'has_many' || $r['assoc_type'] == 'has_many')
-            {
-                $options['primary_key'] = $throughInstance->identityField;
-                $options['foreign_key'] = SInflection::underscore($throughInstance).'_id';
-            }
+                $options['foreign_key'] = $throughMeta->underscored.'_id';
         }
         elseif (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
+            $options['foreign_key'] = $meta->underscored.'_id';
         
         return $options;
     }
     
-    public static function belongsTo($owner, $name, $dest, $options = array())
+    public static function belongsTo($meta, $name, $dest, $options)
     {
         self::assertValidOptions($options, array('foreign_key'));
-        self::registerToOneMethods($owner, $name, $dest);
+        
         if (!isset($options['foreign_key'])) 
             $options['foreign_key'] = SInflection::underscore($dest).'_id';
         
         return $options;
     }
     
-    public static function manyToMany($owner, $name, $dest, $options = array())
+    public static function manyToMany($meta, $name, $dest, $options)
     {
         self::assertValidOptions($options, array('foreign_key', 'association_foreign_key', 'join_table'));
-        self::registerToManyMethods($owner, $name, $dest);
+        
         if (!isset($options['foreign_key'])) 
-            $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
+            $options['foreign_key'] = $meta->underscored.'_id';
         if (!isset($options['association_foreign_key'])) 
             $options['association_foreign_key'] = SInflection::underscore($dest).'_id';
         if (!isset($options['join_table']))
-            $options['join_table'] = self::joinTableName(get_class($owner), $dest);
+            $options['join_table'] = self::joinTableName($meta->class, $dest);
         
         return $options;
     }
     
-    public static function hasOne($owner, $name, $dest, $options = array())
+    public static function hasOne($meta, $name, $dest, $options)
     {
         self::assertValidOptions($options, array('foreign_key'));
-        self::registerToOneMethods($owner, $name, $dest);
+        
         if (!isset($options['foreign_key']))
-            $options['foreign_key'] = SInflection::underscore(get_class($owner)).'_id';
+            $options['foreign_key'] = $meta->underscored.'_id';
         
         return $options;
-    }
-    
-    private static function registerToOneMethods($owner, $name, $dest)
-    {
-        $owner->registerAssociationMethod($name, $name, 'read');
-        $owner->registerAssociationMethod('build'.ucfirst($dest), $name, 'build');
-        $owner->registerAssociationMethod('create'.ucfirst($dest), $name, 'create');
-        $owner->registerAssociationMethod('replace'.ucfirst($dest), $name, 'replace');
-    }
-    
-    private static function registerToManyMethods($owner, $name, $dest)
-    {
-        $owner->registerAssociationMethod($name, $name, 'read');
-        $owner->registerAssociationMethod('count'.ucfirst($name), $name, 'count');
-        $owner->registerAssociationMethod('build'.ucfirst(SInflection::singularize($name)), $name, 'build');
-        $owner->registerAssociationMethod('create'.ucfirst(SInflection::singularize($name)), $name, 'create');
-        $owner->registerAssociationMethod('delete'.ucfirst($name), $name, 'delete');
-        $owner->registerAssociationMethod('clear'.ucfirst($name), $name, 'clear');
-        $owner->registerAssociationMethod('replace'.ucfirst($name), $name, 'replace');
-        $owner->registerAssociationMethod('set'.ucfirst(SInflection::singularize($name)).'Ids', $name, 'replaceWithIds');
     }
     
     private static function joinTableName($firstName, $secondName)
@@ -155,8 +132,7 @@ class SAssociationProxy
     
     private static function assertValidOptions($options, $validOptions)
     {
-        $validOptions = array_merge(array('table_name', 'primary_key', 'assoc_type',
-                                    'class_name'), $validOptions);
+        $validOptions = array_merge(array('assoc_type', 'class_name', 'owner_class'), $validOptions);
         foreach(array_keys($options) as $key)
         {
             if (!in_array($key, $validOptions))

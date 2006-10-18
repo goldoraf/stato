@@ -2,23 +2,19 @@
 
 class SPaginator
 {
-    public $perPage     = 20;
-    public $currentPage = 1;
+    public $perPage     = null;
+    public $currentPage = null;
     
-    private $className = Null;
-    private $condition = Null;
-    private $options   = array();
-    private $param     = 'page';
-    private $pageCount = Null;
+    private $querySet  = null;
+    private $param     = null;
+    private $pageCount = null;
     
-    public function __construct($className, $perPage=20, $currentPage=1, $options=array())
+    public function __construct($querySet, $perPage=20, $currentPage=1, $param='page')
     {
-        $this->className   = $className;
+        $this->querySet    = $querySet;
         $this->perPage     = $perPage;
         $this->currentPage = $currentPage;
-        $this->options     = $options;
-        if (isset($options['parameter']))  $this->param = $options['parameter'];
-        if (isset($options['conditions'])) $this->condition = $options['conditions'];
+        $this->param       = $param;
     }
     
     public function currentPage()
@@ -28,7 +24,7 @@ class SPaginator
     
     public function getPage($page)
     {
-        return SActiveStore::findAll($this->className, $this->condition, $this->sqlOptions($page));
+        return $this->querySet->limit($this->perPage, ($page - 1) * $this->perPage);
     }
     
     public function hasNextPage($page)
@@ -61,13 +57,7 @@ class SPaginator
     
     public function hitsCount()
     {
-        return SActiveStore::count($this->className, $this->condition);
-    }
-    
-    private function sqlOptions($page)
-    {
-        $offset = ($page - 1) * $this->perPage;
-        return array_merge($this->options, array('offset' => $offset, 'limit' => $this->perPage));
+        return $this->querySet->count();
     }
 }
 

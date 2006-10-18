@@ -5,8 +5,9 @@ define('FIXTURES_DIR', CORE_DIR.'/model/test/fixtures');
 require_once(CORE_DIR.'/model/model.php');
 require_once(FIXTURES_DIR.'/models.php');
 
-class ActiveTestCase extends UnitTestCase
+class ActiveTestCase extends StatoTestCase
 {
+    public $models = array();
     public $fixtures = array();
     public $useInstantiatedFixtures = False;
     
@@ -18,6 +19,8 @@ class ActiveTestCase extends UnitTestCase
         parent::UnitTestCase();
         $this->recreateDatabase();
         $this->loadedFixtures = SFixture::createFixtures(FIXTURES_DIR, $this->fixtures);
+        foreach ($this->models as $class) 
+            SActiveRecordMeta::addManagerToClass(SInflection::camelize($class));
     }
     
     public function setUp()

@@ -1,69 +1,86 @@
 <?php
 
-class SManyToManyAssociation extends SAssociationCollection
+class SManyToManyMeta extends SAssociationMeta
 {
-    public $assocForeignKey = Null;
-    public $joinTable = Null;
+    public $assocForeignKey = null;
+    public $joinTable = null;
     
-    public function __construct($owner, $name, $class, $options = array())
+    public function __construct($ownerMeta, $assocName, $options)
     {
-        parent::__construct($owner, $name, $class, $options);
-        $this->assocForeignKey = $options['association_foreign_key'];
-        $this->joinTable = $options['join_table'];
+        parent::__construct($ownerMeta, $assocName, $options);
+        $this->assertValidOptions($options, array('association_foreign_key', 'join_table'));
+        if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
+        else $this->foreignKey = $ownerMeta->underscored.'_id';
+        if (isset($options['association_foreign_key'])) $this->assocForeignKey = $options['association_foreign_key'];
+        else $this->assocForeignKey = SInflection::underscore($this->class).'_id';
+        if (isset($options['join_table'])) $this->joinTable = $options['join_table'];
+        else $this->joinTable = $this->joinTableName($ownerMeta->class, $this->class);
     }
     
-    public function build($attributes = array())
+    private function joinTableName($firstName, $secondName)
     {
-        $this->loadTarget();
-        $class = $this->assocClass;
-        $record = new $class($attributes);
-        $this->target[] = $record;
-        return $record;
+        $firstName  = $this->undecoratedTableName($firstName);
+        $secondName = $this->undecoratedTableName($secondName);
+        
+        if ($firstName < $secondName)
+            $tableName = "${firstName}_${secondName}";
+        else
+            $tableName = "${secondName}_${firstName}";
+            
+        if (SActiveRecord::$tableNamePrefix !== null)
+            $tableName = SActiveRecord::$tableNamePrefix.'_'.$tableName;
+        if (SActiveRecord::$tableNameSuffix !== null)
+            $tableName.= '_'.SActiveRecord::$tableNameSuffix;
+            
+        return $tableName;
     }
     
+    private function undecoratedTableName($className)
+    {
+        return SInflection::pluralize(SInflection::underscore($className));
+    }
+}
+
+class SManyToManyManager extends SManyAssociationManager
+{
     public function beforeOwnerDelete()
     {
-        $sql = "DELETE FROM {$this->joinTable} WHERE "
-        ."{$this->foreignKey} = '{$this->owner->id}'";
-        SActiveRecord::connection()->execute($sql);
+        $this->connection()->execute("DELETE FROM {$this->meta->joinTable} 
+                                      WHERE {$this->meta->foreignKey} = '{$this->owner->id}'");
     }
     
-    protected function findTarget()
+    public function clear()
     {
-        return SActiveStore::findBySql($this->assocClass, $this->constructSql());
+        $this->connection()->execute("DELETE FROM {$this->meta->joinTable} 
+                                      WHERE {$this->meta->foreignKey} = '{$this->owner->id}'");
     }
     
     protected function insertRecord($record)
     {
-        $record->save();
-        // ajout d'un enregistrement dans la table de jointure ...
-        $sql = "INSERT INTO {$this->joinTable} SET "
-        ."{$this->assocForeignKey} = '{$record->id}', "
-        ."{$this->foreignKey} = '{$this->owner->id}'";
-        SActiveRecord::connection()->execute($sql);
+        $this->connection()->execute("INSERT INTO {$this->meta->joinTable} 
+                                      SET {$this->meta->assocForeignKey} = '{$record->id}', 
+                                      {$this->meta->foreignKey} = '{$this->owner->id}'");
     }
     
     protected function deleteRecord($record)
     {
-        $sql = "DELETE FROM {$this->joinTable} WHERE "
-        ."{$this->assocForeignKey} = '{$record->id}' AND "
-        ."{$this->foreignKey} = '{$this->owner->id}'";
-        SActiveRecord::connection()->execute($sql);
+        $this->connection()->execute("DELETE FROM {$this->meta->joinTable} 
+                                      WHERE {$this->meta->assocForeignKey} = '{$record->id}' 
+                                      AND {$this->meta->foreignKey} = '{$this->owner->id}'");
     }
     
-    protected function countRecords($condition)
+    protected function getQuerySet()
     {
-        $this->loadTarget();
-        return count($this->target);
+        $qs = new SQuerySet($this->meta);
+        return $qs->join("LEFT OUTER JOIN {$this->meta->joinTable} 
+                          ON {$this->meta->tableName}.{$this->meta->identityField} 
+                          = {$this->meta->joinTable}.{$this->meta->assocForeignKey}")
+                  ->filter($this->getSqlFilter());
     }
     
-    private function constructSql()
+    protected function getSqlFilter()
     {
-        $sql = "SELECT * FROM {$this->assocTableName} LEFT OUTER JOIN {$this->joinTable} "
-        ."ON {$this->assocTableName}.{$this->assocPrimaryKey} "
-        ."= {$this->joinTable}.{$this->assocForeignKey} "
-        ."WHERE {$this->joinTable}.{$this->foreignKey} = '{$this->owner->id}'";
-        return $sql;
+        return "{$this->meta->joinTable}.{$this->meta->foreignKey} = '{$this->owner->id}'";
     }
 }
 

@@ -3,72 +3,46 @@
 class SBelongsToTest extends ActiveTestCase
 {
     public $fixtures = array('profiles', 'employes');
+    public $models = array('dependent_company_1', 'dependent_company_2', 'dependent_company_3');
     
     function testBelongsTo()
     {
-        $profile = SActiveStore::findByPk('Profile', 1);
-        $employe = $profile->employe;
-        $employeBis = SActiveStore::findByPk('Employe', 1);
-        $this->assertEqual($employe->lastname, $employeBis->lastname);
+        $profile = Profile::$objects->get(1);
+        $employe = Employe::$objects->get(1);
+        $this->assertEqual($profile->employe->lastname, $employe->lastname);
     }
     
-    function testBuild()
-    {
-        $profile = new Profile();
-        $profile->cv = 'test';
-        $employe = $profile->buildEmploye(array('lastname'=>'Bruce', 'firstname'=>'Wayne'));
-        $employe->lastname = 'Brice';
-        $this->assertEqual($employe, $profile->employe);
-        $profile->save();
-        $this->assertEqual($employe->id, $profile->employe_id);
-        $this->assertEqual($employe, $profile->employe);
-    }
-    
-    function testCreate()
-    {
-        $profile = new Profile();
-        $profile->cv = 'test';
-        $employe = $profile->createEmploye(array('lastname'=>'Bruce', 'firstname'=>'Wayne'));
-        $this->assertEqual($employe, $profile->employe);
-        $profile->save();
-        $this->assertEqual('Bruce', $employe->lastname);
-        $this->assertEqual($employe, $profile->employe);
-        $this->assertEqual($employe->id, $profile->employe_id);
-    }
-    
-    function testNaturalAssignment()
+    function testAssignment()
     {
         $profile = new Profile(array('cv'=>'GNU expert'));
         $employe = new Employe(array('lastname'=>'Richard', 'firstname'=>'Stallman'));
         $profile->employe = $employe;
+        $profile->save();
         $this->assertEqual($employe->id, $profile->employe_id);
     }
     
     function testAssignmentBeforeParentSaved()
     {
-        $profile = SActiveStore::findByPk('Profile', 1);
+        $profile = Profile::$objects->get(1);
         $employe = new Employe(array('lastname'=>'Max', 'firstname'=>'Payne'));
         $profile->employe = $employe;
-        $this->assertEqual($employe, $profile->employe);
+        $this->assertEqual($profile->employe->lastname, $employe->lastname);
         $this->assertTrue($employe->isNewRecord());
         $profile->save();
-        $employe->save();
         $this->assertFalse($employe->isNewRecord());
-        $this->assertEqual($employe, $profile->employe);
-        $this->assertEqual($employe, $profile->employe(True));
+        $this->assertEqual($employe->id, $profile->employe_id);
     }
     
     function testAssignmentBeforeChildSaved()
     {
-        $employe = SActiveStore::findByPk('Employe', 1);
+        $employe = Employe::$objects->get(1);
         $profile = new Profile(array('cv'=>'Mozilla expert'));
         $profile->employe = $employe;
         $this->assertTrue($profile->isNewRecord());
         $profile->save();
         $this->assertFalse($profile->isNewRecord());
         $this->assertFalse($employe->isNewRecord());
-        $this->assertEqual($employe, $profile->employe);
-        $this->assertEqual($employe, $profile->employe(True));
+        $this->assertEqual($employe->id, $profile->employe_id);
     }
     
     function testAssignmentBeforeEitherSaved()
@@ -81,8 +55,7 @@ class SBelongsToTest extends ActiveTestCase
         $profile->save();
         $this->assertFalse($profile->isNewRecord());
         $this->assertFalse($employe->isNewRecord());
-        $this->assertEqual($employe, $profile->employe);
-        $this->assertEqual($employe, $profile->employe(True));
+        $this->assertEqual($employe->id, $profile->employe_id);
     }
 }
 
@@ -92,104 +65,74 @@ class SHasManyTest extends ActiveTestCase
     
     function testAdd()
     {
-        $company = SActiveStore::findByPk('Company', 1);
+        $company = Company::$objects->get(1);
         $product = new Product(array('name'=>'CD-R', 'price'=>'0.75'));
-        $company->products[] = $product;
+        $this->assertEqual(1, $company->products->count());
+        $company->products->add($product);
         $this->assertEqual(2, $company->products->count());
-        $this->assertEqual(2, $company->countProducts());
-        $company->save();
-        $companyReloaded = SActiveStore::findByPk('Company', 1);
-        $this->assertEqual(2, $companyReloaded->products->count());
-        $this->assertEqual(2, $companyReloaded->countProducts());
     }
     
     function testAddCollection()
     {
-    
-    }
-    
-    function testAddBeforeSave()
-    {
-        $nb_companies = SActiveStore::count('Company');
-        $nb_products = SActiveStore::count('Product');
+        $nb_companies = Company::$objects->count();
+        $nb_products = Product::$objects->count();
         $new_company = new Company(array('name'=>'OpenSource Inc.'));
         $product1 = new Product(array('name'=>'mouse', 'price'=>'14.95'));
-        $new_company->products[] = $product1;
         $product2 = new Product(array('name'=>'screen', 'price'=>'350.00'));
-        $new_company->products[] = $product2;
-        $this->assertTrue($new_company->isNewRecord());
-        $this->assertTrue($product1->isNewRecord());
-        $this->assertEqual($nb_companies, SActiveStore::count('Company'));
-        $this->assertEqual($nb_products, SActiveStore::count('Product'));
-        $this->assertTrue($new_company->save());
+        $new_company->products->add(array($product2, $product1));
         $this->assertFalse($new_company->isNewRecord());
         $this->assertFalse($product1->isNewRecord());
-        $this->assertEqual($nb_companies+1, SActiveStore::count('Company'));
-        $this->assertEqual($nb_products+2, SActiveStore::count('Product'));
-        $this->assertEqual(2, $new_company->countProducts());
-        $company_reloaded = SActiveStore::findByPk('Company', $new_company->id);
-        $this->assertEqual(2, $company_reloaded->countProducts());
+        $this->assertEqual($nb_companies+1, Company::$objects->count());
+        $this->assertEqual($nb_products+2, Product::$objects->count());
+        $company_reloaded = Company::$objects->get($new_company->id);
+        $this->assertEqual(2, $company_reloaded->products->count());
     }
     
     function testForeach()
     {
         $new_company = new Company(array('name'=>'MegaGeek corp.'));
-        $new_company->products[] = new Product(array('name'=>'usb key', 'price'=>'34.95'));
-        $new_company->products[] = new Product(array('name'=>'keyboard', 'price'=>'50.00'));
+        $new_company->products->add(new Product(array('name'=>'usb key', 'price'=>'34.95')));
+        $new_company->products->add(new Product(array('name'=>'keyboard', 'price'=>'50.00')));
         $i = 0;
-        foreach($new_company->products as $product)
+        foreach($new_company->products->all() as $product)
         {
-            $this->assertEqual($product, $new_company->products[$i]);
+            $this->assertEqual('Product', get_class($product));
             $i++;
         }
+        $this->assertEqual(2, $i);
     }
     
-    function testBuild()
+    function testCreate()
     {
-        $company = SActiveStore::findByPk('Company', 1);
-        $new_product = $company->buildProduct(array('name'=>'toaster', 'price'=>'15.00'));
+        $company = Company::$objects->get(1);
+        $nb_products = $company->products->count();
+        $new_product = $company->products->create(array('name'=>'toaster', 'price'=>'15.00'));
         $this->assertEqual('toaster', $new_product->name);
-        $this->assertTrue($new_product->isNewRecord());
-        $nb_products = $company->countProducts();
-        $this->assertEqual($new_product, $company->products[$nb_products - 1]);
-        $this->assertTrue($new_product->save());
         $this->assertFalse($new_product->isNewRecord());
-        $company->products(True);
-        $this->assertEqual($nb_products, $company->countProducts());
-    }
-    
-    function testInvalidBuild()
-    {
-        $company = SActiveStore::findByPk('Company', 1);
-        $new_product = $company->buildProduct();
-        $this->assertTrue($new_product->isNewRecord());
-        $this->assertFalse($new_product->isValid());
-        $nb_products = $company->countProducts();
-        $this->assertEqual($new_product, $company->products[$nb_products - 1]);
-        $this->assertFalse($new_product->save());
-        $company->products(True);
-        $this->assertEqual($nb_products - 1, $company->countProducts());
+        $company_reloaded = Company::$objects->get(1);
+        $this->assertEqual($nb_products + 1, $company_reloaded->products->count());
     }
     
     function testDeleteDependency()
     {
-        $company = SActiveStore::findByPk('DependentCompany1', 1);
+        $company = DependentCompany1::$objects->get(1);
         $company->delete();
-        $this->assertEqual(0, SActiveStore::count('Product'));
+        $this->assertEqual(0, Product::$objects->count());
     }
     
     function testDeleteAllDependency()
     {
-        $company = SActiveStore::findByPk('DependentCompany2', 1);
+        $company = DependentCompany2::$objects->get(1);
         $company->delete();
-        $this->assertEqual(0, SActiveStore::count('Product'));
+        $this->assertEqual(0, Product::$objects->count());
     }
     
     function testNullifyDependency()
     {
-        $company = SActiveStore::findByPk('DependentCompany3', 1);
+        $company = DependentCompany3::$objects->get(1);
         $company->delete();
-        $product = SActiveStore::findByPk('Product', 1);
+        $this->assertEqual(1, Product::$objects->count());
+        $product = Product::$objects->get(1);
         $this->assertNull($product->company_id);
     }
 }
@@ -200,24 +143,21 @@ class SManyToManyTest extends ActiveTestCase
     
     function testBasic()
     {
-        $ben = SActiveStore::findByPk('Developer', 1);
-        $this->assertEqual(2, $ben->countProjects());
-        $proj = SActiveStore::findByPk('Project', 2);
-        $this->assertEqual(2, $proj->countDevelopers());
+        $ben = Developer::$objects->get(1);
+        $this->assertEqual(2, $ben->projects->count());
+        $proj = Project::$objects->get(1);
+        $this->assertEqual(1, $proj->developers->count());
     }
     
     function testAdd()
     {
-        $richard = SActiveStore::findByPk('Developer', 2);
-        $proj = SActiveStore::findByPk('Project', 1);
-        $this->assertEqual(1, $richard->countProjects());
-        $this->assertEqual(1, $proj->countDevelopers());
-        $richard->projects[] = $proj;
-        $this->assertEqual(2, $richard->countProjects());
-        $richard->projects(True);
-        $this->assertEqual(2, $richard->countProjects());
-        $proj->developers(True);
-        $this->assertEqual(2, $proj->countDevelopers());
+        $richard = Developer::$objects->get(2);
+        $proj = Project::$objects->get(1);
+        $this->assertEqual(1, $richard->projects->count());
+        $this->assertEqual(1, $proj->developers->count());
+        $richard->projects->add($proj);
+        $this->assertEqual(2, $richard->projects->count());
+        $this->assertEqual(2, $proj->developers->count());
     }
     
     function testAddCollection()
@@ -225,7 +165,7 @@ class SManyToManyTest extends ActiveTestCase
     
     }
     
-    function testAddBeforeSave()
+    /*function testAddBeforeSave()
     {
         $nb_devels = SActiveStore::count('Developer');
         $nb_projs  = SActiveStore::count('Project');
@@ -292,10 +232,10 @@ class SManyToManyTest extends ActiveTestCase
         //$this->assertEqual(0, $richard->countProjects());
         // clear() n'est pas censé détruire les objets dans le cas d'une assoc ManyToMany
         // les tests de Rails font pourtant comme si...
-    }
+    }*/
 }
 
-class SHasOneTest extends ActiveTestCase
+/*class SHasOneTest extends ActiveTestCase
 {
     public $fixtures = array('clients', 'contracts');
     
@@ -427,6 +367,6 @@ class SHasOneTest extends ActiveTestCase
         $this->assertFalse($contract->isNewRecord());
         $this->assertFalse($client->isNewRecord());
     }
-}
+}*/
 
 ?>

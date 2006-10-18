@@ -57,7 +57,7 @@ class SMySqlDriver extends SAbstractDriver
         $this->log($strsql, $time, $name);
         $this->runtime += $time;
         
-        if (is_resource($result)) return new SRecordset($result, get_class($this));
+        if (is_resource($result)) return $result;
         
         if (!$result)
             throw new SInvalidStatementException('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
@@ -68,18 +68,12 @@ class SMySqlDriver extends SAbstractDriver
     public function columns($table)
     {
         $rs = $this->execute("SHOW COLUMNS FROM ".$table);
-        if ($rs)
-        {
-            $fields = array();
-            while($row = $rs->fetch())
-            {
-                $fields[$row['Field']] = new SAttribute($row['Field'], 
-                                                        $this->simplifiedType($row['Type']), 
-                                                        $row['Default']);
-            }
-            return $fields;
-        }
-        return false;
+        $fields = array();
+        while($row = $this->fetch($rs))
+            $fields[$row['Field']] = new SAttribute($row['Field'], 
+                                                    $this->simplifiedType($row['Type']), 
+                                                    $row['Default']);
+        return $fields;
     }
     
     public function simplifiedType($sqlType)
@@ -98,17 +92,17 @@ class SMySqlDriver extends SAbstractDriver
         return mysql_affected_rows($this->conn);
     }
     
-    public static function rowCount($resource)
+    public function rowCount($resource)
     {
         return @mysql_num_rows($resource);
     }
     
-    public static function freeResult($resource)
+    public function freeResult($resource)
     {
         return @mysql_free_result($resource);
     }
     
-    public static function fetch($resource, $associative = true)
+    public function fetch($resource, $associative = true)
     {
         if ($associative) return @mysql_fetch_assoc($resource);
         else return @mysql_fetch_row($resource);
@@ -117,19 +111,15 @@ class SMySqlDriver extends SAbstractDriver
     public function getLastUpdate($table)
     {
         $rs = $this->execute("SHOW TABLE STATUS LIKE '".$table."'");
-        if (!$this->isError($rs))
-        {
-            $status = $rs->fetch();
-            return $status['Update_time'];
-        }
-        return false;
+        $status = $this->fetch($rs);
+        return $status['Update_time'];
     }
     
     public function limit($count, $offset=0)
     {
         if ($count > 0)
         {
-            $sql = " LIMIT $count";
+            $sql = "LIMIT $count";
             if ($offset > 0) $sql .= " OFFSET $offset";
         }
         return $sql;
@@ -153,7 +143,7 @@ class SMySqlDriver extends SAbstractDriver
     {
         $tables = array();
         $rs = $this->execute('SHOW TABLES');
-        while ($row = $rs->fetch(false)) $tables[] = $row[0];
+        while ($row = $this->fetch($rs, false)) $tables[] = $row[0];
         return $tables;
     }
     

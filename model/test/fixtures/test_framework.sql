@@ -1,5 +1,12 @@
 # Database : test_framework
 
+CREATE TABLE `bills` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `product` varchar(255) default NULL,
+  `price` float default NULL,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;
+
 CREATE TABLE `posts` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `title` varchar(255) default NULL,

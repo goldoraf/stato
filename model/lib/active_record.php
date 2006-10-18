@@ -2,52 +2,182 @@
 
 class SAssociationTypeMismatch extends SException { }
 
-class SActiveRecord extends SRecord
+class SActiveRecordMeta
 {
+    public $class            = null;
+    public $underscored      = null;
     public $tableName        = null;
     public $identityField    = 'id';
     public $inheritanceField = 'type';
-    public $recordTimestamps = False;
+    public $attributes       = array();
+    public $relationships    = array();
     
-    protected $metaAttributes = array('created_on', 'updated_on');
-    protected $assocMethods = array();
-    protected $newRecord = False;
+    private static $cache = array();
+    
+    public static function addManagerToClass($class)
+    {
+        $ref = new ReflectionClass($class);
+        if ($ref->hasProperty('objects')) $ref->setStaticPropertyValue('objects', new SManager($class));
+    }
+    
+    public static function retrieve($class)
+    {
+        if (!isset(self::$cache[$class]))
+        {
+            $metaClass = $class.'Meta';
+            self::$cache[$class] = new SActiveRecordMeta($class);
+        }
+        return self::$cache[$class];
+    }
+    
+    public static function resetMetaInformation($class)
+    {
+        unset(self::$cache[$class]);
+    }
+    
+    public function __construct($class)
+    {
+        $this->class = $class;
+        $this->underscored = SInflection::underscore($class);
+        $this->getMetaFromClass();
+        if ($this->tableName === null) $this->resetTableName();
+        $this->attributes = array_merge(
+            SActiveRecord::connection()->columns($this->tableName),
+            $this->instantiateAssociations()
+        );
+    }
+    
+    public function resetTableName()
+    {
+        if (($parent = $this->descendsFrom()) == 'SActiveRecord')
+            $this->tableName = SInflection::pluralize(SInflection::underscore($this->class));
+        else
+            $this->tableName = SInflection::pluralize(SInflection::underscore($parent));
+            
+        if (SActiveRecord::$tableNamePrefix !== null)
+            $this->tableName = SActiveRecord::$tableNamePrefix.'_'.$this->tableName;
+        if (SActiveRecord::$tableNameSuffix !== null)
+            $this->tableName.= '_'.SActiveRecord::$tableNameSuffix;
+    }
+    
+    public function descendsFrom()
+    {
+        $ref = new ReflectionClass($this->class);
+        return $ref->getParentClass()->getName();
+    }
+    
+    protected function instantiateAssociations()
+    {
+        $assocs = array();
+        foreach ($this->relationships as $name => $options) 
+            $assocs[$name] = new SAssociation(SAssociationMeta::getInstance($this, $name, $options));
+        return $assocs;
+    }
+    
+    protected function getMetaFromClass()
+    {
+        $ref = new ReflectionClass($this->class);
+        $props = array('tableName', 'identityField', 'inheritanceField', 'relationships');
+        foreach ($props as $p) 
+            if ($ref->hasProperty($p)) $this->$p = $ref->getStaticPropertyValue($p);
+    }
+}
+
+class SActiveRecord extends SObservable implements ArrayAccess
+{
+    public $errors        = array();
+    public $attrRequired  = array();
+    public $attrProtected = array();
+    public $attrUnique    = array();
+    public $validations   = array();
+    
+    public $recordTimestamps = False;
     
     public static $tableNamePrefix = null;
     public static $tableNameSuffix = null;
     
     protected static $conn = null;
+    protected $values      = array();
+    protected $meta        = null;
     
-    public function __construct($values = null, $dontInitAssocs=false, $newRecord = True)
+    public function __construct($values = null)
     {
-        if ($this->tableName == null) $this->resetTableName();
-        if (empty($this->attributes)) $this->attributes = SActiveStore::getAttributes($this->tableName);
-        else $this->initAttributes();
-        
-        $this->initValues();
+        $this->meta = SActiveRecordMeta::retrieve(get_class($this));
         $this->ensureProperType();
         if ($values != null && is_array($values)) $this->populate($values);
-        
-        $this->newRecord = $newRecord;
-        
-        if (!$dontInitAssocs) $this->initAssociations();
     }
     
-    public function __call($methodMissing, $args)
+    public function __get($name)
     {
-        if (isset($this->assocMethods[$methodMissing]))
+        $accMethod = 'read'.ucfirst($name);
+        if (method_exists($this, $accMethod)) return $this->$accMethod();
+        else return $this->readAttribute($name);
+    }
+    
+    public function __set($name, $value)
+    {
+        $accMethod = 'write'.ucfirst($name);
+        if (method_exists($this, $accMethod)) return $this->$accMethod($value);
+        else return $this->writeAttribute($name, $value);
+    }
+    
+    public function __toString()
+    {
+        $str = '';
+        foreach($this->values as $key => $value)
         {
-            $name   = $this->assocMethods[$methodMissing]['assoc'];
-            $method = $this->assocMethods[$methodMissing]['method'];
-            
-            return $this->assocs[$name]->$method($args[0]);
+            if ($value === True) $value = 'True';
+            if ($value === False) $value = 'False';
+            if ($value === Null) $value = 'Null';
+            $str.= "$key = $value\n";
         }
-        return;
+        return '['.get_class($this)."]\n".$str;
     }
     
     public function __repr()
     {
         return $this->id;
+    }
+    
+    public function offsetExists($offset)
+    {
+        return (isset($this->values[$offset]));
+    }
+    
+    public function offsetGet($offset)
+    {
+        return $this->values[$offset];
+    }
+    
+    public function offsetSet($offset, $value)
+    {
+        $this->values[$offset] = $value;
+    }
+    
+    public function offsetUnset($offset)
+    {
+        $this->values[$offset] = null;
+    }
+    
+    /**
+     * Sets all attributes at once by passing in an array with keys matching the
+     * attribute names.
+     */
+    public function populate($values=array())
+    {
+        $multiParamsAttributes = array();
+        
+        foreach($values as $key => $value)
+        {
+            if (is_array($value)) $multiParamsAttributes[$key] = $value;
+            elseif (!in_array($key, array_merge($this->attrProtected, array_keys($this->meta->relationships))))
+            {
+                if (!is_object($value) && $value !== null) $this->$key = stripslashes($value);
+                else $this->$key = $value;
+            }
+        }
+        
+        if (!empty($multiParamsAttributes)) $this->assignMultiparamsAttributes($multiParamsAttributes);
     }
     
     public function save()
@@ -64,8 +194,8 @@ class SActiveRecord extends SRecord
     {
         $this->setState('beforeDelete');
         if ($this->isNewRecord()) return false;
-        $sql = 'DELETE FROM '.$this->tableName.
-               ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
+        $sql = 'DELETE FROM '.$this->meta->tableName.
+               ' WHERE '.$this->meta->identityField.' = \''.$this->id.'\'';
         $this->conn()->update($sql);
         $this->setState('afterDelete');
     }
@@ -84,7 +214,11 @@ class SActiveRecord extends SRecord
     
     public function isNewRecord()
     {
-        return $this->newRecord;
+        $id = $this->readId();
+        if ($id !== null)
+            return !$this->conn()->selectOne("SELECT 1 FROM {$this->meta->tableName} 
+                                             WHERE {$this->meta->identityField}=$id LIMIT 1");
+        return true;
     }
     
     public function isValid()
@@ -108,6 +242,14 @@ class SActiveRecord extends SRecord
     }
     
     /**
+     * Overwrite this method for check validations on all saves
+     */
+    public function validate()
+    {
+    
+    }
+    
+    /**
      * Overwrite this method for check validations on creation
      */
     public function validateOnCreate()
@@ -123,62 +265,66 @@ class SActiveRecord extends SRecord
     
     }
     
-    public function contentAttributes()
+    protected function attrExists($name)
     {
-        $attributes = array();
-        foreach($this->attributes as $key => $attr)
-        {
-            if ($key != $this->identityField && !preg_match('/_id|_count/', $key)
-                && !in_array($key, $this->metaAttributes))
-            {
-                $attributes[$key] = $attr;
-            }
-        }
-        return $attributes;
+        return array_key_exists($name, $this->meta->attributes);
     }
     
-    public function registerAssociationMethod($virtualMethod, $assoc, $method)
+    protected function readAttribute($name)
     {
-        $this->assocMethods[$virtualMethod] = array('assoc' => $assoc, 'method' => $method);
+        if (!$this->attrExists($name)) return;
+        if (!isset($this->values[$name]))
+            $this->values[$name] = $this->meta->attributes[$name]->defaultValue($this);
+        
+        return $this->values[$name];
     }
     
-    public function setAssocAsLoaded($name)
+    protected function writeAttribute($name, $value)
     {
-        $this->assocs[$name]->setAsloaded();
+        if (!$this->attrExists($name)) return;
+        $this->values[$name] = $this->meta->attributes[$name]->typecast($this, $value);
     }
     
     protected function readId()
     {
-        return $this->readAttribute($this->identityField);
+        return $this->readAttribute($this->meta->identityField);
     }
     
     protected function writeId($value)
     {
-        $this->writeAttribute($this->identityField, $value);
+        $this->writeAttribute($this->meta->identityField, $value);
     }
     
-    protected function readAssociation($name)
+    /**
+     * Creates string values for all attributes that needs more than one single parameter
+     * (such as Dates).
+     */
+    protected function assignMultiparamsAttributes($params)
     {
-        $rel  = $this->relationships[$name];
-        $type = (is_array($rel)) ? $rel['assoc_type'] : $rel;
-        if ($type == 'belongs_to' || $type == 'has_one')
-            return $this->assocs[$name]->read();
-        else
-            return $this->assocs[$name];
-    }
-    
-    protected function writeAssociation($name, $value)
-    {
-        return $this->assocs[$name]->replace($value);
+        $errors = array();
+        foreach($params as $key => $value)
+        {
+            $type = $this->meta->attributes[$key]->type;
+            switch ($type)
+            {
+                case 'date':
+                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day'];
+                    break;
+                case 'datetime':
+                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
+                                  .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
+                    break;
+            }
+        }
     }
     
     protected function prepareSqlSet()
     {
         $set = array();
-        foreach($this->attributes as $column => $attr)
-        {
+        foreach($this->meta->attributes as $column => $attr)
+            if (!array_key_exists($column, $this->meta->relationships))
                 $set[] = "$column = ".$this->conn()->quote($this->$column, $attr->type);
-        }
+        
         return 'SET '.join(',', $set);
     }
     
@@ -186,10 +332,9 @@ class SActiveRecord extends SRecord
     {
         $t = SDateTime::today();
         if ($this->isNewRecord())
-        {
-            if ($this->attrExists('created_on')) $this->values['created_on'] = $t->__toString();
-        }
-        if ($this->attrExists('updated_on')) $this->values['updated_on'] = $t->__toString();
+            if ($this->attrExists('created_on')) $this->values['created_on'] = $t;
+        
+        if ($this->attrExists('updated_on')) $this->values['updated_on'] = $t;
     }
     
     protected function beforeCreate() {}
@@ -203,17 +348,20 @@ class SActiveRecord extends SRecord
     protected function beforeSave()
     {
         if ($this->recordTimestamps) $this->saveWithTimestamps();
-        foreach($this->assocs as $assoc) $assoc->beforeOwnerSave();
+        foreach($this->meta->relationships as $k => $v) 
+                $this->$k->beforeOwnerSave();
     }
     
     protected function afterSave()
     {
-        foreach($this->assocs as $assoc) $assoc->afterOwnerSave();
+        foreach($this->meta->relationships as $k => $v) 
+            $this->$k->afterOwnerSave();
     }
     
     protected function beforeDelete()
     {
-        foreach($this->assocs as $assoc) $assoc->beforeOwnerDelete();
+        foreach($this->meta->relationships as $k => $v) 
+            $this->$k->beforeOwnerDelete();
     }
     
     protected function afterDelete() {}
@@ -222,55 +370,35 @@ class SActiveRecord extends SRecord
     
     protected function afterValidate() {}
     
+    protected function runValidations($method)
+    {
+        foreach (array_keys($this->values) as $key)
+            SValidation::validateAttribute($this, $key, $method);
+    }
+    
     private function createRecord()
     {
         $this->setState('beforeCreate');
-        $sql = 'INSERT INTO '.$this->tableName.' '.
+        $sql = 'INSERT INTO '.$this->meta->tableName.' '.
                $this->prepareSqlSet();
         $this->id = $this->conn()->insert($sql);
-        $this->newRecord = False;
         $this->setState('afterCreate');
     }
     
     private function updateRecord()
     {
         $this->setState('beforeUpdate');
-        $sql = 'UPDATE '.$this->tableName.' '.
+        $sql = 'UPDATE '.$this->meta->tableName.' '.
                $this->prepareSqlSet().
-               ' WHERE '.$this->identityField.' = \''.$this->id.'\'';
+               ' WHERE '.$this->meta->identityField.' = \''.$this->id.'\'';
         $this->conn()->update($sql);
         $this->setState('afterUpdate');
     }
     
-    private function initAssociations()
-    {
-        foreach($this->relationships as $name => $options)
-            $this->assocs[$name] = SAssociationProxy::getInstance($this, $name, $options);
-    }
-    
     private function ensureProperType()
     {
-        if ($this->descendsFrom != 'SActiveRecord')
-            $this->writeAttribute($this->inheritanceField, SInflection::underscore(get_class($this)));
-    }
-    
-    private function resetTableName()
-    {
-        if (($class = $this->descendsFrom()) == 'SActiveRecord')
-            $this->tableName = SInflection::pluralize(SInflection::underscore(get_class($this)));
-        else
-            $this->tableName = SInflection::pluralize(SInflection::underscore($class));
-            
-        if (self::$tableNamePrefix !== null)
-            $this->tableName = self::$tableNamePrefix.'_'.$this->tableName;
-        if (self::$tableNameSuffix !== null)
-            $this->tableName.= '_'.self::$tableNameSuffix;
-    }
-    
-    private function descendsFrom()
-    {
-        $class = new ReflectionClass(get_class($this));
-        return $class->getParentClass()->getName();
+        if ($this->meta->descendsFrom() != 'SActiveRecord')
+            $this->writeAttribute($this->meta->inheritanceField, SInflection::underscore(get_class($this)));
     }
     
     /**

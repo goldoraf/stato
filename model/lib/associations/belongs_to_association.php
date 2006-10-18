@@ -1,26 +1,37 @@
 <?php
 
-class SBelongsToAssociation extends SAssociation
+class SBelongsToMeta extends SAssociationMeta
+{
+    public function __construct($ownerMeta, $assocName, $options)
+    {
+        parent::__construct($ownerMeta, $assocName, $options);
+        $this->assertValidOptions($options);
+        if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
+        else $this->foreignKey = SInflection::underscore($this->class).'_id';
+    }
+}
+
+class SBelongsToManager extends SAssociationManager
 {
     public function replace($record)
     {
-        if ($record === Null)
+        if ($record === null)
         {
-            $this->target = Null;
-            $this->owner[$this->foreignKey] = Null;
+            $this->target = null;
+            $this->owner[$this->meta->foreignKey] = null;
         }
         else
         {
             $this->checkRecordType($record);
             $this->target = $record;
-            if (!$record->isNewRecord()) $this->owner[$this->foreignKey] = $record->id;
+            if (!$record->isNewRecord()) $this->owner[$this->meta->foreignKey] = $record->id;
         }
         $this->loaded = true;
     }
     
     public function create($attributes=array())
     {
-        $class = $this->assocClass;
+        $class = $this->meta->class;
         $record = new $class($attributes);
         $record->save();
         $this->replace($record);
@@ -29,7 +40,7 @@ class SBelongsToAssociation extends SAssociation
     
     public function build($attributes=array())
     {
-        $class = $this->assocClass;
+        $class = $this->meta->class;
         $record = new $class($attributes);
         $this->replace($record);
         return $record;
@@ -40,36 +51,21 @@ class SBelongsToAssociation extends SAssociation
         if ($this->target !== null)
         {
             if ($this->target->isNewRecord()) $this->target->save();
-            $this->owner[$this->foreignKey] = $this->target->id;
+            $this->owner[$this->meta->foreignKey] = $this->target->id;
         }
-    }
-    
-    public function afterOwnerSave() {}
-    
-    public function beforeOwnerDelete() {}
-    
-    public function afterOwnerDelete() {}
-    
-    protected function reset()
-    {
-        $this->target = null;
-        $this->loaded = false;
     }
     
     protected function findTarget()
     {
-        return SActiveStore::findByPk($this->assocClass, $this->owner[$this->foreignKey]);
+        //if ($this->owner->isNewRecord() || $this->owner[$this->meta->foreignKey] === null) return null;
+        $qs = new SQuerySet($this->meta);
+        return $qs->get($this->owner[$this->meta->foreignKey]);
     }
     
     protected function isFkPresent()
     {
-        if ($this->owner[$this->foreignKey] === null) return false;
+        if ($this->owner[$this->meta->foreignKey] === null) return false;
         return true;
-    }
-    
-    private function constructSql()
-    {
-        return "{$this->assocTableName}.{$this->assocPrimaryKey} = '{$this->owner[$this->foreignKey]}'";
     }
 }
 

@@ -2,21 +2,9 @@
 
 class ActiveRecordTest extends ActiveTestCase
 {
-    public $fixtures = array('posts', 'products', 'contracts');
+    public $fixtures = array('posts', 'products', 'contracts', 'employes');
     
-    function testSetAttributes()
-    {
-        $post = SActiveStore::findByPk('Post', 1);
-        $post->title = 'Framework clone wars';
-        $post->text  = 'bli bli bli';
-        $post->save();
-        $this->assertEqual('Framework clone wars', $post->title);
-        $this->assertEqual('bli bli bli', $post->text);
-        $postBis = SActiveStore::findByPk('Post', 1);
-        $this->assertEqual($post->author, $postBis->author);
-    }
-    
-    function testAttributeAccess()
+    public function testAttributeAccess()
     {
         $post = new Post();
         $post->title = 'Test Driven Developement';
@@ -27,17 +15,17 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual($post['author'], $post->author);
     }
     
-    function testAttributeAccessOverloading()
+    public function testAttributeAccessOverloading()
     {
         $bill = new Bill();
         $bill->product = 'mouse';
         $bill->price = 100;
         $this->assertEqual(120, $bill->total);
-        $bill->total = 200;
-        $this->assertEqual(120, $bill->total);
+        $bill->total = 210;
+        $this->assertEqual(175, $bill->price);
     }
     
-    function testMultiParamsAssignment()
+    public function testMultiParamsAssignment()
     {
         $emp = new Employe(array('firstname'=>'Steve', 'lastname'=>'Warson', 
                                  'date_of_birth'=>array('year'=>'1962', 'month'=>'09', 'day'=>'12')));
@@ -45,18 +33,40 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual('1962-09-12', $emp->date_of_birth->__toString());
     }
     
-    function testNullValues()
+    public function testIsNewRecord()
+    {
+        $post = new Post();
+        $this->assertTrue($post->isNewRecord());
+        $post = new Post(array('id' => 200, 'title' => 'test'));
+        $this->assertTrue($post->isNewRecord());
+        $post = new Post(array('id' => 1, 'title' => 'test'));
+        $this->assertFalse($post->isNewRecord());
+    }
+    
+    public function testSetAttributes()
+    {
+        $post = Post::$objects->get(1);
+        $post->title = 'Framework clone wars';
+        $post->text  = 'bli bli bli';
+        $post->save();
+        $this->assertEqual('Framework clone wars', $post->title);
+        $this->assertEqual('bli bli bli', $post->text);
+        $postBis = Post::$objects->get(1);
+        $this->assertEqual($post->author, $postBis->author);
+    }
+    
+    public function testNullValues()
     {
         $emp = new Employe(array('firstname'=>'Steve'));
         $emp->save();
-        $emp = SActiveStore::findFirst('Employe');
+        $emp = Employe::$objects->get(3);
         $this->assertNull($emp->date_of_birth);
         $this->assertNull($emp->lastname);
     }
     
-    function testReadWriteBooleanAttribute()
+    public function testReadWriteBooleanAttribute()
     {
-        $post = SActiveStore::findByPk('Post', 1);
+        $post = Post::$objects->get(1);
         $this->assertTrue($post->published);
         $post->published = False;
         $this->assertFalse($post->published);
@@ -64,51 +74,53 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertTrue($post->published);
         $post->published = False;
         $post->save();
-        $postBis = SActiveStore::findByPk('Post', 1);
+        $postBis = Post::$objects->get(1);
         $this->assertFalse($postBis->published);
     }
     
-    function testPreservingDateObjects()
+    public function testPreservingDateObjects()
     {
-        $contract = SActiveStore::findByPk('Contract', 1);
+        $contract = Contract::$objects->get(1);
         $this->assertIsA($contract->date, 'SDate');
     }
     
-    function testCreate()
+    public function testCreate()
     {
         $product = new Product();
         $product->name = 'DVD';
         $product->save();
         $this->assertEqual(2, $product->id);
-        $productReloaded = SActiveStore::findByPk('Product', $product->id);
+        $productReloaded = Product::$objects->get($product->id);
         $this->assertEqual('DVD', $productReloaded->name);
     }
     
-    function testUpdate()
+    public function testUpdate()
     {
         $product = new Product();
         $product->name = 'CD';
         $product->save();
-        $productReloaded = SActiveStore::findByPk('Product', $product->id);
+        $productReloaded = Product::$objects->get($product->id);
         $productReloaded->name = 'CD-R';
         $productReloaded->save();
-        $productReloadedAgain = SActiveStore::findByPk('Product', $product->id);
+        $productReloadedAgain = Product::$objects->get($product->id);
         $this->assertEqual('CD-R', $productReloadedAgain->name);
     }
     
-    function testDelete()
+    public function testDelete()
     {
         $product = new Product();
         $product->name = 'CD';
         $product->save();
         $product->delete();
-        $this->assertFalse(SActiveStore::findByPk('Product', $product->id));
+        try { $p = Product::$objects->get($product->id); }
+        catch (Exception $e) { }
+        $this->assertEqual('SActiveRecordDoesNotExist', get_class($e));
     }
     
-    function testSaveWithTimestamps()
+    public function testSaveWithTimestamps()
     {
         $created_date = new SDateTime(2005,12,01,20,30,00);
-        $post = SActiveStore::findByPk('Post', 2);
+        $post = Post::$objects->get(2);
         $this->assertIsA($post->created_on, 'SDateTime');
         $this->assertEqual($created_date, $post->created_on);
         $this->assertEqual($post->created_on, $post->updated_on);

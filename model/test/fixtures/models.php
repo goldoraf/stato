@@ -1,134 +1,120 @@
 <?php
 
 // For attribute access overloading test
-class Bill extends SRecord
+class Bill extends SActiveRecord
 {
-    public $attributes = array
-    (
-        'product'     => 'string',
-        'price'       => 'float',
-        'total'       => 'float'
-    );
     public static $tax = '0.2';
+    
+    public static function objects()
+    {
+        return new SManager('Bill');
+    }
     
     public function readTotal()
     {
         return $this->values['price'] + $this->values['price'] * self::$tax;
     }
-}
-
-// For class generation tests
-class GeneratedCompany extends SActiveRecord
-{
-    public $tableName = 'companies';
     
-    public static function findAll($conditions=null, $options=array()) {
-        return SActiveStore::findAll('GeneratedCompany', $conditions, $options);
+    public function writeTotal($value)
+    {
+        $this->values['price'] = $value / (1 + self::$tax); 
     }
 }
 
 // For boolean et timestamps attributes tests
 class Post extends SActiveRecord
 {
-    public $tableName = 'posts';
+    public static $objects;
     public $recordTimestamps = True;
+}
+
+class Employe extends SActiveRecord
+{
+    public static $objects;
+    public static $relationships = array('profiles' => 'has_many');
+}
+
+class Contract extends SActiveRecord
+{
+    public static $objects;
+    public $attrRequired = array('code');
+}
+
+class Product extends SActiveRecord
+{
+    public static $objects;
+    public $attrRequired = array('name');
 }
 
 // For belongsTo tests
 class Profile extends SActiveRecord
 {
-    public $tableName = 'profiles';
-    public $relationships = array
-    (
-        'employe' => 'belongs_to'
-    );
+    public static $objects;
+    public static $relationships = array('employe' => 'belongs_to');
 }
 
-class Employe extends SActiveRecord
-{
-    public $tableName = 'employes';
-}
-
-// For hasMany (and SActiveStore) tests
+// For hasMany (and SManager) tests
 class Company extends SActiveRecord
 {
-    public $tableName = 'companies';
-    public $relationships = array
-    (
-        'products' => 'has_many'
-    );
+    public static $objects;
+    public static $relationships = array('products' => 'has_many', 'employes' => 'has_many');
 }
 class DependentCompany1 extends SActiveRecord
 {
-    public $tableName = 'companies';
-    public $relationships = array
+    public static $objects;
+    public static $tableName = 'companies';
+    public static $relationships = array
     (
         'products' => array('assoc_type' => 'has_many', 'dependent' => 'delete', 'foreign_key' => 'company_id')
     );
 }
 class DependentCompany2 extends SActiveRecord
 {
-    public $tableName = 'companies';
-    public $relationships = array
+    public static $objects;
+    public static $tableName = 'companies';
+    public static $relationships = array
     (
         'products' => array('assoc_type' => 'has_many', 'dependent' => 'delete_all', 'foreign_key' => 'company_id')
     );
 }
 class DependentCompany3 extends SActiveRecord
 {
-    public $tableName = 'companies';
-    public $relationships = array
+    public static $objects;
+    public static $tableName = 'companies';
+    public static $relationships = array
     (
         'products' => array('assoc_type' => 'has_many', 'dependent' => 'nullify', 'foreign_key' => 'company_id')
     );
 }
 
-class Product extends SActiveRecord
-{
-    public $tableName = 'products';
-    public $attrRequired = array('name');
-}
-
 // For manyToMany tests
 class Developer extends SActiveRecord
 {
-    public $tableName = 'developers';
-    public $relationships = array
-    (
-        'projects' => 'many_to_many'
-    );
+    public static $objects;
+    public static $relationships = array('projects' => 'many_to_many');
 }
 
 class Project extends SActiveRecord
 {
-    public $tableName = 'projects';
-    public $relationships = array
-    (
-        'developers' => 'many_to_many'
-    );
+    public static $objects;
+    public static $relationships = array('developers' => 'many_to_many');
 }
 
 // For hasOne tests
-class Client extends SActiveRecord
+/*class Client extends SActiveRecord
 {
     public $tableName = 'clients';
     public $relationships = array
     (
         'contract' => 'has_one'
     );
-}
-
-class Contract extends SActiveRecord
-{
-    public $tableName = 'contracts';
-    public $attrRequired = array('code');
-}
+}*/
 
 // For eager loading tests
 class Article extends SActiveRecord
 {
-    public $tableName = 'articles';
-    public $relationships = array
+    public static $objects;
+    public static $relationships = array
     (
         'comments' => 'has_many',
         'categories' => 'many_to_many'
@@ -137,8 +123,8 @@ class Article extends SActiveRecord
 
 class Comment extends SActiveRecord
 {
-    public $tableName = 'comments';
-    public $relationships = array
+    public static $objects;
+    public static $relationships = array
     (
         'article' => 'belongs_to'
     );
@@ -146,15 +132,15 @@ class Comment extends SActiveRecord
 
 class Category extends SActiveRecord
 {
-    public $tableName = 'categories';
-    public $relationships = array
+    public static $objects;
+    public static $relationships = array
     (
         'articles' => 'many_to_many'
     );
 }
 
 // For ListDecorator tests
-class Forum extends SActiveRecord
+/*class Forum extends SActiveRecord
 {
     public $tableName = 'forums';
     public $relationships = array
@@ -166,7 +152,7 @@ class Forum extends SActiveRecord
 class Topic extends SActiveRecord
 {
     public $tableName = 'topics';
-}
+}*/
 
 // For validation tests
 /*class User extends SActiveRecord

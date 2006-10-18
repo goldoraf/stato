@@ -13,18 +13,19 @@ class SAttribute
         'validations' => array()
     );
     
-    public function __construct($name, $type, $default = null, $options = array(), $dontTypecastDefault = False)
+    public function __construct($name, $type, $default = null, $options = array()/*, $dontTypecastDefault = False*/)
     {
         $this->name    = $name;
         $this->type    = $type;
-        if ($dontTypecastDefault) $this->default = $default;
-        else $this->default = $this->typecast($default);
+        /*if ($dontTypecastDefault) */$this->default = $default;
+        //else $this->default = $this->typecast($default);
         $this->options = array_merge($this->options, $options);
     }
     
-    public function typecast($data)
+    public function typecast($owner, $data)
     {
         if ($data === null) return null;
+        if (in_array($this->type, array('boolean', 'integer', 'float')) && $data === '') return null;
         
         switch($this->type)
         {
@@ -49,10 +50,13 @@ class SAttribute
             case 'boolean':
                 return $data === true or strtolower($data) == 'true' or $data == 1;
                 break;
-            case 'list':
-                return explode('|', $data);
-                break;
         }
+    }
+    
+    public function defaultValue($owner)
+    {
+        //return $this->default;
+        return $this->typecast($owner, $this->default);
     }
     
     public function stringToDate($data)
