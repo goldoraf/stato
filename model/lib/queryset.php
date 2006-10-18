@@ -207,7 +207,7 @@ class SQuerySet implements Iterator, Countable
             if (empty($this->includes)) $fields = '*';
             else $fields = implode(', ', $this->columnAliases());
         }
-        $select = ($this->distinct) ? 'SELECT' : 'SELECT DISTINCT';
+        $select = ($this->distinct) ? 'SELECT DISTINCT' : 'SELECT';
         return implode(' ', array($select, $fields, "FROM {$this->meta->tableName}", $this->sqlClause()));
     }
     
