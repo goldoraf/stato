@@ -12,6 +12,7 @@ class SQuerySet implements Iterator, Countable
     public $joins    = array();
     public $offset   = null;
     public $limit    = null;
+    public $distinct = false;
     
     protected $resource = null;
     protected $count    = 0;
@@ -159,6 +160,13 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
+    public function distinct()
+    {
+        $clone = $this->selfClone();
+        $clone->distinct = true;
+        return $clone;
+    }
+    
     public function includes()
     {
         $args = func_get_args();
@@ -199,7 +207,8 @@ class SQuerySet implements Iterator, Countable
             if (empty($this->includes)) $fields = '*';
             else $fields = implode(', ', $this->columnAliases());
         }
-        return implode(' ', array("SELECT $fields", "FROM {$this->meta->tableName}", $this->sqlClause()));
+        $select = ($this->distinct) ? 'SELECT' : 'SELECT DISTINCT';
+        return implode(' ', array($select, $fields, "FROM {$this->meta->tableName}", $this->sqlClause()));
     }
     
     protected function fetch()
@@ -468,6 +477,7 @@ class SQuerySet implements Iterator, Countable
         $clone->joins    = $this->joins;
         $clone->offset   = $this->offset;
         $clone->limit    = $this->limit;
+        $clone->distinct = $this->distinct;
         return $clone;
     }
 }
@@ -480,9 +490,7 @@ class SValuesQuerySet extends SQuerySet
     {
         if (empty($this->fields)) $fields = '*';
         else $fields = implode(', ', $this->fields);
-        $select = 'SELECT';
-        $table  = 'FROM '.$this->meta->tableName;
-        return implode(' ', array($select, $fields, $table, $this->sqlClause()));
+        return parent::prepareSelect($fields);
     }
     
     protected function fetchRow($row)
