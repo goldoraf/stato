@@ -3,8 +3,10 @@
 class SHasManyMeta extends SAssociationMeta
 {
     public $dependent = null;
-    public $throughTableName = null;
+    
+    public $throughTableName  = null;
     public $throughForeignKey = null;
+    public $sourceAssocType   = null;
     
     public function __construct($ownerMeta, $assocName, $options)
     {
@@ -15,18 +17,21 @@ class SHasManyMeta extends SAssociationMeta
         {
             $this->type = 'SHasManyThrough';
             $throughClass = SInflection::camelize(SInflection::singularize($options['through']));
-            $throughMeta = SMetaManager::retrieve($throughClass);;
+            $throughMeta = SActiveRecordMeta::retrieve($throughClass);;
             $this->throughTableName = $throughMeta->tableName;
             $this->throughForeignKey = $ownerMeta->underscored.'_id';
             
-            if (isset($throughMeta->relationships[SInflection::underscore($this->class)]))
-                $r = $throughMeta->relationships[SInflection::underscore($this->class)];
+            if (isset($throughMeta->relationships[$this->underscored]))
+                $r = $throughMeta->relationships[$this->underscored];
             elseif (isset($throughMeta->relationships[SInflection::underscore(SInflection::pluralize($this->class))]))
                 $r = $throughMeta->relationships[SInflection::underscore(SInflection::pluralize($this->class))];
             
-            if ($r == 'belongs_to' || $r['assoc_type'] == 'belongs_to')
-                $this->foreignKey = SInflection::underscore($dest).'_id';
-            elseif ($r == 'has_many' || $r['assoc_type'] == 'has_many')
+            if (is_array($r)) $this->sourceAssocType = $r['assoc_type'];
+            else $this->sourceAssocType = $r;
+            
+            if ($this->sourceAssocType == 'belongs_to')
+                $this->foreignKey = $ownerMeta->underscored.'_id';
+            elseif ($this->sourceAssocType == 'has_many')
                 $this->foreignKey = $throughMeta->underscored.'_id';
         }
         else

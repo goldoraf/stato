@@ -53,7 +53,7 @@ class Profile extends SActiveRecord
     public static $relationships = array('employe' => 'belongs_to');
 }
 
-// For hasMany (and SManager) tests
+// For SManager, hasMany and hasManyThrough tests
 class Company extends SActiveRecord
 {
     public static $objects;

@@ -141,6 +141,25 @@ class SHasManyTest extends ActiveTestCase
     }
 }
 
+class SHasManyThroughTest extends ActiveTestCase
+{
+    public $fixtures = array('companies', 'employes', 'profiles');
+    
+    public function testHasManyJoinModel()
+    {
+        $comp = Company::$objects->get(1);
+        $profiles = $comp->profiles->all()->dump();
+        $this->assertEqual(2, count($profiles));
+        $this->assertEqual('blablabla', $profiles[0]->cv);
+        $this->assertEqual('xxx', $profiles[1]->cv);
+    }
+    
+    public function testBelongsToJoinModel()
+    {
+    
+    }
+}
+
 class SManyToManyTest extends ActiveTestCase
 {
     public $fixtures = array('developers', 'projects', 'developers_projects');

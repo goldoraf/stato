@@ -1,37 +1,59 @@
 <?php
 
-class SHasManyThroughAssociation extends SHasManyAssociation
+class SHasManyThroughException extends SException
 {
-    protected function findTarget()
+    public function __construct()
     {
-        return SActiveStore::findBySql($this->assocClass, 
-            implode(' ', array($this->constructSelect(), $this->constructFrom(), 
-                               $this->constructJoins(), $this->constructConditions())));
+        parent::__construct('HasManyThrough associations only enables data retrieval. 
+            You can\'t add or delete records.');
+    }
+}
+
+class SHasManyThroughManager extends SHasManyManager
+{
+    protected function getQuerySet()
+    {
+        if ($this->sourceAssocType == 'belongs_to')
+        {
+            $assocPk = $this->meta->identityField;
+            $sourcePk = $this->meta->foreignKey;
+        }
+        else
+        {
+            $sourcePk = $this->meta->identityField;
+            $assocPk = $this->meta->foreignKey;
+        }
+        
+        $qs = new SQuerySet($this->meta);
+        return $qs->join("LEFT OUTER JOIN {$this->meta->throughTableName} 
+                          ON {$this->meta->tableName}.{$assocPk} 
+                          = {$this->meta->throughTableName}.{$sourcePk}")
+                  ->filter($this->getSqlFilter());
     }
     
-    protected function constructSelect()
+    protected function getSqlFilter()
     {
-        return 'SELECT '.$this->assocTableName.'.*';
+        return "{$this->meta->throughTableName}.{$this->meta->throughForeignKey} = '{$this->owner->id}'";
     }
     
-    protected function constructFrom()
+    public function add($records)
     {
-        return 'FROM '.$this->assocTableName;
+        throw new SHasManyThroughException();
     }
     
-    protected function constructJoins()
+    public function delete($records)
     {
-        return 'INNER JOIN '.$this->options['through_table_name']
-        ." ON {$this->assocTableName}.{$this->assocPrimaryKey}"
-        .' = '.$this->options['through_table_name'].".{$this->foreignKey}";
+        throw new SHasManyThroughException();
     }
     
-    protected function constructConditions($condition = Null)
+    public function clear()
     {
-        $sql = 'WHERE '.$this->options['through_table_name'].'.'.$this->options['through_foreign_key']." = '{$this->owner->id}'";
-        if ($condition != Null) $sql.= " AND $condition";
-        return $sql;
+        throw new SHasManyThroughException();
     }
+    
+    protected function insertRecord($record) {}
+    
+    protected function deleteRecord($record) {}
 }
 
 ?>
