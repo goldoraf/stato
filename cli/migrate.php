@@ -3,6 +3,7 @@
 define('ROOT_DIR', str_replace('\\', '/', realpath(dirname(__FILE__).'/../..')));
 
 define('CORE_DIR', ROOT_DIR.'/core');
+define('APP_DIR', ROOT_DIR.'/app');
 require_once(CORE_DIR.'/common/common.php');
 require_once(CORE_DIR.'/cli/cli.php');
 require_once(CORE_DIR.'/model/model.php');
