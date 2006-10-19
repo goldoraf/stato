@@ -9,12 +9,17 @@ class SDependencies
     
     public static function requireDependency($layer, $dependency, $relativeTo = null)
     {
-        list($subdir, $class) = self::dependencySubDir($dependency, $relativeTo);
-        $path = APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
+        $path = self::dependencyFilePath($layer, $dependency, $relativeTo);
         if (!file_exists($path))
             throw new SException("Missing ".SInflection::singularize($layer)." $dependency");
         require_once($path);
         if ($layer == 'models') SActiveRecordMeta::addManagerToClass(SInflection::camelize($class));
+    }
+    
+    public static function dependencyFilePath($layer, $dependency, $relativeTo = null)
+    {
+        list($subdir, $class) = self::dependencySubDir($dependency, $relativeTo);
+        return APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
     }
     
     public static function subDirectory($relativeTo)

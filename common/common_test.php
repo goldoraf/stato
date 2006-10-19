@@ -4,7 +4,8 @@ return array
 (
     'inflection',
     'encryption',
-    'date'
+    'date',
+    'dependencies'
 );
 
 ?>
