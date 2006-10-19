@@ -110,27 +110,27 @@ abstract class SAbstractDriver
             ." (".sprintf("%.5f", $time).")\n    $sql");
     }
     
-    abstract protected function connect();
+    abstract public function connect();
     
-    abstract protected function disconnect();
+    abstract public function disconnect();
     
-    abstract protected function getError();
+    abstract public function getError();
     
-    abstract protected function execute($sql);
+    abstract public function execute($sql);
     
-    abstract protected function limit($count, $offset=0);
+    abstract public function limit($count, $offset=0);
     
-    abstract protected function columns($table);
+    abstract public function columns($table);
     
-    abstract protected function lastInsertId();
+    abstract public function lastInsertId();
     
-    abstract protected function affectedRows();
+    abstract public function affectedRows();
     
-    abstract protected function rowCount($resource);
+    abstract public function rowCount($resource);
     
-    abstract protected function fetch($resource, $associative = true);
+    abstract public function fetch($resource, $associative = true);
     
-    abstract protected function escapeStr($str);
+    abstract public function escapeStr($str);
 }
 
 ?>
