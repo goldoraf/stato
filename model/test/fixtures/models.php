@@ -57,7 +57,12 @@ class Profile extends SActiveRecord
 class Company extends SActiveRecord
 {
     public static $objects;
-    public static $relationships = array('products' => 'has_many', 'employes' => 'has_many');
+    public static $relationships = array
+    (
+        'products' => 'has_many',
+        'employes' => 'has_many',
+        'profiles' => array('assoc_type' => 'has_many', 'through' => 'employes')
+    );
 }
 class DependentCompany1 extends SActiveRecord
 {
@@ -101,14 +106,11 @@ class Project extends SActiveRecord
 }
 
 // For hasOne tests
-/*class Client extends SActiveRecord
+class Client extends SActiveRecord
 {
-    public $tableName = 'clients';
-    public $relationships = array
-    (
-        'contract' => 'has_one'
-    );
-}*/
+    public static $objects;
+    public static $relationships = array('contract' => 'has_one');
+}
 
 // For eager loading tests
 class Article extends SActiveRecord
