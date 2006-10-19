@@ -2,15 +2,15 @@
 
 return array
 (
-    //'active_record',
-    //'queryset',
-    //'eager_loading',
+    'active_record',
+    'queryset',
+    'eager_loading',
     'associations',
-    //'callbacks',
+    'callbacks',
     //'decorators',
     //'list_decorator',
-    //'migration',
-    //'csv'
+    'migration',
+    'csv'
 );
 
 ?>

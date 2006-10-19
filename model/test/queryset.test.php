@@ -137,6 +137,14 @@ class QuerySetTest extends ActiveTestCase
         $c2 = Company::$objects->get($c->id);
         $this->assertEqual('Stato Inc.', $c2->name);
     }
+    
+    public function testDelete()
+    {
+        Employe::$objects->all()->delete();
+        $this->assertEqual(0, Employe::$objects->all()->count());
+        Company::$objects->filter("name = 'Groupe W'")->delete();
+        $this->assertEqual(1, Company::$objects->all()->count());
+    }
 }
 
 ?>

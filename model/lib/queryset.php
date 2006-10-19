@@ -127,6 +127,16 @@ class SQuerySet implements Iterator, Countable
         }
     }
     
+    public function delete()
+    {
+        $clone = $this->selfClone();
+        $clone->includes = array();
+        $clone->joins    = array();
+        $clone->orderBy   = array();
+        $this->conn->execute("DELETE FROM {$this->meta->tableName} ".$clone->sqlClause());
+        return;
+    }
+    
     public function filter()
     {
         return $this->filterOrExclude(func_get_args());
