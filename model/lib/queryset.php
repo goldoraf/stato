@@ -195,6 +195,7 @@ class SQuerySet implements Iterator, Countable
         $v->orderBy  = $this->orderBy;
         $v->limit    = $this->limit;
         $v->offset   = $this->offset;
+        $v->distinct = $this->distinct;
         if (!empty($args)) $v->fields = $args;
         return $v;
     }
