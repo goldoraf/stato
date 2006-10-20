@@ -50,8 +50,15 @@ class SHasOneManager extends SAssociationManager
     
     protected function findTarget()
     {
-        $qs = new SQuerySet($this->meta);
-        return $qs->get("{$this->meta->foreignKey} = '{$this->owner->id}'");
+        try
+        {
+            $qs = new SQuerySet($this->meta);
+            return $qs->get("{$this->meta->foreignKey} = '{$this->owner->id}'");
+        }
+        catch (SActiveRecordDoesNotExist $e)
+        {
+            return null;
+        }
     }
 }
 
