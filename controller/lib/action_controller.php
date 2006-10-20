@@ -427,6 +427,8 @@ class SActionController
         $this->session = new SSession();
         $this->flash   = new SFlash($this->session);
         
+        $this->logProcessing();
+        
         if (!empty($this->cachedActions))
             $this->aroundFilters[] = new SActionCacheFilter($this->cachedActions);
         
@@ -444,8 +446,8 @@ class SActionController
         
         if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
             $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
-            
-        $this->logProcessing();
+        
+        SActiveRecord::connection()->writeLog();
         $this->logBenchmarking();
     }
     

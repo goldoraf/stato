@@ -5,6 +5,7 @@ class SInvalidStatementException extends Exception {}
 abstract class SAbstractDriver
 {
     private $conn = null;
+    private $log  = array();
     
     protected $nativeDbTypes   = array();
     protected $simplifiedTypes = array();
@@ -99,6 +100,12 @@ abstract class SAbstractDriver
         return $array;
     }
     
+    public function writeLog()
+    {
+        $logger = SLogger::getInstance();
+        foreach ($this->log as $log) $logger->debug($log);
+    }
+    
     protected function quoteString($value)
     {
         return "'".$this->escapeStr($value)."'";
@@ -106,8 +113,8 @@ abstract class SAbstractDriver
     
     protected function log($sql, $time, $name = null)
     {
-        SLogger::getInstance()->debug((($name === null) ? 'SQL' : $name)
-            ." (".sprintf("%.5f", $time).")\n    $sql");
+        $this->log[] = (($name === null) ? 'SQL' : $name)
+                       ." (".sprintf("%.5f", $time).")\n    $sql";
     }
     
     abstract public function connect();
