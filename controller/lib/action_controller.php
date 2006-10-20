@@ -252,6 +252,7 @@ class SActionController
     protected function addVariablesToAssigns()
     {
         $this->assigns['params'] = $this->params;
+        $this->assigns['request'] = $this->request;
         if (isset($this->flash) && isset($this->session))
         {
             if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
