@@ -10,12 +10,12 @@ class Bill extends SActiveRecord
         return new SManager('Bill');
     }
     
-    public function readTotal()
+    public function read_total()
     {
         return $this->values['price'] + $this->values['price'] * self::$tax;
     }
     
-    public function writeTotal($value)
+    public function write_total($value)
     {
         $this->values['price'] = $value / (1 + self::$tax); 
     }

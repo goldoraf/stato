@@ -109,14 +109,14 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     public function __get($name)
     {
-        $accMethod = 'read'.ucfirst($name);
+        $accMethod = 'read_'.$name;
         if (method_exists($this, $accMethod)) return $this->$accMethod();
         else return $this->readAttribute($name);
     }
     
     public function __set($name, $value)
     {
-        $accMethod = 'write'.ucfirst($name);
+        $accMethod = 'write_'.$name;
         if (method_exists($this, $accMethod)) return $this->$accMethod($value);
         else return $this->writeAttribute($name, $value);
     }
