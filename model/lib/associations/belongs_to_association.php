@@ -40,7 +40,7 @@ class SBelongsToManager extends SAssociationManager
     
     protected function findTarget()
     {
-        //if ($this->owner->isNewRecord() || $this->owner[$this->meta->foreignKey] === null) return null;
+        if (/*$this->owner->isNewRecord() || */$this->owner[$this->meta->foreignKey] === null) return null;
         $qs = new SQuerySet($this->meta);
         return $qs->get($this->owner[$this->meta->foreignKey]);
     }

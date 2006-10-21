@@ -156,6 +156,11 @@ abstract class SAssociationManager
         return $this->loaded;
     }
     
+    public function isNull()
+    {
+        return $this->target() === null;
+    }
+    
     // only belongsTo overwrites it
     protected function isFkPresent() 
     {

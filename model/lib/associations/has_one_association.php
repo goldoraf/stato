@@ -17,7 +17,7 @@ class SHasOneManager extends SAssociationManager
     
     public function replace($record)
     {
-        if ($this->target !== null)
+        if ($this->target() !== null)
         {
             $this->target[$this->meta->foreignKey] = null;
             $this->target->save(); // ou remplacer l'ensemble par $this->target->delete() ???

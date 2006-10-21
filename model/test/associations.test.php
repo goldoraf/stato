@@ -16,9 +16,22 @@ class SBelongsToTest extends ActiveTestCase
     {
         $profile = new Profile(array('cv'=>'GNU expert'));
         $employe = new Employe(array('lastname'=>'Richard', 'firstname'=>'Stallman'));
+        $this->assertTrue($profile->employe->isNull());
         $profile->employe = $employe;
+        $this->assertFalse($profile->employe->isNull());
         $profile->save();
         $this->assertEqual($employe->id, $profile->employe_id);
+    }
+    
+    public function testNullAssignment()
+    {
+        $profile = Profile::$objects->get(1);
+        $this->assertFalse($profile->employe->isNull());
+        $profile->employe = null;
+        $this->assertTrue($profile->employe->isNull());
+        $profile->save();
+        $profile2 = Profile::$objects->get(1);
+        $this->assertTrue($profile2->employe->isNull());
     }
     
     public function testAssignmentBeforeParentSaved()
@@ -284,10 +297,12 @@ class SHasOneTest extends ActiveTestCase
     public function testAssignmentToNull()
     {
         $client = Client::$objects->get(1);
-        $old_contract_id = $client->contract->id;
+        $this->assertFalse($client->contract->isNull());
         $client->contract = null;
         $client->save();
-        $this->assertNull($client->contract->target());
+        $this->assertTrue($client->contract->isNull());
+        $client2 = Client::$objects->get(1);
+        $this->assertTrue($client2->contract->isNull());
         // il faudrait rendre la classe Contract 'dependent' de la classe Client (cf Rails)
         // ainsi on checkerait ici qu'il n'y pas plus de contract dans la table ayant pour id $old_contract_id.
         // Cela peut-il être couvert par l'option 'on_delete' ?
