@@ -39,7 +39,13 @@ class SHasManyMeta extends SAssociationMeta
             if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
             else $this->foreignKey = $ownerMeta->underscored.'_id';
             
-            if (isset($options['dependent'])) $this->dependent = $options['dependent'];
+            if (isset($options['dependent']))
+            {
+                if (!in_array($options['dependent'], array('delete', 'delete_all', 'nullify')))
+                    throw new SException("The 'dependent' option expects either 'delete', 'delete_all', or 'nullify'");
+                
+                $this->dependent = $options['dependent'];
+            }
         }
     }
 }
@@ -61,8 +67,6 @@ class SHasManyManager extends SManyAssociationManager
             case 'nullify':
                 $this->clear();
                 break;
-            default:
-                throw new SException("The 'dependent' option expects either 'delete', 'delete_all', or 'nullify'");
         }
     }
     

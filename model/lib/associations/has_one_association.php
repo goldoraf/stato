@@ -2,12 +2,22 @@
 
 class SHasOneMeta extends SAssociationMeta
 {
+    public $dependent = null;
+    
     public function __construct($ownerMeta, $assocName, $options)
     {
         parent::__construct($ownerMeta, $assocName, $options);
         $this->assertValidOptions($options);
         if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
         else $this->foreignKey = $ownerMeta->underscored.'_id';
+        
+        if (isset($options['dependent']))
+        {
+            if (!in_array($options['dependent'], array('delete', 'nullify')))
+                throw new SException("The 'dependent' option expects either 'delete' or 'nullify'");
+            
+            $this->dependent = $options['dependent'];
+        }
     }
 }
 
@@ -19,8 +29,12 @@ class SHasOneManager extends SAssociationManager
     {
         if ($this->target() !== null)
         {
-            $this->target[$this->meta->foreignKey] = null;
-            $this->target->save(); // ou remplacer l'ensemble par $this->target->delete() ???
+            if ($this->meta->dependent == 'delete') $this->target->delete();
+            else
+            {
+                $this->target[$this->meta->foreignKey] = null;
+                $this->target->save();
+            }
         }
         
         if ($record === null) $this->target = null;
@@ -45,6 +59,22 @@ class SHasOneManager extends SAssociationManager
         {
             if ($this->ownerNewBeforeSave) $this->target[$this->meta->foreignKey] = $this->owner->id;
             $this->target->save();
+        }
+    }
+    
+    public function beforeOwnerDelete()
+    {
+        if ($this->meta->dependent === null || $this->target() === null) return;
+        
+        switch ($this->meta->dependent)
+        {
+            case 'delete':
+                $this->target->delete();
+                break;
+            case 'nullify':
+                $this->target[$this->meta->foreignKey] = null;
+                $this->target->save();
+                break;
         }
     }
     
