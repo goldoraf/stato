@@ -331,13 +331,21 @@ class SQuerySet implements Iterator, Countable
         $records = array();
         $recordsInOrder = array();
         $recordsManyAssocs = array();
+        $manyAssocs = array();
+        
+        foreach ($this->includes as $k)
+        {
+            $assocMeta = $this->meta->attributes[$k]->meta;
+            if ($assocMeta->type == 'SHasMany' || $assocMeta->type == 'SManyToMany') $manyAssocs[] = $k;
+        }
+        
         while($row = $this->conn->fetch($this->resource))
         {
             $id = $row[$pk];
             if (!isset($records[$id]))
                 $recordsInOrder[] = $records[$id] = new $class($this->extractRecord($this->meta->tableName, $row));
             
-            foreach($this->includes as $k)
+            foreach ($this->includes as $k)
             {
                 $assocMeta = $this->meta->attributes[$k]->meta;
                 
@@ -348,7 +356,7 @@ class SQuerySet implements Iterator, Countable
                     {
                         $assocClass = $assocMeta->class;
                         $assoc = new $assocClass($record);
-                        if ($assocMeta->type == 'SHasMany' || $assocMeta->type == 'SManyToMany')
+                        if (in_array($k, $manyAssocs))
                         {
                             if (!isset($recordsManyAssocs[$id][$k][$assoc->id])) 
                                 $recordsManyAssocs[$id][$k][$assoc->id] = $assoc;
@@ -358,9 +366,10 @@ class SQuerySet implements Iterator, Countable
                 }
             }
         }
+        
         foreach ($records as $id => $record)
         {
-            foreach($this->includes as $k)
+            foreach ($manyAssocs as $k)
             {
                 if (isset($recordsManyAssocs[$id][$k]))
                     $records[$id]->$k->setQuerySet(new SFilledQuerySet($this->meta->attributes[$k]->meta, array_values($recordsManyAssocs[$id][$k])));
@@ -368,10 +377,6 @@ class SQuerySet implements Iterator, Countable
                     $records[$id]->$k->setQuerySet(new SFilledQuerySet($this->meta->attributes[$k]->meta, array()));
             }
         }
-        
-        /*foreach ($recordsManyAssocs as $id => $assocs)
-            foreach ($assocs as $k => $set) 
-                $records[$id]->$k->setQuerySet(new SFilledQuerySet($this->meta->attributes[$k]->meta, $set));*/
                 
         $this->conn->freeResult($this->resource);
         $this->resource = null;
