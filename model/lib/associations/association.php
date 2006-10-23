@@ -49,7 +49,19 @@ class SAssociationMeta
     {
         $this->type = $options['assoc_type'];
         
-        if (isset($options['class_name'])) $this->class = $options['class_name'];
+        if (isset($options['class_name']))
+        {
+            if (strpos($options['class_name'], '/') === false)
+                $this->class = SInflection::camelize($options['class_name']);
+            else
+            {
+                list($subdir, $class) = explode('/', $options['class_name']);
+                $this->class = SInflection::camelize($class);
+                
+                if (!class_exists($this->class))
+                    SDependencies::requireDependency('models', $options['class_name'], $ownerMeta->class);
+            }
+        }
         else
         {
             if ($this->type == 'SHasMany' || $this->type == 'SManyToMany') 
