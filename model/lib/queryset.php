@@ -238,7 +238,9 @@ class SQuerySet implements Iterator, Countable
     
     protected function fetchRow($row)
     {
-        $class = $this->meta->class;
+        if (in_array($this->meta->inheritanceField, array_keys($this->meta->attributes))
+            && class_exists($row[$this->meta->inheritanceField])) $class = $row[$this->meta->inheritanceField];
+        else $class = $this->meta->class;
         return new $class($row);
     }
     
