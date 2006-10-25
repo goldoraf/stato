@@ -222,8 +222,15 @@ abstract class SManyAssociationManager
     
     public function all()
     {
+        if ($this->owner->isNewRecord()) return $this->unsaved;
         if ($this->qs !== null) return $this->qs;
         return $this->getQuerySet();
+    }
+    
+    public function count()
+    {
+        if ($this->owner->isNewRecord()) return count($this->unsaved);
+        return $this->__call('count', array());
     }
     
     public function create($attributes=array())

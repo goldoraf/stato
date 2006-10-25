@@ -212,7 +212,8 @@ class SManyToManyTest extends ActiveTestCase
         $peter->projects->add($proj2);
         $this->assertTrue($peter->isNewRecord());
         $this->assertTrue($proj1->isNewRecord());
-        $this->assertEqual(0, $peter->projects->count());
+        $this->assertEqual(2, $peter->projects->count());
+        $this->assertEqual($nb_projs, Project::$objects->count());
         $peter->save();
         $this->assertFalse($peter->isNewRecord());
         $this->assertFalse($proj1->isNewRecord());
