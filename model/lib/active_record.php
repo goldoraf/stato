@@ -175,6 +175,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
                 if (!is_object($value) && $value !== null) $this->$key = stripslashes($value);
                 else $this->$key = $value;
             }
+            if (!$this->attrExists($key)) $this->values[$key] = $value;
         }
         
         if (!empty($multiParamsAttributes)) $this->assignMultiparamsAttributes($multiParamsAttributes);
