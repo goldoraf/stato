@@ -269,6 +269,12 @@ abstract class SManyAssociationManager
         $this->add($records);
     }
     
+    public function singularIds($ids)
+    {
+        $qs = new SQuerySet($this->meta);
+        $this->replace($qs->get($ids));
+    }
+    
     public function setQuerySet($qs)
     {
         $this->qs = $qs;
