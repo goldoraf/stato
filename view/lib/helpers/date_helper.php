@@ -42,7 +42,6 @@ function select_date($date = Null, $options = array())
         $html.= call_user_func('select_'.$param, $date, $options);
     
     return $html;
-    //return select_year($date, $options).select_month($date, $options).select_day($date, $options);
 }
 
 function select_date_time($datetime = Null, $options = array())
@@ -54,8 +53,6 @@ function select_date_time($datetime = Null, $options = array())
         $html.= call_user_func('select_'.$param, $datetime, $options);
     
     return $html;
-    //return select_year($date, $options).select_month($date, $options).select_day($date, $options)
-    //.select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
 function select_time($datetime = Null, $options = array())
@@ -67,7 +64,6 @@ function select_time($datetime = Null, $options = array())
         $html.= call_user_func('select_'.$param, $datetime, $options);
     
     return $html;
-    //return select_hour($datetime, $options).select_minute($datetime, $options).select_second($datetime, $options);
 }
 
 function select_day($date, $options=array())
@@ -159,13 +155,15 @@ function select_hour($datetime, $options = array())
 
 function select_html($type, $dateOptions, $options = array())
 {
+    $htmlOptions = array();
     if (!isset($options['prefix'])) $options['prefix'] = 'date';
-    $html = '<select name="'.$options['prefix']."[{$type}]\"";
-    if (isset($options['disabled']) && $options['disabled'] == true) $html.= ' disabled="disabled"';
-    $html.= ">\n";
-    if (isset($options['include_blank']) && $options['include_blank'] == True) $html.= '<option value=""></option>';
-    $html.= $dateOptions."</select>\n";
-    return $html;
+    $htmlOptions['name'] = $options['prefix']."[{$type}]";
+    if (isset($options['disabled']) && $options['disabled'] == true) $htmlOptions['disabled'] = true;
+    if (isset($options['class'])) $htmlOptions['class'] = $options['class'];    
+    if (isset($options['include_blank']) && $options['include_blank'] == true) 
+        $dateOptions = '<option value=""></option>'.$dateOptions;
+    
+    return content_tag('select', $dateOptions, $htmlOptions)."\n";
 }
 
 function default_date_options($objectName, $method, $object)
