@@ -128,7 +128,7 @@ class SXmlRpcValue
                 return SDateTime::parse($value);
                 break;
             case 'base64':
-                
+                return base64_decode($value);
                 break;
             case 'array':
                 if (!$value instanceof SimpleXMLElement/* || empty($value->data)*/)
@@ -196,7 +196,7 @@ class SXmlRpcValue
                 return '<dateTime.iso8601>'.$value->toIso8601().'</dateTime.iso8601>';
                 break;
             case 'SBase64':
-                
+                return $value->__toString();
                 break;
             default:
                 return $this->arrayToXml(get_object_vars($value));
@@ -273,6 +273,23 @@ class SXmlRpcRequest
     public function toXml()
     {
         return $this->xml;
+    }
+}
+
+class SBase64
+{
+    private $value = null;
+    
+    public function __construct($value, $alreadyEncoded = false)
+    {
+        $value = (string) $value;
+        if ($alreadyEncoded) $this->value = $value;
+        else $this->value = base64_encode($value);
+    }
+    
+    public function __toString()
+    {
+        return $this->value;
     }
 }
 
