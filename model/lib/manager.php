@@ -27,6 +27,13 @@ class SManager
         return $object;
     }
     
+    public function update($id, $attributes)
+    {
+        $object = $this->getQuerySet()->get($id);
+        $object->updateAttributes($attributes);
+        return $object;
+    }
+    
     /*public function getOrCreate()
     {
         try { return call_user_func_array(array($this, 'get'), func_get_args()); }
