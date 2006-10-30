@@ -37,7 +37,7 @@ class SCsvIterator implements Iterator
     
     public function assignFields($fields)
     {
-        $this->fields = $fields;
+        foreach ($fields as $k => $v) $this->fields[$k] = $v;
     }
     
     public function current()
