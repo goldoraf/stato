@@ -23,13 +23,13 @@ function add_select_options($optionsBlock, $options, $value = null)
     return $optionsBlock;
 }
 
-function options_for_select($set, $selected=Null)
+function options_for_select($set, $selected = null, $detectNonAssociative = true)
 {
     $str = '';
     if (!is_array($selected)) $selected = array($selected);
     foreach ($set as $lib => $value)
     {
-        if (is_numeric($lib)) $lib = $value; // non-associative array
+        if ($detectNonAssociative && is_int($lib)) $lib = $value; // non-associative array
         
         $str.= '<option value="'.html_escape($value).'"';
         if (in_array($value, $selected)) $str.= ' selected="selected"';
@@ -46,7 +46,7 @@ function options_from_collection_for_select($collection, $valueProp='id', $textP
         if ($textProp === null) $set[$entity->__repr()] = $entity->$valueProp;
         else $set[$entity->$textProp] = $entity->$valueProp;
     }
-    return options_for_select($set, $selected);
+    return options_for_select($set, $selected, false);
 }
 
 function options_groups_from_collection_for_select()
