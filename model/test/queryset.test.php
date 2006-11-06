@@ -66,7 +66,7 @@ class QuerySetTest extends ActiveTestCase
     public function testExclude()
     {
         $companies = Company::$objects->exclude("name = 'Groupe W'");
-        $this->assertEqual("WHERE NOT name = 'Groupe W'", $companies->sqlClause());
+        $this->assertEqual("WHERE NOT (name = 'Groupe W')", $companies->sqlClause());
         $this->assertEqual(1, $companies->count());
         
         $emp = Employe::$objects->exclude("firstname = 'John'", "lastname = 'Doe'");
@@ -74,11 +74,11 @@ class QuerySetTest extends ActiveTestCase
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->exclude("firstname = 'John'")->exclude("lastname = 'Doe'");
-        $this->assertEqual("WHERE NOT firstname = 'John' AND NOT lastname = 'Doe'", $emp->sqlClause());
+        $this->assertEqual("WHERE NOT (firstname = 'John') AND NOT (lastname = 'Doe')", $emp->sqlClause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->filter("firstname = 'John'")->exclude("lastname = 'Doe'");
-        $this->assertEqual("WHERE firstname = 'John' AND NOT lastname = 'Doe'", $emp->sqlClause());
+        $this->assertEqual("WHERE firstname = 'John' AND NOT (lastname = 'Doe')", $emp->sqlClause());
         $this->assertEqual(0, $emp->count());
     }
     

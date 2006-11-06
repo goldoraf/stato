@@ -281,10 +281,16 @@ class SQuerySet implements Iterator, Countable
         }
         
         if (count($args) == 0) return $clone;
-        elseif (count($args) == 1) $condition = array_pop($args);
-        else $condition = '('.implode(' AND ', $args).')';
-        
-        if ($exclude) $condition = 'NOT '.$condition;
+        elseif (count($args) == 1)
+        {
+            $condition = array_pop($args);
+            if ($exclude) $condition = "NOT ($condition)";
+        }
+        else
+        {
+            $condition = '('.implode(' AND ', $args).')';
+            if ($exclude) $condition = 'NOT '.$condition;
+        }
         $clone->filters[] = $condition;
         
         return $clone;
