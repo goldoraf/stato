@@ -150,7 +150,7 @@ class SMigrator
     
     private function reachedTargetVersion($version)
     {
-        return (($this->isUp() && $version - 1 == $this->targetVersion) 
+        return (($this->isUp() && $this->targetVersion !== null && $version - 1 == $this->targetVersion) 
                 || ($this->isDown() && $version == $this->targetVersion));
     }
     
