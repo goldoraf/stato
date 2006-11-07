@@ -46,6 +46,11 @@ class Product extends SActiveRecord
     public $attrRequired = array('name');
 }
 
+class SuperProduct extends Product
+{
+
+}
+
 // For belongsTo tests
 class Profile extends SActiveRecord
 {

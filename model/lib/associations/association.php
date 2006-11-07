@@ -181,7 +181,10 @@ abstract class SAssociationManager
     
     protected function checkRecordType($record)
     {
-        if (!is_object($record) || get_class($record) != $this->meta->class)
+        $ref = new ReflectionObject($record);
+        
+        if (!is_object($record) && get_class($record) != $this->meta->class 
+            && $ref->getParentClass()->getName() != $this->meta->class)
             throw new SAssociationTypeMismatch('Bad Record Type');
     }
     
@@ -300,7 +303,10 @@ abstract class SManyAssociationManager
     
     protected function checkRecordType($record)
     {
-        if (!is_object($record) || get_class($record) != $this->meta->class)
+        $ref = new ReflectionObject($record);
+        
+        if (!is_object($record) && get_class($record) != $this->meta->class 
+            && $ref->getParentClass()->getName() != $this->meta->class)
             throw new SAssociationTypeMismatch('Bad Record Type');
     }
     

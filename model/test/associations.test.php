@@ -85,6 +85,15 @@ class SHasManyTest extends ActiveTestCase
         $this->assertEqual(2, $company->products->count());
     }
     
+    public function testAddSubClass()
+    {
+        $company = Company::$objects->get(1);
+        $product = new SuperProduct(array('name'=>'CD-R', 'price'=>'0.75'));
+        $this->assertEqual(1, $company->products->count());
+        $company->products->add($product);
+        $this->assertEqual(2, $company->products->count());
+    }
+    
     public function testAddCollection()
     {
         $nb_companies = Company::$objects->count();
