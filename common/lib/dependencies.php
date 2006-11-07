@@ -10,6 +10,7 @@ class SDependencies
     public static function requireDependency($layer, $dependency, $relativeTo = null)
     {
         list($subdir, $class) = self::dependencySubDir($dependency, $relativeTo);
+        if (class_exists($class)) return;
         $path = APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
         if (!file_exists($path))
             throw new SException("Missing ".SInflection::singularize($layer)." $dependency");
