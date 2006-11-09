@@ -448,7 +448,7 @@ class SActionController
         if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
             $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
         
-        SActiveRecord::connection()->writeLog();
+        //SActiveRecord::connection()->writeLog();
         $this->logBenchmarking();
     }
     
