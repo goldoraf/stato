@@ -72,7 +72,7 @@ abstract class SAbstractDriver
     public function quote($value, $attributeType = Null)
     {
         if ($value === Null) return "NULL";
-        //if ($value == Null && $value !== 0) return "NULL";
+        if (is_object($value)) return $this->quoteString($value->__toString());
         switch($attributeType)
         {
             case 'date':
