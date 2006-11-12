@@ -50,7 +50,7 @@ function underscore($matches)
 {
     $exceptions = array('->assertEqual', '->assertNotEqual', '->assertDomEqual', '->assertException', '->assertNull', '->assertTrue', '->assertFalse', 
     '->assertIsA', 'function offsetExists', 'function offsetSet', 'function offsetGet', 'function offsetUnset', 'function __toString', 
-    '->__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER');
+    '->__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER', '::UnitTestCase');
     
     if (!in_array($matches[1], $exceptions)) return SInflection::underscore($matches[1]);
     else return $matches[1];
