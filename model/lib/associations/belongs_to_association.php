@@ -2,12 +2,12 @@
 
 class SBelongsToMeta extends SAssociationMeta
 {
-    public function __construct($ownerMeta, $assocName, $options)
+    public function __construct($owner_meta, $assoc_name, $options)
     {
-        parent::__construct($ownerMeta, $assocName, $options);
-        $this->assertValidOptions($options);
-        if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
-        else $this->foreignKey = SInflection::underscore($this->class).'_id';
+        parent::__construct($owner_meta, $assoc_name, $options);
+        $this->assert_valid_options($options);
+        if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
+        else $this->foreign_key = SInflection::underscore($this->class).'_id';
     }
 }
 
@@ -18,36 +18,36 @@ class SBelongsToManager extends SAssociationManager
         if ($record === null)
         {
             $this->target = null;
-            $this->owner[$this->meta->foreignKey] = null;
+            $this->owner[$this->meta->foreign_key] = null;
         }
         else
         {
-            $this->checkRecordType($record);
+            $this->check_record_type($record);
             $this->target = $record;
-            if (!$record->isNewRecord()) $this->owner[$this->meta->foreignKey] = $record->id;
+            if (!$record->is_new_record()) $this->owner[$this->meta->foreign_key] = $record->id;
         }
         $this->loaded = true;
     }
     
-    public function beforeOwnerSave()
+    public function before_owner_save()
     {
         if ($this->target !== null)
         {
-            if ($this->target->isNewRecord()) $this->target->save();
-            $this->owner[$this->meta->foreignKey] = $this->target->id;
+            if ($this->target->is_new_record()) $this->target->save();
+            $this->owner[$this->meta->foreign_key] = $this->target->id;
         }
     }
     
-    protected function findTarget()
+    protected function find_target()
     {
-        if (/*$this->owner->isNewRecord() || */$this->owner[$this->meta->foreignKey] === null) return null;
+        if (/*$this->owner->is_new_record() || */$this->owner[$this->meta->foreign_key] === null) return null;
         $qs = new SQuerySet($this->meta);
-        return $qs->get($this->owner[$this->meta->foreignKey]);
+        return $qs->get($this->owner[$this->meta->foreign_key]);
     }
     
-    protected function isFkPresent()
+    protected function is_fk_present()
     {
-        if ($this->owner[$this->meta->foreignKey] === null) return false;
+        if ($this->owner[$this->meta->foreign_key] === null) return false;
         return true;
     }
 }

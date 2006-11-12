@@ -5,69 +5,69 @@ class SBelongsToTest extends ActiveTestCase
     public $fixtures = array('profiles', 'employes');
     public $models = array('dependent_company_1', 'dependent_company_2', 'dependent_company_3');
     
-    public function testBelongsTo()
+    public function test_belongs_to()
     {
         $profile = Profile::$objects->get(1);
         $employe = Employe::$objects->get(1);
         $this->assertEqual($profile->employe->lastname, $employe->lastname);
     }
     
-    public function testAssignment()
+    public function test_assignment()
     {
         $profile = new Profile(array('cv'=>'GNU expert'));
         $employe = new Employe(array('lastname'=>'Richard', 'firstname'=>'Stallman'));
-        $this->assertTrue($profile->employe->isNull());
+        $this->assertTrue($profile->employe->is_null());
         $profile->employe = $employe;
-        $this->assertFalse($profile->employe->isNull());
+        $this->assertFalse($profile->employe->is_null());
         $profile->save();
         $this->assertEqual($employe->id, $profile->employe_id);
     }
     
-    public function testNullAssignment()
+    public function test_null_assignment()
     {
         $profile = Profile::$objects->get(1);
-        $this->assertFalse($profile->employe->isNull());
+        $this->assertFalse($profile->employe->is_null());
         $profile->employe = null;
-        $this->assertTrue($profile->employe->isNull());
+        $this->assertTrue($profile->employe->is_null());
         $profile->save();
         $profile2 = Profile::$objects->get(1);
-        $this->assertTrue($profile2->employe->isNull());
+        $this->assertTrue($profile2->employe->is_null());
     }
     
-    public function testAssignmentBeforeParentSaved()
+    public function test_assignment_before_parent_saved()
     {
         $profile = Profile::$objects->get(1);
         $employe = new Employe(array('lastname'=>'Max', 'firstname'=>'Payne'));
         $profile->employe = $employe;
         $this->assertEqual($profile->employe->lastname, $employe->lastname);
-        $this->assertTrue($employe->isNewRecord());
+        $this->assertTrue($employe->is_new_record());
         $profile->save();
-        $this->assertFalse($employe->isNewRecord());
+        $this->assertFalse($employe->is_new_record());
         $this->assertEqual($employe->id, $profile->employe_id);
     }
     
-    public function testAssignmentBeforeChildSaved()
+    public function test_assignment_before_child_saved()
     {
         $employe = Employe::$objects->get(1);
         $profile = new Profile(array('cv'=>'Mozilla expert'));
         $profile->employe = $employe;
-        $this->assertTrue($profile->isNewRecord());
+        $this->assertTrue($profile->is_new_record());
         $profile->save();
-        $this->assertFalse($profile->isNewRecord());
-        $this->assertFalse($employe->isNewRecord());
+        $this->assertFalse($profile->is_new_record());
+        $this->assertFalse($employe->is_new_record());
         $this->assertEqual($employe->id, $profile->employe_id);
     }
     
-    public function testAssignmentBeforeEitherSaved()
+    public function test_assignment_before_either_saved()
     {
         $employe = new Employe(array('lastname'=>'Max', 'firstname'=>'Payne'));
         $profile = new Profile(array('cv'=>'Lone private'));
         $profile->employe = $employe;
-        $this->assertTrue($profile->isNewRecord());
-        $this->assertTrue($employe->isNewRecord());
+        $this->assertTrue($profile->is_new_record());
+        $this->assertTrue($employe->is_new_record());
         $profile->save();
-        $this->assertFalse($profile->isNewRecord());
-        $this->assertFalse($employe->isNewRecord());
+        $this->assertFalse($profile->is_new_record());
+        $this->assertFalse($employe->is_new_record());
         $this->assertEqual($employe->id, $profile->employe_id);
     }
 }
@@ -76,7 +76,7 @@ class SHasManyTest extends ActiveTestCase
 {
     public $fixtures = array('companies', 'products');
     
-    public function testAdd()
+    public function test_add()
     {
         $company = Company::$objects->get(1);
         $product = new Product(array('name'=>'CD-R', 'price'=>'0.75'));
@@ -85,7 +85,7 @@ class SHasManyTest extends ActiveTestCase
         $this->assertEqual(2, $company->products->count());
     }
     
-    public function testAddSubClass()
+    public function test_add_sub_class()
     {
         $company = Company::$objects->get(1);
         $product = new SuperProduct(array('name'=>'CD-R', 'price'=>'0.75'));
@@ -94,7 +94,7 @@ class SHasManyTest extends ActiveTestCase
         $this->assertEqual(2, $company->products->count());
     }
     
-    public function testAddCollection()
+    public function test_add_collection()
     {
         $nb_companies = Company::$objects->count();
         $nb_products = Product::$objects->count();
@@ -102,18 +102,18 @@ class SHasManyTest extends ActiveTestCase
         $product1 = new Product(array('name'=>'mouse', 'price'=>'14.95'));
         $product2 = new Product(array('name'=>'screen', 'price'=>'350.00'));
         $new_company->products->add(array($product2, $product1));
-        $this->assertTrue($new_company->isNewRecord());
-        $this->assertTrue($product1->isNewRecord());
+        $this->assertTrue($new_company->is_new_record());
+        $this->assertTrue($product1->is_new_record());
         $new_company->save();
-        $this->assertFalse($new_company->isNewRecord());
-        $this->assertFalse($product1->isNewRecord());
+        $this->assertFalse($new_company->is_new_record());
+        $this->assertFalse($product1->is_new_record());
         $this->assertEqual($nb_companies+1, Company::$objects->count());
         $this->assertEqual($nb_products+2, Product::$objects->count());
         $company_reloaded = Company::$objects->get($new_company->id);
         $this->assertEqual(2, $company_reloaded->products->count());
     }
     
-    public function testForeach()
+    public function test_foreach()
     {
         $new_company = new Company(array('name'=>'MegaGeek corp.'));
         $new_company->products->add(new Product(array('name'=>'usb key', 'price'=>'34.95')));
@@ -128,32 +128,32 @@ class SHasManyTest extends ActiveTestCase
         $this->assertEqual(2, $i);
     }
     
-    public function testCreate()
+    public function test_create()
     {
         $company = Company::$objects->get(1);
         $nb_products = $company->products->count();
         $new_product = $company->products->create(array('name'=>'toaster', 'price'=>'15.00'));
         $this->assertEqual('toaster', $new_product->name);
-        $this->assertFalse($new_product->isNewRecord());
+        $this->assertFalse($new_product->is_new_record());
         $company_reloaded = Company::$objects->get(1);
         $this->assertEqual($nb_products + 1, $company_reloaded->products->count());
     }
     
-    public function testDeleteDependency()
+    public function test_delete_dependency()
     {
         $company = DependentCompany1::$objects->get(1);
         $company->delete();
         $this->assertEqual(0, Product::$objects->count());
     }
     
-    public function testDeleteAllDependency()
+    public function test_delete_all_dependency()
     {
         $company = DependentCompany2::$objects->get(1);
         $company->delete();
         $this->assertEqual(0, Product::$objects->count());
     }
     
-    public function testNullifyDependency()
+    public function test_nullify_dependency()
     {
         $company = DependentCompany3::$objects->get(1);
         $company->delete();
@@ -167,7 +167,7 @@ class SHasManyThroughTest extends ActiveTestCase
 {
     public $fixtures = array('companies', 'employes', 'profiles');
     
-    public function testHasManyJoinModel()
+    public function test_has_many_join_model()
     {
         $comp = Company::$objects->get(1);
         $profiles = $comp->profiles->all()->dump();
@@ -176,7 +176,7 @@ class SHasManyThroughTest extends ActiveTestCase
         $this->assertEqual('xxx', $profiles[1]->cv);
     }
     
-    public function testBelongsToJoinModel()
+    public function test_belongs_to_join_model()
     {
     
     }
@@ -186,7 +186,7 @@ class SManyToManyTest extends ActiveTestCase
 {
     public $fixtures = array('developers', 'projects', 'developers_projects');
     
-    public function testBasic()
+    public function test_basic()
     {
         $ben = Developer::$objects->get(1);
         $this->assertEqual(2, $ben->projects->count());
@@ -194,7 +194,7 @@ class SManyToManyTest extends ActiveTestCase
         $this->assertEqual(1, $proj->developers->count());
     }
     
-    public function testAdd()
+    public function test_add()
     {
         $richard = Developer::$objects->get(2);
         $proj = Project::$objects->get(1);
@@ -205,12 +205,12 @@ class SManyToManyTest extends ActiveTestCase
         $this->assertEqual(2, $proj->developers->count());
     }
     
-    public function testAddCollection()
+    public function test_add_collection()
     {
     
     }
     
-    public function testAddBeforeSave()
+    public function test_add_before_save()
     {
         $nb_devels = Developer::$objects->count();
         $nb_projs  = Project::$objects->count();
@@ -219,13 +219,13 @@ class SManyToManyTest extends ActiveTestCase
         $proj2 = new Project(array('name' => 'TotalWebInnov'));
         $peter->projects->add($proj1);
         $peter->projects->add($proj2);
-        $this->assertTrue($peter->isNewRecord());
-        $this->assertTrue($proj1->isNewRecord());
+        $this->assertTrue($peter->is_new_record());
+        $this->assertTrue($proj1->is_new_record());
         $this->assertEqual(2, $peter->projects->count());
         $this->assertEqual($nb_projs, Project::$objects->count());
         $peter->save();
-        $this->assertFalse($peter->isNewRecord());
-        $this->assertFalse($proj1->isNewRecord());
+        $this->assertFalse($peter->is_new_record());
+        $this->assertFalse($proj1->is_new_record());
         $this->assertEqual($nb_devels+1, Developer::$objects->count());
         $this->assertEqual($nb_projs+2, Project::$objects->count());
         $this->assertEqual(2, $peter->projects->count());
@@ -233,16 +233,16 @@ class SManyToManyTest extends ActiveTestCase
         $this->assertEqual(2, $peter2->projects->count());
     }
     
-    public function testCreate()
+    public function test_create()
     {
         $richard = Developer::$objects->get(2);
         $proj = $richard->projects->create(array('name' => 'PlzNotAnotherRecursiveAcronym'));
         $projects = $richard->projects->all()->dump();
         $this->assertEqual($projects[1]->name, $proj->name);
-        $this->assertFalse($proj->isNewRecord());
+        $this->assertFalse($proj->is_new_record());
     }
     
-    public function testDelete()
+    public function test_delete()
     {
         $ben = Developer::$objects->get(1);
         $proj = Project::$objects->get(1);
@@ -256,12 +256,12 @@ class SManyToManyTest extends ActiveTestCase
         $this->assertEqual(0, $proj2->developers->count());
     }
     
-    public function testDeleteCollection()
+    public function test_delete_collection()
     {
     
     }
     
-    public function testClear()
+    public function test_clear()
     {
         $richard = Developer::$objects->get(2);
         $richard->projects->clear();
@@ -273,7 +273,7 @@ class SHasOneTest extends ActiveTestCase
 {
     public $fixtures = array('clients', 'contracts', 'projects');
     
-    public function testBasic()
+    public function test_basic()
     {
         $client = Client::$objects->get(1);
         $contract = Contract::$objects->get(1);
@@ -281,7 +281,7 @@ class SHasOneTest extends ActiveTestCase
         $this->assertEqual($contract->code, $client->contract->code);
     }
     
-    public function testTypeMismatch()
+    public function test_type_mismatch()
     {
         $client = Client::$objects->get(1);
         try
@@ -294,7 +294,7 @@ class SHasOneTest extends ActiveTestCase
         }
     }
     
-    public function testNaturalAssignment()
+    public function test_natural_assignment()
     {
         $client = new Client(array('name' => 'Zend'));
         $client->save();
@@ -304,61 +304,61 @@ class SHasOneTest extends ActiveTestCase
         $this->assertEqual($client->id, $contract->client_id);
     }
     
-    public function testAssignmentToNull()
+    public function test_assignment_to_null()
     {
         $client = Client::$objects->get(1);
-        $this->assertFalse($client->contract->isNull());
+        $this->assertFalse($client->contract->is_null());
         $client->contract = null;
         $client->save();
-        $this->assertTrue($client->contract->isNull());
+        $this->assertTrue($client->contract->is_null());
         $client2 = Client::$objects->get(1);
-        $this->assertTrue($client2->contract->isNull());
+        $this->assertTrue($client2->contract->is_null());
         // il faudrait rendre la classe Contract 'dependent' de la classe Client (cf Rails)
         // ainsi on checkerait ici qu'il n'y pas plus de contract dans la table ayant pour id $old_contract_id.
         // Cela peut-il être couvert par l'option 'on_delete' ?
     }
     
-    public function testDependence()
+    public function test_dependence()
     {
         // on teste ici l'effet de l'option 'on_delete' en chargeant un client dôté d'un
         // contrat, en le deletant et en vérifiant que le nb de contrat ds la table a diminué de 1.
     }
     
-    public function testAssignmentBeforeParentSaved()
+    public function test_assignment_before_parent_saved()
     {
         $client = new Client(array('name' => 'HP'));
         $contract = new Contract(array('code' => 'test', 'date' => '2005-12-01'));
         $contract->save();
         $client->contract = $contract;
-        $this->assertTrue($client->isNewRecord());
+        $this->assertTrue($client->is_new_record());
         $this->assertEqual($contract, $client->contract->target());
         $client->save();
-        $this->assertFalse($client->isNewRecord());
+        $this->assertFalse($client->is_new_record());
         $this->assertEqual($contract, $client->contract->target());
         $client2 = Client::$objects->get($client->id);
         $this->assertEqual($contract, $client2->contract->target());
     }
     
-    public function testCreate()
+    public function test_create()
     {
         $client = new Client(array('name' => 'Zend'));
         $client->save();
         $contract = $client->contract->create(array('code' => 'test'));
-        $this->assertFalse($contract->isNewRecord());
+        $this->assertFalse($contract->is_new_record());
         $this->assertEqual($contract, $client->contract->target());
     }
     
-    public function testCreateBeforeSave()
+    public function test_create_before_save()
     {
         $client = new Client(array('name' => 'Zend'));
         $contract = $client->contract->create(array('code' => 'test'));
         $this->assertEqual($contract, $client->contract->target());
-        $this->assertFalse($contract->isNewRecord());
-        $this->assertTrue($client->isNewRecord());
+        $this->assertFalse($contract->is_new_record());
+        $this->assertTrue($client->is_new_record());
         $client->save();
         $this->assertEqual($contract, $client->contract->target());
-        $this->assertFalse($contract->isNewRecord());
-        $this->assertFalse($client->isNewRecord());
+        $this->assertFalse($contract->is_new_record());
+        $this->assertFalse($client->is_new_record());
     }
 }
 

@@ -8,7 +8,7 @@ class SLogger
     
     static private $instance = Null;
 	
-	public static function getInstance()
+	public static function get_instance()
     {
        if (!isset(self::$instance))
        {
@@ -52,7 +52,7 @@ class SLogger
         return (fwrite($this->fp, $line) !== false);
     }
     
-    public function logWithTime($message, $type = null)
+    public function log_with_time($message, $type = null)
     {
         $line = '['.strftime('%Y-%m-%d %H:%M:%S').']'." [$type] $message".$this->eol;
         return $this->log($line, $type);

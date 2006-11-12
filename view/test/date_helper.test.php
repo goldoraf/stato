@@ -3,7 +3,7 @@
 require_once(CORE_DIR.'/view/view.php');
 
 SLocale::$language = 'en_US';
-SLocale::setLocale();
+SLocale::set_locale();
 
 class MockArticle extends MockRecord
 {
@@ -12,7 +12,7 @@ class MockArticle extends MockRecord
 
 class DateHelperTest extends HelperTestCase
 {
-    public function testSelectDay()
+    public function test_select_day()
     {
         $expect = <<<EOT
         <select name="date[day]">
@@ -38,7 +38,7 @@ EOT;
         $this->assertDomEqual($expect, select_day(31));
     }
     
-    public function testSelectDayWithBlank()
+    public function test_select_day_with_blank()
     {
         $expect = <<<EOT
         <select name="date[day]">
@@ -65,7 +65,7 @@ EOT;
         $this->assertDomEqual($expect, select_day(31, array('include_blank' => true)));
     }
     
-    public function testSelectDayNull()
+    public function test_select_day_null()
     {
         $expect = <<<EOT
         <select name="date[day]">
@@ -90,7 +90,7 @@ EOT;
         $this->assertDomEqual($expect, select_day(null));
     }
     
-    public function testSelectMonth()
+    public function test_select_month()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -106,7 +106,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3));
     }
     
-    public function testSelectMonthWithBlank()
+    public function test_select_month_with_blank()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -123,7 +123,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3, array('include_blank' => true)));
     }
     
-    public function testSelectMonthWithDisabled()
+    public function test_select_month_with_disabled()
     {
         $expect = <<<EOT
         <select name="date[month]" disabled="disabled">
@@ -139,7 +139,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3, array('include_blank' => true, 'disabled' => true)));
     }
     
-    public function testSelectMonthNull()
+    public function test_select_month_null()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -154,7 +154,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(null));
     }
     
-    public function testSelectMonthWithNumbers()
+    public function test_select_month_with_numbers()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -169,7 +169,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3, array('use_numbers' => true)));
     }
     
-    public function testSelectMonthWithNumbersAndNames()
+    public function test_select_month_with_numbers_and_names()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -184,7 +184,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3, array('add_numbers' => true)));
     }
     
-    public function testSelectMonthWithAbbrvs()
+    public function test_select_month_with_abbrvs()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -199,7 +199,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3, array('use_abbrv' => true)));
     }
     
-    public function testSelectMonthWithAbbrvsAndNames()
+    public function test_select_month_with_abbrvs_and_names()
     {
         $expect = <<<EOT
         <select name="date[month]">
@@ -214,7 +214,7 @@ EOT;
         $this->assertDomEqual($expect, select_month(3, array('use_abbrv' => true, 'add_numbers' => true)));
     }
     
-    public function testSelectYear()
+    public function test_select_year()
     {
         $expect = <<<EOT
         <select name="date[year]">
@@ -230,7 +230,7 @@ EOT;
         $this->assertDomEqual($expect, select_year(2006));
     }
     
-    public function testSelectYearWithLimits()
+    public function test_select_year_with_limits()
     {
         $expect = <<<EOT
         <select name="date[year]">
@@ -242,7 +242,7 @@ EOT;
         $this->assertDomEqual($expect, select_year(2006, array('start_year' => 2005, 'end_year' => 2008)));
     }
     
-    public function testSelectYearReverse()
+    public function test_select_year_reverse()
     {
         $expect = <<<EOT
         <select name="date[year]">
@@ -253,7 +253,7 @@ EOT;
         $this->assertDomEqual($expect, select_year(new SDate(2006, 3, 31), array('start_year' => 2008, 'end_year' => 2005)));
     }
     
-    public function testSelectHour()
+    public function test_select_hour()
     {
         $expect = <<<EOT
         <select name="date[hour]">
@@ -276,7 +276,7 @@ EOT;
         $this->assertDomEqual($expect, select_hour(1));
     }
     
-    public function testSelectMinute()
+    public function test_select_minute()
     {
         $expect = <<<EOT
         <select name="date[min]">
@@ -307,7 +307,7 @@ EOT;
         $this->assertDomEqual($expect, select_minute(29));
     }
     
-    public function testSelectSecond()
+    public function test_select_second()
     {
         $expect = <<<EOT
         <select name="date[sec]">
@@ -338,7 +338,7 @@ EOT;
         $this->assertDomEqual($expect, select_second(35));
     }
     
-    public function testSelectDate()
+    public function test_select_date()
     {
         $expect = <<<EOT
         <select name="date[test][year]">
@@ -379,7 +379,7 @@ EOT;
         $this->assertDomEqual($expect, select_date(new SDate(2006, 3, 31), array('prefix' => 'date[test]')));
     }
     
-    public function testDateSelect()
+    public function test_date_select()
     {
         $article = new MockArticle();
         $article->written_on = new SDate(2006, 3, 31);
@@ -423,7 +423,7 @@ EOT;
         $this->assertDomEqual($expect, date_select('article', 'written_on', $article));
     }
     
-    public function testDateSelectWithOrder()
+    public function test_date_select_with_order()
     {
         $article = new MockArticle();
         $article->written_on = new SDate(2006, 3, 31);
@@ -467,7 +467,7 @@ EOT;
         $this->assertDomEqual($expect, date_select('article', 'written_on', $article, array('order' => array('day', 'month', 'year'))));
     }
     
-    public function testDateSelectWithBlankAndYearLimits()
+    public function test_date_select_with_blank_and_year_limits()
     {
         $article = new MockArticle();
         $article->written_on = new SDate(2006, 3, 31);
@@ -511,7 +511,7 @@ EOT;
             array('include_blank' => true, 'start_year' => 2005, 'end_year' => 2008)));
     }
     
-    public function testDateTimeSelect()
+    public function test_date_time_select()
     {
         $article = new MockArticle();
         $article->written_on = new SDateTime(2006, 3, 31, 1, 29, 35);

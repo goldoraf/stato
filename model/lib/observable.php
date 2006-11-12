@@ -6,44 +6,44 @@ abstract class SObservable
     protected $observers = array();
     protected $callbacks = array();
     
-    protected $selfCallbacks = array();
+    protected $self_callbacks = array();
     
-    /*public function getState()
+    /*public function get_state()
     {
         return $this->state;
     }*/
     
-    public function setState($state)
+    public function set_state($state)
     {
         //$this->state = $state;
-        $this->notifyObservers($state);
+        $this->notify_observers($state);
     }
     
-    public function addObserver($observer)
+    public function add_observer($observer)
     {
         $this->observers[] = $observer;
     }
     
-    public function addCallback($observer, $state, $method)
+    public function add_callback($observer, $state, $method)
     {
         $this->callbacks[$state][] = array($observer, $method);
     }
     
-    public function addSelfCallback($state, $method)
+    public function add_self_callback($state, $method)
     {
-        $this->selfCallbacks[$state][] = $method;
+        $this->self_callbacks[$state][] = $method;
     }
     
-    public function notifyObservers($state)
+    public function notify_observers($state)
     {
-        //$state = $this->getState();
+        //$state = $this->get_state();
         $this->$state();
         foreach($this->observers as $observer) $observer->update($this, $state);
         if (isset($this->callbacks[$state]))
             foreach($this->callbacks[$state] as $callback) call_user_func($callback);
         
-        if (isset($this->selfCallbacks[$state]))
-            foreach($this->selfCallbacks[$state] as $callback) $this->$callback();
+        if (isset($this->self_callbacks[$state]))
+            foreach($this->self_callbacks[$state] as $callback) $this->$callback();
     }
 }
 

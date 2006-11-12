@@ -1,20 +1,20 @@
 <?php
 
-function form_tag($urlOptions, $options=array())
+function form_tag($url_options, $options=array())
 {
-    $htmlOptions = array_merge(array('method'=>'post'), $options);
-    if ($htmlOptions['multipart'])
+    $html_options = array_merge(array('method'=>'post'), $options);
+    if ($html_options['multipart'])
     {
-        $htmlOptions['enctype'] = "multipart/form-data";
-        unset($htmlOptions['multipart']);
+        $html_options['enctype'] = "multipart/form-data";
+        unset($html_options['multipart']);
     }
-    $htmlOptions['action'] = url_for($urlOptions);
-    return tag('form', $htmlOptions, True);
+    $html_options['action'] = url_for($url_options);
+    return tag('form', $html_options, True);
 }
 
-function start_form_tag($urlOptions, $options=array())
+function start_form_tag($url_options, $options=array())
 {
-    return form_tag($urlOptions, $options);
+    return form_tag($url_options, $options);
 }
 
 function end_form_tag()
@@ -70,23 +70,23 @@ function image_submit_tag($source, $options=array())
     return tag('input', array_merge(array('type' => 'image', 'src' => image_path($source)), $options));
 }
 
-function select_tag($name, $optionsBlock='', $options=array())
+function select_tag($name, $options_block='', $options=array())
 {
-    return content_tag('select', $optionsBlock, array_merge(array('name'=>$name, 'id'=>$name), $options));
+    return content_tag('select', $options_block, array_merge(array('name'=>$name, 'id'=>$name), $options));
 }
 
 function check_box_tag($name, $value="1", $checked=false, $options=array())
 {
-    $htmlOptions = array_merge(array('type'=>'checkbox', 'name'=>$name, 'id'=>$name, 'value'=>$value), $options);
-    if ($checked) $htmlOptions['checked'] = "checked";
-    return tag('input', $htmlOptions);
+    $html_options = array_merge(array('type'=>'checkbox', 'name'=>$name, 'id'=>$name, 'value'=>$value), $options);
+    if ($checked) $html_options['checked'] = "checked";
+    return tag('input', $html_options);
 }
 
 function radio_button_tag($name, $value, $checked=false, $options=array())
 {
-    $htmlOptions = array_merge(array('type'=>'radio', 'name'=>$name, 'id'=>$name, 'value'=>$value), $options);
-    if ($checked) $htmlOptions['checked'] = "checked";
-    return tag('input', $htmlOptions);
+    $html_options = array_merge(array('type'=>'radio', 'name'=>$name, 'id'=>$name, 'value'=>$value), $options);
+    if ($checked) $html_options['checked'] = "checked";
+    return tag('input', $html_options);
 }
 
 ?>

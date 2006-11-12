@@ -16,13 +16,13 @@
  */
 class SFormBuilder
 {
-    private $objectName = null;
+    private $object_name = null;
     private $object     = null;
     private $options    = array();
     
-    public function __construct($objectName, $object, $options = array(), $decorator = null)
+    public function __construct($object_name, $object, $options = array(), $decorator = null)
     {
-        $this->objectName = $objectName;
+        $this->object_name = $object_name;
         $this->object = $object;
         $this->options = $options;
     }
@@ -31,81 +31,81 @@ class SFormBuilder
     {
         if ($text === null) $text = ucfirst($method);
         if (isset($this->options['index']))
-            $id = $this->objectName.'_'.$this->options['index']."_{$method}";
+            $id = $this->object_name.'_'.$this->options['index']."_{$method}";
         else
-            $id = $this->objectName."_{$method}";
+            $id = $this->object_name."_{$method}";
         return content_tag('label', $text, array_merge(array('for' => $id), $options));
     }
     
     public function text_field($method, $options = array())
     {
-        return text_field($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return text_field($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function file_field($method, $options = array())
     {
-        return file_field($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return file_field($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function password_field($method, $options = array())
     {
-        return password_field($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return password_field($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function hidden_field($method, $options = array())
     {
-        return hidden_field($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return hidden_field($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function text_area($method, $options = array())
     {
-        return text_area($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return text_area($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
-    public function check_box($method, $options = array(), $checkedValue = '1', $uncheckedValue = '0', $boolean = true)
+    public function check_box($method, $options = array(), $checked_value = '1', $unchecked_value = '0', $boolean = true)
     {
-        return check_box($this->objectName, $method, $this->object, array_merge($this->options, $options), $checkedValue, $uncheckedValue, $boolean);
+        return check_box($this->object_name, $method, $this->object, array_merge($this->options, $options), $checked_value, $unchecked_value, $boolean);
     }
     
-    public function radio_button($method, $tagValue, $options = array())
+    public function radio_button($method, $tag_value, $options = array())
     {
-        return radio_button($this->objectName, $method, $this->object, $tagValue, array_merge($this->options, $options));
+        return radio_button($this->object_name, $method, $this->object, $tag_value, array_merge($this->options, $options));
     }
     
-    public function select($method, $choices, $options = array(), $htmlOptions = array())
+    public function select($method, $choices, $options = array(), $html_options = array())
     {
-        return select($this->objectName, $method, $this->object, $choices, $options, array_merge($this->options, $htmlOptions));
+        return select($this->object_name, $method, $this->object, $choices, $options, array_merge($this->options, $html_options));
     }
     
-    public function collection_select($method, $collection, $valueProp='id', $textProp=null, $options=array(), $htmlOptions = array())
+    public function collection_select($method, $collection, $value_prop='id', $text_prop=null, $options=array(), $html_options = array())
     {
-        return collection_select($this->objectName, $method, $this->object, $collection, 
-                                 $valueProp, $textProp, $options, array_merge($this->options, $htmlOptions));
+        return collection_select($this->object_name, $method, $this->object, $collection, 
+                                 $value_prop, $text_prop, $options, array_merge($this->options, $html_options));
     }
     
     public function date_select($method, $options = array())
     {
-        return date_select($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return date_select($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function date_time_select($method, $options = array())
     {
-        return date_time_select($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return date_time_select($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function time_select($method, $options = array())
     {
-        return time_select($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return time_select($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
     public function error_message_for($options = array())
     {
-        return error_message_for($this->objectName, $this->object, array_merge($this->options, $options));
+        return error_message_for($this->object_name, $this->object, array_merge($this->options, $options));
     }
     
     public function input($method, $options = array())
     {
-        return input($this->objectName, $method, $this->object, array_merge($this->options, $options));
+        return input($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
 }
 

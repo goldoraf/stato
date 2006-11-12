@@ -6,31 +6,31 @@ class SEncryption
     private static $mode   = 'cfb';
     private static $key    = 'this is the key';
     
-    public static function encrypt($plainText)
+    public static function encrypt($plain_text)
     {
         $handler = mcrypt_module_open(self::$cypher, '', self::$mode, '');
         $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($handler), MCRYPT_RAND);
         mcrypt_generic_init($handler, self::$key, $iv);
         
-        $cryptText = mcrypt_generic($handler, $plainText);
+        $crypt_text = mcrypt_generic($handler, $plain_text);
         mcrypt_generic_deinit($handler);
-        return $iv.$cryptText;
+        return $iv.$crypt_text;
     }
     
-    public static function decrypt($cryptText)
+    public static function decrypt($crypt_text)
     {
         $handler = mcrypt_module_open(self::$cypher, '', self::$mode, '');
-        $ivSize = mcrypt_enc_get_iv_size($handler);
-        $iv = substr($cryptText, 0, $ivSize);
-        $cryptText = substr($cryptText, $ivSize);
-        $plainText = '';
+        $iv_size = mcrypt_enc_get_iv_size($handler);
+        $iv = substr($crypt_text, 0, $iv_size);
+        $crypt_text = substr($crypt_text, $iv_size);
+        $plain_text = '';
         if ($iv)
         {
             mcrypt_generic_init($handler, self::$key, $iv);
-            $plainText = mdecrypt_generic($handler, $cryptText);
+            $plain_text = mdecrypt_generic($handler, $crypt_text);
             mcrypt_generic_deinit($handler);
         }
-        return $plainText;
+        return $plain_text;
     }
 }
 

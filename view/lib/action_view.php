@@ -4,8 +4,8 @@ class SActionView
 {
     //private $assigns     = array();
     private $controller  = null;
-    private $templateDir = null;
-    private $tmpCacheKey = null;
+    private $template_dir = null;
+    private $tmp_cache_key = null;
     
     public function __construct($controller)
     {
@@ -22,20 +22,20 @@ class SActionView
         throw new SException('You\'re not allowed to reassign template variables !');
     }
     
-    public function render($template, $localAssigns = array())
+    public function render($template, $local_assigns = array())
     {
         if (!is_readable($template))
             throw new SException('Template not found : '.$template);
             
         //$this->assigns = $assigns;
-        $this->templateDir = dirname($template);
+        $this->template_dir = dirname($template);
         
-        $compiled = $this->compiledTemplatePath($template);
+        $compiled = $this->compiled_template_path($template);
         
-        if (!$this->isCompiledTemplate($template, $compiled))
+        if (!$this->is_compiled_template($template, $compiled))
             $this->compile($template, $compiled);
             
-        extract($localAssigns);
+        extract($local_assigns);
         
         ob_start();
         include ($compiled);
@@ -45,82 +45,82 @@ class SActionView
         return $str;
     }
     
-    public function renderPartial($partialPath, $localAssigns = array())
+    public function render_partial($partial_path, $local_assigns = array())
     {
-        list($path, $partial) = $this->partialPieces($partialPath);
+        list($path, $partial) = $this->partial_pieces($partial_path);
         $template = "$path/_$partial.php";
         
-        return $this->render($template, $localAssigns);
+        return $this->render($template, $local_assigns);
     }
     
-    public function renderPartialCollection($partialPath, $collection, $spacerTemplate = null)
+    public function render_partial_collection($partial_path, $collection, $spacer_template = null)
     {
-        list($path, $partial) = $this->partialPieces($partialPath);
+        list($path, $partial) = $this->partial_pieces($partial_path);
         $template = "$path/_$partial.php";
         
-        $partialsCollec = array();
-        $counterName = $partial.'_counter';
+        $partials_collec = array();
+        $counter_name = $partial.'_counter';
         $counter = 1;
         foreach($collection as $element)
         {
-            $localAssigns[$counterName] = $counter;
-            $localAssigns[$partial] = $element;
-            $partialsCollec[] = $this->render($template, $localAssigns);
+            $local_assigns[$counter_name] = $counter;
+            $local_assigns[$partial] = $element;
+            $partials_collec[] = $this->render($template, $local_assigns);
             $counter++;
         }
         
-        if ($spacerTemplate !== null)
+        if ($spacer_template !== null)
         {
-            list($spacerPath, $spacerPartial) = $this->partialPieces($spacerTemplate);
-            $spacer = "$spacerPath/_$spacerPartial.php";
-            return implode($this->render($spacer), $partialsCollec);
+            list($spacer_path, $spacer_partial) = $this->partial_pieces($spacer_template);
+            $spacer = "$spacer_path/_$spacer_partial.php";
+            return implode($this->render($spacer), $partials_collec);
         }
-        else return implode('', $partialsCollec);
+        else return implode('', $partials_collec);
     }
     
-    public function cacheStart($id = null, $lifetime = 30)
+    public function cache_start($id = null, $lifetime = 30)
     {
-        if (!$this->controller->performCaching) return;
+        if (!$this->controller->perform_caching) return;
         
-        if ($id === null) $id = array('controller' => $this->controller->controllerPath(),
-                                      'action' => $this->controller->actionName());
+        if ($id === null) $id = array('controller' => $this->controller->controller_path(),
+                                      'action' => $this->controller->action_name());
         
-        $cacheKey = $this->fragmentCacheKey($id);
-        if (($cache = $this->readFragment($cacheKey, $lifetime)) !== false)
+        $cache_key = $this->fragment_cache_key($id);
+        if (($cache = $this->read_fragment($cache_key, $lifetime)) !== false)
         {
             echo $cache;
             return true;
         }
-        $this->tmpCacheKey = $cacheKey;
+        $this->tmp_cache_key = $cache_key;
         ob_start();
         return false;
     }
     
-    public function cacheEnd($id = null)
+    public function cache_end($id = null)
     {
-        if (!$this->controller->performCaching) return;
+        if (!$this->controller->perform_caching) return;
         
-        if ($id !== null) $cacheKey = $id;
+        if ($id !== null) $cache_key = $id;
         else
         {
-            $cacheKey = $this->tmpCacheKey;
-            $this->tmpCacheKey = null;
+            $cache_key = $this->tmp_cache_key;
+            $this->tmp_cache_key = null;
         }
         
         $content = ob_get_contents();
         ob_end_clean();
         
-        $this->writeFragment($cacheKey, $content);
+        $this->write_fragment($cache_key, $content);
         echo $content;
     }
     
-    public function readFragment($key, $lifetime = 30)
+    public function read_fragment($key, $lifetime = 30)
     {
-        if ($this->isFragmentCacheValid($key, $lifetime)) return file_get_contents($key);
+        if ($this->is_fragment_cache_valid($key, $lifetime)) return file_get_contents($key);
         return false;
     }
     
-    public function writeFragment($key, $content)
+    public function write_fragment($key, $content)
     {
         if (!SFileUtils::mkdirs(dirname($key), 0700, true))
             throw new SException('Caching failed with dirs creation');
@@ -128,45 +128,45 @@ class SActionView
         file_put_contents($key, $content);
     }
     
-    private function compile($template, $compiledPath)
+    private function compile($template, $compiled_path)
     {
         $content  = file_get_contents($template);
         $compiled = preg_replace(array('/(<\?=\s)/i', '/(<\?\s)/i', '/(<\%=\s)/i', '/(<\%\s)/i'),
                                  array('<?php echo ', '<?php '), $content);
         
-        file_put_contents($compiledPath, $compiled);
-        return $compiledPath;
+        file_put_contents($compiled_path, $compiled);
+        return $compiled_path;
     }
     
-    private function isCompiledTemplate($template, $compiledPath)
+    private function is_compiled_template($template, $compiled_path)
     {
-        if (!file_exists($compiledPath)) return false;
-        if (filemtime($compiledPath) < filemtime($template))
+        if (!file_exists($compiled_path)) return false;
+        if (filemtime($compiled_path) < filemtime($template))
         {
-            unlink($compiledPath);
+            unlink($compiled_path);
             return false;
         }
         return true;
     }
     
-    private function compiledTemplatePath($template)
+    private function compiled_template_path($template)
     {
         return ROOT_DIR.'/cache/templates/'.md5($template);
     }
     
-    private function partialPieces($partialPath)
+    private function partial_pieces($partial_path)
     {
-        if (strpos($partialPath, '/') === false)
-            return array($this->templateDir, $partialPath);
+        if (strpos($partial_path, '/') === false)
+            return array($this->template_dir, $partial_path);
         else
         {
-            $partial = substr(strrchr($partialPath, '/'), 1);
-            $subPath = substr($partialPath, 0, - (strlen($partial) + 1));
-            return array(APP_DIR."/views/$subPath", $partial);
+            $partial = substr(strrchr($partial_path, '/'), 1);
+            $sub_path = substr($partial_path, 0, - (strlen($partial) + 1));
+            return array(APP_DIR."/views/$sub_path", $partial);
         }
     }
     
-    private function isFragmentCacheValid($file, $lifetime)
+    private function is_fragment_cache_valid($file, $lifetime)
     {
         if (file_exists($file))
         {
@@ -176,10 +176,10 @@ class SActionView
         return false;
     }
     
-    private function fragmentCacheKey($id)
+    private function fragment_cache_key($id)
     {
         if (is_array($id))
-            list($protocol, $id) = explode('://', SUrlRewriter::urlFor($id));
+            list($protocol, $id) = explode('://', SUrlRewriter::url_for($id));
         
         return ROOT_DIR."/cache/fragments/{$id}";
     }
@@ -188,7 +188,7 @@ class SActionView
 class SActionCacheFilter
 {
     private $actions = array();
-    private $renderedActionCache = false;
+    private $rendered_action_cache = false;
     
     public function __construct($actions)
     {
@@ -197,23 +197,23 @@ class SActionCacheFilter
     
     public function before($controller)
     {
-        if (!in_array($controller->actionName(), $this->actions)) return;
-        list($protocol, $key) = $controller->urlFor();
+        if (!in_array($controller->action_name(), $this->actions)) return;
+        list($protocol, $key) = $controller->url_for();
         
-        if (($cache = $controller->view->readFragment($key)) !== false)
+        if (($cache = $controller->view->read_fragment($key)) !== false)
         {
-            $this->renderedActionCache = true;
-            $controller->renderText($cache);
+            $this->rendered_action_cache = true;
+            $controller->render_text($cache);
             return false;
         }
     }
     
     public function after($controller)
     {
-        if (!in_array($controller->actionName(), $this->actions) || $this->renderedActionCache) return;
-        list($protocol, $key) = $controller->urlFor();
+        if (!in_array($controller->action_name(), $this->actions) || $this->rendered_action_cache) return;
+        list($protocol, $key) = $controller->url_for();
         
-        $controller->view->writeFragment($key, $controller->response->body);
+        $controller->view->write_fragment($key, $controller->response->body);
     }
 }
 

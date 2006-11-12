@@ -7,8 +7,8 @@ abstract class SAbstractDriver
     private $conn = null;
     private $log  = array();
     
-    protected $nativeDbTypes   = array();
-    protected $simplifiedTypes = array();
+    protected $native_db_types   = array();
+    protected $simplified_types = array();
     
     public $runtime = 0;
     public $config = array
@@ -30,7 +30,7 @@ abstract class SAbstractDriver
         return $this->execute($sql);
     }
     
-    public function selectAll($sql)
+    public function select_all($sql)
     {
         $rs = $this->select($sql);
         $set = array();
@@ -39,7 +39,7 @@ abstract class SAbstractDriver
         return $set;
     }
     
-    public function selectOne($sql)
+    public function select_one($sql)
     {
         return $this->fetch($this->select($sql));
     }
@@ -47,68 +47,68 @@ abstract class SAbstractDriver
     public function insert($sql)
     {
         if (!$this->execute($sql)) return false;
-        return $this->lastInsertId();
+        return $this->last_insert_id();
     }
     
     public function update($sql)
     {
         if (!$this->execute($sql)) return false;
-        return $this->affectedRows();
+        return $this->affected_rows();
     }
     
-    public function extractLength($sqlType)
+    public function extract_length($sql_type)
     {
-        preg_match('/\((.*)\)/', $sqlType, $matches);
+        preg_match('/\((.*)\)/', $sql_type, $matches);
         if (!empty($matches)) return $matches[1];
         return false;
     }
     
-    public function simplifiedType($sqlType)
+    public function simplified_type($sql_type)
     {
-        foreach($this->simplifiedTypes as $regex => $type)
-            if (preg_match($regex, $sqlType)) return $type;
+        foreach($this->simplified_types as $regex => $type)
+            if (preg_match($regex, $sql_type)) return $type;
     }
     
-    public function quote($value, $attributeType = Null)
+    public function quote($value, $attribute_type = Null)
     {
         if ($value === Null) return "NULL";
-        if (is_object($value)) return $this->quoteString($value->__toString());
-        switch($attributeType)
+        if (is_object($value)) return $this->quote_string($value->__toString());
+        switch($attribute_type)
         {
             case 'date':
-                return $this->quoteString($value->__toString());
+                return $this->quote_string($value->__toString());
                 break;
             case 'datetime':
-                return $this->quoteString($value->__toString());
+                return $this->quote_string($value->__toString());
                 break;
             case 'boolean':
                 return ($value === True ? '1' : '0');
                 break;
             default:
-                return $this->quoteString($value);
+                return $this->quote_string($value);
         }
     }
     
-    public function quoteColumnName($name)
+    public function quote_column_name($name)
     {
         return $name;
     }
     
-    public function arrayQuote($array)
+    public function array_quote($array)
     {
         foreach($array as $key => $value) $array[$key] = $this->quote($value);
         return $array;
     }
     
-    public function writeLog()
+    public function write_log()
     {
-        $logger = SLogger::getInstance();
+        $logger = SLogger::get_instance();
         foreach ($this->log as $log) $logger->debug($log);
     }
     
-    protected function quoteString($value)
+    protected function quote_string($value)
     {
-        return "'".$this->escapeStr($value)."'";
+        return "'".$this->escape_str($value)."'";
     }
     
     protected function log($sql, $time, $name = null)
@@ -121,7 +121,7 @@ abstract class SAbstractDriver
     
     abstract public function disconnect();
     
-    abstract public function getError();
+    abstract public function get_error();
     
     abstract public function execute($sql);
     
@@ -129,15 +129,15 @@ abstract class SAbstractDriver
     
     abstract public function columns($table);
     
-    abstract public function lastInsertId();
+    abstract public function last_insert_id();
     
-    abstract public function affectedRows();
+    abstract public function affected_rows();
     
-    abstract public function rowCount($resource);
+    abstract public function row_count($resource);
     
     abstract public function fetch($resource, $associative = true);
     
-    abstract public function escapeStr($str);
+    abstract public function escape_str($str);
 }
 
 ?>

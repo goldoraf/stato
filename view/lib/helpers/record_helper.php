@@ -1,10 +1,10 @@
 <?php
 
-function form($objectName, $object, $options=array())
+function form($object_name, $object, $options=array())
 {
     if (!isset($options['action']))
     {
-        if ($object->isNewRecord()) $options['action'] = 'create';
+        if ($object->is_new_record()) $options['action'] = 'create';
         else $options['action'] = 'update';
     }
     
@@ -16,15 +16,15 @@ function form($objectName, $object, $options=array())
     else
         $form = form_tag(array('action' => $options['action']));
     
-    if (!$object->isNewRecord()) $form.= hidden_field($objectName, 'id', $object);
+    if (!$object->is_new_record()) $form.= hidden_field($object_name, 'id', $object);
     
-    $fields = $object->contentAttributes();
+    $fields = $object->content_attributes();
     
     foreach($fields as $attr)
     {
-        $form.= '<p><label for="'.$objectName.'_'.$attr->name.'">'
+        $form.= '<p><label for="'.$object_name.'_'.$attr->name.'">'
         .SInflection::humanize($attr->name)."</label>\n"
-        .input($objectName, $attr->name, $object)."</p>\n";
+        .input($object_name, $attr->name, $object)."</p>\n";
     }
     
     if (isset($options['include'])) $form.= $options['include'];
@@ -35,61 +35,61 @@ function form($objectName, $object, $options=array())
     return $form;
 }
 
-function input($objectName, $method, $object, $options=array())
+function input($object_name, $method, $object, $options=array())
 {
-    $attr = $object->getAttribute($method);
+    $attr = $object->get_attribute($method);
     
     switch($attr->type)
     {
         case 'string':
-            $str = text_field($objectName, $method, $object, $options);
+            $str = text_field($object_name, $method, $object, $options);
             break;
         case 'text':
-            $str = text_area($objectName, $method, $object, $options);
+            $str = text_area($object_name, $method, $object, $options);
             break;
         case 'date':
-            $str = date_select($objectName, $method, $object);
+            $str = date_select($object_name, $method, $object);
             break;
         case 'datetime':
-            $str = date_time_select($objectName, $method, $object);
+            $str = date_time_select($object_name, $method, $object);
             break;
         case 'integer':
-            $str = text_field($objectName, $method, $object, $options);
+            $str = text_field($object_name, $method, $object, $options);
             break;
         case 'float':
-            $str = text_field($objectName, $method, $object, $options);
+            $str = text_field($object_name, $method, $object, $options);
             break;
         case 'boolean':
-            $str = check_box($objectName, $method, $object, $options);
+            $str = check_box($object_name, $method, $object, $options);
             break;
         default:
-            $str = hidden_field($objectName, $method, $object);
+            $str = hidden_field($object_name, $method, $object);
             break;
     }
     
     return error_wrapping($str, isset($object->errors[$method]));
 }
 
-function error_wrapping($tag, $hasError)
+function error_wrapping($tag, $has_error)
 {
-    return $hasError ? "<div class=\"field-with-errors\">$tag</div>" : $tag;
+    return $has_error ? "<div class=\"field-with-errors\">$tag</div>" : $tag;
 }
 
-function error_message_on($method, $object, $prependText='', $appendText='', $divClass='form-error')
+function error_message_on($method, $object, $prepend_text='', $append_text='', $div_class='form-error')
 {
     if (isset($object->errors[$method]))
-        return "<div class=\"{$divClass}\">{$prependText}{$object->errors[$method]}{$appendText}</div>";
+        return "<div class=\"{$div_class}\">{$prepend_text}{$object->errors[$method]}{$append_text}</div>";
 }
 
-function error_message_for($objectName, $object, $options=array())
+function error_message_for($object_name, $object, $options=array())
 {
     $errors = $object->errors;
     if (!empty($errors))
     {
-        $headerTag = 'h2';
+        $header_tag = 'h2';
         if (isset($options['header_tag']))
         {
-            $headerTag = $options['header_tag'];
+            $header_tag = $options['header_tag'];
             unset($options['header_tag']);
         }
         
@@ -98,10 +98,10 @@ function error_message_for($objectName, $object, $options=array())
         
         $list = '';
         foreach($errors as $field => $error)
-            $list.= '<li>'.link_to_function($error, "Field.focus('{$objectName}_{$field}')").'</li>';
+            $list.= '<li>'.link_to_function($error, "Field.focus('{$object_name}_{$field}')").'</li>';
             
         return content_tag('div', 
-        content_tag($headerTag, SLocale::translate('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
+        content_tag($header_tag, SLocale::translate('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
         $options);
     }
 }

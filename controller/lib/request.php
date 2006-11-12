@@ -6,39 +6,39 @@ class SRequest
     public $action     = Null;
     public $params     = array();
     
-    private $relativeUrlRoot = Null;
-    private $requestUri      = Null;
+    private $relative_url_root = Null;
+    private $request_uri      = Null;
     private $host            = Null;
     
     public function __construct()
     {
-        if ($this->isPost()) $this->parsePostParameters();
+        if ($this->is_post()) $this->parse_post_parameters();
     }
     
-    public function isPost()
+    public function is_post()
     {
         return $this->method() == 'POST';
     }
     
-    public function isGet()
+    public function is_get()
     {
         return $this->method() == 'GET';
     }
     
-    public function isSSL()
+    public function is_ssl()
     {
         return $_SERVER['HTTPS'] == 'on';
     }
     
-    public function isXmlHttpRequest()
+    public function is_xml_http_request()
     {
         if (preg_match('/XMLHttpRequest/i', $_SERVER['HTTP_X_REQUESTED_WITH'])) return true;
         return false;
     }
     
-    public function isXhr()
+    public function is_xhr()
     {
-        return $this->isXmlHttpRequest();
+        return $this->is_xml_http_request();
     }
     
     public function method()
@@ -56,51 +56,51 @@ class SRequest
         return $_SERVER['SERVER_PORT'];
     }
     
-    public function remoteIp()
+    public function remote_ip()
     {
         return $_SERVER['REMOTE_ADDR'];
     }
     
     public function protocol()
     {
-        return ($this->isSSL() ? 'https://' : 'http://');
+        return ($this->is_ssl() ? 'https://' : 'http://');
     }
     
-    public function standardPort()
+    public function standard_port()
     {
         return (($this->protocol() == 'https://') ? 443 : 80);
     }
     
-    public function portString()
+    public function port_string()
     {
-        return (($this->port() == $this->standardPort()) ? '' : ':'.$this->port());
+        return (($this->port() == $this->standard_port()) ? '' : ':'.$this->port());
     }
     
-    public function hostWithPort()
+    public function host_with_port()
     {
-        return $this->host().$this->portString();
+        return $this->host().$this->port_string();
     }
     
-    public function rawPostData()
+    public function raw_post_data()
     {
         return file_get_contents('php://input');
     }
     
-    public function requestUri()
+    public function request_uri()
     {
-        if (!isset($this->requestUri))
-            $this->requestUri = substr($_SERVER['REQUEST_URI'], strlen($this->relativeUrlRoot()));
-        return $this->requestUri;
+        if (!isset($this->request_uri))
+            $this->request_uri = substr($_SERVER['REQUEST_URI'], strlen($this->relative_url_root()));
+        return $this->request_uri;
     }
     
-    public function relativeUrlRoot()
+    public function relative_url_root()
     {
-        if (!isset($this->relativeUrlRoot))
-            $this->relativeUrlRoot = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
-        return $this->relativeUrlRoot;
+        if (!isset($this->relative_url_root))
+            $this->relative_url_root = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
+        return $this->relative_url_root;
     }
     
-    private function parsePostParameters()
+    private function parse_post_parameters()
     {
         $keys  = array_keys($_POST);
         $count = sizeof($keys);

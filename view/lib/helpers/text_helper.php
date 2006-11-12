@@ -8,10 +8,10 @@ function html_escape($html)
     return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
 }
 
-function truncate($text, $length = 30, $truncateString = '...')
+function truncate($text, $length = 30, $truncate_string = '...')
 {
     if (utf8_strlen($text) > $length)
-        return utf8_substr_replace($text, $truncateString, $length - utf8_strlen($truncateString));
+        return utf8_substr_replace($text, $truncate_string, $length - utf8_strlen($truncate_string));
     else
         return $text;
 }
@@ -40,15 +40,15 @@ function sanitize($html)
 
 function cycle($values, $name = 'default')
 {
-    $cycle = SCycle::getCycle($name);
+    $cycle = SCycle::get_cycle($name);
     if ($cycle === null || $cycle->values != $values)
-        $cycle = SCycle::setCycle($name, new SCycle($values));
+        $cycle = SCycle::set_cycle($name, new SCycle($values));
     return $cycle->__toString();
 }
 
 function reset_cycle($name = 'default')
 {
-    $cycle = SCycle::getCycle($name);
+    $cycle = SCycle::get_cycle($name);
     if ($cycle !== null) $cycle->reset();
 }
 
@@ -77,13 +77,13 @@ class SCycle
         $this->index = 0;
     }
     
-    public static function setCycle($name, $cycle)
+    public static function set_cycle($name, $cycle)
     {
         self::$cycles[$name] = $cycle;
         return $cycle;
     }
     
-    public static function getCycle($name)
+    public static function get_cycle($name)
     {
         if (isset(self::$cycles[$name])) return self::$cycles[$name];
         else return null;

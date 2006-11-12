@@ -2,13 +2,13 @@
 
 define('APP_DIR', ROOT_DIR.'/app');
 
-function error_handler($errorType, $message)
+function error_handler($error_type, $message)
 {
     // No exception thrown for notices : Stato uses some PHP4 librairies
     // and we don't want to bother with "var is deprecated"
     // Ideally, we could log this type of errors
-    if ($errorType != E_NOTICE && $errorType != E_STRICT)
-        throw new SException($message, $errorType);
+    if ($error_type != E_NOTICE && $error_type != E_STRICT)
+        throw new SException($message, $error_type);
 }
 set_error_handler('error_handler');
 
@@ -36,7 +36,7 @@ class SDispatcher
         }
         catch (Exception $e)
         {
-            SActionController::processWithException($request, $response, $e)->out();
+            SActionController::process_with_exception($request, $response, $e)->out();
         }
 	}
 }

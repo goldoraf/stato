@@ -45,7 +45,7 @@ class SDate
         throw new SDateException("Properties are read-only.");
     }
     
-    public function isLeap()
+    public function is_leap()
     {
         return $this->year % 4 == 0 && ($this->year % 400 == 0 || $this->year % 100 != 0);
     }
@@ -65,7 +65,7 @@ class SDate
         return $this->sprintf('%04d-%02d-%02d');
     }
     
-    public function toIso8601()
+    public function to_iso8601()
     {
         return $this->sprintf('%04d%02d%02dT00:00:00');
     }
@@ -142,7 +142,7 @@ class SDateTime extends SDate
         return $this->sprintf('%04d-%02d-%02d %02d:%02d:%02d');
     }
     
-    public function toIso8601()
+    public function to_iso8601()
     {
         return $this->sprintf('%04d%02d%02dT%02d:%02d:%02d');
     }

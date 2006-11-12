@@ -11,14 +11,14 @@ class SAssociation
     
     public function typecast($owner, $value)
     {
-        $manager = $this->meta->getManager($owner);
+        $manager = $this->meta->get_manager($owner);
         $manager->replace($value);
         return $manager;
     }
     
-    public function defaultValue($owner)
+    public function default_value($owner)
     {
-        return $this->meta->getManager($owner);
+        return $this->meta->get_manager($owner);
     }
 }
 
@@ -26,12 +26,12 @@ class SAssociationMeta
 {
     public $type  = null;
     public $class = null;
-    public $foreignKey = null;
+    public $foreign_key = null;
     
-    protected $validOptions = array('assoc_type', 'class_name', 'foreign_key');
-    protected $baseMeta = null;
+    protected $valid_options = array('assoc_type', 'class_name', 'foreign_key');
+    protected $base_meta = null;
     
-    public static function getInstance($ownerMeta, $assocName, $options)
+    public static function get_instance($owner_meta, $assoc_name, $options)
     {
         if (!is_array($options))
         {
@@ -41,11 +41,11 @@ class SAssociationMeta
         }
         if (!isset($options['assoc_type'])) throw new SException('Type of relationship is required.');
         $options['assoc_type'] = 'S'.SInflection::camelize($options['assoc_type']);
-        $instanceClass = $options['assoc_type'].'Meta';
-        return new $instanceClass($ownerMeta, $assocName, $options);
+        $instance_class = $options['assoc_type'].'Meta';
+        return new $instance_class($owner_meta, $assoc_name, $options);
     }
     
-    public function __construct($ownerMeta, $assocName, $options)
+    public function __construct($owner_meta, $assoc_name, $options)
     {
         $this->type = $options['assoc_type'];
         
@@ -59,51 +59,51 @@ class SAssociationMeta
                 $this->class = SInflection::camelize($class);
                 
                 if (!class_exists($this->class))
-                    SDependencies::requireDependency('models', $options['class_name'], $ownerMeta->class);
+                    SDependencies::require_dependency('models', $options['class_name'], $owner_meta->class);
             }
         }
         else
         {
             if ($this->type == 'SHasMany' || $this->type == 'SManyToMany') 
-                $this->class = SInflection::camelize(SInflection::singularize($assocName));
+                $this->class = SInflection::camelize(SInflection::singularize($assoc_name));
             else 
-                $this->class = SInflection::camelize($assocName);
+                $this->class = SInflection::camelize($assoc_name);
         }
         
         if (!class_exists($this->class))
-            SDependencies::requireDependency('models', $this->class, $ownerMeta->class);
+            SDependencies::require_dependency('models', $this->class, $owner_meta->class);
     }
     
     public function __get($key)
     {
-        return $this->baseMeta()->$key;
+        return $this->base_meta()->$key;
     }
     
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->baseMeta(), $method), $args);
+        return call_user_func_array(array($this->base_meta(), $method), $args);
     }
     
-    public function getManager($owner)
+    public function get_manager($owner)
     {
         $class = $this->type.'Manager';
         return new $class($owner, $this);
     }
     
-    protected function assertValidOptions($options, $additionalOptions = array())
+    protected function assert_valid_options($options, $additional_options = array())
     {
-        $validOptions = array_merge($this->validOptions, $additionalOptions);
+        $valid_options = array_merge($this->valid_options, $additional_options);
         foreach(array_keys($options) as $key)
         {
-            if (!in_array($key, $validOptions))
+            if (!in_array($key, $valid_options))
                 throw new SException($key.' is not a valid mapping option.');
         }
     }
     
-    protected function baseMeta()
+    protected function base_meta()
     {
-        if ($this->baseMeta === null) $this->baseMeta = SActiveRecordMeta::retrieve($this->class);
-        return $this->baseMeta;
+        if ($this->base_meta === null) $this->base_meta = SActiveRecordMeta::retrieve($this->class);
+        return $this->base_meta;
     }
 }
 
@@ -146,40 +146,40 @@ abstract class SAssociationManager
     
     public function target()
     {
-        if (!$this->owner->isNewRecord() || $this->isFkPresent())
+        if (!$this->owner->is_new_record() || $this->is_fk_present())
         {
             if (!$this->loaded)
             {
-                $this->target = $this->findTarget();
+                $this->target = $this->find_target();
                 $this->loaded = true;
             }
         }
         return $this->target;
     }
     
-    public function setTarget($record)
+    public function set_target($record)
     {
         $this->target = $record;
         $this->loaded = true;
     }
     
-    public function isLoaded()
+    public function is_loaded()
     {
         return $this->loaded;
     }
     
-    public function isNull()
+    public function is_null()
     {
         return $this->target() === null;
     }
     
     // only belongsTo overwrites it
-    protected function isFkPresent() 
+    protected function is_fk_present() 
     {
         return false;
     }
     
-    protected function checkRecordType($record)
+    protected function check_record_type($record)
     {
         $ref = new ReflectionObject($record);
         
@@ -191,15 +191,15 @@ abstract class SAssociationManager
     abstract public function replace($value);
     
     // Callbacks
-    public function beforeOwnerSave() {}
+    public function before_owner_save() {}
     
-    public function afterOwnerSave() {}
+    public function after_owner_save() {}
     
-    public function beforeOwnerDelete() {}
+    public function before_owner_delete() {}
     
-    public function afterOwnerDelete() {}
+    public function after_owner_delete() {}
     
-    abstract protected function findTarget();
+    abstract protected function find_target();
 }
 
 abstract class SManyAssociationManager
@@ -220,19 +220,19 @@ abstract class SManyAssociationManager
         if ($this->qs !== null) 
             return call_user_func_array(array($this->qs, $method), $args);
         else
-            return call_user_func_array(array($this->getQuerySet(), $method), $args);
+            return call_user_func_array(array($this->get_query_set(), $method), $args);
     }
     
     public function all()
     {
-        if ($this->owner->isNewRecord()) return $this->unsaved;
+        if ($this->owner->is_new_record()) return $this->unsaved;
         if ($this->qs !== null) return $this->qs;
-        return $this->getQuerySet();
+        return $this->get_query_set();
     }
     
     public function count()
     {
-        if ($this->owner->isNewRecord()) return count($this->unsaved);
+        if ($this->owner->is_new_record()) return count($this->unsaved);
         return $this->__call('count', array());
     }
     
@@ -250,9 +250,9 @@ abstract class SManyAssociationManager
         if (!is_array($records)) $records = array($records);
         foreach($records as $record)
         {
-            $this->checkRecordType($record);
-            if ($this->owner->isNewRecord()) $this->unsaved[] = $record;
-            else $this->insertRecord($record);
+            $this->check_record_type($record);
+            if ($this->owner->is_new_record()) $this->unsaved[] = $record;
+            else $this->insert_record($record);
         }
     }
     
@@ -261,8 +261,8 @@ abstract class SManyAssociationManager
         if (!is_array($records)) $records = array($records);
         foreach($records as $record)
         {
-            $this->checkRecordType($record);
-            $this->deleteRecord($record);
+            $this->check_record_type($record);
+            $this->delete_record($record);
         }
     }
     
@@ -272,36 +272,36 @@ abstract class SManyAssociationManager
         $this->add($records);
     }
     
-    public function singularIds($ids)
+    public function singular_ids($ids)
     {
         $qs = new SQuerySet($this->meta);
         $this->replace($qs->get($ids));
     }
     
-    public function setQuerySet($qs)
+    public function set_query_set($qs)
     {
         $this->qs = $qs;
     }
     
-    public function isLoaded()
+    public function is_loaded()
     {
         return ($this->qs !== null);
     }
     
     abstract public function clear();
     
-    public function beforeOwnerSave() {}
+    public function before_owner_save() {}
     
-    public function afterOwnerSave()
+    public function after_owner_save()
     {
-        foreach ($this->unsaved as $record) $this->insertRecord($record);
+        foreach ($this->unsaved as $record) $this->insert_record($record);
     }
     
-    public function beforeOwnerDelete() {}
+    public function before_owner_delete() {}
     
-    public function afterOwnerDelete() {}
+    public function after_owner_delete() {}
     
-    protected function checkRecordType($record)
+    protected function check_record_type($record)
     {
         $ref = new ReflectionObject($record);
         
@@ -315,11 +315,11 @@ abstract class SManyAssociationManager
         return SActiveRecord::connection();
     }
     
-    abstract protected function insertRecord($record);
+    abstract protected function insert_record($record);
     
-    abstract protected function deleteRecord($record);
+    abstract protected function delete_record($record);
     
-    abstract protected function getQuerySet();
+    abstract protected function get_query_set();
 }
 
 ?>

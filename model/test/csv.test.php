@@ -2,7 +2,7 @@
 
 class CsvTest extends UnitTestCase
 {
-    public function testIteratorWithFile()
+    public function test_iterator_with_file()
     {
         $csv = new SCsvIterator(fopen(CORE_DIR.'/model/test/fixtures/clients.csv', 'r'));
         $this->assertEqual(array('id', 'name'), $csv->fields());
@@ -16,7 +16,7 @@ class CsvTest extends UnitTestCase
         $this->assertFalse($csv->valid());
     }
     
-    public function testIteratorWithStream()
+    public function test_iterator_with_stream()
     {
         global $str;
         $str = "'id';'contract_id';'name'\n'1';'1';'apple'\n'2';'2';'ibm'\n'3';'0';'mozilla corp.'";

@@ -7,12 +7,12 @@ class SComponent
     protected $key = null;
     protected $optional = false;
     
-    public function isDynamic()
+    public function is_dynamic()
     {
         return false;
     }
     
-    public function isOptional()
+    public function is_optional()
     {
         return $this->optional;
     }
@@ -44,7 +44,7 @@ class SStaticComponent extends SComponent
         $this->value = $value;
     }
     
-    public function writeGeneration($url)
+    public function write_generation($url)
     {
         $url->parts[] = $this->value;
     }
@@ -65,18 +65,18 @@ class SDynamicComponent extends SComponent
         $this->key = $key;
     }
     
-    public function setDefault($default)
+    public function set_default($default)
     {
         $this->default = $default;
         $this->optional = true;
     }
     
-    public function isDynamic()
+    public function is_dynamic()
     {
         return true;
     }
     
-    public function writeGeneration($url)
+    public function write_generation($url)
     {
         if (isset($url->params[$this->key]))
         {
@@ -87,7 +87,7 @@ class SDynamicComponent extends SComponent
             
             unset($url->params[$this->key]);
         }
-        elseif ($this->default !== null && !$this->isOptional())
+        elseif ($this->default !== null && !$this->is_optional())
             $url->parts[] = $this->default;
         else $url->parts[] = false;
     }
@@ -105,12 +105,12 @@ class SControllerComponent extends SDynamicComponent
 {
     public $subdir = null;
     
-    public function writeGeneration($url)
+    public function write_generation($url)
     {
         if (isset($url->params[$this->key]) && $this->subdir !== null)
             $url->params[$this->key] = str_replace($this->subdir.'/', '', $url->params[$this->key]);
             
-        parent::writeGeneration($url);
+        parent::write_generation($url);
     }
     
     public function regex()
@@ -143,7 +143,7 @@ class SUrl
         return implode('/', $this->parts);
     }
     
-    public function hasGaps()
+    public function has_gaps()
     {
         $gaps = false;
         foreach ($this->parts as $k => $p)
@@ -165,7 +165,7 @@ class SRoute
     public $options    = array();
     public $components = array();
     public $known      = array();
-    public $pathKeys   = array();
+    public $path_keys   = array();
     public $keys       = array();
     public $defaults   = array();
     public $regex      = null;
@@ -175,23 +175,23 @@ class SRoute
     {
         $this->path = $path;
         $this->options = $options;
-        $this->initializeComponents($path);
-        list($defaults, $conditions) = $this->initializeHashes($options);
+        $this->initialize_components($path);
+        list($defaults, $conditions) = $this->initialize_hashes($options);
         $this->defaults = $defaults;
-        $this->configureComponents($defaults, $conditions);
-        $this->addDefaultRequirements();
+        $this->configure_components($defaults, $conditions);
+        $this->add_default_requirements();
     }
     
     public function generate($options)
     {
         $url = new SUrl($options);
         
-        //foreach ($this->components as $comp) $comp->writeGeneration($url);
+        //foreach ($this->components as $comp) $comp->write_generation($url);
         $comps = array_reverse($this->components);
-        foreach ($comps as $comp) $comp->writeGeneration($url);
+        foreach ($comps as $comp) $comp->write_generation($url);
         $url->parts = array_reverse($url->parts);
         
-        if ($url->hasGaps())
+        if ($url->has_gaps())
             throw new SRoutingException("No url can be generated for the options : $options");
             
         foreach($this->known as $k => $v)
@@ -200,20 +200,20 @@ class SRoute
         return array($url->__toString(), $url->params);
     }
     
-    public function writeRegex()
+    public function write_regex()
     {
-        list($regex, $optional) = $this->buildRecursiveRegex($this->components);
+        list($regex, $optional) = $this->build_recursive_regex($this->components);
         $this->regex = '#^'.$regex.'$#i';
     }
     
-    protected function buildRecursiveRegex($components)
+    protected function build_recursive_regex($components)
     {
         $rest = null;
         $optional = true;
         
         $comp = array_shift($components);
         if (count($components) > 0)
-            list($rest, $optional) = $this->buildRecursiveRegex($components);
+            list($rest, $optional) = $this->build_recursive_regex($components);
             
         if (empty($rest)) $regex = $comp->regex();
         else
@@ -224,24 +224,24 @@ class SRoute
                 $regex = $comp->regex()."/$rest";
         }
         
-        if ($comp->isOptional() && $optional)
+        if ($comp->is_optional() && $optional)
             return array($regex, true);
         else
             return array($regex, false);
     }
     
-    protected function initializeComponents($path)
+    protected function initialize_components($path)
     {
         if (is_string($path)) $path = explode('/', $path);
         foreach ($path as $str)
         {
             $comp = SComponent::instanciate($str);
             $this->components[] = $comp;
-            $this->pathKeys[] = $comp->key();
+            $this->path_keys[] = $comp->key();
         }
     }
     
-    protected function initializeHashes($options)
+    protected function initialize_hashes($options)
     {
         $conditions = array();
         $defaults   = array();
@@ -254,7 +254,7 @@ class SRoute
         
         if (isset($options['subdirectory']))
         {
-            if (!in_array('controller', $this->pathKeys))
+            if (!in_array('controller', $this->path_keys))
             {
                 throw new SRoutingException('Subdirectory option must be used 
                 with a route including a ControllerComponent');
@@ -269,7 +269,7 @@ class SRoute
         
         foreach ($options as $k => $v)
         {
-            if (in_array($k, $this->pathKeys))
+            if (in_array($k, $this->path_keys))
             {
                 if ($v{0} == '/' && $v{strlen($v)-1} == '/') // if $k is a regex
                     $conditions[$k] = $v;
@@ -282,29 +282,29 @@ class SRoute
         return array($defaults, $conditions);
     }
     
-    protected function configureComponents($defaults, $conditions)
+    protected function configure_components($defaults, $conditions)
     {
         foreach ($this->components as $comp)
         {
-            if (array_key_exists($comp->key(), $defaults)) $comp->setDefault($defaults[$comp->key()]);
-            elseif ($comp->key() == 'action') $comp->setDefault('index');
-            elseif ($comp->key() == 'id') $comp->setDefault(null);
+            if (array_key_exists($comp->key(), $defaults)) $comp->set_default($defaults[$comp->key()]);
+            elseif ($comp->key() == 'action') $comp->set_default('index');
+            elseif ($comp->key() == 'id') $comp->set_default(null);
             
             if (array_key_exists($comp->key(), $conditions))
                 $comp->condition = $conditions[$comp->key()];
         }
     }
     
-    protected function addDefaultRequirements()
+    protected function add_default_requirements()
     {
-        //if (!in_array('action', $this->pathKeys)) $this->known['action'] = 'index';
+        //if (!in_array('action', $this->path_keys)) $this->known['action'] = 'index';
     }
 }
 
 class SRouteSet
 {
     private $routes = array();
-    private $genMap = array();
+    private $gen_map = array();
     
     public function connect($path, $options = array())
     {
@@ -313,31 +313,31 @@ class SRouteSet
     
     public function generate($options)
     {
-        if (!isset($this->genMap[$options['controller']]))
+        if (!isset($this->gen_map[$options['controller']]))
         {
             if (strpos($options['controller'], '/'))
             {
                 list($subdir, $contr) = explode('/', $options['controller']);
-                $actions = $this->genMap[$subdir.'/*'];
+                $actions = $this->gen_map[$subdir.'/*'];
             }
             else
-                $actions = $this->genMap['*'];
+                $actions = $this->gen_map['*'];
         }
-        else $actions = $this->genMap[$options['controller']];
+        else $actions = $this->gen_map[$options['controller']];
         
         if (!isset($actions[$options['action']]))
         {
             if (isset($actions['*'])) $route = $actions['*'];
-            else $route = $this->genMap['*']['*'];
+            else $route = $this->gen_map['*']['*'];
         }
         else $route = $actions[$options['action']];
         
         return $route->generate($options);
     }
     
-    public function recognizePath($url)
+    public function recognize_path($url)
     {
-        list($path, $queryString) = explode('?', $url);
+        list($path, $query_string) = explode('?', $url);
         $options = array();
         $recognized = false;
         
@@ -365,7 +365,7 @@ class SRouteSet
         
         if (!$recognized) return null;
         
-        parse_str($queryString, $params);
+        parse_str($query_string, $params);
         return array_merge($params, $options);
     }
     
@@ -373,21 +373,21 @@ class SRouteSet
     {
         foreach ($this->routes as $r)
         {
-            $r->writeRegex();
+            $r->write_regex();
             
             if (array_key_exists('controller', $r->known))
             {
                 if (array_key_exists('action', $r->known))
-                    $this->genMap[$r->known['controller']][$r->known['action']] = $r;
+                    $this->gen_map[$r->known['controller']][$r->known['action']] = $r;
                 else
-                    $this->genMap[$r->known['controller']]['*'] = $r;
+                    $this->gen_map[$r->known['controller']]['*'] = $r;
             }
             else
             {
                 if ($r->subdir !== null)
-                    $this->genMap[$r->subdir.'/*']['*'] = $r;
+                    $this->gen_map[$r->subdir.'/*']['*'] = $r;
                 else
-                    $this->genMap['*']['*'] = $r;
+                    $this->gen_map['*']['*'] = $r;
             }
         }
     }
@@ -405,10 +405,10 @@ class SRoutes
   
     public static function recognize($request)
     {
-        $options = self::$map->recognizePath($request->requestUri());
+        $options = self::$map->recognize_path($request->request_uri());
         
         if ($options === null)
-            throw new SRoutingException('Recognition failed for '.$request->requestUri());
+            throw new SRoutingException('Recognition failed for '.$request->request_uri());
         
         $request->controller = $options['controller'];
         $request->action     = $options['action'];

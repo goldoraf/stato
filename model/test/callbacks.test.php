@@ -3,31 +3,31 @@
 class FakeRecord extends SObservable
 {
     public $value = 0;
-    public $beforeValue = Null;
-    public $afterValue = Null;
+    public $before_value = Null;
+    public $after_value = Null;
     public $association = Null;
     
     public function __construct()
     {
         $this->association = new FakeAssoc();
-        $this->addCallback($this->association, 'beforeSave', 'increment');
+        $this->add_callback($this->association, 'before_save', 'increment');
     }
     
     public function save()
     {
-        $this->setState('beforeSave');
+        $this->set_state('before_save');
         $this->value++;
-        $this->setState('afterSave');
+        $this->set_state('after_save');
     }
     
-    public function beforeSave()
+    public function before_save()
     {
-        $this->beforeValue = $this->value;
+        $this->before_value = $this->value;
     }
     
-    public function afterSave()
+    public function after_save()
     {
-        $this->afterValue = $this->value;
+        $this->after_value = $this->value;
     }
 }
 
@@ -43,17 +43,17 @@ class FakeAssoc
 
 class CallbacksTest extends UnitTestCase
 {
-    function testSelfCallbacks()
+    function test_self_callbacks()
     {
         $entity = new FakeRecord();
         $this->assertEqual(0, $entity->value);
         $entity->save();
-        $this->assertEqual(0, $entity->beforeValue);
+        $this->assertEqual(0, $entity->before_value);
         $this->assertEqual(1, $entity->value);
-        $this->assertEqual(1, $entity->afterValue);
+        $this->assertEqual(1, $entity->after_value);
     }
     
-    function testCallbacks()
+    function test_callbacks()
     {
         $entity = new FakeRecord();
         $this->assertEqual(0, $entity->association->value);

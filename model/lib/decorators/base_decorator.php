@@ -19,9 +19,9 @@ class SActiveRecordDecorator
         return $this->record->__set($name, $value);
     }
     
-    public function __call($methodMissing, $args)
+    public function __call($method_missing, $args)
     {
-        return call_user_func_array(array($this->record, $methodMissing), $args);
+        return call_user_func_array(array($this->record, $method_missing), $args);
     }
 }
 

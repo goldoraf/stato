@@ -1,8 +1,8 @@
 <?php
 
-function date_select($objectName, $method, $object, $options = array())
+function date_select($object_name, $method, $object, $options = array())
 {
-    list($options['prefix'], $value) = default_date_options($objectName, $method, $object);
+    list($options['prefix'], $value) = default_date_options($object_name, $method, $object);
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $date = ($value != Null) ? $value : 0; 
     else
@@ -11,9 +11,9 @@ function date_select($objectName, $method, $object, $options = array())
     return select_date($date, $options);
 }
 
-function date_time_select($objectName, $method, $object, $options = array())
+function date_time_select($object_name, $method, $object, $options = array())
 {
-    list($options['prefix'], $value) = default_date_options($objectName, $method, $object);
+    list($options['prefix'], $value) = default_date_options($object_name, $method, $object);
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $datetime = ($value != Null) ? $value : Null; 
     else
@@ -22,9 +22,9 @@ function date_time_select($objectName, $method, $object, $options = array())
     return select_date_time($datetime, $options);
 }
 
-function time_select($objectName, $method, $object, $options = array())
+function time_select($object_name, $method, $object, $options = array())
 {
-    list($options['prefix'], $value) = default_date_options($objectName, $method, $object);
+    list($options['prefix'], $value) = default_date_options($object_name, $method, $object);
     if (isset($options['include_blank']) && $options['include_blank'] == True)
         $datetime = ($value != Null) ? $value : Null; 
     else
@@ -68,23 +68,23 @@ function select_time($datetime = Null, $options = array())
 
 function select_day($date, $options=array())
 {
-    $dayOptions = '';
+    $day_options = '';
     $selected = is_date_type($date) ? $date->day : $date;
     for ($i = 1; $i <= 31; $i++)
     {
         if ($i == $selected)
-            $dayOptions.= "<option value=\"{$i}\" selected=\"selected\">{$i}</option>\n";
+            $day_options.= "<option value=\"{$i}\" selected=\"selected\">{$i}</option>\n";
         else
-            $dayOptions.= "<option value=\"{$i}\">{$i}</option>\n";
+            $day_options.= "<option value=\"{$i}\">{$i}</option>\n";
     }
     if (!isset($options['field_name'])) $options['field_name'] = 'day';
     
-    return select_html($options['field_name'], $dayOptions, $options);
+    return select_html($options['field_name'], $day_options, $options);
 }
 
 function select_month($date, $options=array())
 {
-    $monthOptions = '';
+    $month_options = '';
     $selected = is_date_type($date) ? $date->month : $date;
     for ($i = 1; $i <= 12; $i++)
     {
@@ -99,18 +99,18 @@ function select_month($date, $options=array())
             $month = $i.' - '.$month;
             
         if ($i == $selected)
-            $monthOptions.= "<option value=\"{$i}\" selected=\"selected\">{$month}</option>\n";
+            $month_options.= "<option value=\"{$i}\" selected=\"selected\">{$month}</option>\n";
         else
-            $monthOptions.= "<option value=\"{$i}\">{$month}</option>\n";
+            $month_options.= "<option value=\"{$i}\">{$month}</option>\n";
     }
     if (!isset($options['field_name'])) $options['field_name'] = 'month';
     
-    return select_html($options['field_name'], $monthOptions, $options);
+    return select_html($options['field_name'], $month_options, $options);
 }
 
 function select_year($date, $options = array())
 {
-    $yearOptions = '';
+    $year_options = '';
     $today = SDate::today();
     if (!isset($options['start_year'])) $options['start_year'] = $today->year - 5;
     if (!isset($options['end_year'])) $options['end_year'] = $today->year + 5;
@@ -119,56 +119,56 @@ function select_year($date, $options = array())
     for($i = $options['start_year']; $i != $options['end_year'] + $step; $i = $i + $step)
     {
         if ($i == $selected)
-            $yearOptions.= "<option value=\"{$i}\" selected=\"selected\">{$i}</option>\n";
+            $year_options.= "<option value=\"{$i}\" selected=\"selected\">{$i}</option>\n";
         else
-            $yearOptions.= "<option value=\"{$i}\">{$i}</option>\n";
+            $year_options.= "<option value=\"{$i}\">{$i}</option>\n";
     }
     if (!isset($options['field_name'])) $options['field_name'] = 'year';
     
-    return select_html($options['field_name'], $yearOptions, $options);
+    return select_html($options['field_name'], $year_options, $options);
 }
 
 function select_second($datetime, $options = array())
 {
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->sec : $datetime;
-    $secOptions = numerical_options(0, 59, $selected);
+    $sec_options = numerical_options(0, 59, $selected);
     if (!isset($options['field_name'])) $options['field_name'] = 'sec';
-    return select_html($options['field_name'], $secOptions, $options);
+    return select_html($options['field_name'], $sec_options, $options);
 }
 
 function select_minute($datetime, $options = array())
 {
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->min : $datetime;
     $step = (isset($options['minute_step'])) ? $options['minute_step'] : 1;
-    $minOptions = numerical_options(0, 59, $selected, $step);
+    $min_options = numerical_options(0, 59, $selected, $step);
     if (!isset($options['field_name'])) $options['field_name'] = 'min';
-    return select_html($options['field_name'], $minOptions, $options);
+    return select_html($options['field_name'], $min_options, $options);
 }
 
 function select_hour($datetime, $options = array())
 {
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->hour : $datetime;
-    $hourOptions = numerical_options(0, 23, $selected);
+    $hour_options = numerical_options(0, 23, $selected);
     if (!isset($options['field_name'])) $options['field_name'] = 'hour';
-    return select_html($options['field_name'], $hourOptions, $options);
+    return select_html($options['field_name'], $hour_options, $options);
 }
 
-function select_html($type, $dateOptions, $options = array())
+function select_html($type, $date_options, $options = array())
 {
-    $htmlOptions = array();
+    $html_options = array();
     if (!isset($options['prefix'])) $options['prefix'] = 'date';
-    $htmlOptions['name'] = $options['prefix']."[{$type}]";
-    if (isset($options['disabled']) && $options['disabled'] == true) $htmlOptions['disabled'] = true;
-    if (isset($options['class'])) $htmlOptions['class'] = $options['class'];    
+    $html_options['name'] = $options['prefix']."[{$type}]";
+    if (isset($options['disabled']) && $options['disabled'] == true) $html_options['disabled'] = true;
+    if (isset($options['class'])) $html_options['class'] = $options['class'];    
     if (isset($options['include_blank']) && $options['include_blank'] == true) 
-        $dateOptions = '<option value=""></option>'.$dateOptions;
+        $date_options = '<option value=""></option>'.$date_options;
     
-    return content_tag('select', $dateOptions, $htmlOptions)."\n";
+    return content_tag('select', $date_options, $html_options)."\n";
 }
 
-function default_date_options($objectName, $method, $object)
+function default_date_options($object_name, $method, $object)
 {
-    return array("{$objectName}[{$method}]", $object->$method);
+    return array("{$object_name}[{$method}]", $object->$method);
 }
 
 function numerical_options($start, $end, $selected = Null, $step=1)

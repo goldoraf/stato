@@ -3,125 +3,125 @@
 class ListDecoratorTest extends ActiveTestCase
 {
     public $fixtures = array('topics', 'forums');
-    public $useInstantiatedFixtures = True;
+    public $use_instantiated_fixtures = True;
     
-    function testReordering()
+    function test_reordering()
     {
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
         
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
-        $topic->moveLower();
-        $this->instanciateFixtures(); // if not called, the topics array will not be refreshed and the next test will fail
+        $topic->move_lower();
+        $this->instanciate_fixtures(); // if not called, the topics array will not be refreshed and the next test will fail
         
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_3'],
                                  $this->topics['list_2'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
         
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
-        $topic->moveHigher();
-        $this->instanciateFixtures();
+        $topic->move_higher();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
                                  
         $topic = new SListDecorator($this->topics['list_1'], 'forum');
-        $topic->moveToBottom();
-        $this->instanciateFixtures();
+        $topic->move_to_bottom();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4'],
                                  $this->topics['list_1']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
                                  
         $topic = new SListDecorator($this->topics['list_1'], 'forum');
-        $topic->moveToTop();
-        $this->instanciateFixtures();
+        $topic->move_to_top();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
                                  
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
-        $topic->moveToBottom();
-        $this->instanciateFixtures();
+        $topic->move_to_bottom();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4'],
                                  $this->topics['list_2']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
                                  
         $topic = new SListDecorator($this->topics['list_4'], 'forum');
-        $topic->moveToTop();
-        $this->instanciateFixtures();
+        $topic->move_to_top();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_4'],
                                  $this->topics['list_1'],
                                  $this->topics['list_3'],
                                  $this->topics['list_2']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
                                  
         $topic = new SListDecorator($this->topics['list_3'], 'forum');
-        $topic->moveToBottom();
-        $this->instanciateFixtures();
+        $topic->move_to_bottom();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_4'],
                                  $this->topics['list_1'],
                                  $this->topics['list_2'],
                                  $this->topics['list_3']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
     }
     
-    function testHigherLower()
+    function test_higher_lower()
     {
         $topic = new SListDecorator($this->topics['list_1'], 'forum');
-        $this->assertEqual($this->topics['list_2'], $topic->lowerItem());
-        $this->assertNull($topic->higherItem());
+        $this->assertEqual($this->topics['list_2'], $topic->lower_item());
+        $this->assertNull($topic->higher_item());
         $topic = new SListDecorator($this->topics['list_4'], 'forum');
-        $this->assertEqual($this->topics['list_3'], $topic->higherItem());
-        $this->assertNull($topic->lowerItem());
+        $this->assertEqual($this->topics['list_3'], $topic->higher_item());
+        $this->assertNull($topic->lower_item());
     }
     
-    function testInsert()
+    function test_insert()
     {
         $new = new SListDecorator(new Topic(array('forum_id' => 2)), 'forum');
         $new->save();
         $this->assertEqual(1, $new->position);
-        $this->assertTrue($new->isFirst());
-        $this->assertTrue($new->isLast());
+        $this->assertTrue($new->is_first());
+        $this->assertTrue($new->is_last());
         
         $new = new SListDecorator(new Topic(array('forum_id' => 2)), 'forum');
         $new->save();
         $this->assertEqual(2, $new->position);
-        $this->assertFalse($new->isFirst());
-        $this->assertTrue($new->isLast());
+        $this->assertFalse($new->is_first());
+        $this->assertTrue($new->is_last());
         
         $new = new SListDecorator(new Topic(array('forum_id' => 2)), 'forum');
         $new->save();
         $this->assertEqual(3, $new->position);
-        $this->assertFalse($new->isFirst());
-        $this->assertTrue($new->isLast());
+        $this->assertFalse($new->is_first());
+        $this->assertTrue($new->is_last());
         
         $new = new SListDecorator(new Topic(array('forum_id' => 3)), 'forum');
         $new->save();
         $this->assertEqual(1, $new->position);
-        $this->assertTrue($new->isFirst());
-        $this->assertTrue($new->isLast());
+        $this->assertTrue($new->is_first());
+        $this->assertTrue($new->is_last());
     }
     
-    function testInsertAt()
+    function test_insert_at()
     {
         $new = new SListDecorator(new Topic(array('forum_id' => 2)), 'forum');
         $new->save();
@@ -136,41 +136,41 @@ class ListDecoratorTest extends ActiveTestCase
         $new4->save();
         $this->assertEqual(4, $new4->position);
         
-        $new4->insertAt(3);
+        $new4->insert_at(3);
         $this->assertEqual(3, $new4->position);
-        $new = new SListDecorator(SActiveStore::findByPk('Topic', $new->id), 'forum');
+        $new = new SListDecorator(SActiveStore::find_by_pk('Topic', $new->id), 'forum');
         $this->assertEqual(4, $new->position);
         
-        $new->insertAt(2);
+        $new->insert_at(2);
         $this->assertEqual(2, $new->position);
-        $new4 = new SListDecorator(SActiveStore::findByPk('Topic', $new4->id), 'forum');
+        $new4 = new SListDecorator(SActiveStore::find_by_pk('Topic', $new4->id), 'forum');
         $this->assertEqual(4, $new4->position);
         
         $new5 = new SListDecorator(new Topic(array('forum_id' => 2)), 'forum');
         $new5->save();
         $this->assertEqual(5, $new5->position);
-        $new5->insertAt(1);
+        $new5->insert_at(1);
         $this->assertEqual(1, $new5->position);
-        $new4 = new SListDecorator(SActiveStore::findByPk('Topic', $new4->id), 'forum');
+        $new4 = new SListDecorator(SActiveStore::find_by_pk('Topic', $new4->id), 'forum');
         $this->assertEqual(5, $new4->position);
     }
     
-    function testDelete()
+    function test_delete()
     {
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
                                  
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
         $topic->delete();
-        $this->instanciateFixtures();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
         
         $this->assertEqual(1, $this->topics['list_1']->position);
         $this->assertEqual(2, $this->topics['list_3']->position);
@@ -178,11 +178,11 @@ class ListDecoratorTest extends ActiveTestCase
         
         $topic = new SListDecorator($this->topics['list_1'], 'forum');
         $topic->delete();
-        $this->instanciateFixtures();
+        $this->instanciate_fixtures();
         
         $this->assertEqual(array($this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::findAll('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
         
         $this->assertEqual(1, $this->topics['list_3']->position);
         $this->assertEqual(2, $this->topics['list_4']->position);

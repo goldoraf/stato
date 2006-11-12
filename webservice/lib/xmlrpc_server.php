@@ -9,9 +9,9 @@ class SXmlRpcServer
     
     }
     
-    public function parseRequest($xmlString)
+    public function parse_request($xml_string)
     {
-        try { $xml = new SimpleXMLElement($xmlString); }
+        try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { throw new SXmlRpcServerException('Failed to parse request'); }
         
         if (empty($xml->methodName))
@@ -29,23 +29,23 @@ class SXmlRpcServer
                 if (empty($param->value))
                     throw new SXmlRpcServerException('Invalid request parameter : no <value> tag');
                     
-                $params[] = SXmlRpcValue::typecast($param->value->asXML());
+                $params[] = SXmlRpcValue::typecast($param->value->asXml());
             }
         }
         return array($method, $params);
     }
     
-    public function writeResponse($value)
+    public function write_response($value)
     {
         $value = new SXmlRpcValue($value);
-        $xmlValue = $value->toXml();
+        $xml_value = $value->to_xml();
         $xml = <<<EOD
 <?xml version="1.0"?>
 <methodResponse>
   <params>
     <param>
       <value>
-        $xmlValue
+        $xml_value
       </value>
     </param>
   </params>

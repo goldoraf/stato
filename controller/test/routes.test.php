@@ -4,7 +4,7 @@ require_once(CORE_DIR.'/controller/controller.php');
 
 class RoutesTest extends UnitTestCase
 {
-    function setMap($map)
+    function set_map($map)
     {
         $map->draw();
         $this->map = $map;
@@ -12,7 +12,7 @@ class RoutesTest extends UnitTestCase
     
     function rec($url)
     {
-        return $this->map->recognizePath($url);
+        return $this->map->recognize_path($url);
     }
     
     function gen($options)
@@ -20,11 +20,11 @@ class RoutesTest extends UnitTestCase
         return $this->map->generate($options);
     }
     
-    function testBasicRule()
+    function test_basic_rule()
     {
         $map = new SRouteSet();
         $map->connect(':controller/:action/:id');
-        $this->setMap($map);
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
             $this->rec('posts/view/45'));
@@ -47,11 +47,11 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'users', 'action'=>'show', 'group'=>'admin', 'pays'=>'france')));
     }
     
-    function testBasicRuleWithDefaultController()
+    function test_basic_rule_with_default_controller()
     {
         $map = new SRouteSet();
         $map->connect(':controller/:action/:id', array('controller'=>'blog'));
-        $this->setMap($map);
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
             $this->rec('posts/view/45'));
@@ -76,12 +76,12 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'recent')));
     }
     
-    function testEmptyPath()
+    function test_empty_path()
     {
         $map = new SRouteSet();
         $map->connect('', array('controller'=>'blog', 'action'=>'recent'));
         $map->connect(':controller/:action/:id');
-        $this->setMap($map);
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'blog', 'action'=>'recent'),
             $this->rec(''));
@@ -90,13 +90,13 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'recent')));
     }
     
-    function testSimpleRewrites()
+    function test_simple_rewrites()
     {
         $map = new SRouteSet();
         $map->connect('test/:action', array('controller' => 'other'));
         $map->connect('posts/:category', array('controller'=>'blog', 'action'=>'posts', 'category'=>'all'));
         $map->connect(':controller/:action/:id');
-        $this->setMap($map);
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'other', 'action'=>'list'),
             $this->rec('test/list'));
@@ -115,13 +115,13 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'posts', 'category'=>'php')));
     }
     
-    function testDateBased()
+    function test_date_based()
     {
         $map = new SRouteSet();
         $map->connect('archives/:year/:month/:day', array('controller'=>'blog', 'action'=>'by_date',
             'month'=>null, 'day'=>null, 'requirements'=>array('year'=>'/\d{4}/', 'day'=>'/\d{1,2}/', 'month'=>'/\d{1,2}/')));
         $map->connect(':controller/:action/:id');
-        $this->setMap($map);
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>14),
             $this->rec('archives/2006/02/14'));
@@ -138,14 +138,14 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006)));
     }
     
-    function testControllerInSubdir()
+    function test_controller_in_subdir()
     {
         $map = new SRouteSet();
         $map->connect('process/:controller/:action/:id', array('subdirectory'=>'processing', 'controller'=>'images', 'action'=>'list'));
         $map->connect('cms/:controller/:action/:id', array('subdirectory'=>'content', 'controller'=>'articles'));
         $map->connect('admin/:controller/:action/:id', array('subdirectory'=>'admin'));
         $map->connect(':controller/:action/:id');
-        $this->setMap($map);
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'admin/users', 'action'=>'edit', 'id'=>15),
             $this->rec('admin/users/edit/15'));

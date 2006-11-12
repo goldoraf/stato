@@ -11,29 +11,29 @@ class SHasManyThroughException extends SException
 
 class SHasManyThroughManager extends SHasManyManager
 {
-    protected function getQuerySet()
+    protected function get_query_set()
     {
-        if ($this->sourceAssocType == 'belongs_to')
+        if ($this->source_assoc_type == 'belongs_to')
         {
-            $assocPk = $this->meta->identityField;
-            $sourcePk = $this->meta->foreignKey;
+            $assoc_pk = $this->meta->identity_field;
+            $source_pk = $this->meta->foreign_key;
         }
         else
         {
-            $sourcePk = $this->meta->identityField;
-            $assocPk = $this->meta->foreignKey;
+            $source_pk = $this->meta->identity_field;
+            $assoc_pk = $this->meta->foreign_key;
         }
         
         $qs = new SQuerySet($this->meta);
-        return $qs->join("LEFT OUTER JOIN {$this->meta->throughTableName} 
-                          ON {$this->meta->tableName}.{$assocPk} 
-                          = {$this->meta->throughTableName}.{$sourcePk}")
-                  ->filter($this->getSqlFilter());
+        return $qs->join("LEFT OUTER JOIN {$this->meta->through_table_name} 
+                          ON {$this->meta->table_name}.{$assoc_pk} 
+                          = {$this->meta->through_table_name}.{$source_pk}")
+                  ->filter($this->get_sql_filter());
     }
     
-    protected function getSqlFilter()
+    protected function get_sql_filter()
     {
-        return "{$this->meta->throughTableName}.{$this->meta->throughForeignKey} = '{$this->owner->id}'";
+        return "{$this->meta->through_table_name}.{$this->meta->through_foreign_key} = '{$this->owner->id}'";
     }
     
     public function add($records)
@@ -51,9 +51,9 @@ class SHasManyThroughManager extends SHasManyManager
         throw new SHasManyThroughException();
     }
     
-    protected function insertRecord($record) {}
+    protected function insert_record($record) {}
     
-    protected function deleteRecord($record) {}
+    protected function delete_record($record) {}
 }
 
 ?>

@@ -4,7 +4,7 @@ require_once(CORE_DIR.'/webservice/webservice.php');
 
 class HttpClientTest extends UnitTestCase
 {
-    public function testGetRequest()
+    public function test_get_request()
     {
         $client = new SHttpClient('http://www.php.net/');
         $response = $client->get();
@@ -12,7 +12,7 @@ class HttpClientTest extends UnitTestCase
         $this->assertNotNull($response->body);
     }
     
-    public function testXmlPostRequest()
+    public function test_xml_post_request()
     {
         $xml = '<?xml version="1.0"?>
         <methodCall>

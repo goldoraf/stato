@@ -2,62 +2,62 @@
 
 class SPaginator
 {
-    public $perPage     = null;
-    public $currentPage = null;
+    public $per_page     = null;
+    public $current_page = null;
     
-    private $querySet  = null;
+    private $query_set  = null;
     private $param     = null;
-    private $pageCount = null;
+    private $page_count = null;
     
-    public function __construct($querySet, $perPage=20, $currentPage=1, $param='page')
+    public function __construct($query_set, $per_page=20, $current_page=1, $param='page')
     {
-        $this->querySet    = $querySet;
-        $this->perPage     = $perPage;
-        $this->currentPage = $currentPage;
+        $this->query_set    = $query_set;
+        $this->per_page     = $per_page;
+        $this->current_page = $current_page;
         $this->param       = $param;
     }
     
-    public function currentPage()
+    public function current_page()
     {
-        return $this->getPage($this->currentPage);
+        return $this->get_page($this->current_page);
     }
     
-    public function getPage($page)
+    public function get_page($page)
     {
-        return $this->querySet->limit($this->perPage, ($page - 1) * $this->perPage);
+        return $this->query_set->limit($this->per_page, ($page - 1) * $this->per_page);
     }
     
-    public function hasNextPage($page)
+    public function has_next_page($page)
     {
-        return $page < $this->pageCount() && $page > 0;
+        return $page < $this->page_count() && $page > 0;
     }
     
-    public function hasPreviousPage($page)
+    public function has_previous_page($page)
     {
         return $page > 1;
     }
     
-    public function windowPages($windowSize)
+    public function window_pages($window_size)
     {
         $window = array();
-        $first = $this->currentPage - $windowSize;
-        $last  = $this->currentPage + $windowSize;
-        for ($i=1; $i<=$this->pageCount(); $i++)
+        $first = $this->current_page - $window_size;
+        $last  = $this->current_page + $window_size;
+        for ($i=1; $i<=$this->page_count(); $i++)
         {
             if ($i >= $first && $i <= $last) $window[] = $i;
         }
         return $window;
     }
     
-    public function pageCount()
+    public function page_count()
     {
-        if ($this->pageCount == Null) $this->pageCount = ceil($this->hitsCount() / $this->perPage);
-        return $this->pageCount;
+        if ($this->page_count == Null) $this->page_count = ceil($this->hits_count() / $this->per_page);
+        return $this->page_count;
     }
     
-    public function hitsCount()
+    public function hits_count()
     {
-        return $this->querySet->count();
+        return $this->query_set->count();
     }
 }
 

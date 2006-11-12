@@ -4,20 +4,20 @@ require_once(CORE_DIR.'/view/view.php');
 
 class AssetTagHelperTest extends HelperTestCase
 {   
-    private $tmpScriptName = null;
+    private $tmp_script_name = null;
     
     public function setUp()
     {
-        $this->tmpScriptName = $_SERVER['SCRIPT_NAME'];
+        $this->tmp_script_name = $_SERVER['SCRIPT_NAME'];
         $_SERVER['SCRIPT_NAME'] = '/index.php';
     }
     
     public function tearDown()
     {
-        $_SERVER['SCRIPT_NAME'] = $this->tmpScriptName;
+        $_SERVER['SCRIPT_NAME'] = $this->tmp_script_name;
     }
     
-    public function testImageTag()
+    public function test_image_tag()
     {
         $this->assertDomEqual(image_tag('stato.png'), '<img alt="Stato" src="/images/stato.png" />');
         $this->assertDomEqual(
@@ -34,14 +34,15 @@ class AssetTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testJsIncludeTag()
+    public function test_js_include_tag()
     {
         $this->assertDomEqual(
             javascript_include_defaults(),
             '<script src="/js/prototype.js" type="text/javascript"></script>
             <script src="/js/controls.js" type="text/javascript"></script>
             <script src="/js/dragdrop.js" type="text/javascript"></script>
-            <script src="/js/effects.js" type="text/javascript"></script>'
+            <script src="/js/effects.js" type="text/javascript"></script>
+            <script src="/js/lowpro.js" type="text/javascript"></script>'
         );
         $this->assertDomEqual(
             javascript_include_tag('sortable'),
@@ -54,7 +55,7 @@ class AssetTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testStylesheetLinkTag()
+    public function test_stylesheet_link_tag()
     {
         $this->assertDomEqual(
             stylesheet_link_tag('main'),

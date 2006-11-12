@@ -26,7 +26,7 @@ class SCsvIterator implements Iterator
         if ($this->config['has_fields_in_first_line'])
         {
             $this->next();
-            if ($this->valid()) $this->fields = $this->fetchRow();
+            if ($this->valid()) $this->fields = $this->fetch_row();
         }
     }
     
@@ -35,15 +35,15 @@ class SCsvIterator implements Iterator
         return $this->fields;
     }
     
-    public function assignFields($fields)
+    public function assign_fields($fields)
     {
         foreach ($fields as $k => $v) $this->fields[$k] = $v;
     }
     
     public function current()
     {
-        if ($this->config['has_fields_in_first_line']) return $this->fetchAssoc();
-        else return $this->fetchRow();
+        if ($this->config['has_fields_in_first_line']) return $this->fetch_assoc();
+        else return $this->fetch_row();
     }
     
     public function key()
@@ -72,26 +72,26 @@ class SCsvIterator implements Iterator
         $this->next();
     }
     
-    private function fetchRow()
+    private function fetch_row()
     {
         $row = array();
         foreach ($this->data as $key => $value) 
-            $row[$key] = $this->convertEncoding($value);
+            $row[$key] = $this->convert_encoding($value);
         return $row;
     }
     
-    private function fetchAssoc()
+    private function fetch_assoc()
     {
         if (count($this->fields) != count($this->data))
             throw new SException("Wrong field count at line {$this->line}");
         
         $row = array();
         foreach ($this->fields as $key => $value) 
-            $row[$value] = $this->convertEncoding($this->data[$key]);
+            $row[$value] = $this->convert_encoding($this->data[$key]);
         return $row;
     }
     
-    private function convertEncoding($value)
+    private function convert_encoding($value)
     {
         if (!$this->config['convert_encoding']) return $value;
         else return mb_convert_encoding($value, "UTF-8", $this->config['encoding']);

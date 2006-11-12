@@ -1,35 +1,35 @@
 <?php
 
-function select($objectName, $method, $object, $choices, $options = array(), $htmlOptions = array())
+function select($object_name, $method, $object, $choices, $options = array(), $html_options = array())
 {
-    list($name, $value, $htmlOptions) = default_options($objectName, $method, $object, $htmlOptions);
-    $optionsBlock = add_select_options(options_for_select($choices, $value), $options, $value);
-    return select_tag($name, $optionsBlock, $htmlOptions);
+    list($name, $value, $html_options) = default_options($object_name, $method, $object, $html_options);
+    $options_block = add_select_options(options_for_select($choices, $value), $options, $value);
+    return select_tag($name, $options_block, $html_options);
 }
 
 
-function collection_select($objectName, $method, $object, $collection, $valueProp='id', $textProp=null, $options=array(), $htmlOptions = array())
+function collection_select($object_name, $method, $object, $collection, $value_prop='id', $text_prop=null, $options=array(), $html_options = array())
 {
-    list($name, $value, $htmlOptions) = default_options($objectName, $method, $object, $htmlOptions);
-    $optionsBlock = add_select_options(options_from_collection_for_select($collection, $valueProp, $textProp, $value), $options, $value);
-    return select_tag($name, $optionsBlock, $htmlOptions);
+    list($name, $value, $html_options) = default_options($object_name, $method, $object, $html_options);
+    $options_block = add_select_options(options_from_collection_for_select($collection, $value_prop, $text_prop, $value), $options, $value);
+    return select_tag($name, $options_block, $html_options);
 }
 
-function add_select_options($optionsBlock, $options, $value = null)
+function add_select_options($options_block, $options, $value = null)
 {
-    if ($options['include_blank']) $optionsBlock = '<option value=""></option>'.$optionsBlock;
+    if ($options['include_blank']) $options_block = '<option value=""></option>'.$options_block;
     if (empty($value) && isset($options['prompt']))
-        $optionsBlock = '<option value="">'.$options['prompt'].'</option>'.$optionsBlock;
-    return $optionsBlock;
+        $options_block = '<option value="">'.$options['prompt'].'</option>'.$options_block;
+    return $options_block;
 }
 
-function options_for_select($set, $selected = null, $detectNonAssociative = true)
+function options_for_select($set, $selected = null, $detect_non_associative = true)
 {
     $str = '';
     if (!is_array($selected)) $selected = array($selected);
     foreach ($set as $lib => $value)
     {
-        if ($detectNonAssociative && is_int($lib)) $lib = $value; // non-associative array
+        if ($detect_non_associative && is_int($lib)) $lib = $value; // non-associative array
         
         $str.= '<option value="'.html_escape($value).'"';
         if (in_array($value, $selected)) $str.= ' selected="selected"';
@@ -38,13 +38,13 @@ function options_for_select($set, $selected = null, $detectNonAssociative = true
     return $str;
 }
 
-function options_from_collection_for_select($collection, $valueProp='id', $textProp=null, $selected=null)
+function options_from_collection_for_select($collection, $value_prop='id', $text_prop=null, $selected=null)
 {
     $set = array();
     foreach ($collection as $entity)
     {
-        if ($textProp === null) $set[$entity->__repr()] = $entity->$valueProp;
-        else $set[$entity->$textProp] = $entity->$valueProp;
+        if ($text_prop === null) $set[$entity->__repr()] = $entity->$value_prop;
+        else $set[$entity->$text_prop] = $entity->$value_prop;
     }
     return options_for_select($set, $selected, false);
 }

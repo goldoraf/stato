@@ -25,7 +25,7 @@ class Bill extends SActiveRecord
 class Post extends SActiveRecord
 {
     public static $objects;
-    public $recordTimestamps = True;
+    public $record_timestamps = True;
 }
 
 class Employe extends SActiveRecord
@@ -37,13 +37,13 @@ class Employe extends SActiveRecord
 class Contract extends SActiveRecord
 {
     public static $objects;
-    public $attrRequired = array('code');
+    public $attr_required = array('code');
 }
 
 class Product extends SActiveRecord
 {
     public static $objects;
-    public $attrRequired = array('name');
+    public $attr_required = array('name');
 }
 
 class SuperProduct extends Product
@@ -72,7 +72,7 @@ class Company extends SActiveRecord
 class DependentCompany1 extends SActiveRecord
 {
     public static $objects;
-    public static $tableName = 'companies';
+    public static $table_name = 'companies';
     public static $relationships = array
     (
         'products' => array('assoc_type' => 'has_many', 'dependent' => 'delete', 'foreign_key' => 'company_id')
@@ -81,7 +81,7 @@ class DependentCompany1 extends SActiveRecord
 class DependentCompany2 extends SActiveRecord
 {
     public static $objects;
-    public static $tableName = 'companies';
+    public static $table_name = 'companies';
     public static $relationships = array
     (
         'products' => array('assoc_type' => 'has_many', 'dependent' => 'delete_all', 'foreign_key' => 'company_id')
@@ -90,7 +90,7 @@ class DependentCompany2 extends SActiveRecord
 class DependentCompany3 extends SActiveRecord
 {
     public static $objects;
-    public static $tableName = 'companies';
+    public static $table_name = 'companies';
     public static $relationships = array
     (
         'products' => array('assoc_type' => 'has_many', 'dependent' => 'nullify', 'foreign_key' => 'company_id')
@@ -149,7 +149,7 @@ class Category extends SActiveRecord
 // For ListDecorator tests
 /*class Forum extends SActiveRecord
 {
-    public $tableName = 'forums';
+    public $table_name = 'forums';
     public $relationships = array
     (
         'topics' => 'has_many'
@@ -158,13 +158,13 @@ class Category extends SActiveRecord
 
 class Topic extends SActiveRecord
 {
-    public $tableName = 'topics';
+    public $table_name = 'topics';
 }*/
 
 // For validation tests
 /*class User extends SActiveRecord
 {
-    public $tableName = 'users';
+    public $table_name = 'users';
     
     public $attributes = array
     (

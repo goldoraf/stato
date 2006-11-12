@@ -5,15 +5,15 @@ class AddReminders extends SMigration
     public function up()
     {
         $t = new STable();
-        $t->addPrimaryKey('id');
-        $t->addColumn('content', 'text');
-        $t->addColumn('remind_at', 'datetime');
-        $this->createTable('reminders', $t);
+        $t->add_primary_key('id');
+        $t->add_column('content', 'text');
+        $t->add_column('remind_at', 'datetime');
+        $this->create_table('reminders', $t);
     }
     
     public function down()
     {
-        $this->dropTable('reminders');
+        $this->drop_table('reminders');
     }
 }
 

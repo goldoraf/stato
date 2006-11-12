@@ -8,7 +8,7 @@ class SQuerySet implements Iterator, Countable
     public $excludes = array();
     public $includes = array();
     public $params   = array();
-    public $orderBy  = array();
+    public $order_by  = array();
     public $joins    = array();
     public $offset   = null;
     public $limit    = null;
@@ -20,8 +20,8 @@ class SQuerySet implements Iterator, Countable
     protected $meta     = null;
     protected $conn     = null;
     
-    protected $pkLookup   = array();
-    protected $schemaAbbr = array();
+    protected $pk_lookup   = array();
+    protected $schema_abbr = array();
     
     public function __construct($meta)
     {
@@ -58,11 +58,11 @@ class SQuerySet implements Iterator, Countable
             return isset($this->cache[$this->count]);
         elseif ($this->resource === null && $this->cache === null)
         {
-            $this->resource = $this->conn->select($this->prepareSelect());
+            $this->resource = $this->conn->select($this->prepare_select());
             $this->cache = array();
             if (!empty($this->includes))
             {
-                $this->fetchAllWithAssocs();
+                $this->fetch_all_with_assocs();
                 return !empty($this->cache);
             }
         }
@@ -73,8 +73,8 @@ class SQuerySet implements Iterator, Countable
     {
         if (!is_array($this->cache))
         {
-            $this->resource = $this->conn->select($this->prepareSelect());
-            if (!empty($this->includes)) $this->fetchAllWithAssocs();
+            $this->resource = $this->conn->select($this->prepare_select());
+            if (!empty($this->includes)) $this->fetch_all_with_assocs();
             else { while ($this->fetch()) { } }
         }
         return $this->cache;
@@ -86,8 +86,8 @@ class SQuerySet implements Iterator, Countable
         $args = func_get_args();
         if ($numargs == 1)
         {
-            $pk = $this->meta->identityField;
-            if (!empty($this->includes)) $pk = $this->meta->tableName.'.'.$pk;
+            $pk = $this->meta->identity_field;
+            if (!empty($this->includes)) $pk = $this->meta->table_name.'.'.$pk;
             
             if (is_array($args[0])) 
                 $args[] = $pk.' IN ('.join(',', $args[0]).')';
@@ -103,25 +103,25 @@ class SQuerySet implements Iterator, Countable
         elseif ($count == 1) return $set[0];
         else
         {
-            $newSet = array();
-            foreach ($set as $o) $newSet[$o->id] = $o;
-            return $newSet;
+            $new_set = array();
+            foreach ($set as $o) $new_set[$o->id] = $o;
+            return $new_set;
         }
     }
     
     public function count()
     {
-        if ($this->resource !== null) return $this->conn->rowCount($this->resource);
+        if ($this->resource !== null) return $this->conn->row_count($this->resource);
         elseif ($this->resource === null && is_array($this->cache)) return count($this->cache);
         else
         {
-            $clone = $this->selfClone();
+            $clone = $this->self_clone();
             $clone->order_by = array();
             $clone->includes = array();
             $clone->offset   = null;
             $clone->limit    = null;
             
-            $rs = $this->conn->select($clone->prepareSelect('COUNT(*)'));
+            $rs = $this->conn->select($clone->prepare_select('COUNT(*)'));
             $row = $this->conn->fetch($rs, false);
             return $row[0];
         }
@@ -129,50 +129,50 @@ class SQuerySet implements Iterator, Countable
     
     public function delete()
     {
-        $clone = $this->selfClone();
+        $clone = $this->self_clone();
         $clone->includes = array();
         $clone->joins    = array();
-        $clone->orderBy   = array();
-        $this->conn->execute("DELETE FROM {$this->meta->tableName} ".$clone->sqlClause());
+        $clone->order_by   = array();
+        $this->conn->execute("DELETE FROM {$this->meta->table_name} ".$clone->sql_clause());
         return;
     }
     
     public function filter()
     {
-        return $this->filterOrExclude(func_get_args());
+        return $this->filter_or_exclude(func_get_args());
     }
     
     public function exclude()
     {
-        return $this->filterOrExclude(func_get_args(), true);
+        return $this->filter_or_exclude(func_get_args(), true);
     }
     
     public function limit($limit, $offset = 0)
     {
-        $clone = $this->selfClone();
+        $clone = $this->self_clone();
         $clone->limit = $limit;
         $clone->offset = $offset;
         return $clone;
     }
     
-    public function orderBy()
+    public function order_by()
     {
         $args = func_get_args();
-        $clone = $this->selfClone();
-        $clone->orderBy = array_merge($this->orderBy, $args);
+        $clone = $this->self_clone();
+        $clone->order_by = array_merge($this->order_by, $args);
         return $clone;
     }
     
     public function join($sql)
     {
-        $clone = $this->selfClone();
+        $clone = $this->self_clone();
         $clone->joins[] = $sql;
         return $clone;
     }
     
     public function distinct()
     {
-        $clone = $this->selfClone();
+        $clone = $this->self_clone();
         $clone->distinct = true;
         return $clone;
     }
@@ -180,7 +180,7 @@ class SQuerySet implements Iterator, Countable
     public function includes()
     {
         $args = func_get_args();
-        $clone = $this->selfClone();
+        $clone = $this->self_clone();
         $clone->includes = array_merge($this->includes, $args);
         return $clone;
     }
@@ -192,7 +192,7 @@ class SQuerySet implements Iterator, Countable
         $v->filters  = $this->filters;
         $v->excludes = $this->excludes;
         $v->params   = $this->params;
-        $v->orderBy  = $this->orderBy;
+        $v->order_by  = $this->order_by;
         $v->limit    = $this->limit;
         $v->offset   = $this->offset;
         $v->distinct = $this->distinct;
@@ -200,26 +200,26 @@ class SQuerySet implements Iterator, Countable
         return $v;
     }
     
-    public function sqlClause()
+    public function sql_clause()
     {
         $components = array();
-        $components[] = $this->sqlJoins();
-        $components[] = $this->sqlConditions();
-        $components[] = $this->sqlOrderBy();
-        $components[] = $this->sqlLimit();
+        $components[] = $this->sql_joins();
+        $components[] = $this->sql_conditions();
+        $components[] = $this->sql_order_by();
+        $components[] = $this->sql_limit();
         foreach ($components as $k => $v) if ($v === null) unset($components[$k]);
-        return $this->sanitizeSql(implode(' ', $components));
+        return $this->sanitize_sql(implode(' ', $components));
     }
     
-    public function prepareSelect($fields = null)
+    public function prepare_select($fields = null)
     {
         if ($fields === null)
         {
             if (empty($this->includes)) $fields = '*';
-            else $fields = implode(', ', $this->columnAliases());
+            else $fields = implode(', ', $this->column_aliases());
         }
         $select = ($this->distinct) ? 'SELECT DISTINCT' : 'SELECT';
-        return implode(' ', array($select, $fields, "FROM {$this->meta->tableName}", $this->sqlClause()));
+        return implode(' ', array($select, $fields, "FROM {$this->meta->table_name}", $this->sql_clause()));
     }
     
     protected function fetch()
@@ -228,26 +228,26 @@ class SQuerySet implements Iterator, Countable
         $row = $this->conn->fetch($this->resource);
         if (!$row)
         {
-            $this->conn->freeResult($this->resource);
+            $this->conn->free_result($this->resource);
             $this->resource = null;
             return false;
         }
-        $this->cache[] = $this->fetchRow($row);
+        $this->cache[] = $this->fetch_row($row);
         return true;
     }
     
-    protected function fetchRow($row)
+    protected function fetch_row($row)
     {
-        if (in_array($this->meta->inheritanceField, array_keys($this->meta->attributes))
-            && class_exists($row[$this->meta->inheritanceField])) $class = $row[$this->meta->inheritanceField];
+        if (in_array($this->meta->inheritance_field, array_keys($this->meta->attributes))
+            && class_exists($row[$this->meta->inheritance_field])) $class = $row[$this->meta->inheritance_field];
         else $class = $this->meta->class;
         return new $class($row);
     }
     
-    protected function filterOrExclude($args, $exclude = false)
+    protected function filter_or_exclude($args, $exclude = false)
     {
         $numargs = count($args);
-        $clone = $this->selfClone();
+        $clone = $this->self_clone();
         
         if ($numargs > 1 && is_array($args[$numargs - 1]))
         {
@@ -261,17 +261,17 @@ class SQuerySet implements Iterator, Countable
             {
                 if (!isset($this->meta->attributes[$matches[1]]))
                     throw new SException('Association '.$matches[1].' does not exist.');
-                $assocMeta = $this->meta->attributes[$matches[1]]->meta;
-                if ($assocMeta->type == 'SManyToMany')
+                $assoc_meta = $this->meta->attributes[$matches[1]]->meta;
+                if ($assoc_meta->type == 'SManyToMany')
                 {
-                    /*$clone->joins[] = "LEFT OUTER JOIN {$assocMeta->joinTable} 
-                                       ON {$assocMeta->tableName}.{$assocMeta->identityField} 
-                                       = {$assocMeta->joinTable}.{$assocMeta->assocForeignKey}";
-                    $clone->filters[] = "{$assocMeta->joinTable}.{$assocMeta->foreignKey} = '{$this->owner->id}'"*/
+                    /*$clone->joins[] = "LEFT OUTER JOIN {$assoc_meta->join_table} 
+                                       ON {$assoc_meta->table_name}.{$assoc_meta->identity_field} 
+                                       = {$assoc_meta->join_table}.{$assoc_meta->assoc_foreign_key}";
+                    $clone->filters[] = "{$assoc_meta->join_table}.{$assoc_meta->foreign_key} = '{$this->owner->id}'"*/
                 }
                 else
                 {
-                    $table = $assocMeta->tableName;
+                    $table = $assoc_meta->table_name;
                     $field = $matches[2];
                     $cond  = $matches[3];
                     $clone->joins[] = "LEFT OUTER JOIN $table ON $table.{$field}{$cond}";
@@ -296,30 +296,30 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
-    protected function sqlJoins()
+    protected function sql_joins()
     {
         if (empty($this->joins) && empty($this->includes)) return null;
-        return implode(' ', array_merge($this->includeJoins(), $this->joins));
+        return implode(' ', array_merge($this->include_joins(), $this->joins));
     }
     
-    protected function sqlConditions()
+    protected function sql_conditions()
     {
-        if ($this->meta->descendsFrom() != 'SActiveRecord') $this->filters[] = $this->typeCondition();
+        if ($this->meta->descends_from() != 'SActiveRecord') $this->filters[] = $this->type_condition();
         if (empty($this->filters)) return null;
         return 'WHERE '.implode(' AND ', $this->filters);
     }
     
-    protected function sqlLimit()
+    protected function sql_limit()
     {
         if ($this->limit === null) return null;
         return $this->conn->limit($this->limit, $this->offset);
     }
     
-    protected function sqlOrderBy()
+    protected function sql_order_by()
     {
-        if (empty($this->orderBy)) return null;
+        if (empty($this->order_by)) return null;
         $orders = array();
-        foreach ($this->orderBy as $o)
+        foreach ($this->order_by as $o)
         {
             if (strpos($o, '.') !== false) list($table, $o) = explode('.', $o);
             if ($o{0} == '-') $order = substr($o, 1).' DESC';
@@ -330,49 +330,49 @@ class SQuerySet implements Iterator, Countable
         return 'ORDER BY '.implode(', ', $orders);
     }
     
-    protected function typeCondition()
+    protected function type_condition()
     {
-        return $this->meta->inheritanceField.' = \''.strtolower($this->meta->class).'\'';
+        return $this->meta->inheritance_field.' = \''.strtolower($this->meta->class).'\'';
     }
     
-    protected function fetchAllWithAssocs()
+    protected function fetch_all_with_assocs()
     {
-        $pk = $this->meta->tableName.'_'.$this->meta->identityField;
+        $pk = $this->meta->table_name.'_'.$this->meta->identity_field;
         $class = $this->meta->class;
         $records = array();
-        $recordsInOrder = array();
-        $recordsManyAssocs = array();
-        $manyAssocs = array();
+        $records_in_order = array();
+        $records_many_assocs = array();
+        $many_assocs = array();
         
         foreach ($this->includes as $k)
         {
-            $assocMeta = $this->meta->attributes[$k]->meta;
-            if ($assocMeta->type == 'SHasMany' || $assocMeta->type == 'SManyToMany') $manyAssocs[] = $k;
+            $assoc_meta = $this->meta->attributes[$k]->meta;
+            if ($assoc_meta->type == 'SHasMany' || $assoc_meta->type == 'SManyToMany') $many_assocs[] = $k;
         }
         
         while($row = $this->conn->fetch($this->resource))
         {
             $id = $row[$pk];
             if (!isset($records[$id]))
-                $recordsInOrder[] = $records[$id] = new $class($this->extractRecord($this->meta->tableName, $row));
+                $records_in_order[] = $records[$id] = new $class($this->extract_record($this->meta->table_name, $row));
             
             foreach ($this->includes as $k)
             {
-                $assocMeta = $this->meta->attributes[$k]->meta;
+                $assoc_meta = $this->meta->attributes[$k]->meta;
                 
-                if (isset($row[$this->pkLookup[$assocMeta->tableName]]))
+                if (isset($row[$this->pk_lookup[$assoc_meta->table_name]]))
                 {
-                    $record = $this->extractRecord($assocMeta->tableName, $row);
+                    $record = $this->extract_record($assoc_meta->table_name, $row);
                     if ($record)
                     {
-                        $assocClass = $assocMeta->class;
-                        $assoc = new $assocClass($record);
-                        if (in_array($k, $manyAssocs))
+                        $assoc_class = $assoc_meta->class;
+                        $assoc = new $assoc_class($record);
+                        if (in_array($k, $many_assocs))
                         {
-                            if (!isset($recordsManyAssocs[$id][$k][$assoc->id])) 
-                                $recordsManyAssocs[$id][$k][$assoc->id] = $assoc;
+                            if (!isset($records_many_assocs[$id][$k][$assoc->id])) 
+                                $records_many_assocs[$id][$k][$assoc->id] = $assoc;
                         } 
-                        else $records[$id]->$k->setTarget($assoc);
+                        else $records[$id]->$k->set_target($assoc);
                     }
                 }
             }
@@ -380,29 +380,29 @@ class SQuerySet implements Iterator, Countable
         
         foreach ($records as $id => $record)
         {
-            foreach ($manyAssocs as $k)
+            foreach ($many_assocs as $k)
             {
-                if (isset($recordsManyAssocs[$id][$k]))
-                    $records[$id]->$k->setQuerySet(new SFilledQuerySet($this->meta->attributes[$k]->meta, array_values($recordsManyAssocs[$id][$k])));
+                if (isset($records_many_assocs[$id][$k]))
+                    $records[$id]->$k->set_query_set(new SFilledQuerySet($this->meta->attributes[$k]->meta, array_values($records_many_assocs[$id][$k])));
                 else
-                    $records[$id]->$k->setQuerySet(new SFilledQuerySet($this->meta->attributes[$k]->meta, array()));
+                    $records[$id]->$k->set_query_set(new SFilledQuerySet($this->meta->attributes[$k]->meta, array()));
             }
         }
                 
-        $this->conn->freeResult($this->resource);
+        $this->conn->free_result($this->resource);
         $this->resource = null;
-        $this->cache = $recordsInOrder;
+        $this->cache = $records_in_order;
     }
     
     // n'instancie pas les records dont ttes les values sont NULL !!!
-    protected function extractRecord($tableName, $row)
+    protected function extract_record($table_name, $row)
     {
         $record = array();
         $valid = false;
         foreach($row as $key => $value)
         {
-            list($prefix, $column) = $this->schemaAbbr[$key];
-            if ($prefix == $tableName)
+            list($prefix, $column) = $this->schema_abbr[$key];
+            if ($prefix == $table_name)
             {
                 $record[$column] = $value;
                 if ($value != null) $valid = true;
@@ -412,11 +412,11 @@ class SQuerySet implements Iterator, Countable
         return false;
     }
     
-    protected function columnAliases()
+    protected function column_aliases()
     {
         $aliases = array();
-        $tables = array($this->meta->tableName);
-        foreach ($this->includes as $r) $tables[$r] = $this->meta->attributes[$r]->meta->tableName;
+        $tables = array($this->meta->table_name);
+        foreach ($this->includes as $r) $tables[$r] = $this->meta->attributes[$r]->meta->table_name;
         foreach ($tables as $r => $t)
         {
             $columns = array_keys($this->conn->columns($t));
@@ -424,65 +424,65 @@ class SQuerySet implements Iterator, Countable
             foreach($columns as $column)
             {
                 $abbr = $t.'_'.$column;
-                $this->schemaAbbr[$abbr] = array($t, $column);
+                $this->schema_abbr[$abbr] = array($t, $column);
                 $aliases[] = join(array($t, $column), '.').' AS '.$abbr;
-                if (is_string($r) && $column == $this->meta->attributes[$r]->meta->identityField) $this->pkLookup[$t] = $abbr;
+                if (is_string($r) && $column == $this->meta->attributes[$r]->meta->identity_field) $this->pk_lookup[$t] = $abbr;
             }
         }
         return $aliases;
     }
     
-    protected function includeJoins()
+    protected function include_joins()
     {
         $joins = array();
         foreach ($this->includes as $r)
         {
-            $assocMeta = $this->meta->attributes[$r]->meta;
-            switch($assocMeta->type)
+            $assoc_meta = $this->meta->attributes[$r]->meta;
+            switch($assoc_meta->type)
             {
                 case 'SBelongsTo':
-                    $joins[] = "LEFT OUTER JOIN {$assocMeta->tableName} ON "
-                    ."{$assocMeta->tableName}.{$assocMeta->identityField} = "
-                    ."{$this->meta->tableName}.{$assocMeta->foreignKey}";
+                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
+                    ."{$assoc_meta->table_name}.{$assoc_meta->identity_field} = "
+                    ."{$this->meta->table_name}.{$assoc_meta->foreign_key}";
                     break;
                     
                 case 'SManyToMany':
-                    $joins[] = "LEFT OUTER JOIN {$assocMeta->joinTable} ON "
-                    ."{$assocMeta->joinTable}.{$assocMeta->foreignKey} = "
-                    ."{$this->meta->tableName}.{$this->meta->identityField}";
+                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->join_table} ON "
+                    ."{$assoc_meta->join_table}.{$assoc_meta->foreign_key} = "
+                    ."{$this->meta->table_name}.{$this->meta->identity_field}";
                     
-                    $joins[] = "LEFT OUTER JOIN {$assocMeta->tableName} ON "
-                    ."{$assocMeta->joinTable}.{$assocMeta->assocForeignKey} = "
-                    ."{$assocMeta->tableName}.{$assocMeta->identityField}";
+                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
+                    ."{$assoc_meta->join_table}.{$assoc_meta->assoc_foreign_key} = "
+                    ."{$assoc_meta->table_name}.{$assoc_meta->identity_field}";
                     break;
                     
                 default:
-                    $joins[] = "LEFT OUTER JOIN {$assocMeta->tableName} ON "
-                    ."{$assocMeta->tableName}.{$assocMeta->foreignKey} = "
-                    ."{$this->meta->tableName}.{$this->meta->identityField}";
+                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
+                    ."{$assoc_meta->table_name}.{$assoc_meta->foreign_key} = "
+                    ."{$this->meta->table_name}.{$this->meta->identity_field}";
             }
         }
         return $joins;
     }
     
-    protected function sanitizeSql($stmt)
+    protected function sanitize_sql($stmt)
     {
         if (!empty($this->params))
         {
-            if (strpos($stmt, ':')) return $this->replaceNamedBindVariables($stmt, $this->params);
-            elseif (strpos($stmt, '?')) return $this->replaceBindVariables($stmt, $this->params);
+            if (strpos($stmt, ':')) return $this->replace_named_bind_variables($stmt, $this->params);
+            elseif (strpos($stmt, '?')) return $this->replace_bind_variables($stmt, $this->params);
             else return vsprintf($stmt, $this->params);
         }
         return $stmt;
     }
     
-    protected function replaceBindVariables($stmt, $values)
+    protected function replace_bind_variables($stmt, $values)
     {
         foreach ($values as $value) $stmt = preg_replace('/\?/i', $this->conn->quote($value), $stmt, 1);
         return $stmt;
     }
     
-    protected function replaceNamedBindVariables($stmt, $values)
+    protected function replace_named_bind_variables($stmt, $values)
     {
         foreach ($values as $key => $value)
         {
@@ -492,7 +492,7 @@ class SQuerySet implements Iterator, Countable
         return $stmt;
     }
     
-    protected function selfClone()
+    protected function self_clone()
     {
         $class = __CLASS__;
         $clone = new $class($this->meta);
@@ -500,7 +500,7 @@ class SQuerySet implements Iterator, Countable
         $clone->excludes = $this->excludes;
         $clone->includes = $this->includes;
         $clone->params   = $this->params;
-        $clone->orderBy  = $this->orderBy;
+        $clone->order_by  = $this->order_by;
         $clone->joins    = $this->joins;
         $clone->offset   = $this->offset;
         $clone->limit    = $this->limit;
@@ -513,14 +513,14 @@ class SValuesQuerySet extends SQuerySet
 {
     public $fields = array();
     
-    public function prepareSelect()
+    public function prepare_select()
     {
         if (empty($this->fields)) $fields = '*';
         else $fields = implode(', ', $this->fields);
-        return parent::prepareSelect($fields);
+        return parent::prepare_select($fields);
     }
     
-    protected function fetchRow($row)
+    protected function fetch_row($row)
     {
         if (count($this->fields) == 1) return $row[$this->fields[0]];
         return $row;

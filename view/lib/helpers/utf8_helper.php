@@ -19,7 +19,7 @@
  * @author Andreas Gohr <andi@splitbrain.org>
  * @see    urlencode
  */
-function utf8_encodeFN($file,$safe=true){
+function utf8_encode_fn($file,$safe=true){
   if($safe && preg_match('#^[a-zA-Z0-9/_\-.%]+$#',$file)){
     return $file;
   }
@@ -36,7 +36,7 @@ function utf8_encodeFN($file,$safe=true){
  * @author Andreas Gohr <andi@splitbrain.org>
  * @see    urldecode
  */
-function utf8_decodeFN($file){
+function utf8_decode_fn($file){
   $file = urldecode($file);
   return $file;
 }
@@ -46,7 +46,7 @@ function utf8_decodeFN($file){
  *
  * @author Andreas Gohr <andi@splitbrain.org>
  */
-function utf8_isASCII($str){
+function utf8_is_ascii($str){
   for($i=0; $i<strlen($str); $i++){
     if(ord($str{$i}) >127) return false;
   }
@@ -76,17 +76,17 @@ function utf8_strip($str){
  * @author <bmorel@ssi.fr>
  * @link   http://www.php.net/manual/en/function.utf8-encode.php
  */
-function utf8_check($Str) {
- for ($i=0; $i<strlen($Str); $i++) {
-  if (ord($Str[$i]) < 0x80) continue; # 0bbbbbbb
-  elseif ((ord($Str[$i]) & 0xE0) == 0xC0) $n=1; # 110bbbbb
-  elseif ((ord($Str[$i]) & 0xF0) == 0xE0) $n=2; # 1110bbbb
-  elseif ((ord($Str[$i]) & 0xF8) == 0xF0) $n=3; # 11110bbb
-  elseif ((ord($Str[$i]) & 0xFC) == 0xF8) $n=4; # 111110bb
-  elseif ((ord($Str[$i]) & 0xFE) == 0xFC) $n=5; # 1111110b
+function utf8_check($str) {
+ for ($i=0; $i<strlen($str); $i++) {
+  if (ord($str[$i]) < 0x80) continue; # 0bbbbbbb
+  elseif ((ord($str[$i]) & 0xE0) == 0xC0) $n=1; # 110bbbbb
+  elseif ((ord($str[$i]) & 0xF0) == 0xE0) $n=2; # 1110bbbb
+  elseif ((ord($str[$i]) & 0xF8) == 0xF0) $n=3; # 11110bbb
+  elseif ((ord($str[$i]) & 0xFC) == 0xF8) $n=4; # 111110bb
+  elseif ((ord($str[$i]) & 0xFE) == 0xFC) $n=5; # 1111110b
   else return false; # Does not match any model
   for ($j=0; $j<$n; $j++) { # n bytes matching 10bbbbbb follow ?
-   if ((++$i == strlen($Str)) || ((ord($Str[$i]) & 0xC0) != 0x80))
+   if ((++$i == strlen($str)) || ((ord($str[$i]) & 0xC0) != 0x80))
    return false;
   }
  }
@@ -232,12 +232,12 @@ function utf8_strtolower($string){
   if(!defined('UTF8_NOMBSTRING') && function_exists('mb_strtolower'))
     return mb_strtolower($string,'utf-8');
 
-  global $UTF8_UPPER_TO_LOWER;
+  global $utf8_upper_to_lower;
   $uni = utf8_to_unicode($string); 
   $cnt = count($uni);
   for ($i=0; $i < $cnt; $i++){
-    if($UTF8_UPPER_TO_LOWER[$uni[$i]]){
-      $uni[$i] = $UTF8_UPPER_TO_LOWER[$uni[$i]];
+    if($utf8_upper_to_lower[$uni[$i]]){
+      $uni[$i] = $utf8_upper_to_lower[$uni[$i]];
     }
   }
   return unicode_to_utf8($uni);
@@ -256,12 +256,12 @@ function utf8_strtoupper($string){
   if(!defined('UTF8_NOMBSTRING') && function_exists('mb_strtolower'))
     return mb_strtoupper($string,'utf-8');
 
-  global $UTF8_LOWER_TO_UPPER;
+  global $utf8_lower_to_upper;
   $uni = utf8_to_unicode($string);
   $cnt = count($uni);
   for ($i=0; $i < $cnt; $i++){
-    if($UTF8_LOWER_TO_UPPER[$uni[$i]]){
-      $uni[$i] = $UTF8_LOWER_TO_UPPER[$uni[$i]];
+    if($utf8_lower_to_upper[$uni[$i]]){
+      $uni[$i] = $utf8_lower_to_upper[$uni[$i]];
     }
   }
   return unicode_to_utf8($uni);
@@ -277,12 +277,12 @@ function utf8_strtoupper($string){
  */
 function utf8_deaccent($string,$case=0){
   if($case <= 0){
-    global $UTF8_LOWER_ACCENTS;
-    $string = str_replace(array_keys($UTF8_LOWER_ACCENTS),array_values($UTF8_LOWER_ACCENTS),$string);
+    global $utf8_lower_accents;
+    $string = str_replace(array_keys($utf8_lower_accents),array_values($utf8_lower_accents),$string);
   }
   if($case >= 0){
-    global $UTF8_UPPER_ACCENTS;
-    $string = str_replace(array_keys($UTF8_UPPER_ACCENTS),array_values($UTF8_UPPER_ACCENTS),$string);
+    global $utf8_upper_accents;
+    $string = str_replace(array_keys($utf8_upper_accents),array_values($utf8_upper_accents),$string);
   }
   return $string;
 }
@@ -291,7 +291,7 @@ function utf8_deaccent($string,$case=0){
  * Removes special characters (nonalphanumeric) from a UTF-8 string
  *
  * This function adds the controlchars 0x00 to 0x19 to the array of
- * stripped chars (they are not included in $UTF8_SPECIAL_CHARS)
+ * stripped chars (they are not included in $utf8_special_chars)
  *
  * @author Andreas Gohr <andi@splitbrain.org>
  * @param  string $string     The UTF8 string to strip of special chars
@@ -299,11 +299,11 @@ function utf8_deaccent($string,$case=0){
  * @param  string $additional Additional chars to strip (used in regexp char class)
  */
 function utf8_stripspecials($string,$repl='',$additional=''){
-  global $UTF8_SPECIAL_CHARS;
+  global $utf8_special_chars;
 
   static $specials = null;
   if(is_null($specials)){
-    $specials = preg_quote(unicode_to_utf8($UTF8_SPECIAL_CHARS), '/');
+    $specials = preg_quote(unicode_to_utf8($utf8_special_chars), '/');
   }
 
   return preg_replace('/['.$additional.'\x00-\x19'.$specials.']/u',$repl,$string);
@@ -380,21 +380,21 @@ function utf8_tohtml ($str) {
 function utf8_to_unicode( &$str ) {
   $unicode = array();  
   $values = array();
-  $lookingFor = 1;
+  $looking_for = 1;
   
   for ($i = 0; $i < strlen( $str ); $i++ ) {
-    $thisValue = ord( $str[ $i ] );
-    if ( $thisValue < 128 ) $unicode[] = $thisValue;
+    $this_value = ord( $str[ $i ] );
+    if ( $this_value < 128 ) $unicode[] = $this_value;
     else {
-      if ( count( $values ) == 0 ) $lookingFor = ( $thisValue < 224 ) ? 2 : 3;
-      $values[] = $thisValue;
-      if ( count( $values ) == $lookingFor ) {
-  $number = ( $lookingFor == 3 ) ?
+      if ( count( $values ) == 0 ) $looking_for = ( $this_value < 224 ) ? 2 : 3;
+      $values[] = $this_value;
+      if ( count( $values ) == $looking_for ) {
+  $number = ( $looking_for == 3 ) ?
     ( ( $values[0] % 16 ) * 4096 ) + ( ( $values[1] % 64 ) * 64 ) + ( $values[2] % 64 ):
   	( ( $values[0] % 32 ) * 64 ) + ( $values[1] % 64 );
   $unicode[] = $number;
   $values = array();
-  $lookingFor = 1;
+  $looking_for = 1;
       }
     }
   }
@@ -462,7 +462,7 @@ function utf16be_to_utf8(&$str) {
  *
  * @author Andreas Gohr <andi@splitbrain.org>
  */
-$UTF8_LOWER_TO_UPPER = array(
+$utf8_lower_to_upper = array(
   0x0061=>0x0041, 0x03C6=>0x03A6, 0x0163=>0x0162, 0x00E5=>0x00C5, 0x0062=>0x0042,
   0x013A=>0x0139, 0x00E1=>0x00C1, 0x0142=>0x0141, 0x03CD=>0x038E, 0x0101=>0x0100,
   0x0491=>0x0490, 0x03B4=>0x0394, 0x015B=>0x015A, 0x0064=>0x0044, 0x03B3=>0x0393,
@@ -512,11 +512,11 @@ $UTF8_LOWER_TO_UPPER = array(
  * UTF-8 Case lookup table
  *
  * This lookuptable defines the lower case letters to their correspponding
- * upper case letter in UTF-8 (it does so by flipping $UTF8_LOWER_TO_UPPER)
+ * upper case letter in UTF-8 (it does so by flipping $utf8_lower_to_upper)
  *
  * @author Andreas Gohr <andi@splitbrain.org>
  */
-$UTF8_UPPER_TO_LOWER = @array_flip($UTF8_LOWER_TO_UPPER);
+$utf8_upper_to_lower = @array_flip($utf8_lower_to_upper);
 
 /**
  * UTF-8 lookup table for lower case accented letters
@@ -527,7 +527,7 @@ $UTF8_UPPER_TO_LOWER = @array_flip($UTF8_LOWER_TO_UPPER);
  * @author Andreas Gohr <andi@splitbrain.org>
  * @see    utf8_deaccent()
  */
-$UTF8_LOWER_ACCENTS = array(
+$utf8_lower_accents = array(
   'à' => 'a', 'ô' => 'o', 'd' => 'd', '?' => 'f', 'ë' => 'e', 'š' => 's', 'o' => 'o', 
   'ß' => 'ss', 'a' => 'a', 'r' => 'r', '?' => 't', 'n' => 'n', 'a' => 'a', 'k' => 'k', 
   's' => 's', '?' => 'y', 'n' => 'n', 'l' => 'l', 'h' => 'h', '?' => 'p', 'ó' => 'o', 
@@ -554,7 +554,7 @@ $UTF8_LOWER_ACCENTS = array(
  * @author Andreas Gohr <andi@splitbrain.org>
  * @see    utf8_deaccent()
  */
-$UTF8_UPPER_ACCENTS = array(
+$utf8_upper_accents = array(
   'À' => 'A', 'Ô' => 'O', 'D' => 'D', '?' => 'F', 'Ë' => 'E', 'Š' => 'S', 'O' => 'O', 
   'A' => 'A', 'R' => 'R', '?' => 'T', 'N' => 'N', 'A' => 'A', 'K' => 'K', 
   'S' => 'S', '?' => 'Y', 'N' => 'N', 'L' => 'L', 'H' => 'H', '?' => 'P', 'Ó' => 'O', 
@@ -586,7 +586,7 @@ $UTF8_UPPER_ACCENTS = array(
  * @author Andreas Gohr <andi@splitbrain.org>
  * @see    utf8_stripspecials()
  */
-$UTF8_SPECIAL_CHARS = array(
+$utf8_special_chars = array(
   0x001a, 0x001b, 0x001c, 0x001d, 0x001e, 0x001f, 0x0020, 0x0021, 0x0022, 0x0023,
   0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029,         0x002b, 0x002c,
           0x002f,         0x003b, 0x003c, 0x003d, 0x003e, 0x003f, 0x0040, 0x005b,

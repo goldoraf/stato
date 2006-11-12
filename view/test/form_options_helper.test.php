@@ -14,7 +14,7 @@ class MockUser extends MockRecord
 
 class FormOptionsTest extends HelperTestCase
 {
-    public function testOptionsForSelect()
+    public function test_options_for_select()
     {
         $this->assertDomEqual(
             options_for_select(array('PHP', 'Apache', 'MySQL')),
@@ -41,7 +41,7 @@ class FormOptionsTest extends HelperTestCase
         );
     }
     
-    public function testOptionsForSelectWithAssociativeArray()
+    public function test_options_for_select_with_associative_array()
     {
         $this->assertDomEqual(
             options_for_select(array('Margharita'=>'7€', 'Calzone'=>'9€', 'Napolitaine'=>'8€')),
@@ -63,7 +63,7 @@ class FormOptionsTest extends HelperTestCase
         );
     }
     
-    public function testOptionsFromCollection()
+    public function test_options_from_collection()
     {
         $roles = array(
             new MockRole('root', 'SuperAdmin'),
@@ -90,7 +90,7 @@ class FormOptionsTest extends HelperTestCase
         );
     }
     
-    public function testSelect()
+    public function test_select()
     {
         $services = array('Marketing', 'IT', 'Commercial');
         $user = new MockUser('John Doe');
@@ -151,7 +151,7 @@ class FormOptionsTest extends HelperTestCase
         );
     }
     
-    public function testCollectionSelect()
+    public function test_collection_select()
     {
         $roles = array(
             new MockRole('root', 'SuperAdmin'),

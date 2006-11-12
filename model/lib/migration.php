@@ -43,72 +43,72 @@ abstract class SMigration
 
 class SMigrator
 {
-    private $migrationsPath = null;
-    private $targetVersion  = null;
+    private $migrations_path = null;
+    private $target_version  = null;
     private $direction      = null;
     
-    public static $schemaInfoTableName = 'schema_info';
+    public static $schema_info_table_name = 'schema_info';
     
-    public static function migrate($migrationsPath, $targetVersion = null)
+    public static function migrate($migrations_path, $target_version = null)
     {
-        SActiveRecord::connection()->initializeSchemaInformation();
-        $currentVersion = self::currentVersion();
-        if ($targetVersion === null || $currentVersion < $targetVersion)
-            self::up($migrationsPath, $targetVersion);
-        elseif ($currentVersion > $targetVersion)
-            self::down($migrationsPath, $targetVersion);
-        elseif ($currentVersion == $targetVersion)
+        SActiveRecord::connection()->initialize_schema_information();
+        $current_version = self::current_version();
+        if ($target_version === null || $current_version < $target_version)
+            self::up($migrations_path, $target_version);
+        elseif ($current_version > $target_version)
+            self::down($migrations_path, $target_version);
+        elseif ($current_version == $target_version)
             return;
     }
     
-    public static function up($migrationsPath, $targetVersion = null)
+    public static function up($migrations_path, $target_version = null)
     {
-        $m = new SMigrator('up', $migrationsPath, $targetVersion);
-        $m->executeMigration();
+        $m = new SMigrator('up', $migrations_path, $target_version);
+        $m->execute_migration();
     }
     
-    public static function down($migrationsPath, $targetVersion = null)
+    public static function down($migrations_path, $target_version = null)
     {
-        $m = new SMigrator('down', $migrationsPath, $targetVersion);
-        $m->executeMigration();
+        $m = new SMigrator('down', $migrations_path, $target_version);
+        $m->execute_migration();
     }
     
-    public static function currentVersion()
+    public static function current_version()
     {
-        $row = SActiveRecord::connection()->selectOne('SELECT version FROM '.self::$schemaInfoTableName);
+        $row = SActiveRecord::connection()->select_one('SELECT version FROM '.self::$schema_info_table_name);
         return $row['version'];
     }
     
-    public function __construct($direction, $migrationsPath, $targetVersion)
+    public function __construct($direction, $migrations_path, $target_version)
     {
         $this->direction = $direction;
-        $this->migrationsPath = $migrationsPath;
-        $this->targetVersion = $targetVersion;
-        SActiveRecord::connection()->initializeSchemaInformation();
+        $this->migrations_path = $migrations_path;
+        $this->target_version = $target_version;
+        SActiveRecord::connection()->initialize_schema_information();
     }
     
-    public function executeMigration()
+    public function execute_migration()
     {
-        foreach ($this->migrationFiles() as $file)
+        foreach ($this->migration_files() as $file)
         {
-            require_once($this->migrationsPath.'/'.$file);
-            list($version, $name) = $this->versionAndName($file);
-            if ($this->reachedTargetVersion($version)) break;
-            if (!$this->isIrrelevantMigration($version))
+            require_once($this->migrations_path.'/'.$file);
+            list($version, $name) = $this->version_and_name($file);
+            if ($this->reached_target_version($version)) break;
+            if (!$this->is_irrelevant_migration($version))
             {
-                $class = $this->migrationClass($name);
+                $class = $this->migration_class($name);
                 echo "Migrating to $class ($version)\n";
                 $migration = new $class();
                 $migration->migrate($this->direction);
-                $this->setSchemaVersion($version);
+                $this->set_schema_version($version);
             }
         }
     }
     
-    private function migrationFiles()
+    private function migration_files()
     {
         $files = array();
-        $dir = new DirectoryIterator($this->migrationsPath);
+        $dir = new DirectoryIterator($this->migrations_path);
         foreach ($dir as $file)
         {
             if (preg_match('/([0-9]+)_([_a-z0-9]*)/i', $file->getFileName(), $matches))
@@ -118,46 +118,46 @@ class SMigrator
             }
         }
         natsort($files);
-        return $this->isDown() ? array_reverse($files) : $files;
+        return $this->is_down() ? array_reverse($files) : $files;
     }
     
-    private function migrationClass($name)
+    private function migration_class($name)
     {
         return SInflection::camelize($name);
     }
     
-    private function versionAndName($file)
+    private function version_and_name($file)
     {
         preg_match('/([0-9]+)_([_a-z0-9]*)/i', $file, $matches);
         return array($matches[1], $matches[2]);
     }
     
-    private function setSchemaVersion($version)
+    private function set_schema_version($version)
     {
-        SActiveRecord::connection()->update('UPDATE '.self::$schemaInfoTableName
-        .' SET version = '.($this->isDown() ? $version -1 : $version));
+        SActiveRecord::connection()->update('UPDATE '.self::$schema_info_table_name
+        .' SET version = '.($this->is_down() ? $version -1 : $version));
     }
     
-    private function isUp()
+    private function is_up()
     {
         return $this->direction == 'up';
     }
     
-    private function isDown()
+    private function is_down()
     {
         return $this->direction == 'down';
     }
     
-    private function reachedTargetVersion($version)
+    private function reached_target_version($version)
     {
-        return (($this->isUp() && $this->targetVersion !== null && $version - 1 == $this->targetVersion) 
-                || ($this->isDown() && $version == $this->targetVersion));
+        return (($this->is_up() && $this->target_version !== null && $version - 1 == $this->target_version) 
+                || ($this->is_down() && $version == $this->target_version));
     }
     
-    private function isIrrelevantMigration($version)
+    private function is_irrelevant_migration($version)
     {
-        return (($this->isUp() && $version <= self::currentVersion()) 
-                || ($this->isDown() && $version > self::currentVersion()));
+        return (($this->is_up() && $version <= self::current_version()) 
+                || ($this->is_down() && $version > self::current_version()));
     }
 }
 

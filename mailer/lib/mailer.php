@@ -2,7 +2,7 @@
 
 class ApplicationMailer extends Mailer
 {
-    public function signupNotification($user)
+    public function signup_notification($user)
     {
         $this->to = $user->email;
         $this->subject = "Création d'un compte Opopope";
@@ -19,8 +19,8 @@ class Mailer
     public $subject = "";
     public $body = null;
     public $charset = "utf-8";
-    public $contentType = "text/plain";
-    public $mimeVersion = "1.0";*/
+    public $content_type = "text/plain";
+    public $mime_version = "1.0";*/
     
     public $body = Null;
     
@@ -30,15 +30,15 @@ class Mailer
     
     private static $instance = Null;
     
-    private static $templatePath   = 'views/mailing';
-    private static $deliveryMethod = 'mail'; // valeurs possibles : mail, smtp, sendmail et test (où le mail est loggé)
+    private static $template_path   = 'views/mailing';
+    private static $delivery_method = 'mail'; // valeurs possibles : mail, smtp, sendmail et test (où le mail est loggé)
     private static $defaults       = array
     (
         'charset'     => 'utf-8',
         'contentType' => 'text/plain',
         'mimeVersion' => '1.0'
     );
-    private static $serverSettings = array
+    private static $server_settings = array
     (
         'host'     => 'localhost',
         'port'     => 25,
@@ -48,9 +48,9 @@ class Mailer
         'password' => Null
     );
     
-    public function __construct($methodName)
+    public function __construct($method_name)
     {
-        $this->template = strtolower($methodName);
+        $this->template = strtolower($method_name);
         $this->mail     = new Mail();
         foreach(self::$defaults as $header => $value) $this->mail->$header = $value;
     }
@@ -83,15 +83,15 @@ class Mailer
             throw new Exception('Mailer : mail method required.'); // pas top comme msg
         }
         
-        $methodName = $args[0];
+        $method_name = $args[0];
         unset($args[0]);
         // PHP5 ne gère pas bien l'héritage de fonctions statiques, aussi sommes-nous
         // obligés de préciser que nous voulons instancier la classe ApplicationMailer.
         // Cela contraint l'user à nommer sa classe ApplicationMailer...
-        if (self::$instance == null) self::$instance = new ApplicationMailer($methodName);
+        if (self::$instance == null) self::$instance = new ApplicationMailer($method_name);
         
         // appel de la méthode définie par l'user
-        call_user_func_array(array(self::$instance, $methodName),$args);
+        call_user_func_array(array(self::$instance, $method_name),$args);
         
         if (!is_string(self::$instance->body))
         {
@@ -112,19 +112,19 @@ class Mailer
     }
     
     // utilise la fonction mail() de PHP
-    private function phpSend($mail) {}
+    private function php_send($mail) {}
     
-    private function sendmailSend($mail) {}
+    private function sendmail_send($mail) {}
     
-    private function smtpSend($mail) {}
+    private function smtp_send($mail) {}
 }
 
 class Mail
 {
-    private $headersValues    = array();
-    private $headersAccessors = array();
+    private $headers_values    = array();
+    private $headers_accessors = array();
     
-    private static $headersMap = array
+    private static $headers_map = array
     (
         'to'          => 'To',
         'cc'          => 'Cc',
@@ -139,27 +139,27 @@ class Mail
     
     public function __construct()
     {
-        $this->headersAccessors = array_keys(self::$headersMap);
+        $this->headers_accessors = array_keys(self::$headers_map);
     }
     
     public function __set($header, $value)
     {
-        if (in_array($header, $this->headersAccessors))
+        if (in_array($header, $this->headers_accessors))
         {
-            $this->headersValues[self::$headersMap[$header]] = $value;
+            $this->headers_values[self::$headers_map[$header]] = $value;
         }
     }
     
     public function __get($header)
     {
-        if (in_array($header, $this->headersAccessors))
+        if (in_array($header, $this->headers_accessors))
         {
-            return $this->headersValues[self::$headersMap[$header]];
+            return $this->headers_values[self::$headers_map[$header]];
         }
     }
     
     // taken from phpmailer
-    private function RFCDate()
+    private function rfc_date()
     {
         $tz = date("Z");
         $tzs = ($tz < 0) ? "-" : "+";
@@ -170,15 +170,15 @@ class Mail
         return $result;
     }
     
-    private function fixEOL($str)
+    private function fix_eol($str)
     {
         $str = str_replace("\r\n", "\n", $str);
         $str = str_replace("\r", "\n", $str);
-        $str = str_replace("\n", $this->LE, $str);
+        $str = str_replace("\n", $this->le, $str);
         return $str;
     }
     
-    private function wrapText($str)
+    private function wrap_text($str)
     {
     
     }
@@ -186,7 +186,7 @@ class Mail
 
 class Part
 {
-    private $contentType = "";
+    private $content_type = "";
     
 }
 

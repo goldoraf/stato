@@ -13,11 +13,11 @@ class SAttribute
         'validations' => array()
     );
     
-    public function __construct($name, $type, $default = null, $options = array()/*, $dontTypecastDefault = False*/)
+    public function __construct($name, $type, $default = null, $options = array()/*, $dont_typecast_default = False*/)
     {
         $this->name    = $name;
         $this->type    = $type;
-        /*if ($dontTypecastDefault) */$this->default = $default;
+        /*if ($dont_typecast_default) */$this->default = $default;
         //else $this->default = $this->typecast($default);
         $this->options = array_merge($this->options, $options);
     }
@@ -42,10 +42,10 @@ class SAttribute
                 return (float) $data;
                 break;
             case 'datetime':
-                return $this->stringToDateTime($data);
+                return $this->string_to_date_time($data);
                 break;
             case 'date':
-                return $this->stringToDate($data);
+                return $this->string_to_date($data);
                 break;
             case 'boolean':
                 return $data === true or strtolower($data) == 'true' or $data == 1;
@@ -53,13 +53,13 @@ class SAttribute
         }
     }
     
-    public function defaultValue($owner)
+    public function default_value($owner)
     {
         //return $this->default;
         return $this->typecast($owner, $this->default);
     }
     
-    public function stringToDate($data)
+    public function string_to_date($data)
     {
         if (get_class($data) == 'SDate') return $data;
         try { $date = SDate::parse($data); }
@@ -67,7 +67,7 @@ class SAttribute
         return $date;
     }
     
-    public function stringToDateTime($data)
+    public function string_to_date_time($data)
     {
         if (get_class($data) == 'SDateTime') return $data;
         try { $date = SDateTime::parse($data); }

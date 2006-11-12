@@ -2,7 +2,7 @@
 
 class DomAssertEqualTest extends UnitTestCase
 {
-    function testDomAssertEqual()
+    function test_dom_assert_equal()
     {
         $this->assertTrue($this->assertDomEqual('<fake />', '<fake />'));
         $this->assertTrue($this->assertDomEqual('<fake />', '<fake/>'));
@@ -52,7 +52,7 @@ class DomAssertEqualTest extends UnitTestCase
         ));
     }
     
-    function assertDomEqual($first, $second)
+    function assert_dom_equal($first, $second)
     {
         $expectation = new DomEqualExpectation($first);
         return $expectation->test($second);

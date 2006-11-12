@@ -64,15 +64,15 @@ function stylesheet_path($source)
 
 function compute_public_path($source, $dir = 'images', $ext = Null)
 {
-    static $relativeUrlRoot = null;
+    static $relative_url_root = null;
     
     if (preg_match('/http|https/', $source)) return $source;
     
     if (strpos($source, '.') === false) $source.= ".{$ext}";
     
-    if ($relativeUrlRoot == null)
-        $relativeUrlRoot = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
-    return "{$relativeUrlRoot}{$dir}/{$source}";
+    if ($relative_url_root == null)
+        $relative_url_root = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
+    return "{$relative_url_root}{$dir}/{$source}";
 }
 
 ?>

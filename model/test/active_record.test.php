@@ -4,7 +4,7 @@ class ActiveRecordTest extends ActiveTestCase
 {
     public $fixtures = array('posts', 'products', 'contracts', 'employes');
     
-    public function testAttributeAccess()
+    public function test_attribute_access()
     {
         $post = new Post();
         $post->title = 'Test Driven Developement';
@@ -15,7 +15,7 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual($post['author'], $post->author);
     }
     
-    public function testAttributeAccessOverloading()
+    public function test_attribute_access_overloading()
     {
         $bill = new Bill();
         $bill->product = 'mouse';
@@ -25,7 +25,7 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual(175, $bill->price);
     }
     
-    public function testMultiParamsAssignment()
+    public function test_multi_params_assignment()
     {
         $emp = new Employe(array('firstname'=>'Steve', 'lastname'=>'Warson', 
                                  'date_of_birth'=>array('year'=>'1962', 'month'=>'09', 'day'=>'12')));
@@ -33,17 +33,17 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual('1962-09-12', $emp->date_of_birth->__toString());
     }
     
-    public function testIsNewRecord()
+    public function test_is_new_record()
     {
         $post = new Post();
-        $this->assertTrue($post->isNewRecord());
+        $this->assertTrue($post->is_new_record());
         $post = new Post(array('id' => 200, 'title' => 'test'));
-        $this->assertTrue($post->isNewRecord());
+        $this->assertTrue($post->is_new_record());
         $post = new Post(array('id' => 1, 'title' => 'test'));
-        $this->assertFalse($post->isNewRecord());
+        $this->assertFalse($post->is_new_record());
     }
     
-    public function testSetAttributes()
+    public function test_set_attributes()
     {
         $post = Post::$objects->get(1);
         $post->title = 'Framework clone wars';
@@ -51,11 +51,11 @@ class ActiveRecordTest extends ActiveTestCase
         $post->save();
         $this->assertEqual('Framework clone wars', $post->title);
         $this->assertEqual('bli bli bli', $post->text);
-        $postBis = Post::$objects->get(1);
-        $this->assertEqual($post->author, $postBis->author);
+        $post_bis = Post::$objects->get(1);
+        $this->assertEqual($post->author, $post_bis->author);
     }
     
-    public function testNullValues()
+    public function test_null_values()
     {
         $emp = new Employe(array('firstname'=>'Steve'));
         $emp->save();
@@ -64,7 +64,7 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertNull($emp->lastname);
     }
     
-    public function testReadWriteBooleanAttribute()
+    public function test_read_write_boolean_attribute()
     {
         $post = Post::$objects->get(1);
         $this->assertTrue($post->published);
@@ -74,39 +74,39 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertTrue($post->published);
         $post->published = False;
         $post->save();
-        $postBis = Post::$objects->get(1);
-        $this->assertFalse($postBis->published);
+        $post_bis = Post::$objects->get(1);
+        $this->assertFalse($post_bis->published);
     }
     
-    public function testPreservingDateObjects()
+    public function test_preserving_date_objects()
     {
         $contract = Contract::$objects->get(1);
         $this->assertIsA($contract->date, 'SDate');
     }
     
-    public function testCreate()
+    public function test_create()
     {
         $product = new Product();
         $product->name = 'DVD';
         $product->save();
         $this->assertEqual(2, $product->id);
-        $productReloaded = Product::$objects->get($product->id);
-        $this->assertEqual('DVD', $productReloaded->name);
+        $product_reloaded = Product::$objects->get($product->id);
+        $this->assertEqual('DVD', $product_reloaded->name);
     }
     
-    public function testUpdate()
+    public function test_update()
     {
         $product = new Product();
         $product->name = 'CD';
         $product->save();
-        $productReloaded = Product::$objects->get($product->id);
-        $productReloaded->name = 'CD-R';
-        $productReloaded->save();
-        $productReloadedAgain = Product::$objects->get($product->id);
-        $this->assertEqual('CD-R', $productReloadedAgain->name);
+        $product_reloaded = Product::$objects->get($product->id);
+        $product_reloaded->name = 'CD-R';
+        $product_reloaded->save();
+        $product_reloaded_again = Product::$objects->get($product->id);
+        $this->assertEqual('CD-R', $product_reloaded_again->name);
     }
     
-    public function testDelete()
+    public function test_delete()
     {
         $product = new Product();
         $product->name = 'CD';
@@ -117,7 +117,7 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual('SActiveRecordDoesNotExist', get_class($e));
     }
     
-    public function testSaveWithTimestamps()
+    public function test_save_with_timestamps()
     {
         $created_date = new SDateTime(2005,12,01,20,30,00);
         $post = Post::$objects->get(2);

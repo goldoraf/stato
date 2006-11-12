@@ -2,34 +2,34 @@
 
 class InflectionTest extends UnitTestCase
 {
-    function testPlural()
+    function test_plural()
     {
         $this->assertEqual('products', SInflection::pluralize('product'));
     }
     
-    function testSingular()
+    function test_singular()
     {
         $this->assertEqual('product', SInflection::singularize('products'));
     }
     
-    function testUnderscore()
+    function test_underscore()
     {
         $this->assertEqual('my_test_controller', SInflection::underscore('MyTestController'));
         $this->assertEqual('s_my_test_controller', SInflection::underscore('SMyTestController'));
     }
     
-    function testCamelize()
+    function test_camelize()
     {
         $this->assertEqual('MyTestController', SInflection::camelize('my_test_controller'));
         $this->assertEqual('SMyTestController', SInflection::camelize('s_my_test_controller'));
     }
     
-    function testWikify()
+    function test_wikify()
     {
         $this->assertEqual('hello_world', SInflection::wikify('Hello World'));
     }
     
-    function testHumanize()
+    function test_humanize()
     {
         $this->assertEqual('Post', SInflection::humanize('post_id'));
         $this->assertEqual('Relative post', SInflection::humanize('relative_post_id'));

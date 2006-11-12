@@ -11,12 +11,12 @@ class SManager
     
     public function __call($method, $args)
     {
-        return call_user_func_array(array($this->getQuerySet(), $method), $args);
+        return call_user_func_array(array($this->get_query_set(), $method), $args);
     }
     
     public function all()
     {
-        return $this->getQuerySet();
+        return $this->get_query_set();
     }
     
     public function create($attributes = null)
@@ -29,12 +29,12 @@ class SManager
     
     public function update($id, $attributes)
     {
-        $object = $this->getQuerySet()->get($id);
-        $object->updateAttributes($attributes);
+        $object = $this->get_query_set()->get($id);
+        $object->update_attributes($attributes);
         return $object;
     }
     
-    /*public function getOrCreate()
+    /*public function get_or_create()
     {
         try { return call_user_func_array(array($this, 'get'), func_get_args()); }
         catch (SActiveRecordDoesNotExist $e) { 
@@ -42,7 +42,7 @@ class SManager
         }
     }*/
     
-    protected function getQuerySet()
+    protected function get_query_set()
     {
         return new SQuerySet($this->meta);
     }

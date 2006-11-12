@@ -18,7 +18,7 @@ class SDoubleRenderException extends SException {}
  *{
  *     public function index()
  *     {
- *         $this->posts = SActiveStore::findAll('Post');
+ *         $this->posts = SActiveStore::find_all('Post');
  *     }
  *      
  *     public function add_comment()
@@ -35,7 +35,7 @@ class SActionController
     /**
      * Holds the request object that's primarily used to get variables set by the 
      * web server or otherwise directly related to the execution environment.
-     * Examples : <var>$this->request->isPost(); $this->request->requestUri();</var>     
+     * Examples : <var>$this->request->is_post(); $this->request->request_uri();</var>     
      */
     public $request  = null;
     /**
@@ -55,52 +55,52 @@ class SActionController
     protected $helpers  = array();
     protected $scaffold = null;
     
-    protected $hiddenActions  = array();
+    protected $hidden_actions  = array();
     
-    protected $cachedPages    = array();
-    protected $cachedActions  = array();
-    protected $pageCacheDir   = null;
-    protected $pageCacheExt   = '.html';
-    protected $performCaching = True;
+    protected $cached_pages    = array();
+    protected $cached_actions  = array();
+    protected $page_cache_dir   = null;
+    protected $page_cache_ext   = '.html';
+    protected $perform_caching = True;
     
-    protected $beforeFilters = array();
-    protected $afterFilters  = array();
-    protected $aroundFilters = array();
+    protected $before_filters = array();
+    protected $after_filters  = array();
+    protected $around_filters = array();
     
-    protected $skipBeforeFilters = array();
-    protected $skipAfterFilters  = array();
+    protected $skip_before_filters = array();
+    protected $skip_after_filters  = array();
     
-    private $subDirectory      = null;
+    private $sub_directory      = null;
     
-    private $performedRender   = false;
-    private $performedRedirect = false;
+    private $performed_render   = false;
+    private $performed_redirect = false;
     
-    public $parentController  = null;
+    public $parent_controller  = null;
     
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
     public static function factory($request, $response)
     {
         if ($request->controller == 'api') 
-            return self::dispatchWebServiceRequest($request, $response);
+            return self::dispatch_web_service_request($request, $response);
 		else 
-            return self::instanciateController($request->controller)->process($request, $response);
+            return self::instanciate_controller($request->controller)->process($request, $response);
     }
     
-    public static function processWithException($request, $response, $exception)
+    public static function process_with_exception($request, $response, $exception)
     {
         $controller = new SActionController();
-        return $controller->process($request, $response, 'rescueAction', $exception);
+        return $controller->process($request, $response, 'rescue_action', $exception);
     }
     
-    public static function processWithComponent($class, $request, $response, $parentController = null)
+    public static function process_with_component($class, $request, $response, $parent_controller = null)
     {
         $controller = new $class();
-        $controller->parentController = $parentController;
+        $controller->parent_controller = $parent_controller;
         return $controller->process($request, $response);
     }
     
-    public function process($request, $response, $method = 'performAction', $arguments = null)
+    public function process($request, $response, $method = 'perform_action', $arguments = null)
     {
         $this->request  = $request;
         $this->response = $response;
@@ -113,7 +113,7 @@ class SActionController
         return $this->response;
     }
     
-    public function invokeDirectWebService($request)
+    public function invoke_direct_web_service($request)
     {
         return call_user_func_array(array(&$this, $request->method), $request->params);
     }
@@ -121,9 +121,9 @@ class SActionController
     public function __construct()
     {
         $this->view    = new SActionView($this);
-        $this->logger  = SLogger::getInstance();
+        $this->logger  = SLogger::get_instance();
         
-        $this->pageCacheDir = ROOT_DIR.'/public/cache';
+        $this->page_cache_dir = ROOT_DIR.'/public/cache';
     }
     
     public function __get($name)
@@ -139,36 +139,36 @@ class SActionController
     /**
      * Converts the class name from something like "WeblogController" to "weblog"
      */
-    public function controllerName()
+    public function controller_name()
     {
-        return SInflection::underscore(str_replace('Controller', '', $this->controllerClassName()));
+        return SInflection::underscore(str_replace('Controller', '', $this->controller_class_name()));
     }
     
     /**
      * Returns the class name
      */
-    public function controllerClassName()
+    public function controller_class_name()
     {
         return get_class($this);
     }
     
-    public function controllerPath()
+    public function controller_path()
     {
-        return SDependencies::subDirectory(get_class($this)).$this->controllerName();
+        return SDependencies::sub_directory(get_class($this)).$this->controller_name();
     }
     
-    public function actionName()
+    public function action_name()
     {
         if (empty($this->request->action)) return 'index';
         return $this->request->action;
     }
     
-    public function urlFor($options = array())
+    public function url_for($options = array())
     {
         if (!isset($options['controller']))
         {
-            $options['controller'] = $this->controllerPath();
-            if (!isset($options['action'])) $options['action'] = $this->actionName();
+            $options['controller'] = $this->controller_path();
+            if (!isset($options['action'])) $options['action'] = $this->action_name();
         }
         elseif (!isset($options['action'])) $options['action'] = 'index';  
         
@@ -185,44 +185,44 @@ class SActionController
     
     protected function render($status = null)
     {
-        $this->renderAction($this->actionName(), $status);
+        $this->render_action($this->action_name(), $status);
     }
     
-    protected function renderAction($action, $status = null)
+    protected function render_action($action, $status = null)
     {
-        $template = $this->templatePath($this->controllerPath(), $action);
+        $template = $this->template_path($this->controller_path(), $action);
         if (!file_exists($template)) throw new SException('Template not found for this action');
         
-        if ($this->layout) $this->renderWithLayout($template, $status);
-        else $this->renderFile($template, $status);
+        if ($this->layout) $this->render_with_layout($template, $status);
+        else $this->render_file($template, $status);
     }
     
-    protected function renderWithLayout($template, $status = null)
+    protected function render_with_layout($template, $status = null)
     {
-        $this->addVariablesToAssigns();
+        $this->add_variables_to_assigns();
         $this->assigns['layout_content'] = $this->view->render($template);
         
         $layout = APP_DIR.'/views/layouts/'.$this->layout.'.php';
         if (!file_exists($layout)) throw new SException('Layout not found');
-        $this->renderFile($layout, $status);
+        $this->render_file($layout, $status);
     }
     
-    protected function renderFile($path, $status = null)
+    protected function render_file($path, $status = null)
     {
-        $this->addVariablesToAssigns();
-        $this->renderText($this->view->render($path), $status);
+        $this->add_variables_to_assigns();
+        $this->render_text($this->view->render($path), $status);
     }
     
-    protected function renderComponent($options = array())
+    protected function render_component($options = array())
     {
-        $this->renderText($this->componentResponse($options, true)->body); 
+        $this->render_text($this->component_response($options, true)->body); 
     }
     
-    protected function renderPartial($partial, $localAssigns = array())
+    protected function render_partial($partial, $local_assigns = array())
     {
-        $this->addVariablesToAssigns();
-        if (strpos($partial, '/') === false) $partial = $this->controllerPath().'/'.$partial;
-        $this->renderText($this->view->renderPartial($partial, $localAssigns));
+        $this->add_variables_to_assigns();
+        if (strpos($partial, '/') === false) $partial = $this->controller_path().'/'.$partial;
+        $this->render_text($this->view->render_partial($partial, $local_assigns));
     }
     
     /**
@@ -233,60 +233,60 @@ class SActionController
      * Note that it must remain public instead of protected because SActionCacheFilter
      * must be able to call it directly.
      */
-    public function renderText($str, $status = null)
+    public function render_text($str, $status = null)
     {
-        if ($this->isPerformed())
+        if ($this->is_performed())
             throw new SDoubleRenderException('Can only render or redirect once per action');
         
-        $this->performedRender = true;
+        $this->performed_render = true;
         $this->response->headers['Status'] = (!empty($status)) ? $status : self::DEFAULT_RENDER_STATUS_CODE;
         $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->response->body = $str;
     }
     
-    protected function templatePath($controllerPath, $action)
+    protected function template_path($controller_path, $action)
     {
-        return APP_DIR."/views/$controllerPath/$action.php";
+        return APP_DIR."/views/$controller_path/$action.php";
     }
     
-    protected function addVariablesToAssigns()
+    protected function add_variables_to_assigns()
     {
         $this->assigns['params'] = $this->params;
         $this->assigns['request'] = $this->request;
         if (isset($this->flash) && isset($this->session))
         {
-            if (!$this->flash->isEmpty()) $this->assigns['flash'] = $this->flash->dump();
+            if (!$this->flash->is_empty()) $this->assigns['flash'] = $this->flash->dump();
             $this->flash->discard();
             $this->assigns['session'] = $this->session;
         }
     }
     
-    protected function redirectTo($options)
+    protected function redirect_to($options)
     {
         if (is_array($options))
         {
-            $this->redirectTo($this->urlFor($options));
-            //$this->response->redirectedTo = $options;
+            $this->redirect_to($this->url_for($options));
+            //$this->response->redirected_to = $options;
         }
         elseif (preg_match('#^\w+://.*#', $options))
         {
-            if ($this->isPerformed())
+            if ($this->is_performed())
                 throw new SDoubleRenderException('Can only render or redirect once per action');
             
             $this->logger->info("Redirected to {$options}");
             $this->response->redirect($options);
-            $this->response->redirectedTo = $options;
-            $this->performedRedirect = true;
+            $this->response->redirected_to = $options;
+            $this->performed_redirect = true;
         }
         else
         {
-            $this->redirectTo($this->request->protocol().$this->request->hostWithPort().$options);
+            $this->redirect_to($this->request->protocol().$this->request->host_with_port().$options);
         }
     }
     
-    protected function redirectBack()
+    protected function redirect_back()
     {
-        if (isset($_SERVER['HTTP_REFERER'])) $this->redirectTo($_SERVER['HTTP_REFERER']);
+        if (isset($_SERVER['HTTP_REFERER'])) $this->redirect_to($_SERVER['HTTP_REFERER']);
         else
         {
             throw new SException('No HTTP_REFERER was set in the request to this action, 
@@ -294,45 +294,45 @@ class SActionController
         }
     }
     
-    protected function expiresIn($seconds, $options = array())
+    protected function expires_in($seconds, $options = array())
     {
-        $cacheOptions = array_merge(array('max-age' => $seconds, 'private' => true), $options);
-        $cacheControl = array();
-        foreach ($cacheOptions as $k => $v)
+        $cache_options = array_merge(array('max-age' => $seconds, 'private' => true), $options);
+        $cache_control = array();
+        foreach ($cache_options as $k => $v)
         {
-            if ($v === false || $v === null) unset($cacheOptions[$k]);
-            if ($v === true) $cacheControl[] = $k;
-            else $cacheControl[] = "$k=$v";
+            if ($v === false || $v === null) unset($cache_options[$k]);
+            if ($v === true) $cache_control[] = $k;
+            else $cache_control[] = "$k=$v";
         }
-        $this->response->headers['Cache-Control'] = implode(',', $cacheControl);
+        $this->response->headers['Cache-Control'] = implode(',', $cache_control);
     }
     
-    protected function expiresNow()
+    protected function expires_now()
     {
         $this->response->headers['Cache-Control'] = 'no-cache';
     }
     
-    protected function eraseResults()
+    protected function erase_results()
     {
-        $this->eraseRenderResults();
-        $this->eraseRedirectResults();
+        $this->erase_render_results();
+        $this->erase_redirect_results();
     }
     
-    protected function eraseRenderResults()
+    protected function erase_render_results()
     {
         $this->response->body = '';
-        $this->performedRender = false;
+        $this->performed_render = false;
     }
     
-    protected function eraseRedirectResults()
+    protected function erase_redirect_results()
     {
-        $this->performedRedirect = false;
-        $this->response->redirectedTo = null;
-        $this->response->headers['Status'] = self::DEFAULT_RENDER_STATUS_CODE;
+        $this->performed_redirect = false;
+        $this->response->redirected_to = null;
+        $this->response->headers['Status'] = self::default_render_status_code;
         unset($this->response->headers['location']);
     }
     
-    protected function sendFile($path, $params=array())
+    protected function send_file($path, $params=array())
     {
         if (!file_exists($path) || !is_readable($path)) 
             throw new SException('Cannot read file : '.$path);
@@ -348,118 +348,118 @@ class SActionController
         if (!isset($params['filename'])) $params['filename'] = basename($path);
         if (!isset($params['length']))   $params['length']   = filesize($path);
         
-        $this->sendFileHeaders($params);
+        $this->send_file_headers($params);
         
         if ($params['stream'] === true)
         {
-            $this->response->sendHeaders();
+            $this->response->send_headers();
             $fp = @fopen($path, "rb");
             fpassthru($fp);
             exit();
         }
-        else $this->renderText(file_get_contents($path));
+        else $this->render_text(file_get_contents($path));
     }
     
-    protected function cachePage($content = null, $options = array())
+    protected function cache_page($content = null, $options = array())
     {
-        if (!$this->performCaching) return;
+        if (!$this->perform_caching) return;
         
         if ($content == null) $content = $this->response->body;
         if (is_array($options))
-            $path = $this->urlFor(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
+            $path = $this->url_for(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
         else 
             $path = $options;
         
-        if (!SFileUtils::mkdirs(dirname($this->pageCachePath($path)), 0700, true))
+        if (!SFileUtils::mkdirs(dirname($this->page_cache_path($path)), 0700, true))
             throw new SException('Caching failed with dirs creation');
-        file_put_contents($this->pageCachePath($path), $content);
+        file_put_contents($this->page_cache_path($path), $content);
     }
     
-    protected function expirePage($options = array())
+    protected function expire_page($options = array())
     {
-        if (!$this->performCaching) return;
+        if (!$this->perform_caching) return;
         
         if (is_array($options))
-            $path = $this->urlFor(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
+            $path = $this->url_for(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
         else 
             $path = $options;
             
-        if (file_exists($this->pageCachePath($path))) unlink($this->pageCachePath($path));
+        if (file_exists($this->page_cache_path($path))) unlink($this->page_cache_path($path));
     }
     
-    protected function expireFragment($id)
+    protected function expire_fragment($id)
     {
-        if (!$this->performCaching) return;
+        if (!$this->perform_caching) return;
         
         if (is_array($id))
-            list($protocol, $id) = explode('://', $this->urlFor($id));
+            list($protocol, $id) = explode('://', $this->url_for($id));
         
         $file = ROOT_DIR."/cache/fragments/{$id}";
         if (file_exists($file)) unlink($file);
     }
     
-    protected function paginate($querySet, $perPage=10, $param='page')
+    protected function paginate($query_set, $per_page=10, $param='page')
     {
         if (isset($this->request->params[$param]))
-            $currentPage = $this->request->params[$param];
+            $current_page = $this->request->params[$param];
         else
-            $currentPage = 1;
+            $current_page = 1;
         
-        $paginator = new SPaginator($querySet, $perPage, $currentPage, $param);
-        return array($paginator, $paginator->currentPage());
+        $paginator = new SPaginator($query_set, $per_page, $current_page, $param);
+        return array($paginator, $paginator->current_page());
     }
     
-    private function performAction()
+    private function perform_action()
     {
-        $action = $this->actionName();
-        if (!$this->actionExists($action) && $this->scaffold === null)
-            throw new SUnknownActionException("Action $action not found in ".$this->controllerClassName());
+        $action = $this->action_name();
+        if (!$this->action_exists($action) && $this->scaffold === null)
+            throw new SUnknownActionException("Action $action not found in ".$this->controller_class_name());
             
         if ($this->scaffold !== null)
         {
-            $this->renderComponent(array('controller' => 'scaffolding', 'action' => $action,
+            $this->render_component(array('controller' => 'scaffolding', 'action' => $action,
                                          'scaffold' => $this->scaffold));
             return;
         }
         
         $this->initialize();
-        $this->requireDependencies();
+        $this->require_dependencies();
         
         $this->session = new SSession();
         $this->flash   = new SFlash($this->session);
         
-        $this->logProcessing();
+        $this->log_processing();
         
-        if (!empty($this->cachedActions))
-            $this->aroundFilters[] = new SActionCacheFilter($this->cachedActions);
+        if (!empty($this->cached_actions))
+            $this->around_filters[] = new SActionCacheFilter($this->cached_actions);
         
-        $beforeResult = $this->processFilters('before');
-        foreach($this->aroundFilters as $filter) $filter->before($this);
+        $before_result = $this->process_filters('before');
+        foreach($this->around_filters as $filter) $filter->before($this);
         
-        if ($beforeResult !== false && !$this->isPerformed())
+        if ($before_result !== false && !$this->is_performed())
         {
             $this->$action();
-            if (!$this->isPerformed()) $this->render();
+            if (!$this->is_performed()) $this->render();
         }
         
-        foreach($this->aroundFilters as $filter) $filter->after($this);
-        $this->processFilters('after');
+        foreach($this->around_filters as $filter) $filter->after($this);
+        $this->process_filters('after');
         
-        if (in_array($this->actionName(), $this->cachedPages) && $this->performCaching && $this->isCachingAllowed())
-            $this->cachePage($this->response->body, array('action' => $this->actionName(), 'params' => $this->params));
+        if (in_array($this->action_name(), $this->cached_pages) && $this->perform_caching && $this->is_caching_allowed())
+            $this->cache_page($this->response->body, array('action' => $this->action_name(), 'params' => $this->params));
         
-        //SActiveRecord::connection()->writeLog();
-        $this->logBenchmarking();
+        //SActiveRecord::connection()->write_log();
+        $this->log_benchmarking();
     }
     
-    private function actionExists($action)
+    private function action_exists($action)
     {
         try
         {
             $method = new ReflectionMethod(get_class($this), $action);
             return ($method->isPublic() && !$method->isConstructor()
                     && $method->getDeclaringClass()->getName() != __CLASS__
-                    && !in_array($action, $this->hiddenActions));
+                    && !in_array($action, $this->hidden_actions));
         }
         catch (ReflectionException $e)
         {
@@ -467,42 +467,42 @@ class SActionController
         }
     }
     
-    private function requireDependencies()
+    private function require_dependencies()
     {
-        SLocale::loadStrings(APP_DIR.'/i18n/'.SDependencies::subDirectory(get_class($this)));
+        SLocale::load_strings(APP_DIR.'/i18n/'.SDependencies::sub_directory(get_class($this)));
         SUrlRewriter::initialize($this->request);
         
         foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
         
-        SDependencies::requireDependencies('models', $this->models, get_class($this));
-        SDependencies::requireDependencies('helpers', $this->helpers, get_class($this));
+        SDependencies::require_dependencies('models', $this->models, get_class($this));
+        SDependencies::require_dependencies('helpers', $this->helpers, get_class($this));
     }
     
-    private function componentResponse($options, $reuseResponse)
+    private function component_response($options, $reuse_response)
     {
         $controller = $options['controller'];
         $class = SInflection::camelize($controller).'Controller';
         
         if (!file_exists($path = APP_DIR."/components/{$controller}/{$controller}_controller.php"))
-    		throw new SUnknownControllerException(ucfirst($reqController).' Component not found !');
+    		throw new SUnknownControllerException(ucfirst($req_controller).' Component not found !');
     		
     	require_once($path);
         
-        $request = $this->requestForComponent($options);
-        $response = ($reuseResponse) ? $this->response : new SResponse();
-        return SActionController::processWithComponent($class, $request, $response, $this);
+        $request = $this->request_for_component($options);
+        $response = ($reuse_response) ? $this->response : new SResponse();
+        return SActionController::process_with_component($class, $request, $response, $this);
     }
     
-    private function requestForComponent($options)
+    private function request_for_component($options)
     {
         $request = clone $this->request;
         $request->params = array_merge($request->params, $options);
         return $request;
     }
     
-    private function processFilters($state)
+    private function process_filters($state)
     {
-        $prop = $state.'Filters';
+        $prop = $state.'_filters';
         foreach ($this->$prop as $filter)
         {
             if (is_array($filter))
@@ -514,29 +514,29 @@ class SActionController
                 if (isset($filter['except']) && !is_array($filter['except']))
                     $filter['except'] = array($filter['except']);
                 
-                if ((isset($filter['only']) && in_array($this->actionName(), $filter['only']))
-                    || (isset($filter['except']) && !in_array($this->actionName(), $filter['except']))
+                if ((isset($filter['only']) && in_array($this->action_name(), $filter['only']))
+                    || (isset($filter['except']) && !in_array($this->action_name(), $filter['except']))
                     || (!isset($filter['only']) && !isset($filter['except'])))
-                    $result = $this->callFilter($method, $state);
+                    $result = $this->call_filter($method, $state);
             }
-            else $result = $this->callFilter($filter, $state);
+            else $result = $this->call_filter($filter, $state);
             
             if ($result === false) return false;
         }
     }
     
-    private function callFilter($method, $state)
+    private function call_filter($method, $state)
     {
-        $skipProp = 'skip'.ucfirst($state).'Filters';
-        if (!in_array($method, $this->$skipProp)) return $this->$method();
+        $skip_prop = 'skip_'.$state.'_filters';
+        if (!in_array($method, $this->$skip_prop)) return $this->$method();
     }
     
-    private function isPerformed()
+    private function is_performed()
     {
-        return ($this->performedRender || $this->performedRedirect);
+        return ($this->performed_render || $this->performed_redirect);
     }
     
-    private function sendFileHeaders($params = array())
+    private function send_file_headers($params = array())
     {
         $disposition = $params['disposition'];
         if (isset($params['filename'])) $disposition.= '; filename='.$params['filename'];
@@ -553,89 +553,89 @@ class SActionController
             $this->response->headers['Cache-Control'] = 'private';*/
     }
     
-    private function logProcessing()
+    private function log_processing()
     {
-        $log = "\n\nProcessing ".$this->controllerClassName().'::'.$this->actionName()
-            .'() for '.$this->request->remoteIp().' at '
+        $log = "\n\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
+            .'() for '.$this->request->remote_ip().' at '
             .SDateTime::today()->__toString().' ['.$this->request->method().']';
-        if (($sessId = $this->session->sessionId()) != '') $log.= "\n    Session ID: ".$sessId;
+        if (($sess_id = $this->session->session_id()) != '') $log.= "\n    Session ID: ".$sess_id;
         $log.= "\n    Parameters: ".serialize($this->params);
         $this->logger->info($log);
     }
     
-    private function logBenchmarking()
+    private function log_benchmarking()
     {
         $runtime = microtime(true) - STATO_TIME_START;
-        $dbRuntime = SActiveRecord::connection()->runtime;
-        $dbPercentage = ($dbRuntime * 100) / $runtime;
+        $db_runtime = SActiveRecord::connection()->runtime;
+        $db_percentage = ($db_runtime * 100) / $runtime;
         $this->logger->info('Completed in '.sprintf("%.5f", $runtime)
-                            .' seconds | DB: '.sprintf("%.5f", $dbRuntime).' ('.sprintf("%d", $dbPercentage).' %)');
+                            .' seconds | DB: '.sprintf("%.5f", $db_runtime).' ('.sprintf("%d", $db_percentage).' %)');
     }
     
-    private function rescueAction($exception)
+    private function rescue_action($exception)
     {
-        if ($this->isPerformed()) $this->eraseResults();
-        $this->logError($exception);
-        if (APP_MODE == 'dev') $this->rescueActionLocally($exception);
-        else $this->rescueActionInPublic($exception);
+        if ($this->is_performed()) $this->erase_results();
+        $this->log_error($exception);
+        if (APP_MODE == 'dev') $this->rescue_action_locally($exception);
+        else $this->rescue_action_in_public($exception);
     }
     
-    private function rescueActionInPublic($exception)
+    private function rescue_action_in_public($exception)
     {
         if (in_array(get_class($exception), array('SRoutingException', 
             'SUnknownControllerException', 'SUnknownActionException')))
-            $this->renderText(file_get_contents(ROOT_DIR.'/public/404.html'));
-        else $this->renderText(file_get_contents(ROOT_DIR.'/public/500.html'));
+            $this->render_text(file_get_contents(ROOT_DIR.'/public/404.html'));
+        else $this->render_text(file_get_contents(ROOT_DIR.'/public/500.html'));
     }
     
-    private function rescueActionLocally($exception)
+    private function rescue_action_locally($exception)
     {
         $this->assigns['exception']  = $exception;
-        $this->assigns['controller_name'] = self::controllerClass($this->request->controller);
-        $this->assigns['action_name']     = $this->actionName();
-        $this->renderFile(ROOT_DIR.'/core/controller/lib/templates/rescue/exception.php');
+        $this->assigns['controller_name'] = self::controller_class($this->request->controller);
+        $this->assigns['action_name']     = $this->action_name();
+        $this->render_file(ROOT_DIR.'/core/controller/lib/templates/rescue/exception.php');
     }
     
-    private function logError($exception)
+    private function log_error($exception)
     {
-        $this->logger->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
-        .implode("\n    ", $this->cleanBacktrace($exception))."\n");
+        $this->logger->fatal(get_class($exception)." (".$exception->get_message().")\n    "
+        .implode("\n    ", $this->clean_backtrace($exception))."\n");
     }
     
-    private function cleanBacktrace($exception)
+    private function clean_backtrace($exception)
     {
         $trace = array();
-        foreach ($exception->getTrace() as $t)
+        foreach ($exception->get_trace() as $t)
             $trace[] = $t['file'].':'.$t['line'].' in \''.$t['function'].'\'';
         return $trace;
     }
     
-    private function pageCachePath($path)
+    private function page_cache_path($path)
     {
-        return $this->pageCacheDir.$this->pageCacheFile($path);
+        return $this->page_cache_dir.$this->page_cache_file($path);
     }
     
-    private function pageCacheFile($path)
+    private function page_cache_file($path)
     {
         $name = ((empty($path) || $path == '/') ? '/index' : '/'.$path);
-        $name.= $this->pageCacheExt;
+        $name.= $this->page_cache_ext;
         return $name;
     }
     
-    private function isCachingAllowed()
+    private function is_caching_allowed()
     {
-        return (!$this->request->isPost() && isset($this->response->headers['Status'])
+        return (!$this->request->is_post() && isset($this->response->headers['Status'])
             && $this->response->headers['Status'] < 400);
     }
     
-    private static function dispatchWebServiceRequest($request, $response)
+    private static function dispatch_web_service_request($request, $response)
     {
         $protocol = $request->action;
         if (!in_array($protocol, array('xmlrpc')))
             throw new SUnknownProtocolException($protocol);
         $class = 'S'.$protocol.'Server';
         $server = new $class();
-        list($method, $params) = $server->parseRequest($request->rawPostData());
+        list($method, $params) = $server->parse_request($request->raw_post_data());
         $parts = explode('.', $method);
         if (count($parts) < 2 || count($parts) > 3)
             throw new SException("Requested method does not exist : $method");
@@ -643,44 +643,44 @@ class SActionController
         if (count($parts) == 2) $service = $parts[0].'/'.$parts[1];
         else $service = $parts[0];
         
-        $wsRequest = new SWebServiceRequest($protocol, $service, $method, $params);
-        $returnValue = self::invokeWebService($wsRequest);
-        $response->body = $server->writeResponse($returnValue);
+        $ws_request = new SWebServiceRequest($protocol, $service, $method, $params);
+        $return_value = self::invoke_web_service($ws_request);
+        $response->body = $server->write_response($return_value);
         return $response;
     }
     
-    private static function invokeWebService($request)
+    private static function invoke_web_service($request)
     {
-        if (file_exists(self::controllerFile('api')))
-            return self::instanciateController('api')->invokeDelegatedWebService($request);
+        if (file_exists(self::controller_file('api')))
+            return self::instanciate_controller('api')->invoke_delegated_web_service($request);
         else
-            return self::instanciateController($request->service)->invokeDirectWebService($request);
+            return self::instanciate_controller($request->service)->invoke_direct_web_service($request);
     }
     
-    private static function instanciateController($reqController)
+    private static function instanciate_controller($req_controller)
     {
-        if (!file_exists($path = self::controllerFile($reqController)))
-    		throw new SUnknownControllerException(ucfirst($reqController).'Controller not found !');
+        if (!file_exists($path = self::controller_file($req_controller)))
+    		throw new SUnknownControllerException(ucfirst($req_controller).'Controller not found !');
     		
     	require_once($path);
     	
-        $className = self::controllerClass($reqController);
-		return new $className();
+        $class_name = self::controller_class($req_controller);
+		return new $class_name();
     }
     
-    private static function controllerClass($reqController)
+    private static function controller_class($req_controller)
     {
-        if (strpos($reqController, '/'))
-    	   list( , $controllerName) = explode('/', $reqController);
+        if (strpos($req_controller, '/'))
+    	   list( , $controller_name) = explode('/', $req_controller);
     	else
-    	   $controllerName = $reqController;
+    	   $controller_name = $req_controller;
     	   
-    	return SInflection::camelize($controllerName).'Controller';
+    	return SInflection::camelize($controller_name).'Controller';
     }
     
-    private static function controllerFile($reqController)
+    private static function controller_file($req_controller)
 	{
-        return APP_DIR.'/controllers/'.$reqController.'_controller.php';
+        return APP_DIR.'/controllers/'.$req_controller.'_controller.php';
     }
 }
 

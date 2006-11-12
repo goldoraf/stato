@@ -10,204 +10,204 @@ class SListDecorator extends SActiveRecordDecorator
         $this->record = $record;
         $this->column = $column;
         $this->scope  = $scope;
-        $this->record->addCallback($this, 'beforeCreate', 'addToListBottom');
-        $this->record->addCallback($this, 'afterDelete', 'removeFromList');
+        $this->record->add_callback($this, 'beforeCreate', 'addToListBottom');
+        $this->record->add_callback($this, 'afterDelete', 'removeFromList');
     }
     
-    public function insertAt($position = 1)
+    public function insert_at($position = 1)
     {
-        $this->insertAtPosition($position);
+        $this->insert_at_position($position);
     }
     
-    public function moveLower()
+    public function move_lower()
     {
-        $lowerItem = new SListDecorator($this->lowerItem(), $this->scope);
-        if ($lowerItem === null) return;
+        $lower_item = new SListDecorator($this->lower_item(), $this->scope);
+        if ($lower_item === null) return;
         // transaction...
-        $lowerItem->decrementPosition();
-        $this->incrementPosition();
+        $lower_item->decrement_position();
+        $this->increment_position();
     }
     
-    public function moveHigher()
+    public function move_higher()
     {
-        $higherItem = new SListDecorator($this->higherItem(), $this->scope);
-        if ($higherItem === null) return;
+        $higher_item = new SListDecorator($this->higher_item(), $this->scope);
+        if ($higher_item === null) return;
         // transaction...
-        $higherItem->incrementPosition();
-        $this->decrementPosition();
+        $higher_item->increment_position();
+        $this->decrement_position();
     }
     
-    public function moveToBottom()
+    public function move_to_bottom()
     {
-        if (!$this->isInList()) return;
+        if (!$this->is_in_list()) return;
         // transaction...
-        $this->decrementPositionsOnLowerItems();
-        $this->assumeBottomPosition();
+        $this->decrement_positions_on_lower_items();
+        $this->assume_bottom_position();
     }
     
-    public function moveToTop()
+    public function move_to_top()
     {
-        if (!$this->isInList()) return;
+        if (!$this->is_in_list()) return;
         // transaction...
-        $this->incrementPositionsOnHigherItems();
-        $this->assumeTopPosition();
+        $this->increment_positions_on_higher_items();
+        $this->assume_top_position();
     }
     
-    public function removeFromList()
+    public function remove_from_list()
     {
-        if ($this->isInList()) $this->decrementPositionsOnLowerItems();
+        if ($this->is_in_list()) $this->decrement_positions_on_lower_items();
     }
     
-    public function incrementPosition()
+    public function increment_position()
     {
-        if (!$this->isInList()) return;
-        $this->record->updateAttribute($this->column, $this->record->__get($this->column) + 1);
+        if (!$this->is_in_list()) return;
+        $this->record->update_attribute($this->column, $this->record->__get($this->column) + 1);
     }
     
-    public function decrementPosition()
+    public function decrement_position()
     {
-        if (!$this->isInList()) return;
-        $this->record->updateAttribute($this->column, $this->record->__get($this->column) - 1);
+        if (!$this->is_in_list()) return;
+        $this->record->update_attribute($this->column, $this->record->__get($this->column) - 1);
     }
     
-    public function isInList()
+    public function is_in_list()
     {
         return $this->record->__get($this->column) != Null;
     }
     
-    public function isFirst()
+    public function is_first()
     {
-        if (!$this->isInList()) return false;
+        if (!$this->is_in_list()) return false;
         return $this->record->__get($this->column) == 1;
     }
     
-    public function isLast()
+    public function is_last()
     {
-        if (!$this->isInList()) return false;
-        return $this->record->__get($this->column) == $this->bottomPosition();
+        if (!$this->is_in_list()) return false;
+        return $this->record->__get($this->column) == $this->bottom_position();
     }
     
-    public function higherItem()
+    public function higher_item()
     {
-        if (!$this->isInList()) return null;
-        return SActiveStore::findFirst(
+        if (!$this->is_in_list()) return null;
+        return SActiveStore::find_first(
             get_class($this->record),
-            $this->scopeCondition()." AND {$this->column} = ".($this->record->__get($this->column) - 1)
+            $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) - 1)
         );
     }
     
-    public function lowerItem()
+    public function lower_item()
     {
-        if (!$this->isInList()) return null;
-        return SActiveStore::findFirst(
+        if (!$this->is_in_list()) return null;
+        return SActiveStore::find_first(
             get_class($this->record),
-            $this->scopeCondition()." AND {$this->column} = ".($this->record->__get($this->column) + 1)
+            $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) + 1)
         );
     }
     
-    public function addToListTop()
+    public function add_to_list_top()
     {
-        $this->incrementPositionsOnAllItems();
+        $this->increment_positions_on_all_items();
     }
     
-    public function addToListBottom()
+    public function add_to_list_bottom()
     {
-        $this->record->__set($this->column, $this->bottomPosition() + 1);
+        $this->record->__set($this->column, $this->bottom_position() + 1);
     }
     
-    protected function scopeCondition()
+    protected function scope_condition()
     {
         if ($this->scope === null) return '1 = 1';
         elseif (ctype_alpha($this->scope))
         {
-            if (!$this->modelExists($this->scope))
+            if (!$this->model_exists($this->scope))
                 throw new SException('The scope provided does not seem to be an existent model.');
         }
         $fk = strtolower($this->scope).'_id';
         return $fk." = '".$this->record->__get($fk)."'";
     }
     
-    protected function bottomPosition()
+    protected function bottom_position()
     {
-        $item = $this->bottomItem();
+        $item = $this->bottom_item();
         return $item ? $item[$this->column] : 0;
     }
     
-    protected function bottomItem()
+    protected function bottom_item()
     {
-        return SActiveStore::findFirst(get_class($this->record), $this->scopeCondition(), array('order' => "{$this->column} DESC"));
+        return SActiveStore::find_first(get_class($this->record), $this->scope_condition(), array('order' => "{$this->column} DESC"));
     }
     
-    protected function assumeBottomPosition()
+    protected function assume_bottom_position()
     {
-        $this->record->updateAttribute($this->column, $this->bottomPosition() + 1);
+        $this->record->update_attribute($this->column, $this->bottom_position() + 1);
     }
     
-    protected function assumeTopPosition()
+    protected function assume_top_position()
     {
-        $this->record->updateAttribute($this->column, 1);
+        $this->record->update_attribute($this->column, 1);
     }
     
-    protected function decrementPositionsOnHigherItems($position)
+    protected function decrement_positions_on_higher_items($position)
     {
-        SActiveStore::updateAll(
+        SActiveStore::update_all(
             get_class($this->record),
             "{$this->column} = ({$this->column} - 1)",
-            $this->scopeCondition()." AND {$this->column} <= {$position}"
+            $this->scope_condition()." AND {$this->column} <= {$position}"
         );
     }
     
-    protected function decrementPositionsOnLowerItems()
+    protected function decrement_positions_on_lower_items()
     {
-        if (!$this->isInList()) return;
-        SActiveStore::updateAll(
+        if (!$this->is_in_list()) return;
+        SActiveStore::update_all(
             get_class($this->record),
             "{$this->column} = ({$this->column} - 1)",
-            $this->scopeCondition()." AND {$this->column} > ".$this->record->__get($this->column)
+            $this->scope_condition()." AND {$this->column} > ".$this->record->__get($this->column)
         );
     }
     
-    protected function incrementPositionsOnHigherItems()
+    protected function increment_positions_on_higher_items()
     {
-        if (!$this->isInList()) return;
-        SActiveStore::updateAll(
+        if (!$this->is_in_list()) return;
+        SActiveStore::update_all(
             get_class($this->record),
             "{$this->column} = ({$this->column} + 1)",
-            $this->scopeCondition()." AND {$this->column} < ".$this->record->__get($this->column)
+            $this->scope_condition()." AND {$this->column} < ".$this->record->__get($this->column)
         );
     }
     
-    protected function incrementPositionsOnLowerItems($position)
+    protected function increment_positions_on_lower_items($position)
     {
-        SActiveStore::updateAll(
+        SActiveStore::update_all(
             get_class($this->record),
             "{$this->column} = ({$this->column} + 1)",
-            $this->scopeCondition()." AND {$this->column} >= {$position}"
+            $this->scope_condition()." AND {$this->column} >= {$position}"
         );
     }
     
-    protected function incrementPositionsOnAllItems()
+    protected function increment_positions_on_all_items()
     {
-        SActiveStore::updateAll(
+        SActiveStore::update_all(
             get_class($this->record),
             "{$this->column} = ({$this->column} + 1)",
-            $this->scopeCondition()
+            $this->scope_condition()
         );
     }
     
-    protected function insertAtPosition($position)
+    protected function insert_at_position($position)
     {
-        $this->removeFromList();
-        $this->incrementPositionsOnLowerItems($position);
-        $this->updateAttribute($this->column, $position);
+        $this->remove_from_list();
+        $this->increment_positions_on_lower_items($position);
+        $this->update_attribute($this->column, $position);
     }
     
-    protected function modelExists($className)
+    protected function model_exists($class_name)
     {
-        if (class_exists($className)) return true;
+        if (class_exists($class_name)) return true;
         else
         {
-            try { SDependencies::requireDependency('models', $className, get_class($this->record)); }
+            try { SDependencies::require_dependency('models', $class_name, get_class($this->record)); }
             catch (Exception $e) { return false; }
         }
         return true;

@@ -6,7 +6,7 @@ if (!class_exists('SUrlRewriter'))
 {
     class SUrlRewriter
     {
-        public static function urlFor($options)
+        public static function url_for($options)
         {
             return 'http://www.example.com';
         }
@@ -15,7 +15,7 @@ if (!class_exists('SUrlRewriter'))
 
 class FormTagHelperTest extends HelperTestCase
 {
-    public function testFormTag()
+    public function test_form_tag()
     {
         $this->assertDomEqual(
             form_tag('http://www.example.com').end_form_tag(),
@@ -27,7 +27,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testCheckboxTag()
+    public function test_checkbox_tag()
     {
         $this->assertDomEqual(
             check_box_tag('admin', 1),
@@ -35,7 +35,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testHiddenFieldTag()
+    public function test_hidden_field_tag()
     {
         $this->assertDomEqual(
             hidden_field_tag('id', 3),
@@ -43,7 +43,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testPasswordFieldTag()
+    public function test_password_field_tag()
     {
         $this->assertDomEqual(
             password_field_tag('password'),
@@ -51,7 +51,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testRadioButtonTag()
+    public function test_radio_button_tag()
     {
         $this->assertDomEqual(
             radio_button_tag('people', 'raph'),
@@ -59,7 +59,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testSelectTag()
+    public function test_select_tag()
     {
         $this->assertDomEqual(
             select_tag('people', '<option>raph</option>'),
@@ -67,7 +67,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testTextAreaTagWithSize()
+    public function test_text_area_tag_with_size()
     {
         $this->assertDomEqual(
             text_area_tag('body', 'hello world', array('size' => '20x40')),
@@ -75,7 +75,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testTextFieldTag()
+    public function test_text_field_tag()
     {
         $this->assertDomEqual(
             text_field_tag('title', 'Hello !'),
@@ -83,7 +83,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testTextFieldTagWithClassOption()
+    public function test_text_field_tag_with_class_option()
     {
         $this->assertDomEqual(
             text_field_tag('title', 'Hello !', array('class' => 'admin')),
@@ -91,7 +91,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testBooleanOptions()
+    public function test_boolean_options()
     {
         $this->assertDomEqual(
             check_box_tag('admin', 1, true, array('disabled' => true, 'readonly' => true)),
@@ -111,7 +111,7 @@ class FormTagHelperTest extends HelperTestCase
         );
     }
     
-    public function testSubmitTag()
+    public function test_submit_tag()
     {
         $this->assertDomEqual(
             submit_tag('Save'),

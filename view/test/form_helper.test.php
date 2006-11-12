@@ -19,7 +19,7 @@ class FormHelperTest extends HelperTestCase
         $this->post->written_on = new SDate(2006, 3, 31);
     }
     
-    public function testTextfield()
+    public function test_textfield()
     {
         $this->assertDomEqual(
             text_field('post', 'title', $this->post),
@@ -43,32 +43,32 @@ class FormHelperTest extends HelperTestCase
         );
     }
     
-    public function testCheckbox()
+    public function test_checkbox()
     {
         $this->assertDomEqual(
             check_box('post', 'private', $this->post),
-            '<input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />
-            <input name="post[private]" type="hidden" value="0" />'
+            '<input name="post[private]" type="hidden" value="0" />
+            <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />'
         );
         $this->assertDomEqual(
             check_box('post', 'private', $this->post, array(), 'on', 'off'),
-            '<input checked="checked" id="post_private" name="post[private]" type="checkbox" value="on" />
-            <input name="post[private]" type="hidden" value="off" />'
+            '<input name="post[private]" type="hidden" value="off" />
+            <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="on" />'
         );
         $this->post->private = false;
         $this->assertDomEqual(
             check_box('post', 'private', $this->post),
-            '<input id="post_private" name="post[private]" type="checkbox" value="1" />
-            <input name="post[private]" type="hidden" value="0" />'
+            '<input name="post[private]" type="hidden" value="0" />
+            <input id="post_private" name="post[private]" type="checkbox" value="1" />'
         );
         $this->assertDomEqual(
             check_box('post', 'private', $this->post, array('checked' => 'checked')),
-            '<input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />
-            <input name="post[private]" type="hidden" value="0" />'
+            '<input name="post[private]" type="hidden" value="0" />
+            <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />'
         );
     }
     
-    public function testRadiobutton()
+    public function test_radiobutton()
     {
         $this->assertDomEqual(
             radio_button('post', 'title', $this->post, 'PHP for ever'),
@@ -80,7 +80,7 @@ class FormHelperTest extends HelperTestCase
         );
     }
     
-    public function testTextarea()
+    public function test_textarea()
     {
         $this->assertDomEqual(
             text_area('post', 'body', $this->post),

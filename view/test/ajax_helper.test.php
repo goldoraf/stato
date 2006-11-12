@@ -4,7 +4,7 @@ require_once(CORE_DIR.'/view/view.php');
 
 class AjaxHelperTest extends HelperTestCase
 {
-    public function testAjax()
+    public function test_ajax()
     {
         $this->assertDomEqual(
             link_to_function('Hello', "alert('Hello World')"), 

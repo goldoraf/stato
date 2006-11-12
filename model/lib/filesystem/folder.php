@@ -9,14 +9,14 @@ class SFolder extends DirectoryIterator
     
     public function current()
     {
-        return parent::getFileName();
+        return parent::get_file_name();
     }
     
     public function valid()
     {
         if (parent::valid())
         {
-            if (!parent::isFile())
+            if (!parent::is_file())
             {
                 parent::next();
                 return $this->valid();

@@ -14,7 +14,7 @@ class SFlash implements ArrayAccess
         unset($this->session['FLASH_MESSAGES']);
     }
     
-    public function isEmpty()
+    public function is_empty()
     {
         return (count($this->session['FLASH_MESSAGES']) == 0);
     }
@@ -32,7 +32,7 @@ class SFlash implements ArrayAccess
     
     public function offsetGet($offset)
     {
-        if ($this->offsetExists($offset)) return $this->session['FLASH_MESSAGES'][$offset];
+        if ($this->offset_exists($offset)) return $this->session['FLASH_MESSAGES'][$offset];
         return null;
     }
     
@@ -50,7 +50,7 @@ class SFlash implements ArrayAccess
     
     public function offsetUnset($offset)
     {
-        if ($this->offsetExists($offset)) unset($this->session['FLASH_MESSAGES'][$offset]);
+        if ($this->offset_exists($offset)) unset($this->session['FLASH_MESSAGES'][$offset]);
         return;
     }
 }

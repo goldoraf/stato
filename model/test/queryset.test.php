@@ -4,7 +4,7 @@ class QuerySetTest extends ActiveTestCase
 {
     public $fixtures = array('companies', 'employes');
     
-    public function testForeach()
+    public function test_foreach()
     {
         $count = 0;
         foreach (Company::$objects->all() as $c)
@@ -15,7 +15,7 @@ class QuerySetTest extends ActiveTestCase
         $this->assertEqual(2, $count);
     }
     
-    public function testGet()
+    public function test_get()
     {
         $emp = Employe::$objects->get(1);
         $this->assertEqual(1, $emp->id);
@@ -32,13 +32,13 @@ class QuerySetTest extends ActiveTestCase
         $this->assertEqual('Bridget', $emps[2]->firstname);
     }
     
-    public function testCount()
+    public function test_count()
     {
         $this->assertEqual(2, Employe::$objects->count());
         $this->assertEqual(1, Employe::$objects->filter("firstname = 'John'")->count());
     }
     
-    public function testValues()
+    public function test_values()
     {
         $companies = Company::$objects->filter("name = 'Groupe W'")->values();
         if ($companies->valid()) $c = $companies->current();
@@ -48,99 +48,99 @@ class QuerySetTest extends ActiveTestCase
         $this->assertEqual(2, $c);
     }
     
-    public function testFilter()
+    public function test_filter()
     {
         $companies = Company::$objects->filter("name = 'Groupe W'");
-        $this->assertEqual("WHERE name = 'Groupe W'", $companies->sqlClause());
+        $this->assertEqual("WHERE name = 'Groupe W'", $companies->sql_clause());
         $this->assertEqual(1, $companies->count());
         
         $emp = Employe::$objects->filter("firstname = 'John'", "lastname = 'Doe'");
-        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->filter("firstname = 'John'")->filter("lastname = 'Doe'");
-        $this->assertEqual("WHERE firstname = 'John' AND lastname = 'Doe'", $emp->sqlClause());
+        $this->assertEqual("WHERE firstname = 'John' AND lastname = 'Doe'", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
     }
     
-    public function testExclude()
+    public function test_exclude()
     {
         $companies = Company::$objects->exclude("name = 'Groupe W'");
-        $this->assertEqual("WHERE NOT (name = 'Groupe W')", $companies->sqlClause());
+        $this->assertEqual("WHERE NOT (name = 'Groupe W')", $companies->sql_clause());
         $this->assertEqual(1, $companies->count());
         
         $emp = Employe::$objects->exclude("firstname = 'John'", "lastname = 'Doe'");
-        $this->assertEqual("WHERE NOT (firstname = 'John' AND lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE NOT (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->exclude("firstname = 'John'")->exclude("lastname = 'Doe'");
-        $this->assertEqual("WHERE NOT (firstname = 'John') AND NOT (lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE NOT (firstname = 'John') AND NOT (lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->filter("firstname = 'John'")->exclude("lastname = 'Doe'");
-        $this->assertEqual("WHERE firstname = 'John' AND NOT (lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE firstname = 'John' AND NOT (lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(0, $emp->count());
     }
     
-    public function testFilterWithBindedParam()
+    public function test_filter_with_binded_param()
     {
         $companies = Company::$objects->filter("name = :company", array(':company' => 'Groupe W'));
-        $this->assertEqual("WHERE name = 'Groupe W'", $companies->sqlClause());
+        $this->assertEqual("WHERE name = 'Groupe W'", $companies->sql_clause());
         $this->assertEqual(1, $companies->count());
         
         $emp = Employe::$objects->filter("firstname = :first", "lastname = :last", array(':first' => 'John', ':last' => 'Doe'));
-        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->filter("firstname = :first", "lastname = :last", array('first' => 'John', 'last' => 'Doe'));
-        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->filter("firstname = ?", "lastname = ?", array('John', 'Doe'));
-        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
         
         $emp = Employe::$objects->filter("firstname = '%s'", "lastname = '%s'", array('John', 'Doe'));
-        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sqlClause());
+        $this->assertEqual("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
         $this->assertEqual(1, $emp->count());
     }
     
-    public function testLimit()
+    public function test_limit()
     {
         $companies = Company::$objects->filter("name = 'Groupe W'")->limit(2);
-        $this->assertEqual("WHERE name = 'Groupe W' LIMIT 2", $companies->sqlClause());
+        $this->assertEqual("WHERE name = 'Groupe W' LIMIT 2", $companies->sql_clause());
         $companies = Company::$objects->filter("name = 'Groupe W'")->limit(2, 5);
-        $this->assertEqual("WHERE name = 'Groupe W' LIMIT 2 OFFSET 5", $companies->sqlClause());
+        $this->assertEqual("WHERE name = 'Groupe W' LIMIT 2 OFFSET 5", $companies->sql_clause());
     }
     
-    public function testOrderBy()
+    public function test_order_by()
     {
-        $companies = Company::$objects->filter("name = 'Groupe W'")->orderBy('name');
-        $this->assertEqual("WHERE name = 'Groupe W' ORDER BY name ASC", $companies->sqlClause());
-        $companies = Company::$objects->filter("name = 'Groupe W'")->orderBy('name', '-id');
-        $this->assertEqual("WHERE name = 'Groupe W' ORDER BY name ASC, id DESC", $companies->sqlClause());
-        $companies = Company::$objects->filter("name = 'Groupe W'")->orderBy('companies.name', 'companies.-id');
-        $this->assertEqual("WHERE name = 'Groupe W' ORDER BY companies.name ASC, companies.id DESC", $companies->sqlClause());
+        $companies = Company::$objects->filter("name = 'Groupe W'")->order_by('name');
+        $this->assertEqual("WHERE name = 'Groupe W' ORDER BY name ASC", $companies->sql_clause());
+        $companies = Company::$objects->filter("name = 'Groupe W'")->order_by('name', '-id');
+        $this->assertEqual("WHERE name = 'Groupe W' ORDER BY name ASC, id DESC", $companies->sql_clause());
+        $companies = Company::$objects->filter("name = 'Groupe W'")->order_by('companies.name', 'companies.-id');
+        $this->assertEqual("WHERE name = 'Groupe W' ORDER BY companies.name ASC, companies.id DESC", $companies->sql_clause());
     }
     
-    public function testJoins()
+    public function test_joins()
     {
         $companies = Company::$objects->filter("employes->lastname = 'Doe'");
-        $this->assertEqual("LEFT OUTER JOIN employes ON employes.lastname = 'Doe'", $companies->sqlClause());
+        $this->assertEqual("LEFT OUTER JOIN employes ON employes.lastname = 'Doe'", $companies->sql_clause());
         if ($companies->valid()) $c = $companies->current();
         $this->assertEqual('World Company', $c->name);
     }
     
-    public function testCreate()
+    public function test_create()
     {
         $c = Company::$objects->create(array('name' => 'Stato Inc.'));
-        $this->assertFalse($c->isNewRecord());
+        $this->assertFalse($c->is_new_record());
         $this->assertEqual('Stato Inc.', $c->name);
         $c2 = Company::$objects->get($c->id);
         $this->assertEqual('Stato Inc.', $c2->name);
     }
     
-    public function testDelete()
+    public function test_delete()
     {
         Employe::$objects->all()->delete();
         $this->assertEqual(0, Employe::$objects->all()->count());

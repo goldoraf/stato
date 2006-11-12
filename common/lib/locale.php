@@ -5,19 +5,19 @@ class SLocale
     public static $language = 'en_US';
     private static $strings = array();
     
-    public static function initialize($detectLanguage = true)
+    public static function initialize($detect_language = true)
     {
-        if ($detectLanguage) self::detectLanguage();
-        self::loadStrings(ROOT_DIR.'/core/common/lib/locale/');
-        self::setLocale();
+        if ($detect_language) self::detect_language();
+        self::load_strings(ROOT_DIR.'/core/common/lib/locale/');
+        self::set_locale();
     }
     
-    public static function setLocale()
+    public static function set_locale()
     {
         putenv("LANG=".self::$language."");
-        if (count($exp = explode('_', self::$language)) != 1) $winLanguage = $exp[0];
-        else $winLanguage = self::$language;
-        setlocale(LC_TIME, $winLanguage, self::$language, self::$language.'.UTF-8');
+        if (count($exp = explode('_', self::$language)) != 1) $win_language = $exp[0];
+        else $win_language = self::$language;
+        setlocale(LC_TIME, $win_language, self::$language, self::$language.'.UTF-8');
     }
     
     public static function translate($key)
@@ -34,7 +34,7 @@ class SLocale
         }
     }
     
-    public static function loadStrings($dir)
+    public static function load_strings($dir)
     {
         $path = $dir.self::$language.'.php';
         
@@ -42,9 +42,9 @@ class SLocale
             self::$strings = array_merge(self::$strings, include($path));
     }
     
-    private static function detectLanguage()
+    private static function detect_language()
     {
-        foreach (self::getAcceptedLanguages() as $language)
+        foreach (self::get_accepted_languages() as $language)
         {
             if (file_exists(ROOT_DIR.'/core/common/lib/locale/'.$language.'.php'))
             {
@@ -54,7 +54,7 @@ class SLocale
         }
     }
     
-    private static function getAcceptedLanguages()
+    private static function get_accepted_languages()
     {
         $langs = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
         $qcandidat = 0;

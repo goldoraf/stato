@@ -5,58 +5,58 @@ class SAuthException extends SException {}
 class SCookie
 {
     private $created;
-    private $userId;
+    private $user_id;
     private $version;
     
-    private static $cookieName = 'USERAUTH';
-    private static $myVersion  = '1';
+    private static $cookie_name = 'USERAUTH';
+    private static $my_version  = '1';
     private static $expiration = '600';
-    private static $resetTime  = '300';
+    private static $reset_time  = '300';
     private static $glue       = '|';
     
-    public function __construct($userId = False)
+    public function __construct($user_id = False)
     {
-        if ($userId)
+        if ($user_id)
         {
-            $this->userId = $userId;
+            $this->user_id = $user_id;
             return;
         }
         else
         {
-            if (!array_key_exists(self::$cookieName, $_COOKIE))
+            if (!array_key_exists(self::$cookie_name, $_cookie))
                 throw new SAuthException('No cookie !');
                 
-            $this->unpackage($_COOKIE[self::$cookieName]);
+            $this->unpackage($_cookie[self::$cookie_name]);
         }
     }
     
     public function set()
     {
-        set_cookie(self::$cookieName, $this->package());
+        set_cookie(self::$cookie_name, $this->package());
     }
     
     public function logout()
     {
-        set_cookie(self::$cookieName, '', 0);
+        set_cookie(self::$cookie_name, '', 0);
     }
     
     public function validate()
     {
-        if (!$this->version || !$this->created || !$this->userId)
+        if (!$this->version || !$this->created || !$this->user_id)
             throw new SAuthException('Malformed cookie !');
             
-        if ($this->version != self::$myVersion)
+        if ($this->version != self::$my_version)
             throw new SAuthException('Version mismatch !');
             
         if (time() - $this->created > self::$expiration)
             throw new SAuthException('Cookie expired !');
             
-        if (time() - $this->created > self::$resetTime) $this->set();
+        if (time() - $this->created > self::$reset_time) $this->set();
     }
     
     private function package()
     {
-        $parts = array(self::$myVersion, time(), $this->userId);
+        $parts = array(self::$my_version, time(), $this->user_id);
         $cookie = implode(self::$glue, $parts);
         return SEncryption::encrypt($cookie);
     }
@@ -64,7 +64,7 @@ class SCookie
     private function unpackage($cookie)
     {
         $buffer = SEncryption::decrypt($cookie);
-        list($this->version, $this->created, $this->userId) = explode(self::$glue, $buffer);
+        list($this->version, $this->created, $this->user_id) = explode(self::$glue, $buffer);
     }
 }
 

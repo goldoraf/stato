@@ -17,11 +17,11 @@ class SHttpClient
         $this->credentials = $credentials;
     }
     
-    public function get($redirectMax = 5)
+    public function get($redirect_max = 5)
     {
         $ch = $this->connect();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, $redirectMax);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, $redirect_max);
         return $this->execute($ch);
     }
     
@@ -48,7 +48,7 @@ class SHttpClient
     
     private function execute($ch)
     {
-        if ($this->isSsl())
+        if ($this->is_ssl())
         {
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // win2k hack
@@ -69,7 +69,7 @@ class SHttpClient
         return $response;
     }
     
-    private function isSsl()
+    private function is_ssl()
     {
         list($host, $uri) = explode('://', $this->uri);
         return $host == 'https';

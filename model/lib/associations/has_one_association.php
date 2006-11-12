@@ -4,12 +4,12 @@ class SHasOneMeta extends SAssociationMeta
 {
     public $dependent = null;
     
-    public function __construct($ownerMeta, $assocName, $options)
+    public function __construct($owner_meta, $assoc_name, $options)
     {
-        parent::__construct($ownerMeta, $assocName, $options);
-        $this->assertValidOptions($options);
-        if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
-        else $this->foreignKey = $ownerMeta->underscored.'_id';
+        parent::__construct($owner_meta, $assoc_name, $options);
+        $this->assert_valid_options($options);
+        if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
+        else $this->foreign_key = $owner_meta->underscored.'_id';
         
         if (isset($options['dependent']))
         {
@@ -23,7 +23,7 @@ class SHasOneMeta extends SAssociationMeta
 
 class SHasOneManager extends SAssociationManager
 {
-    protected $ownerNewBeforeSave = false;
+    protected $owner_new_before_save = false;
     
     public function replace($record)
     {
@@ -32,7 +32,7 @@ class SHasOneManager extends SAssociationManager
             if ($this->meta->dependent == 'delete') $this->target->delete();
             else
             {
-                $this->target[$this->meta->foreignKey] = null;
+                $this->target[$this->meta->foreign_key] = null;
                 $this->target->save();
             }
         }
@@ -40,29 +40,29 @@ class SHasOneManager extends SAssociationManager
         if ($record === null) $this->target = null;
         else
         {
-            $this->checkRecordType($record);
-            if (!$this->owner->isNewRecord()) $record[$this->meta->foreignKey] = $this->owner->id;
+            $this->check_record_type($record);
+            if (!$this->owner->is_new_record()) $record[$this->meta->foreign_key] = $this->owner->id;
             $this->target = $record;
         }
         $this->loaded = true;
     }
     
-    public function beforeOwnerSave()
+    public function before_owner_save()
     {
-        if ($this->owner->isNewRecord() && $this->target !== null)
-            $this->ownerNewBeforeSave = true;
+        if ($this->owner->is_new_record() && $this->target !== null)
+            $this->owner_new_before_save = true;
     }
     
-    public function afterOwnerSave()
+    public function after_owner_save()
     {
         if ($this->target !== null)
         {
-            if ($this->ownerNewBeforeSave) $this->target[$this->meta->foreignKey] = $this->owner->id;
+            if ($this->owner_new_before_save) $this->target[$this->meta->foreign_key] = $this->owner->id;
             $this->target->save();
         }
     }
     
-    public function beforeOwnerDelete()
+    public function before_owner_delete()
     {
         if ($this->meta->dependent === null || $this->target() === null) return;
         
@@ -72,18 +72,18 @@ class SHasOneManager extends SAssociationManager
                 $this->target->delete();
                 break;
             case 'nullify':
-                $this->target[$this->meta->foreignKey] = null;
+                $this->target[$this->meta->foreign_key] = null;
                 $this->target->save();
                 break;
         }
     }
     
-    protected function findTarget()
+    protected function find_target()
     {
         try
         {
             $qs = new SQuerySet($this->meta);
-            return $qs->get("{$this->meta->foreignKey} = '{$this->owner->id}'");
+            return $qs->get("{$this->meta->foreign_key} = '{$this->owner->id}'");
         }
         catch (SActiveRecordDoesNotExist $e)
         {

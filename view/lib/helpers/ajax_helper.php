@@ -12,9 +12,9 @@ function escape_javascript($javascript)
     return $javascript;
 }
 
-function link_to_function($content, $function, $htmlOptions = array())
+function link_to_function($content, $function, $html_options = array())
 {
-    $options = array_merge(array('href' => '#', 'onclick' => $function.'; return false;'), $htmlOptions);
+    $options = array_merge(array('href' => '#', 'onclick' => $function.'; return false;'), $html_options);
     return content_tag('a', $content, $options);
 }
 
@@ -26,12 +26,12 @@ function link_to_function($content, $function, $htmlOptions = array())
  * 
  * @return string
  **/
-function link_to_remote($content, $options = array(), $htmlOptions = array())
+function link_to_remote($content, $options = array(), $html_options = array())
 {
-    return link_to_function($content, remote_function($options), $htmlOptions);
+    return link_to_function($content, remote_function($options), $html_options);
 }
 
-function update_element_function($elementId, $options = array())
+function update_element_function($element_id, $options = array())
 {
     if (!isset($options['action'])) $options['action'] = 'update';
     if (!isset($options['escape'])) $options['escape'] = true;
@@ -44,15 +44,15 @@ function update_element_function($elementId, $options = array())
     {
         case 'update':
             if (isset($options['position']))
-                $js = 'new Insertion.'.SInflection::camelize($options['position'])."('$elementId', '$content')";
+                $js = 'new Insertion.'.SInflection::camelize($options['position'])."('$element_id', '$content')";
             else
-                $js = "$('$elementId').innerHTML = '$content'";
+                $js = "$('$element_id').innerHTML = '$content'";
             break;
         case 'empty':
-            $js = "$('$elementId').innerHTML = ''";
+            $js = "$('$element_id').innerHTML = ''";
             break;
         case 'remove':
-            "Element.remove('$elementId')";
+            "Element.remove('$element_id')";
             break;
         default:
             throw new SException("Invalid action, choose one of 'update', 'remove', 'empty'");
@@ -89,52 +89,52 @@ function observe_form($id, $options = array())
         return build_observer('Form.EventObserver', $id, $options);
 }
 
-function in_place_editor_field($objectName, $method, $object, $tagOptions = array(), $editorOptions = array())
+function in_place_editor_field($object_name, $method, $object, $tag_options = array(), $editor_options = array())
 {
-    $tagOptions = array_merge(array('id' => "${objectName}_${method}_".$object->id."_in_place_editor",
-    'class' => 'in_place_editor'), $tagOptions);
+    $tag_options = array_merge(array('id' => "${objectName}_${method}_".$object->id."_in_place_editor",
+    'class' => 'in_place_editor'), $tag_options);
     
-    if (!isset($editorOptions['url'])) 
-        $editorOptions['url'] = array('action' => "set_${objectName}_${method}", 'id' => $object->id);
+    if (!isset($editor_options['url'])) 
+        $editor_options['url'] = array('action' => "set_${objectName}_${method}", 'id' => $object->id);
         
-    $tag = $tagOptions['tag'];
-    unset($tagOptions['tag']);
+    $tag = $tag_options['tag'];
+    unset($tag_options['tag']);
     
-    return content_tag($tag, $object->$method, $tagOptions)
-    .in_place_editor($tagOptions['id'], $editorOptions);
+    return content_tag($tag, $object->$method, $tag_options)
+    .in_place_editor($tag_options['id'], $editor_options);
 }
 
-function in_place_editor($fieldId, $options = array())
+function in_place_editor($field_id, $options = array())
 {
     $js = "new Ajax.InPlaceEditor(";
-    $js.= "'{$fieldId}',";
+    $js.= "'{$field_id}',";
     $js.= "'".url_for($options['url'])."'";
     
-    $jsOptions = array();
-    if (isset($options['cancel_text'])) $jsOptions['cancelText'] = "'".$options['cancel_text']."'";
-    if (isset($options['save_text'])) $jsOptions['okText'] = "'".$options['save_text']."'";
-    if (isset($options['loading_text'])) $jsOptions['loadingText'] = "'".$options['loading_text']."'";
-    if (isset($options['rows'])) $jsOptions['rows'] = $options['rows'];
-    if (isset($options['cols'])) $jsOptions['cols'] = $options['cols'];
-    if (isset($options['size'])) $jsOptions['size'] = $options['size'];
-    if (isset($options['external_control'])) $jsOptions['externalControl'] = "'".$options['external_control']."'";
-    if (isset($options['load_text_url'])) $jsOptions['loadTextURL'] = "'".url_for($options['load_text_url'])."'";
-    if (isset($options['options'])) $jsOptions['ajaxOptions'] = $options['options'];
-    if (isset($options['script'])) $jsOptions['evalScripts'] = $options['script'];
-    if (isset($options['with'])) $jsOptions['callback'] = "function(form) { return ".$options['with']." }";
+    $js_options = array();
+    if (isset($options['cancel_text'])) $js_options['cancelText'] = "'".$options['cancel_text']."'";
+    if (isset($options['save_text'])) $js_options['okText'] = "'".$options['save_text']."'";
+    if (isset($options['loading_text'])) $js_options['loadingText'] = "'".$options['loading_text']."'";
+    if (isset($options['rows'])) $js_options['rows'] = $options['rows'];
+    if (isset($options['cols'])) $js_options['cols'] = $options['cols'];
+    if (isset($options['size'])) $js_options['size'] = $options['size'];
+    if (isset($options['external_control'])) $js_options['externalControl'] = "'".$options['external_control']."'";
+    if (isset($options['load_text_url'])) $js_options['loadTextURL'] = "'".url_for($options['load_text_url'])."'";
+    if (isset($options['options'])) $js_options['ajaxOptions'] = $options['options'];
+    if (isset($options['script'])) $js_options['evalScripts'] = $options['script'];
+    if (isset($options['with'])) $js_options['callback'] = "function(form) { return ".$options['with']." }";
     
-    if (!empty($jsOptions)) $js.= ', '.options_for_js($jsOptions);
+    if (!empty($js_options)) $js.= ', '.options_for_js($js_options);
     $js.= ')';
     
     return javascript_tag($js);
 }
 
-function text_field_with_auto_complete($objectName, $method, $object, $tagOptions = array(), $completionOptions = array())
+function text_field_with_auto_complete($object_name, $method, $object, $tag_options = array(), $completion_options = array())
 {
-    $tagOptions['autocomplete'] = "off";
+    $tag_options['autocomplete'] = "off";
     
     $html = auto_complete_css()
-    .text_field($objectName, $method, $object, $tagOptions)
+    .text_field($object_name, $method, $object, $tag_options)
     .content_tag('div', '', array('id' => "${objectName}_${method}_auto_complete", 'class' => "auto_complete"))
     .auto_complete_field("${objectName}_${method}", array('url' => array('action' => "auto_complete_for_${objectName}_${method}")));
     
@@ -146,17 +146,17 @@ function auto_complete_field($id, $options = array())
     if (!isset($options['update'])) $options['update'] = $id.'_auto_complete';
     $js = "new Ajax.Autocompleter('$id', '".$options['update']."', '".url_for($options['url'])."'";
     
-    $jsOptions = array();
-    if (isset($options['with'])) $jsOptions['callback'] = "function(element, value) { return ".$options['with']." }";
-    if (isset($options['indicator'])) $jsOptions['indicator'] = "'".$options['indicator']."'";
-    $js.= ', '.options_for_js($jsOptions).')';
+    $js_options = array();
+    if (isset($options['with'])) $js_options['callback'] = "function(element, value) { return ".$options['with']." }";
+    if (isset($options['indicator'])) $js_options['indicator'] = "'".$options['indicator']."'";
+    $js.= ', '.options_for_js($js_options).')';
     
     return javascript_tag($js);
 }
 
 function remote_function($options)
 {
-    $jsOptions = options_for_ajax($options);
+    $js_options = options_for_ajax($options);
     if (isset($options['update']) && is_array($options['update']))
     {
         $updates = array();
@@ -172,7 +172,7 @@ function remote_function($options)
     }
     
     $js = (!isset($update)) ? "new Ajax.Request(" : "new Ajax.Updater($update, ";
-    $js.= "'".url_for($options['url'])."', $jsOptions)";
+    $js.= "'".url_for($options['url'])."', $js_options)";
     
     if (isset($options['before']))      $js = $options['before']."; $js";
     if (isset($options['after']))       $js = "$js; ".$options['after'];
@@ -191,18 +191,18 @@ function options_for_js($options)
 
 function options_for_ajax($options)
 {
-    $jsOptions = build_callbacks($options);
-    $jsOptions['asynchronous'] = 'true';
-    $jsOptions['method'] = "'post'";
-    //$jsOptions['evalScripts'] = ?
+    $js_options = build_callbacks($options);
+    $js_options['asynchronous'] = 'true';
+    $js_options['method'] = "'post'";
+    //$js_options['evalScripts'] = ?
     if (isset($options['position']) && in_array($options['position'], array('before', 'after', 'top', 'bottom')))
     {
-        $jsOptions['insertion'] = 'Insertion.'.ucfirst($options['position']);
+        $js_options['insertion'] = 'Insertion.'.ucfirst($options['position']);
     }
-    if ($options['form']) $jsOptions['parameters'] = 'Form.serialize(this)';
-    elseif ($options['with']) $jsOptions['parameters'] = $options['with'];
+    if ($options['form']) $js_options['parameters'] = 'Form.serialize(this)';
+    elseif ($options['with']) $js_options['parameters'] = $options['with'];
     
-    return options_for_js($jsOptions);
+    return options_for_js($js_options);
 }
 
 function build_callbacks($options)

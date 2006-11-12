@@ -18,11 +18,11 @@ class SColumn
         $this->null    = $null;
     }
     
-    public function toSql()
+    public function to_sql()
     {
         $db = SActiveRecord::connection();
-        $sql = $db->quoteColumnName($this->name).' '.$db->typeToSql($this->type, $this->limit);
-        $sql = $db->addColumnOptions($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
+        $sql = $db->quote_column_name($this->name).' '.$db->type_to_sql($this->type, $this->limit);
+        $sql = $db->add_column_options($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
         if ($this->primary) $sql.= ' PRIMARY KEY';
         return $sql;
     }
@@ -31,21 +31,21 @@ class SColumn
 class STable
 {
     private $columns = array();
-    private $hasPk   = false;
+    private $has_pk   = false;
     
     public function __construct()
     {
     
     }
     
-    public function addPrimaryKey($name, $type = 'primary_key', $options = array())
+    public function add_primary_key($name, $type = 'primary_key', $options = array())
     {
-        $this->addColumn($name, $type, $options);
-        $this->hasPk = true;
+        $this->add_column($name, $type, $options);
+        $this->has_pk = true;
         $this->columns[$name]->primary = true;
     }
     
-    public function addColumn($name, $type, $options = array())
+    public function add_column($name, $type, $options = array())
     {
         if (!is_object($name))
         {
@@ -59,11 +59,11 @@ class STable
         $this->columns[$name] = $column;
     }
     
-    public function toSql()
+    public function to_sql()
     {
-        //if (!$this->hasPk) $this->addPrimaryKey('id');
+        //if (!$this->has_pk) $this->add_primary_key('id');
         $cols = array();
-        foreach($this->columns as $column) $cols[] = $column->toSql();
+        foreach($this->columns as $column) $cols[] = $column->to_sql();
         return implode(', ', $cols);
     }
 }

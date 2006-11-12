@@ -4,7 +4,7 @@ require_once(CORE_DIR.'/webservice/webservice.php');
 
 class XmlRpcServerTest extends XmlTestCase
 {
-    public function testBasicRequestParsing()
+    public function test_basic_request_parsing()
     {
         $xml = <<<EOD
 <?xml version="1.0"?>
@@ -19,13 +19,13 @@ class XmlRpcServerTest extends XmlTestCase
 EOD;
         $server = new SXmlRpcServer();
         $this->assertEqual(array('test.myMethod', array('hello world', true, 12)),
-                           $server->parseRequest($xml));
+                           $server->parse_request($xml));
     }
     
-    /*public function testServer()
+    /*public function test_server()
     {
         $client = new SXmlRpcClient('http://bdtef_v2/api/xmlrpc');
-        echo $client->gestion->centres->helloWorld('raphael', 'rougeron');
+        echo $client->gestion->centres->hello_world('raphael', 'rougeron');
     }*/
 }
 

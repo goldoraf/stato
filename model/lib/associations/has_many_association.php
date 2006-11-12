@@ -4,40 +4,40 @@ class SHasManyMeta extends SAssociationMeta
 {
     public $dependent = null;
     
-    public $throughTableName  = null;
-    public $throughForeignKey = null;
-    public $sourceAssocType   = null;
+    public $through_table_name  = null;
+    public $through_foreign_key = null;
+    public $source_assoc_type   = null;
     
-    public function __construct($ownerMeta, $assocName, $options)
+    public function __construct($owner_meta, $assoc_name, $options)
     {
-        parent::__construct($ownerMeta, $assocName, $options);
-        $this->assertValidOptions($options, array('dependent', 'through'));
+        parent::__construct($owner_meta, $assoc_name, $options);
+        $this->assert_valid_options($options, array('dependent', 'through'));
         
         if (isset($options['through']))
         {
             $this->type = 'SHasManyThrough';
-            $throughClass = SInflection::camelize(SInflection::singularize($options['through']));
-            $throughMeta = SActiveRecordMeta::retrieve($throughClass);;
-            $this->throughTableName = $throughMeta->tableName;
-            $this->throughForeignKey = $ownerMeta->underscored.'_id';
+            $through_class = SInflection::camelize(SInflection::singularize($options['through']));
+            $through_meta = SActiveRecordMeta::retrieve($through_class);;
+            $this->through_table_name = $through_meta->table_name;
+            $this->through_foreign_key = $owner_meta->underscored.'_id';
             
-            if (isset($throughMeta->relationships[$this->underscored]))
-                $r = $throughMeta->relationships[$this->underscored];
-            elseif (isset($throughMeta->relationships[SInflection::underscore(SInflection::pluralize($this->class))]))
-                $r = $throughMeta->relationships[SInflection::underscore(SInflection::pluralize($this->class))];
+            if (isset($through_meta->relationships[$this->underscored]))
+                $r = $through_meta->relationships[$this->underscored];
+            elseif (isset($through_meta->relationships[SInflection::underscore(SInflection::pluralize($this->class))]))
+                $r = $through_meta->relationships[SInflection::underscore(SInflection::pluralize($this->class))];
             
-            if (is_array($r)) $this->sourceAssocType = $r['assoc_type'];
-            else $this->sourceAssocType = $r;
+            if (is_array($r)) $this->source_assoc_type = $r['assoc_type'];
+            else $this->source_assoc_type = $r;
             
-            if ($this->sourceAssocType == 'belongs_to')
-                $this->foreignKey = $ownerMeta->underscored.'_id';
-            elseif ($this->sourceAssocType == 'has_many')
-                $this->foreignKey = $throughMeta->underscored.'_id';
+            if ($this->source_assoc_type == 'belongs_to')
+                $this->foreign_key = $owner_meta->underscored.'_id';
+            elseif ($this->source_assoc_type == 'has_many')
+                $this->foreign_key = $through_meta->underscored.'_id';
         }
         else
         {
-            if (isset($options['foreign_key'])) $this->foreignKey = $options['foreign_key'];
-            else $this->foreignKey = $ownerMeta->underscored.'_id';
+            if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
+            else $this->foreign_key = $owner_meta->underscored.'_id';
             
             if (isset($options['dependent']))
             {
@@ -52,7 +52,7 @@ class SHasManyMeta extends SAssociationMeta
 
 class SHasManyManager extends SManyAssociationManager
 {
-    public function beforeOwnerDelete()
+    public function before_owner_delete()
     {
         if ($this->meta->dependent === null) return;
         
@@ -62,7 +62,7 @@ class SHasManyManager extends SManyAssociationManager
                 foreach ($this->all() as $r) $r->delete();
                 break;
             case 'delete_all':
-                $this->connection()->execute("DELETE FROM {$this->meta->tableName} WHERE ".$this->getSqlFilter());
+                $this->connection()->execute("DELETE FROM {$this->meta->table_name} WHERE ".$this->get_sql_filter());
                 break;
             case 'nullify':
                 $this->clear();
@@ -72,39 +72,39 @@ class SHasManyManager extends SManyAssociationManager
     
     public function clear()
     {
-        $this->connection()->execute("UPDATE {$this->meta->tableName} 
-                                     SET {$this->meta->tableName}.{$this->meta->foreignKey} = NULL
-                                     WHERE ".$this->getSqlFilter());
+        $this->connection()->execute("UPDATE {$this->meta->table_name} 
+                                     SET {$this->meta->table_name}.{$this->meta->foreign_key} = NULL
+                                     WHERE ".$this->get_sql_filter());
     }
     
-    protected function insertRecord($record)
+    protected function insert_record($record)
     {
-        $fk = $this->meta->foreignKey;
+        $fk = $this->meta->foreign_key;
         $record->$fk = $this->owner->id;
         $record->save();
     }
     
-    protected function deleteRecord($record)
+    protected function delete_record($record)
     {
         if ($this->meta->dependent == 'delete') $record->delete();
         else
         {
-            $this->connection()->execute("UPDATE {$this->meta->tableName} 
-                                         SET {$this->meta->tableName}.{$this->meta->foreignKey} = NULL
-                                         WHERE ".$this->getSqlFilter()." 
-                                         AND {$this->meta->tableName}.{$this->meta->identityField} = '{$record->id}'");
+            $this->connection()->execute("UPDATE {$this->meta->table_name} 
+                                         SET {$this->meta->table_name}.{$this->meta->foreign_key} = NULL
+                                         WHERE ".$this->get_sql_filter()." 
+                                         AND {$this->meta->table_name}.{$this->meta->identity_field} = '{$record->id}'");
         }
     }
     
-    protected function getQuerySet()
+    protected function get_query_set()
     {
         $qs = new SQuerySet($this->meta);
-        return $qs->filter($this->getSqlFilter());
+        return $qs->filter($this->get_sql_filter());
     }
     
-    protected function getSqlFilter()
+    protected function get_sql_filter()
     {
-        return "{$this->meta->tableName}.{$this->meta->foreignKey} = '{$this->owner->id}'";
+        return "{$this->meta->table_name}.{$this->meta->foreign_key} = '{$this->owner->id}'";
     }
 }
 

@@ -3,7 +3,7 @@
 class SUrlRewriter
 {
     private static $request = null;
-    private static $reservedOptions = array('only_path', 'protocol', 'host', 'anchor',
+    private static $reserved_options = array('only_path', 'protocol', 'host', 'anchor',
         'trailing_slash', 'skip_relative_url_root', 'action_suffix');
         
     public static function initialize($request)
@@ -11,19 +11,19 @@ class SUrlRewriter
         self::$request = $request;
     }
     
-    public static function currentParams()
+    public static function current_params()
     {
         return self::$request->params;
     }
     
-    public static function isCurrentPage($options)
+    public static function is_current_page($options)
     {
         $options['only_path'] = true;
         $options['skip_relative_url_root'] = true;
-        return self::urlFor($options) == self::$request->requestUri();
+        return self::url_for($options) == self::$request->request_uri();
     }
     
-    public static function urlFor($options)
+    public static function url_for($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';
         if (!isset($options['controller'])) $options['controller'] = self::$request->controller;
@@ -33,20 +33,20 @@ class SUrlRewriter
     
     public static function rewrite($options = array())
     {
-        return self::rewriteUrl(self::rewritePath($options), $options);
+        return self::rewrite_url(self::rewrite_path($options), $options);
     }
     
-    private static function rewriteUrl($path, $options)
+    private static function rewrite_url($path, $options)
     {
         $url = '';
         
         if (!isset($options['only_path']) || $options['only_path'] == false)
         {
             $url.= isset($options['protocol']) ? $options['protocol'] : self::$request->protocol();
-            $url.= isset($options['host']) ? $options['host'] : self::$request->hostWithPort();
+            $url.= isset($options['host']) ? $options['host'] : self::$request->host_with_port();
         }
         if (!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false)
-            $url.= self::$request->relativeUrlRoot();
+            $url.= self::$request->relative_url_root();
         
         $url.= $path;
         if (isset($options['action_suffix'])) $url.= '/'.$options['action_suffix'];
@@ -56,9 +56,9 @@ class SUrlRewriter
         return $url;
     }
     
-    private static function rewritePath($options)
+    private static function rewrite_path($options)
     {
-        foreach(self::$reservedOptions as $opt) unset($options[$opt]);
+        foreach(self::$reserved_options as $opt) unset($options[$opt]);
         
         if (isset($options['params']))
         {
@@ -66,14 +66,14 @@ class SUrlRewriter
             unset($options['params']);
         }
         
-        list($path, $extraKeys) = SRoutes::generate($options);
+        list($path, $extra_keys) = SRoutes::generate($options);
         
-        if (!empty($extraKeys)) $path.= self::buildQueryString($extraKeys);
+        if (!empty($extra_keys)) $path.= self::build_query_string($extra_keys);
         
         return $path;
     }
     
-    private static function buildQueryString($options)
+    private static function build_query_string($options)
     {
         $string = '';
         $elements = array();

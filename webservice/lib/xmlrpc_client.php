@@ -7,16 +7,16 @@ class SXmlRpcClient
 {
     private $uri = null;
     private $api = null;
-    private $userAgent  = null;
+    private $user_agent  = null;
     private $namespaces = array();
     
     private $credentials = null;
     
-    public function __construct($uri, $api = null, $userAgent = 'Stato XML-RPC Client')
+    public function __construct($uri, $api = null, $user_agent = 'Stato XML-RPC Client')
     {
         $this->uri = $uri;
         $this->api = $api;
-        $this->userAgent = $userAgent;
+        $this->user_agent = $user_agent;
     }
     
     public function __get($namespace)
@@ -32,35 +32,35 @@ class SXmlRpcClient
             $method = implode('.', $this->namespaces).".$method";
             $this->namespaces = array();
         }
-        return $this->sendRequest($method, $args);
+        return $this->send_request($method, $args);
     }
     
-    public function setHttpCredentials($username, $password)
+    public function set_http_credentials($username, $password)
     {
         $this->credentials = "$username:$password";
     }
     
-    private function sendRequest($method, $args)
+    private function send_request($method, $args)
     {
         $request = new SXmlRpcRequest($method, $args);
         $headers = array
         (
             "Content-Type: text/xml",
-            "User-Agent: {$this->userAgent}",
+            "User-Agent: {$this->user_agent}",
             "Content-length: ".$request->length()
         );
         $client = new SHttpClient($this->uri, $headers, $this->credentials);
-        $response = $client->post($request->toXml());
+        $response = $client->post($request->to_xml());
         
         if ($response->code != 200)
             throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
         
-        return $this->parseResponse($response->body);
+        return $this->parse_response($response->body);
     }
     
-    private function parseResponse($xmlString)
+    private function parse_response($xml_string)
     {
-        try { $xml = new SimpleXMLElement($xmlString); }
+        try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { throw new SXmlRpcClientException('Failed to parse response'); }
         
         if (!empty($xml->fault))
@@ -68,7 +68,7 @@ class SXmlRpcClient
             if (empty($xml->fault->value))
                 throw new SXmlRpcClientException('Invalid fault response : no <value> tag');
             
-            try { $fault = SXmlRpcValue::typecast($xml->fault->value->asXML()); }
+            try { $fault = SXmlRpcValue::typecast($xml->fault->value->asXml()); }
             catch (SXmlRpcValueException $e) { 
                 throw new SXmlRpcClientException('Invalid fault response');
             }
@@ -83,7 +83,7 @@ class SXmlRpcClient
         elseif (empty($xml->params->param->value))
             throw new SXmlRpcClientException('Invalid response : no <value> tag');
             
-        return SXmlRpcValue::typecast($xml->params->param->value->asXML());
+        return SXmlRpcValue::typecast($xml->params->param->value->asXml());
     }
 }
 
@@ -98,11 +98,11 @@ class SXmlRpcValue
         $this->value = $value;
     }
     
-    public static function typecast($xmlString)
+    public static function typecast($xml_string)
     {
-        try { $xml = new SimpleXMLElement($xmlString); }
+        try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { 
-            throw new SXmlRpcValueException("Failed to typecast XML value : $xmlString");
+            throw new SXmlRpcValueException("Failed to typecast XML value : $xml_string");
         }
         
         list($type, $value) = each($xml);
@@ -136,7 +136,7 @@ class SXmlRpcValue
                 
                 $values = array();
                 foreach ($value->data->value as $element)
-                    $values[] = self::typecast($element->asXML());
+                    $values[] = self::typecast($element->asXml());
                 
                 return $values;
                 break;
@@ -150,7 +150,7 @@ class SXmlRpcValue
                     if ((!$member->value instanceof SimpleXMLElement) || empty($member->value))
                         throw new SXmlRpcValueException('Member of a struct must contain a <value> tag');
                     
-                    $values[(string) $member->name] = self::typecast($member->value->asXML());
+                    $values[(string) $member->name] = self::typecast($member->value->asXml());
                 }
                 return $values;
                 break;
@@ -160,7 +160,7 @@ class SXmlRpcValue
         }
     }
     
-    public function toXml()
+    public function to_xml()
     {
         switch (gettype($this->value))
         {
@@ -177,43 +177,43 @@ class SXmlRpcValue
                 return '<string>'.htmlspecialchars($this->value).'</string>';
                 break;
             case 'object':
-                return $this->objectToXml($this->value);
+                return $this->object_to_xml($this->value);
                 break;
             case 'array':
-                return $this->arrayToXml($this->value);
+                return $this->array_to_xml($this->value);
                 break;
         }
     }
     
-    private function objectToXml($value)
+    private function object_to_xml($value)
     {
         switch (get_class($value))
         {
             case 'SDate':
-                return '<dateTime.iso8601>'.$value->toIso8601().'</dateTime.iso8601>';
+                return '<dateTime.iso8601>'.$value->to_iso8601().'</dateTime.iso8601>';
                 break;
             case 'SDateTime':
-                return '<dateTime.iso8601>'.$value->toIso8601().'</dateTime.iso8601>';
+                return '<dateTime.iso8601>'.$value->to_iso8601().'</dateTime.iso8601>';
                 break;
             case 'SBase64':
                 return $value->__toString();
                 break;
             default:
-                return $this->arrayToXml(get_object_vars($value));
+                return $this->array_to_xml(get_object_vars($value));
                 break;
         }
     }
     
-    private function arrayToXml($array)
+    private function array_to_xml($array)
     {
-        if ($this->isStruct($array))
+        if ($this->is_struct($array))
         {
             $xml = "<struct>\n";
             foreach ($array as $name => $value)
             {
                 $v = new SXmlRpcValue($value);
                 $xml.= "  <member><name>$name</name><value>";
-                $xml.= $v->toXml()."</value></member>\n";
+                $xml.= $v->to_xml()."</value></member>\n";
             }
             $xml.= '</struct>';
             return $xml;
@@ -224,14 +224,14 @@ class SXmlRpcValue
             foreach ($array as $value)
             {
                 $v = new SXmlRpcValue($value);
-                $xml.= '  <value>'.$v->toXml()."</value>\n";
+                $xml.= '  <value>'.$v->to_xml()."</value>\n";
             }
             $xml.= '</data></array>';
             return $xml;
         }
     }
     
-    private function isStruct($array)
+    private function is_struct($array)
     {
         $expected = 0;
         foreach ($array as $key => $value)
@@ -259,7 +259,7 @@ class SXmlRpcRequest
         {
             $this->xml.= '<param><value>';
             $v = new SXmlRpcValue($arg);
-            $this->xml.= $v->toXml();
+            $this->xml.= $v->to_xml();
             $this->xml.= "</value></param>\n";
         }
         $this->xml.= "</params>\n</methodCall>";
@@ -270,7 +270,7 @@ class SXmlRpcRequest
         return strlen($this->xml);
     }
     
-    public function toXml()
+    public function to_xml()
     {
         return $this->xml;
     }
@@ -280,10 +280,10 @@ class SBase64
 {
     private $value = null;
     
-    public function __construct($value, $alreadyEncoded = false)
+    public function __construct($value, $already_encoded = false)
     {
         $value = (string) $value;
-        if ($alreadyEncoded) $this->value = $value;
+        if ($already_encoded) $this->value = $value;
         else $this->value = base64_encode($value);
     }
     

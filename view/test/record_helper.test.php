@@ -9,18 +9,18 @@ SLocale::initialize(false);
 class MockContent extends MockRecord
 {
     public $id = null;
-    public $contentAttributes = array();
-    public $newRecord  = true;
+    public $content_attributes = array();
+    public $new_record  = true;
     public $errors = array();
     protected $attributes = array('title', 'body', 'private', 'written_on');
     
-    public function isNewRecord() { return $this->newRecord; }
+    public function is_new_record() { return $this->new_record; }
     
-    public function contentAttributes() { return $this->contentAttributes; }
+    public function content_attributes() { return $this->content_attributes; }
     
-    public function getAttribute($name)
+    public function get_attribute($name)
     {
-        foreach ($this->contentAttributes as $attr) if ($attr->name == $name) return $attr;
+        foreach ($this->content_attributes as $attr) if ($attr->name == $name) return $attr;
     }
 }
 
@@ -28,7 +28,7 @@ if (!class_exists('SUrlRewriter'))
 {
     class SUrlRewriter
     {
-        public static function urlFor($options)
+        public static function url_for($options)
         {
             return $options['action'];
         }
@@ -46,9 +46,9 @@ class RecordHelperTest extends HelperTestCase
         $this->post->written_on = new SDate(2006, 3, 31);
     }
     
-    public function testBasicInputTag()
+    public function test_basic_input_tag()
     {
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
         );
@@ -58,10 +58,10 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testBasicInputTagWithError()
+    public function test_basic_input_tag_with_error()
     {
         $this->post->errors['title'] = 'Error !';
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
         );
@@ -73,10 +73,10 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testErrorMessageFor()
+    public function test_error_message_for()
     {
         $this->post->errors['title'] = 'Title can\'t be empty';
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
         );
@@ -100,10 +100,10 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testErrorMessageOn()
+    public function test_error_message_on()
     {
         $this->post->errors['title'] = 'can\'t be empty';
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
         );
@@ -117,9 +117,9 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testFormWithStrings()
+    public function test_form_with_strings()
     {
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
             new SAttribute('body', 'text'),
@@ -136,9 +136,9 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testFormWithBoolean()
+    public function test_form_with_boolean()
     {
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
             new SAttribute('private', 'boolean')
@@ -149,19 +149,19 @@ class RecordHelperTest extends HelperTestCase
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_private">Private</label>
-            <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />
             <input name="post[private]" type="hidden" value="0" />
+            <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />
             </p>
             <input type="submit" name="commit" value="Create" />
             </form>'
         );
     }
     
-    public function testFormWithExistentRecord()
+    public function test_form_with_existent_record()
     {
         $this->post->id = 1;
-        $this->post->newRecord = false;
-        $this->post->contentAttributes = array
+        $this->post->new_record = false;
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
         );
@@ -176,10 +176,10 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testFormWithErrors()
+    public function test_form_with_errors()
     {
         $this->post->errors['title'] = 'Title can\'t be empty';
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
         );
@@ -196,9 +196,9 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testFormWithDate()
+    public function test_form_with_date()
     {
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
             new SAttribute('written_on', 'date')
@@ -249,10 +249,10 @@ class RecordHelperTest extends HelperTestCase
         );
     }
     
-    public function testFormWithDateTime()
+    public function test_form_with_date_time()
     {
         $this->post->written_on = new SDateTime(2006, 3, 31, 1, 29, 35);
-        $this->post->contentAttributes = array
+        $this->post->content_attributes = array
         (
             new SAttribute('title', 'string'),
             new SAttribute('written_on', 'datetime')

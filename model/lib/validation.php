@@ -12,12 +12,12 @@ class SValidation
         'alpha', 'alphanum', 'num', 'singleline', 'email', 'ip', 'xml', 'utf8'
     );
     
-    public static function validateAttribute($record, $attr, $method = 'save')
+    public static function validate_attribute($record, $attr, $method = 'save')
     {
         // required ?
-        if (in_array($attr, $record->attrRequired)) self::validatePresence($record, $attr);
+        if (in_array($attr, $record->attr_required)) self::validate_presence($record, $attr);
         // unique ?
-        if (in_array($attr, $record->attrUnique)) self::validateUniqueness($record, $attr);
+        if (in_array($attr, $record->attr_unique)) self::validate_uniqueness($record, $attr);
         
         if (isset($record->validations[$attr]))
         {
@@ -36,41 +36,41 @@ class SValidation
         }
     }
     
-    public static function validatePresence($record, $attr, $options = array())
+    public static function validate_presence($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_REQUIRED', 'on' => 'save');
         $config = array_merge($config, $options);
         
-        if ($record->$attr == '') self::addError($record, $attr, $config['message']);
+        if ($record->$attr == '') self::add_error($record, $attr, $config['message']);
     }
     
-    public static function validateUniqueness($record, $attr, $options = array())
+    public static function validate_uniqueness($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_UNIQUE', 'on' => 'save', 'scope' => Null);
         $config = array_merge($config, $options);
         
         $value = $record->$attr;
-        $conditionsSql = $attr.' '.self::attributeCondition($value);
-        $conditionsValues = array($value);
+        $conditions_sql = $attr.' '.self::attribute_condition($value);
+        $conditions_values = array($value);
         
         if ($config['scope'] !== Null)
         {
-            $scopeValue = $record->readAttribute($config['scope']);
-            $conditionsSql.= ' AND '.$config['scope'].' '.self::attributeCondition($scopeValue);
-            $conditionsValues[] = $scopeValue;
+            $scope_value = $record->read_attribute($config['scope']);
+            $conditions_sql.= ' AND '.$config['scope'].' '.self::attribute_condition($scope_value);
+            $conditions_values[] = $scope_value;
         }
         
-        if (!$record->isNewRecord())
+        if (!$record->is_new_record())
         {
-            $conditionsSql.= ' AND '.$record->identityField.' <> ?';
-            $conditionsValues[] = $record->id;
+            $conditions_sql.= ' AND '.$record->identity_field.' <> ?';
+            $conditions_values[] = $record->id;
         }
         
-        if (SActiveStore::findFirst(get_class($record), array($conditionsSql, $conditionsValues)))
-            self::addError($record, $attr, $config['message']);
+        if (SActiveStore::find_first(get_class($record), array($conditions_sql, $conditions_values)))
+            self::add_error($record, $attr, $config['message']);
     }
     
-    public static function validateFormat($record, $attr, $options = array())
+    public static function validate_format($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_FORMAT', 'on' => 'save', 'pattern' => Null);
         $config = array_merge($config, $options);
@@ -85,10 +85,10 @@ class SValidation
             
         if ($config['message'] === Null) $config['message'] = self::$messages[$method];
         
-        if (!self::$method($record->$attr)) self::addError($record, $attr, $config['message']);
+        if (!self::$method($record->$attr)) self::add_error($record, $attr, $config['message']);
     }
     
-    public static function validateLength($record, $attr, $options = array())
+    public static function validate_length($record, $attr, $options = array())
     {
         $config = array
         (
@@ -101,16 +101,16 @@ class SValidation
         $length = strlen($record->$attr);
         
         if (isset($config['length']) && $length != $config['length'])
-            self::addError($record, $attr, $config['wrong_size'], $config['length']);
+            self::add_error($record, $attr, $config['wrong_size'], $config['length']);
             
         if (isset($config['min_length']) && $length < $config['min_length'])
-            self::addError($record, $attr, $config['too_short'], $config['min_length']);
+            self::add_error($record, $attr, $config['too_short'], $config['min_length']);
         
         if (isset($config['max_length']) && $length > $config['max_length'])
-            self::addError($record, $attr, $config['too_long'], $config['max_length']);
+            self::add_error($record, $attr, $config['too_long'], $config['max_length']);
     }
     
-    public static function validateInclusion($record, $attr, $options = array())
+    public static function validate_inclusion($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_INCLUSION', 'on' => 'save');
         $config = array_merge($config, $options);
@@ -119,10 +119,10 @@ class SValidation
             throw new SException('An array of choices must be supplied.');
             
         if (!in_array($record->$attr, $config['choices']))
-            self::addError($record, $attr, $config['message']);
+            self::add_error($record, $attr, $config['message']);
     }
     
-    public static function validateExclusion($record, $attr, $options = array())
+    public static function validate_exclusion($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_EXCLUSION', 'on' => 'save');
         $config = array_merge($config, $options);
@@ -131,50 +131,50 @@ class SValidation
             throw new SException('An array of choices must be supplied.');
             
         if (in_array($record->$attr, $config['choices']))
-            self::addError($record, $attr, $config['message']);
+            self::add_error($record, $attr, $config['message']);
     }
     
-    public static function validateConfirmation($record, $attr, $options = array())
+    public static function validate_confirmation($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_CONFIRM', 'on' => 'save');
         $config = array_merge($config, $options);
         
-        $confirmAttr = $attr.'_confirmation';
+        $confirm_attr = $attr.'_confirmation';
         
-        if ($record->$attr != $record->$confirmAttr)
-            self::addError($record, $attr, $config['message']);
+        if ($record->$attr != $record->$confirm_attr)
+            self::add_error($record, $attr, $config['message']);
     }
     
-    public static function validateAcceptance($record, $attr, $options = array())
+    public static function validate_acceptance($record, $attr, $options = array())
     {
         $config = array('message' => 'ERR_VALID_ACCEPT', 'on' => 'save', 'accept' => '1');
         $config = array_merge($config, $options);
         
         if ($record->$attr != $config['accept'])
-            self::addError($record, $attr, $config['message']);
+            self::add_error($record, $attr, $config['message']);
     }
     
-    public static function isAlpha($data, $options = array())
+    public static function is_alpha($data, $options = array())
     {
         return ctype_alpha($data);
     }
     
-    public static function isAlphaNum($data, $options = array())
+    public static function is_alpha_num($data, $options = array())
     {
         return ctype_alnum($data);
     }
     
-    public static function isNum($data, $options = array())
+    public static function is_num($data, $options = array())
     {
         return ctype_digit($data);
     }
     
-    public static function isSingleline($data, $options = array())
+    public static function is_singleline($data, $options = array())
     {
         return ctype_graph($data);
     }
     
-    public static function isEmail($data, $options = array())
+    public static function is_email($data, $options = array())
     {
         if (ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", trim($data))) 
         {
@@ -183,7 +183,7 @@ class SValidation
         return False;
     }
     
-    public static function isIP($data, $options = array())
+    public static function is_ip($data, $options = array())
     {
         $num = "(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])";
         /*
@@ -200,12 +200,12 @@ class SValidation
         return False;
     }
     
-    public static function isXML($data, $options = array())
+    public static function is_xml($data, $options = array())
     {
         
     }
     
-    public static function isUTF8($data, $options = array())
+    public static function is_utf8($data, $options = array())
     {
        if (strlen($str) == 0) return True;
         // If even just the first character can be matched, when the /u
@@ -215,7 +215,7 @@ class SValidation
         return (preg_match('/^.{1}/us',$str,$ar) == 1);
     }
     
-    public static function isValidUTF8($str)
+    public static function is_valid_utf8($str)
     {
        // values of -1 represent disalloweded values for the first bytes in current UTF-8
        /*static */$trailing_bytes = array (
@@ -230,14 +230,14 @@ class SValidation
        );
     
        $ups = unpack('C*', $str);
-       if (!($aCnt = count($ups))) return true; // Empty string *is* valid UTF-8
-       for ($i = 1; $i <= $aCnt;)
+       if (!($a_cnt = count($ups))) return true; // Empty string *is* valid UTF-8
+       for ($i = 1; $i <= $a_cnt;)
        {
            if (!($tbytes = $trailing_bytes[($b1 = $ups[$i++])])) continue;
            if ($tbytes == -1) return false;
           
            $first = true;
-           while ($tbytes > 0 && $i <= $aCnt)
+           while ($tbytes > 0 && $i <= $a_cnt)
            {
                $cbyte = $ups[$i++];
                if (($cbyte & 0xC0) != 0x80) return false;
@@ -270,16 +270,16 @@ class SValidation
        return true;
     }
     
-    private static function addError($record, $attr, $message, $var = null)
+    private static function add_error($record, $attr, $message, $var = null)
     {
         $message = SLocale::translate($message);
-        $humanReadableAttr = SLocale::translate($attr);
-        if ($humanReadableAttr == $attr) $humanReadableAttr = str_replace('_', ' ', $attr);
-        $message = ucfirst(sprintf($message, $humanReadableAttr, $var));
+        $human_readable_attr = SLocale::translate($attr);
+        if ($human_readable_attr == $attr) $human_readable_attr = str_replace('_', ' ', $attr);
+        $message = ucfirst(sprintf($message, $human_readable_attr, $var));
         if (!isset($record->errors[$attr])) $record->errors[$attr] = $message;
     }
     
-    private static function attributeCondition($value)
+    private static function attribute_condition($value)
     {
         if ($value === Null) return 'IS ?';
         return '= ?';

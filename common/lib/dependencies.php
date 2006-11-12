@@ -2,52 +2,52 @@
 
 class SDependencies
 {
-    public static function requireDependencies($layer, $dependencies, $relativeTo = null)
+    public static function require_dependencies($layer, $dependencies, $relative_to = null)
     {
-        foreach ($dependencies as $dependency) self::requireDependency($layer, $dependency, $relativeTo);
+        foreach ($dependencies as $dependency) self::require_dependency($layer, $dependency, $relative_to);
     }
     
-    public static function requireDependency($layer, $dependency, $relativeTo = null)
+    public static function require_dependency($layer, $dependency, $relative_to = null)
     {
-        list($subdir, $class) = self::dependencySubDir($dependency, $relativeTo);
+        list($subdir, $class) = self::dependency_sub_dir($dependency, $relative_to);
         if (class_exists($class)) return;
         $path = APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
         if (!file_exists($path))
             throw new SException("Missing ".SInflection::singularize($layer)." $dependency");
         require_once($path);
-        if ($layer == 'models') SActiveRecordMeta::addManagerToClass(SInflection::camelize($class));
+        if ($layer == 'models') SActiveRecordMeta::add_manager_to_class(SInflection::camelize($class));
     }
     
-    public static function dependencyFilePath($layer, $dependency, $relativeTo = null)
+    public static function dependency_file_path($layer, $dependency, $relative_to = null)
     {
-        list($subdir, $class) = self::dependencySubDir($dependency, $relativeTo);
+        list($subdir, $class) = self::dependency_sub_dir($dependency, $relative_to);
         return APP_DIR."/$layer/$subdir".SInflection::underscore($class).'.php';
     }
     
-    public static function subDirectory($relativeTo)
+    public static function sub_directory($relative_to)
     {
-        if ($relativeTo === null) return '';
+        if ($relative_to === null) return '';
         
-        $reflection = new ReflectionClass($relativeTo);
-        return self::fileSubDirectory($reflection->getFileName());
+        $reflection = new ReflectionClass($relative_to);
+        return self::file_sub_directory($reflection->getFileName());
     }
     
-    public static function fileSubDirectory($file)
+    public static function file_sub_directory($file)
     {
-        $relativeDir = preg_replace('#'.APP_DIR.'/(\w+)/#i', '', 
+        $relative_dir = preg_replace('#'.APP_DIR.'/(\w+)/#i', '', 
                         str_replace('\\', '/', $file));
-        if (strpos($relativeDir, '/') !== false)
+        if (strpos($relative_dir, '/') !== false)
         {
-            list($subdir, $file) = explode('/', $relativeDir);
+            list($subdir, $file) = explode('/', $relative_dir);
             return $subdir.'/';
         }
         return '';
     }
     
-    private static function dependencySubDir($dependency, $relativeTo)
+    private static function dependency_sub_dir($dependency, $relative_to)
     {
         if (strpos($dependency, '/') === false)
-            return array(self::subDirectory($relativeTo), $dependency);
+            return array(self::sub_directory($relative_to), $dependency);
         elseif (strpos($dependency, '/') == 0)
             return array('', substr($dependency, 1));
         else

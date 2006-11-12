@@ -5,7 +5,7 @@ class SZipIterator implements Iterator
     private $filepath  = null;
     private $resource  = null;
     private $entry     = null;
-    private $entryName = null;
+    private $entry_name = null;
     
     public function __construct($filepath)
     {
@@ -20,7 +20,7 @@ class SZipIterator implements Iterator
     public function next()
     {
         $this->entry = zip_read($this->resource);
-        if ($this->valid()) $this->entryName = zip_entry_name($this->entry);
+        if ($this->valid()) $this->entry_name = zip_entry_name($this->entry);
     }
     
     public function valid()
@@ -41,7 +41,7 @@ class SZipIterator implements Iterator
     
     public function key()
     {
-        return $this->entryName;
+        return $this->entry_name;
     }
     
     public function rewind()

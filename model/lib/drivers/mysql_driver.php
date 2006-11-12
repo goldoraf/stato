@@ -2,7 +2,7 @@
 
 class SMySqlDriver extends SAbstractDriver
 {
-    public $nativeDbTypes = array
+    public $native_db_types = array
     (
         'primary_key'   => 'int(11) DEFAULT NULL auto_increment',
         'string'        => array('name' => 'varchar', 'limit' => 255),
@@ -14,7 +14,7 @@ class SMySqlDriver extends SAbstractDriver
         'boolean'       => array('name' => 'tinyint', 'limit' => 1)
     );
     
-    protected $simplifiedTypes = array
+    protected $simplified_types = array
     (
         '/tinyint|smallint|mediumint|int|bigint/i'  => 'integer',
         '/tinytext|text|mediumtext|longtext/i'      => 'text',
@@ -42,7 +42,7 @@ class SMySqlDriver extends SAbstractDriver
         $this->conn = null;
     }
     
-    public function getError()
+    public function get_error()
     {
         return mysql_errno($this->conn) . ": " . mysql_error($this->conn). "\n";
     }
@@ -60,7 +60,7 @@ class SMySqlDriver extends SAbstractDriver
         if (is_resource($result)) return $result;
         
         if (!$result)
-            throw new SInvalidStatementException('MySQL Error : '.$this->getError().' ; SQL used : '.$strsql);
+            throw new SInvalidStatementException('MySQL Error : '.$this->get_error().' ; SQL used : '.$strsql);
             
         return true;
     }
@@ -71,33 +71,33 @@ class SMySqlDriver extends SAbstractDriver
         $fields = array();
         while($row = $this->fetch($rs))
             $fields[$row['Field']] = new SAttribute($row['Field'], 
-                                                    $this->simplifiedType($row['Type']), 
+                                                    $this->simplified_type($row['Type']), 
                                                     $row['Default']);
         return $fields;
     }
     
-    public function simplifiedType($sqlType)
+    public function simplified_type($sql_type)
     {
-        if ($sqlType == 'tinyint(1)') return 'boolean';
-        return parent::simplifiedType($sqlType);
+        if ($sql_type == 'tinyint(1)') return 'boolean';
+        return parent::simplified_type($sql_type);
     }
     
-    public function lastInsertId()
+    public function last_insert_id()
     {
         return mysql_insert_id($this->conn);
     }
     
-    public function affectedRows()
+    public function affected_rows()
     {
         return mysql_affected_rows($this->conn);
     }
     
-    public function rowCount($resource)
+    public function row_count($resource)
     {
         return @mysql_num_rows($resource);
     }
     
-    public function freeResult($resource)
+    public function free_result($resource)
     {
         return @mysql_free_result($resource);
     }
@@ -108,7 +108,7 @@ class SMySqlDriver extends SAbstractDriver
         else return @mysql_fetch_row($resource);
     }
     
-    public function getLastUpdate($table)
+    public function get_last_update($table)
     {
         $rs = $this->execute("SHOW TABLE STATUS LIKE '".$table."'");
         $status = $this->fetch($rs);
@@ -125,13 +125,13 @@ class SMySqlDriver extends SAbstractDriver
         return $sql;
     }
     
-    public function escapeStr($str)
+    public function escape_str($str)
     {
         // throw exception if magic_quotes ?
         return mysql_real_escape_string($str, $this->conn);
     }
     
-    public function quoteColumnName($name)
+    public function quote_column_name($name)
     {
         return "`$name`";
     }
@@ -147,95 +147,95 @@ class SMySqlDriver extends SAbstractDriver
         return $tables;
     }
     
-    public function tableExists($name)
+    public function table_exists($name)
     {
         return in_array($name, $this->tables());
     }
     
-    public function createTable($name, $tableDef, $options = array())
+    public function create_table($name, $table_def, $options = array())
     {
         $sql = "CREATE TABLE $name (";
-        $sql.= $tableDef->toSql();
+        $sql.= $table_def->to_sql();
         $sql.= ")";
         
         $this->execute($sql);
     }
     
-    public function renameTable($oldName, $newName)
+    public function rename_table($old_name, $new_name)
     {
-        $this->execute("RENAME TABLE $oldName TO $newName");
+        $this->execute("RENAME TABLE $old_name TO $new_name");
     }
     
-    public function dropTable($name)
+    public function drop_table($name)
     {
         $this->execute("DROP TABLE $name");
     }
     
-    public function addColumn($tableName, $columnName, $type, $options = array())
+    public function add_column($table_name, $column_name, $type, $options = array())
     {
-        $sql = "ALTER TABLE $tableName ADD $columnName ".self::typeToSql($type, $options['limit']);
-        $sql = self::addColumnOptions($sql, $type, $options);
+        $sql = "ALTER TABLE $table_name ADD $column_name ".self::type_to_sql($type, $options['limit']);
+        $sql = self::add_column_options($sql, $type, $options);
         $this->execute($sql);
     }
     
-    public function removeColumn($tableName, $columnName)
+    public function remove_column($table_name, $column_name)
     {
-        $this->execute("ALTER TABLE {$tableName} DROP {$columnName}");
+        $this->execute("ALTER TABLE {$table_name} DROP {$column_name}");
     }
     
-    public function changeColumn($tableName, $columnName, $type, $options = array())
+    public function change_column($table_name, $column_name, $type, $options = array())
     {
         if (!isset($options['default']))
         {
-            $column = $this->selectOne("SHOW COLUMNS FROM $tableName LIKE '$columnName'");
+            $column = $this->select_one("SHOW COLUMNS FROM $table_name LIKE '$column_name'");
             $options['default'] = $column['Default'];
         }
-        $sql = "ALTER TABLE $tableName CHANGE $columnName $columnName "
-        .self::typeToSql($type, $options['limit']);
-        $sql = self::addColumnOptions($sql, $type, $options);
+        $sql = "ALTER TABLE $table_name CHANGE $column_name $column_name "
+        .self::type_to_sql($type, $options['limit']);
+        $sql = self::add_column_options($sql, $type, $options);
         $this->execute($sql);
     }
     
-    public function renameColumn($tableName, $columnName, $newName)
+    public function rename_column($table_name, $column_name, $new_name)
     {
-        $column = $this->selectOne("SHOW COLUMNS FROM $tableName LIKE '$columnName'");
-        $currentType = $column['Type'];
-        $this->execute("ALTER TABLE $tableName CHANGE $columnName $newName $currentType");
+        $column = $this->select_one("SHOW COLUMNS FROM $table_name LIKE '$column_name'");
+        $current_type = $column['Type'];
+        $this->execute("ALTER TABLE $table_name CHANGE $column_name $new_name $current_type");
     }
     
-    public function addIndex($tableName, $columnName, $options = array())
+    public function add_index($table_name, $column_name, $options = array())
     {
-        if (isset($options['name'])) $indexName = $options['name'];
+        if (isset($options['name'])) $index_name = $options['name'];
         else
         {
-            if (!is_array($columnName)) $columnName = array($columnName);
-            $indexName = "{$tableName}_".$columnName[0]."_index";
+            if (!is_array($column_name)) $column_name = array($column_name);
+            $index_name = "{$table_name}_".$column_name[0]."_index";
         }
-        if (isset($options['unique'])) $indexType = 'UNIQUE';
-        else $indexType = '';
+        if (isset($options['unique'])) $index_type = 'UNIQUE';
+        else $index_type = '';
         
-        $this->execute("CREATE {$indexType} INDEX {$indexName} ON {$tableName} (".implode(', ', $columnName).")");
+        $this->execute("CREATE {$index_type} INDEX {$index_name} ON {$table_name} (".implode(', ', $column_name).")");
     }
     
-    public function removeIndex($tableName, $options = array())
+    public function remove_index($table_name, $options = array())
     {
         if (!is_array($options)) $options = array('column' => $options);
-        $this->execute("DROP INDEX ".self::indexName($tableName, $options)." ON {$tableName}");
+        $this->execute("DROP INDEX ".self::index_name($table_name, $options)." ON {$table_name}");
     }
     
-    public function indexName($tableName, $options = array())
+    public function index_name($table_name, $options = array())
     {
         if (isset($options['column']))
-            return "{$tableName}_".$options['column']."_index";
+            return "{$table_name}_".$options['column']."_index";
         elseif (isset($options['name']))
             return $options['name'];
         else
             throw new SException('You must specify the index name');
     }
     
-    public function typeToSql($type, $limit = Null)
+    public function type_to_sql($type, $limit = Null)
     {
-        $native = $this->nativeDbTypes[$type];
+        $native = $this->native_db_types[$type];
         if (!is_array($native)) $sql = $native;
         else
         {
@@ -246,7 +246,7 @@ class SMySqlDriver extends SAbstractDriver
         return $sql;
     }
     
-    public function addColumnOptions($sql, $type, $options)
+    public function add_column_options($sql, $type, $options)
     {
         if ($options['default'] !== Null)
             $sql.= ' DEFAULT '.$this->quote($options['default'], $type);
@@ -254,13 +254,13 @@ class SMySqlDriver extends SAbstractDriver
         return $sql;
     }
     
-    public function initializeSchemaInformation()
+    public function initialize_schema_information()
     {
         try
         {
-            $this->execute('CREATE TABLE '.SMigrator::$schemaInfoTableName.' (version '
-            .$this->typeToSql('integer').')');
-            $this->execute('INSERT INTO '.SMigrator::$schemaInfoTableName.' (version) VALUES (0)');
+            $this->execute('CREATE TABLE '.SMigrator::$schema_info_table_name.' (version '
+            .$this->type_to_sql('integer').')');
+            $this->execute('INSERT INTO '.SMigrator::$schema_info_table_name.' (version) VALUES (0)');
         }
         catch (Exception $e) {}
     }

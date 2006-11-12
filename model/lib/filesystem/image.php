@@ -16,9 +16,9 @@ class SImage
         $this->path   = $path;
     }
     
-    public function resize($maxDim='32', $path)
+    public function resize($max_dim='32', $path)
     {
-        if (!function_exists('gd_info') || !$this->isResizeSafe()) return False;
+        if (!function_exists('gd_info') || !$this->is_resize_safe()) return False;
         
         switch ($this->type)
         {
@@ -34,16 +34,16 @@ class SImage
         
         if ($this->width > $this->height)
         {
-            $thX = $maxDim;
-            $thY = $maxDim * ((float)$this->height/(float)$this->width);
+            $th_x = $max_dim;
+            $th_y = $max_dim * ((float)$this->height/(float)$this->width);
         }
         else
         {
-            $thX = $maxDim * ((float)$this->width/(float)$this->height);
-            $thY = $maxDim;
+            $th_x = $max_dim * ((float)$this->width/(float)$this->height);
+            $th_y = $max_dim;
         }
-        $thumbnail = imagecreatetruecolor($thX, $thY);
-        imagecopyresampled ($thumbnail, $image, 0, 0, 0, 0 ,$thX, $thY, $this->width, $this->height);
+        $thumbnail = imagecreatetruecolor($th_x, $th_y);
+        imagecopyresampled ($thumbnail, $image, 0, 0, 0, 0 ,$th_x, $th_y, $this->width, $this->height);
         
         if (!imagejpeg($thumbnail, $path)) return False;
         return True;
@@ -56,9 +56,9 @@ class SImage
     
     // une fonction image_type_to_extension a été implémentée
     // dans le CVS de PHP. A suivre...
-    public function extension($includeDot=true)
+    public function extension($include_dot=true)
     {
-        $dot = $includeDot ? '.' : '';
+        $dot = $include_dot ? '.' : '';
         switch($this->type)
         {
            case IMAGETYPE_GIF    : return $dot.'gif';
@@ -80,21 +80,21 @@ class SImage
         }
     }
     
-    private function isResizeSafe()
+    private function is_resize_safe()
     {
-        $estimatedMemory = $this->width * $this->height * 3;
-        $memoryLimit = ini_get('memory_limit');
-        if ($memoryLimit == '') $memoryLimit = get_cfg_var('memory_limit');
-        $memoryLimit = $this->convertToBytes($memoryLimit);
+        $estimated_memory = $this->width * $this->height * 3;
+        $memory_limit = ini_get('memory_limit');
+        if ($memory_limit == '') $memory_limit = get_cfg_var('memory_limit');
+        $memory_limit = $this->convert_to_bytes($memory_limit);
         if (function_exists('memory_get_usage'))
-            $memoryUsage = memory_get_usage() + 1000000;
+            $memory_usage = memory_get_usage() + 1000000;
         else
-            $memoryUsage = 2000000;     
-        if (($estimatedMemory + $memoryUsage) > $memoryLimit) return False;
+            $memory_usage = 2000000;     
+        if (($estimated_memory + $memory_usage) > $memory_limit) return False;
         return True;
     }
     
-    private function convertToBytes($val)
+    private function convert_to_bytes($val)
     {
         $val = trim($val);
         $last = $val{strlen($val)-1};

@@ -4,7 +4,7 @@ require_once(CORE_DIR.'/view/view.php');
 
 class TagHelperTest extends HelperTestCase
 {   
-    public function testTags()
+    public function test_tags()
     {
         $this->assertDomEqual(tag('fake', array('key'=>'value')), '<fake key="value" />');
         $this->assertDomEqual(
@@ -13,13 +13,13 @@ class TagHelperTest extends HelperTestCase
         );
     }
     
-    public function testRejectOptions()
+    public function test_reject_options()
     {
         $this->assertDomEqual(tag('p', array('ignore' => null)), '<p />');
         $this->assertDomEqual(tag('p', array('ignore' => false)), '<p />');
     }
     
-    public function testConvertTrueOptions()
+    public function test_convert_true_options()
     {
         $this->assertDomEqual(
             tag('p', array('disabled' => true, 'multiple' => true)),
@@ -27,7 +27,7 @@ class TagHelperTest extends HelperTestCase
         );
     }
     
-    public function testCdataSection()
+    public function test_cdata_section()
     {
         $this->assertEqual(cdata_section('<hello world>'), '<![CDATA[<hello world>]]>');
     }

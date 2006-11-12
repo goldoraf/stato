@@ -9,36 +9,36 @@ class SSession implements ArrayAccess
     
     public function destroy()
     {
-        $_SESSION = array();
+        $_session = array();
         session_destroy();
     }
     
-    public function sessionId()
+    public function session_id()
     {
         return session_id();
     }
     
     public function offsetExists($offset)
     {
-        if (isset($_SESSION[$offset])) return true;
+        if (isset($_session[$offset])) return true;
         return false;
     }
     
     public function offsetGet($offset)
     {
-        if ($this->offsetExists($offset)) return $_SESSION[$offset];
+        if ($this->offset_exists($offset)) return $_session[$offset];
         return null;
     }
     
     public function offsetSet($offset, $value)
     {
-        $_SESSION[$offset] = $value;
+        $_session[$offset] = $value;
         return;
     }
     
     public function offsetUnset($offset)
     {
-        if ($this->offsetExists($offset)) unset($_SESSION[$offset]);
+        if ($this->offset_exists($offset)) unset($_session[$offset]);
         return;
     }
 }

@@ -6,59 +6,59 @@ class MockRequest
     public $action     = Null;
     public $params     = array();
     public $method     = 'GET';
-    public $requestUri = '/';
+    public $request_uri = '/';
     public $host       = 'test.host';
     public $port       = 80;
-    public $remoteIp   = '0.0.0.0';
+    public $remote_ip   = '0.0.0.0';
     public $ssl        = false;
     
-    public $relativeUrlRoot = Null;
+    public $relative_url_root = Null;
     
     public function __call($method, $args)
     {
         return $this->$method;
     }
     
-    public function isPost()
+    public function is_post()
     {
         return $this->method() == 'POST';
     }
     
-    public function isGet()
+    public function is_get()
     {
         return $this->method() == 'GET';
     }
     
-    public function isSSL()
+    public function is_ssl()
     {
         return $this->ssl;
     }
     
     public function protocol()
     {
-        return ($this->isSSL() ? 'https://' : 'http://');
+        return ($this->is_ssl() ? 'https://' : 'http://');
     }
     
-    public function standardPort()
+    public function standard_port()
     {
         return (($this->protocol() == 'https://') ? 443 : 80);
     }
     
-    public function portString()
+    public function port_string()
     {
-        return (($this->port == $this->standardPort()) ? '' : ':'.$this->port);
+        return (($this->port == $this->standard_port()) ? '' : ':'.$this->port);
     }
     
-    public function hostWithPort()
+    public function host_with_port()
     {
-        return $this->host.$this->portString();
+        return $this->host.$this->port_string();
     }
     
-    public function relativeUrlRoot()
+    public function relative_url_root()
     {
-        if (!isset($this->relativeUrlRoot))
-            $this->relativeUrlRoot = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
-        return $this->relativeUrlRoot;
+        if (!isset($this->relative_url_root))
+            $this->relative_url_root = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
+        return $this->relative_url_root;
     }
 }
 
@@ -74,29 +74,29 @@ class MockResponse extends SResponse
         return substr($this->headers['Status'], 4, strlen($this->headers['Status']));
     }
     
-    public function isSuccess()
+    public function is_success()
     {
         return ($this->code() == 200);
     }
     
-    public function isMissing()
+    public function is_missing()
     {
         return ($this->code() == 404);
     }
     
-    public function isRedirect()
+    public function is_redirect()
     {
         return ($this->code() >= 300 && $this->code() <= 399);
     }
     
-    public function isError()
+    public function is_error()
     {
         return ($this->code() >= 500 && $this->code() <= 599);
     }
     
-    public function redirectUrl()
+    public function redirect_url()
     {
-        return ($this->isRedirect() ? $this->headers['location'] : null);
+        return ($this->is_redirect() ? $this->headers['location'] : null);
     }
 }
 
@@ -104,7 +104,7 @@ class MockSession implements ArrayAccess
 {
     private $vars = array();
     
-    public function sessionId()
+    public function session_id()
     {
         return 'fake_session_id';
     }
@@ -117,7 +117,7 @@ class MockSession implements ArrayAccess
     
     public function offsetGet($offset)
     {
-        if ($this->offsetExists($offset)) return $this->vars[$offset];
+        if ($this->offset_exists($offset)) return $this->vars[$offset];
         return null;
     }
     
@@ -129,7 +129,7 @@ class MockSession implements ArrayAccess
     
     public function offsetUnset($offset)
     {
-        if ($this->offsetExists($offset)) unset($this->vars[$offset]);
+        if ($this->offset_exists($offset)) unset($this->vars[$offset]);
         return;
     }
 }
