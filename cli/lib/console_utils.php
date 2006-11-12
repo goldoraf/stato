@@ -4,16 +4,16 @@ class SConsoleException extends Exception {}
 
 class SConsoleUtils
 {
-    public function readOptions($short_options, $long_options = null)
+    public function read_options($short_options, $long_options = null)
     {
-        $args = self::readArguments();
+        $args = self::read_arguments();
         array_shift($args);
-        list($opt, ) = self::parseOptions($args, $short_options, $long_options);
+        list($opt, ) = self::parse_options($args, $short_options, $long_options);
         return $opt;
     }
     
     /**
-     * Function adapted from PEAR::Console_Getopt by Andrei Zmievski
+     * function adapted from PEAR::console_getopt by Andrei Zmievski
      * Parses the command-line options.
      *
      * The first parameter to this function should be the list of command-line
@@ -49,7 +49,7 @@ class SConsoleUtils
      * @access public
      *
      */
-    public function parseOptions($args, $short_options, $long_options = null)
+    public function parse_options($args, $short_options, $long_options = null)
     {
         if (empty($args)) return array(array(), array());
         
@@ -78,39 +78,39 @@ class SConsoleUtils
                 break;
             }
             elseif (strlen($arg) > 1 && $arg{1} == '-')
-                self::parseLongOption(substr($arg, 2), $long_options, $opts, $args);
+                self::parse_long_option(substr($arg, 2), $long_options, $opts, $args);
             else
-                self::parseShortOption(substr($arg, 1), $short_options, $opts, $args);
+                self::parse_short_option(substr($arg, 1), $short_options, $opts, $args);
         }
         
         return array($opts, $non_opts);
     }
     
     /**
-    * Function adapted from PEAR::Console_Getopt by Andrei Zmievski
+    * function adapted from PEAR::console_getopt by Andrei Zmievski
     * Safely read the $argv PHP array across different PHP configurations.
     * Will take care on register_globals and register_argc_argv ini directives
     *
     * @return mixed the $argv PHP array
     */
-    public static function readArguments()
+    public static function read_arguments()
     {
         global $argv;
         if (!is_array($argv))
         {
             if (!@is_array($_SERVER['argv']))
             {
-                if (!@is_array($GLOBALS['HTTP_SERVER_VARS']['argv']))
+                if (!@is_array($globals['HTTP_SERVER_VARS']['argv']))
                     throw new SConsoleException("Could not read cmd args (register_argc_argv = Off ?)");
                 
-                return $GLOBALS['HTTP_SERVER_VARS']['argv'];
+                return $globals['HTTP_SERVER_VARS']['argv'];
             }
             return $_SERVER['argv'];
         }
         return $argv;
     }
     
-    private static function parseShortOption($arg, $short_options, &$opts, &$args)
+    private static function parse_short_option($arg, $short_options, &$opts, &$args)
     {
         for ($i = 0; $i < strlen($arg); $i++)
         {
@@ -153,7 +153,7 @@ class SConsoleUtils
         }
     }
     
-    private static function parseLongOption($arg, $long_options, &$opts, &$args)
+    private static function parse_long_option($arg, $long_options, &$opts, &$args)
     {
         @list($opt, $opt_arg) = explode('=', $arg);
         $opt_len = strlen($opt);

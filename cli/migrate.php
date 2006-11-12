@@ -10,7 +10,7 @@ require_once(CORE_DIR.'/model/model.php');
 
 include(ROOT_DIR.'/conf/environment.php');
 
-$options = SConsoleUtils::readOptions('v:', array('version='));
+$options = SConsoleUtils::read_options('v:', array('version='));
 if (isset($options['version'])) $version = $options['version'];
 elseif (isset($options['v'])) $version = $options['v'];
 else $version = null;

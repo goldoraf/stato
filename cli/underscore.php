@@ -11,6 +11,9 @@ iterate_files($dir, array('build'));
 
 function iterate_files($dir, $exceptions)
 {
+    $files_to_exclude = array('inflection.php', 'dir.php', 'colortextreporter.php', 
+    'helpertestcase.php', 'showpasses.php', 'statotestcase.php', 'run_tests.php', 'test_underscore.php', 'test_underscore2.php');
+    
     foreach ($dir as $file)
     {
         if ($file->hasChildren() && !in_array((string) $file, $exceptions))
@@ -18,7 +21,7 @@ function iterate_files($dir, $exceptions)
             echo "Opening $file\n";
             iterate_files($file->getChildren(), $exceptions);
         }
-        elseif (substr($file, -4) == '.php')
+        elseif (substr($file, -4) == '.php' && !in_array((string) $file, $files_to_exclude))
         {
             $path = $dir->getPath()."/$file";
             echo "Processing $path\n";
@@ -28,6 +31,35 @@ function iterate_files($dir, $exceptions)
 }
 
 function underscore_file($class_file)
+{
+    $regexes = array
+    (
+        '/(\$[a-zA-Z0-9_]+)/i',
+        '/(\${[a-zA-Z0-9_]+})/i',
+        '/(->[a-zA-Z0-9_]+)/i',
+        '/(function [a-zA-Z0-9_]+)/i',
+        '/(::[a-zA-Z0-9_]+)/i'
+    );
+    
+    $code = file_get_contents($class_file);
+    $new_code = preg_replace_callback($regexes, 'underscore', $code);
+    
+    file_put_contents($class_file, $new_code);
+}
+
+function underscore($matches)
+{
+    $exceptions = array('->assertEqual', '->assertNotEqual', '->assertDomEqual', '->assertException', '->assertNull', '->assertNotNull', '->assertTrue', '->assertFalse', 
+    '->assertIsA', '->assertNothingThrown', 'function offsetExists', 'function offsetSet', 'function offsetGet', 'function offsetUnset', 'function __toString', 
+    '->__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER', '$GLOBALS', '::UnitTestCase', '->hasProperty', '::CSV_MODE', '::INI_MODE',
+    '->getParentClass', '->getName', '->setStaticPropertyValue', '->getStaticPropertyValue', 'function setUp', 'function tearDown',
+    '->assertCopy', '->isPublic', '->isConstructor', '->getDeclaringClass');
+    
+    if (!in_array($matches[1], $exceptions)) return SInflection::underscore($matches[1]);
+    else return $matches[1];
+}
+
+/*function underscore_file($class_file)
 {
     $code = file_get_contents($class_file);
     $new_code = '';
@@ -66,15 +98,6 @@ function underscore_file($class_file)
     }
     
     file_put_contents($class_file, $new_code);
-}
-
-function underscore($text)
-{
-    $exceptions = array('assertEqual', 'assertDomEqual', 'assertException', 'assertNull', 'assertTrue', 'assertFalse', 'offsetExists', 
-    'offsetSet', 'offsetGet', 'offsetUnset', '__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER');
-    
-    if (!in_array($text, $exceptions)) return SInflection::underscore($text);
-    else return $text;
-}
+}*/
 
 ?>

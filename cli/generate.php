@@ -12,12 +12,12 @@ if ($_SERVER['argc'] == 3)
     {
         case 'model':
             if (strpos($_SERVER['argv'][2], '/') !== false)
-                list($subdir, $className) = explode('/', $_SERVER['argv'][2]);
+                list($subdir, $class_name) = explode('/', $_SERVER['argv'][2]);
             else
-                $className = $_SERVER['argv'][2];
+                $class_name = $_SERVER['argv'][2];
                 
-            $content = SCodeGenerator::generateClass($className, '    public static $objects;', 'SActiveRecord');
-            $file = SInflection::underscore($className).'.php';
+            $content = SCodeGenerator::generate_class($class_name, '    public static $objects;', 'SActiveRecord');
+            $file = SInflection::underscore($class_name).'.php';
             if (!empty($subdir)) $file = $subdir.'/'.$file;
             $path = ROOT_DIR.'/app/models/'.$file;
             if (file_exists($path))

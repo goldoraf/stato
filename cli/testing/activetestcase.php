@@ -9,24 +9,24 @@ class ActiveTestCase extends StatoTestCase
 {
     public $models = array();
     public $fixtures = array();
-    public $useInstantiatedFixtures = False;
+    public $use_instantiated_fixtures = False;
     
-    private $loadedFixtures = array();
-    private $fixtureInstances = array();
+    private $loaded_fixtures = array();
+    private $fixture_instances = array();
     
     public function __construct()
     {
         parent::UnitTestCase();
-        $this->recreateDatabase();
-        $this->loadedFixtures = SFixture::createFixtures(FIXTURES_DIR, $this->fixtures);
+        $this->recreate_database();
+        $this->loaded_fixtures = SFixture::create_fixtures(FIXTURES_DIR, $this->fixtures);
         foreach ($this->models as $class) 
-            SActiveRecordMeta::addManagerToClass(SInflection::camelize($class));
+            SActiveRecordMeta::add_manager_to_class(SInflection::camelize($class));
     }
     
     public function setUp()
     {
-        $this->loadFixtures();
-        if ($this->useInstantiatedFixtures) $this->instanciateFixtures();
+        $this->load_fixtures();
+        if ($this->use_instantiated_fixtures) $this->instanciate_fixtures();
     }
     
     public function tearDown()
@@ -34,24 +34,24 @@ class ActiveTestCase extends StatoTestCase
     
     }
     
-    public function loadFixtures()
+    public function load_fixtures()
     {
-        foreach($this->loadedFixtures as $table => $fixture)
+        foreach($this->loaded_fixtures as $table => $fixture)
         {
-            $fixture->deleteExistingFixtures();
-            $fixture->insertFixtures();
+            $fixture->delete_existing_fixtures();
+            $fixture->insert_fixtures();
         }
     }
     
-    public function instanciateFixtures()
+    public function instanciate_fixtures()
     {
-        foreach($this->loadedFixtures as $table => $fixture)
+        foreach($this->loaded_fixtures as $table => $fixture)
         {
-            if (($insts = $fixture->instanciateFixtures()) !== false) $this->$table = $insts;
+            if (($insts = $fixture->instanciate_fixtures()) !== false) $this->$table = $insts;
         }
     }
     
-    private function recreateDatabase()
+    private function recreate_database()
     {
         $db = SActiveRecord::connection();
         $dbname = $db->config['dbname'];
