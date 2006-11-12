@@ -2,7 +2,7 @@
 
 class SInflection
 {
-    private static $pluralRules = array
+    private static $plural_rules = array
     (
         '/(fish)$/i'                => '\1\2',       # fish
         '/(x|ch|ss|sh)$/'			=> '\1es',       # search, switch, fix, box, process, address
@@ -19,7 +19,7 @@ class SInflection
 		'/$/'                       => 's'
     );
     
-    private static $singularRules = array
+    private static $singular_rules = array
     (
         '/(f)ish$/i'               => '\1\2ish',
         '/(x|ch|ss)es$/'		   => '\1',
@@ -38,19 +38,19 @@ class SInflection
 		'/s$/'						=> ''
     );
     
-    public static function addSingularRule($regex, $singular)
+    public static function add_singular_rule($regex, $singular)
     {
-        self::$singularRules = array($regex => $singular) + self::$singularRules;
+        self::$singular_rules = array($regex => $singular) + self::$singular_rules;
     }
     
-    public static function addPluralRule($regex, $plural)
+    public static function add_plural_rule($regex, $plural)
     {
-        self::$pluralRules = array($regex => $plural) + self::$pluralRules;
+        self::$plural_rules = array($regex => $plural) + self::$plural_rules;
     }
     
     public static function pluralize($word)
     {
-        foreach (self::$pluralRules as $rule => $replace)
+        foreach (self::$plural_rules as $rule => $replace)
         {
 			if (preg_match($rule, $word))
                 return preg_replace($rule, $replace, $word);
@@ -60,7 +60,7 @@ class SInflection
     
     public static function singularize($word)
     {
-        foreach (self::$singularRules as $rule => $replace)
+        foreach (self::$singular_rules as $rule => $replace)
         {
 			if (preg_match($rule, $word))
                 return preg_replace($rule, $replace, $word);
@@ -68,15 +68,15 @@ class SInflection
 		return false;
     }
     
-    public static function underscore($camelCasedWord)
+    public static function underscore($camel_cased_word)
     {
         return strtolower(preg_replace('/([a-z\d])([A-Z])/', '\1_\2', 
-            preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $camelCasedWord)));
+            preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $camel_cased_word)));
     }
     
-    public static function camelize($underscoreWord)
+    public static function camelize($underscore_word)
     {
-        return preg_replace('/(^|_)(.)/e', "strtoupper('\\2')", $underscoreWord);
+        return preg_replace('/(^|_)(.)/e', "strtoupper('\\2')", $underscore_word);
     }
     
     public static function wikify($sentence)
