@@ -34,10 +34,10 @@ function underscore_file($class_file)
 {
     $regexes = array
     (
-        '/(\$[a-zA-Z0-9]+)/i',
-        '/(->[a-zA-Z0-9]+)/i',
-        '/(function [a-zA-Z0-9]+)/i',
-        '/(::[a-zA-Z0-9]+)/i'
+        '/(\$[a-zA-Z0-9_]+)/i',
+        '/(->[a-zA-Z0-9_]+)/i',
+        '/(function [a-zA-Z0-9_]+)/i',
+        '/(::[a-zA-Z0-9_]+)/i'
     );
     
     $code = file_get_contents($class_file);
@@ -50,7 +50,7 @@ function underscore($matches)
 {
     $exceptions = array('->assertEqual', '->assertNotEqual', '->assertDomEqual', '->assertException', '->assertNull', '->assertTrue', '->assertFalse', 
     '->assertIsA', 'function offsetExists', 'function offsetSet', 'function offsetGet', 'function offsetUnset', 'function __toString', 
-    '->__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER', '::UnitTestCase', '::CSV_MODE', '::INI_MODE', '->hasProperty', 
+    '->__toString', '$_POST', '$_GET', '$_FILES', '$_SERVER', '::UnitTestCase', '->hasProperty', 
     '->getParentClass', '->getName');
     
     if (!in_array($matches[1], $exceptions)) return SInflection::underscore($matches[1]);
