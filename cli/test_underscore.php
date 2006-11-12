@@ -21,7 +21,7 @@ function iterate_files($dir, $exceptions)
             echo "Opening $file\n";
             iterate_files($file->getChildren(), $exceptions);
         }
-        elseif (substr($file, -4) == '.php' && !in_array($file, $files_to_exclude))
+        elseif (substr($file, -4) == '.php' && !in_array((string) $file, $files_to_exclude))
         {
             $path = $dir->getPath()."/$file";
             echo "Processing $path\n";
