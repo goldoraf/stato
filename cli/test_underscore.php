@@ -6,14 +6,14 @@ define('APP_DIR', ROOT_DIR.'/app');
 
 require_once(CORE_DIR.'/common/lib/inflection.php');
 
-$files_to_exclude = array('inflection.php', 'dir.php', 'colortextreporter.php', 
-'helpertestcase.php', 'showpasses.php', 'statotestcase.php');
-
 $dir = new RecursiveDirectoryIterator(CORE_DIR);
 iterate_files($dir, array('build'));
 
 function iterate_files($dir, $exceptions)
 {
+    $files_to_exclude = array('inflection.php', 'dir.php', 'colortextreporter.php', 
+    'helpertestcase.php', 'showpasses.php', 'statotestcase.php', 'run_tests.php', 'test_underscore.php');
+    
     foreach ($dir as $file)
     {
         if ($file->hasChildren() && !in_array((string) $file, $exceptions))
@@ -21,7 +21,7 @@ function iterate_files($dir, $exceptions)
             echo "Opening $file\n";
             iterate_files($file->getChildren(), $exceptions);
         }
-        elseif (substr($file, -4) == '.php')
+        elseif (substr($file, -4) == '.php' && !in_array($file, $files_to_exclude))
         {
             $path = $dir->getPath()."/$file";
             echo "Processing $path\n";
