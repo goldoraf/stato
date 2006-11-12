@@ -22,11 +22,11 @@ require_once(TESTS_DIR.'/helpertestcase.php');
 // we call session_start() now to avoid triggering "headers already sent" error
 session_start();
 
-function addPackageTests($groupTest, $package)
+function add_package_tests($group_test, $package)
 {
-    $testFiles = include(CORE_DIR."/{$package}/{$package}_test.php");
+    $test_files = include(CORE_DIR."/{$package}/{$package}_test.php");
     set_include_path(get_include_path() . PATH_SEPARATOR . CORE_DIR."/{$package}/test/");
-    foreach ($testFiles as $file) $groupTest->addTestFile($file.'.test.php');
+    foreach ($test_files as $file) $group_test->addTestFile($file.'.test.php');
 }
 
 if ($_SERVER['argc'] == 2)
@@ -42,13 +42,11 @@ if ($_SERVER['argc'] == 2)
     {
         $package = $_SERVER['argv'][1];
         $test =& new GroupTest(ucfirst($package).' tests');
-        addPackageTests($test, $package);
+        add_package_tests($test, $package);
     }
 }
 else
 {
-    /*$test =& new GroupTest('All tests');
-    foreach (array('common', 'controller', 'model', 'view') as $package) addPackageTests($test, $package);*/
     echo "\nPHP is not Ruby ! Please launch tests separately for each layer to avoid 
 conflicts between fake and normal classes.\n
     Usage : run_tests.php [layer]\n
