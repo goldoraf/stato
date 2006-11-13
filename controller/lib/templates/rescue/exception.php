@@ -38,12 +38,12 @@
   </head>
   <body>
         <h1><?php echo get_class($this->exception)." in {$this->controller_name}::{$this->action_name}()"; ?></h1>
-        <pre><?php echo $this->exception->get_message(); ?></pre>
-        <p><?php echo "Exception occured at : ".$this->exception->get_file()." : ".$this->exception->get_line(); ?></p>
+        <pre><?php echo $this->exception->getMessage(); ?></pre>
+        <p><?php echo "Exception occured at : ".$this->exception->getFile()." : ".$this->exception->getLine(); ?></p>
         <table>
             <caption>Stack trace</caption>
             <tr><th>#</th><th>File</th><th>Line</th><th>Function</th></tr>
-            <?php foreach ($this->exception->get_trace() as $num => $trace) { ?>
+            <?php foreach ($this->exception->getTrace() as $num => $trace) { ?>
             <tr>
                 <td><?php echo $num + 1; ?></td>
                 <td><?php echo $trace['file']; ?></td>

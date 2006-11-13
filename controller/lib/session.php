@@ -9,7 +9,7 @@ class SSession implements ArrayAccess
     
     public function destroy()
     {
-        $_session = array();
+        $_SESSION = array();
         session_destroy();
     }
     
@@ -20,25 +20,25 @@ class SSession implements ArrayAccess
     
     public function offsetExists($offset)
     {
-        if (isset($_session[$offset])) return true;
+        if (isset($_SESSION[$offset])) return true;
         return false;
     }
     
     public function offsetGet($offset)
     {
-        if ($this->offset_exists($offset)) return $_session[$offset];
+        if ($this->offsetExists($offset)) return $_SESSION[$offset];
         return null;
     }
     
     public function offsetSet($offset, $value)
     {
-        $_session[$offset] = $value;
+        $_SESSION[$offset] = $value;
         return;
     }
     
     public function offsetUnset($offset)
     {
-        if ($this->offset_exists($offset)) unset($_session[$offset]);
+        if ($this->offsetExists($offset)) unset($_SESSION[$offset]);
         return;
     }
 }

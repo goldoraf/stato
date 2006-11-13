@@ -598,14 +598,14 @@ class SActionController
     
     private function log_error($exception)
     {
-        $this->logger->fatal(get_class($exception)." (".$exception->get_message().")\n    "
+        $this->logger->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
         .implode("\n    ", $this->clean_backtrace($exception))."\n");
     }
     
     private function clean_backtrace($exception)
     {
         $trace = array();
-        foreach ($exception->get_trace() as $t)
+        foreach ($exception->getTrace() as $t)
             $trace[] = $t['file'].':'.$t['line'].' in \''.$t['function'].'\'';
         return $trace;
     }
