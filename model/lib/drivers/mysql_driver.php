@@ -233,24 +233,25 @@ class SMySqlDriver extends SAbstractDriver
             throw new SException('You must specify the index name');
     }
     
-    public function type_to_sql($type, $limit = Null)
+    public function type_to_sql($type, $limit = null)
     {
         $native = $this->native_db_types[$type];
         if (!is_array($native)) $sql = $native;
         else
         {
-            if ($limit === Null && isset($native['limit'])) $limit = $native['limit'];
+            if ($limit === null && isset($native['limit'])) $limit = $native['limit'];
             $sql = $native['name'];
-            if ($limit !== Null) $sql.= "($limit)";
+            if ($limit !== null) $sql.= "($limit)";
         }
         return $sql;
     }
     
     public function add_column_options($sql, $type, $options)
     {
-        if ($options['default'] !== Null)
+        if ($options['default'] !== null)
             $sql.= ' DEFAULT '.$this->quote($options['default'], $type);
-        if ($options['null'] === False) $sql.= ' NOT NULL';
+        if ($options['null'] === false) $sql.= ' NOT NULL';
+        if (isset($options['after'])) $sql.= ' AFTER '.$options['after'];
         return $sql;
     }
     
