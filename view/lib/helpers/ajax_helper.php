@@ -91,11 +91,11 @@ function observe_form($id, $options = array())
 
 function in_place_editor_field($object_name, $method, $object, $tag_options = array(), $editor_options = array())
 {
-    $tag_options = array_merge(array('id' => "${objectName}_${method}_".$object->id."_in_place_editor",
+    $tag_options = array_merge(array('id' => "${object_name}_${method}_".$object->id."_in_place_editor",
     'class' => 'in_place_editor'), $tag_options);
     
     if (!isset($editor_options['url'])) 
-        $editor_options['url'] = array('action' => "set_${objectName}_${method}", 'id' => $object->id);
+        $editor_options['url'] = array('action' => "set_${object_name}_${method}", 'id' => $object->id);
         
     $tag = $tag_options['tag'];
     unset($tag_options['tag']);
@@ -135,8 +135,8 @@ function text_field_with_auto_complete($object_name, $method, $object, $tag_opti
     
     $html = auto_complete_css()
     .text_field($object_name, $method, $object, $tag_options)
-    .content_tag('div', '', array('id' => "${objectName}_${method}_auto_complete", 'class' => "auto_complete"))
-    .auto_complete_field("${objectName}_${method}", array('url' => array('action' => "auto_complete_for_${objectName}_${method}")));
+    .content_tag('div', '', array('id' => "${object_name}_${method}_auto_complete", 'class' => "auto_complete"))
+    .auto_complete_field("${object_name}_${method}", array('url' => array('action' => "auto_complete_for_${object_name}_${method}")));
     
     return $html;
 }
