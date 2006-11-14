@@ -27,7 +27,7 @@ class SValidation
                 {
                     if (in_array($validation, self::$validations))
                     {
-                        $method = 'validate'.ucfirst($validation);
+                        $method = 'validate_'.ucfirst($validation);
                         self::$method($record, $attr, $options);
                     }
                     else throw new SException("The validation rule '$validation' does not exist.");
