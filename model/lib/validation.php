@@ -81,7 +81,7 @@ class SValidation
         if (!in_array($config['pattern'], self::$patterns))
             throw new SException('The pattern provided does not exist.');
         
-        $method = 'is'.ucfirst($config['pattern']);
+        $method = 'is_'.ucfirst($config['pattern']);
             
         if ($config['message'] === Null) $config['message'] = self::$messages[$method];
         
