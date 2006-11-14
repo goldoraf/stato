@@ -72,7 +72,10 @@ class SDate
     
     public function format($strf)
     {
-        return utf8_encode(strftime($strf, $this->ts()));
+        if (SLocale::is_server_windows()) 
+            return utf8_encode(strftime($strf, $this->ts()));
+        else
+            return strftime($strf, $this->ts());
     }
     
     public function sprintf($format)

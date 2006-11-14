@@ -42,6 +42,11 @@ class SLocale
             self::$strings = array_merge(self::$strings, include($path));
     }
     
+    public static function is_server_windows()
+    {
+        return (strtoupper(substr(PHP_OS, 0, 3) == 'WIN'));
+    }
+    
     private static function detect_language()
     {
         foreach (self::get_accepted_languages() as $language)
