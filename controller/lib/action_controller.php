@@ -332,6 +332,22 @@ class SActionController
         unset($this->response->headers['location']);
     }
     
+    protected function send_data($data, $params=array())
+    {
+        $defaults = array
+        (
+            'type' => 'application/octet-stream',
+            'disposition' => 'attachment',
+        );
+        $params = array_merge($defaults, $params);
+        
+        if (!isset($params['length'])) $params['length'] = strlen($data);
+        
+        $this->send_file_headers($params);
+        
+        $this->render_text($data);
+    }
+    
     protected function send_file($path, $params=array())
     {
         if (!file_exists($path) || !is_readable($path)) 
