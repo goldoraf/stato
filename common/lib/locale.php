@@ -17,7 +17,7 @@ class SLocale
         putenv("LANG=".self::$language."");
         if (count($exp = explode('_', self::$language)) != 1) $win_language = $exp[0];
         else $win_language = self::$language;
-        SLogger::get_instance()->info(setlocale(LC_TIME, $win_language, self::$language, self::$language.'.UTF-8'));
+        setlocale(LC_TIME, $win_language, self::$language, self::$language.'.utf8');
     }
     
     public static function translate($key)
