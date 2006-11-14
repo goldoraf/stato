@@ -159,7 +159,7 @@ class SValidation
         return ctype_alpha($data);
     }
     
-    public static function is_alpha_num($data, $options = array())
+    public static function is_alphanum($data, $options = array())
     {
         return ctype_alnum($data);
     }
