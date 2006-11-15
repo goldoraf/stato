@@ -487,7 +487,7 @@ class SQuerySet implements Iterator, Countable
         foreach ($values as $key => $value)
         {
             if (strpos($key, ':') === false) $key = ':'.$key;
-            $stmt = preg_replace('/'.$key.'/i', $this->conn->quote($value), $stmt, 1);
+            $stmt = preg_replace('/'.$key.'/i', $this->conn->quote($value), $stmt/*, 1*/);
         }
         return $stmt;
     }
