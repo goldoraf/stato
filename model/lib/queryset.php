@@ -261,21 +261,14 @@ class SQuerySet implements Iterator, Countable
             {
                 if (!isset($this->meta->attributes[$matches[1]]))
                     throw new SException('Association '.$matches[1].' does not exist.');
+                
                 $assoc_meta = $this->meta->attributes[$matches[1]]->meta;
-                if ($assoc_meta->type == 'SManyToMany')
-                {
-                    /*$clone->joins[] = "LEFT OUTER JOIN {$assoc_meta->join_table} 
-                                       ON {$assoc_meta->table_name}.{$assoc_meta->identity_field} 
-                                       = {$assoc_meta->join_table}.{$assoc_meta->assoc_foreign_key}";
-                    $clone->filters[] = "{$assoc_meta->join_table}.{$assoc_meta->foreign_key} = '{$this->owner->id}'"*/
-                }
-                else
-                {
-                    $table = $assoc_meta->table_name;
-                    $field = $matches[2];
-                    $cond  = $matches[3];
-                    $clone->joins[] = "LEFT OUTER JOIN $table ON $table.{$field}{$cond}";
-                }
+                $field = $matches[2];
+                $cond  = $matches[3];
+                
+                $clone->joins[]   = $this->association_join($assoc_meta);
+                $clone->filters[] = "{$assoc_meta->table_name}.{$field}{$cond}";
+                
                 unset($args[$k]);
             }
         }
@@ -435,34 +428,37 @@ class SQuerySet implements Iterator, Countable
     protected function include_joins()
     {
         $joins = array();
+        
         foreach ($this->includes as $r)
-        {
-            $assoc_meta = $this->meta->attributes[$r]->meta;
-            switch($assoc_meta->type)
-            {
-                case 'SBelongsTo':
-                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
-                    ."{$assoc_meta->table_name}.{$assoc_meta->identity_field} = "
-                    ."{$this->meta->table_name}.{$assoc_meta->foreign_key}";
-                    break;
-                    
-                case 'SManyToMany':
-                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->join_table} ON "
-                    ."{$assoc_meta->join_table}.{$assoc_meta->foreign_key} = "
-                    ."{$this->meta->table_name}.{$this->meta->identity_field}";
-                    
-                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
-                    ."{$assoc_meta->join_table}.{$assoc_meta->assoc_foreign_key} = "
-                    ."{$assoc_meta->table_name}.{$assoc_meta->identity_field}";
-                    break;
-                    
-                default:
-                    $joins[] = "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
-                    ."{$assoc_meta->table_name}.{$assoc_meta->foreign_key} = "
-                    ."{$this->meta->table_name}.{$this->meta->identity_field}";
-            }
-        }
+            $joins[] = $this->association_join($this->meta->attributes[$r]->meta);
+            
         return $joins;
+    }
+    
+    protected function association_join($assoc_meta)
+    {
+        switch($assoc_meta->type)
+        {
+            case 'SBelongsTo':
+                return "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
+                ."{$assoc_meta->table_name}.{$assoc_meta->identity_field} = "
+                ."{$this->meta->table_name}.{$assoc_meta->foreign_key}";
+                break;
+                
+            case 'SManyToMany':
+                return "LEFT OUTER JOIN {$assoc_meta->join_table} ON "
+                ."{$assoc_meta->join_table}.{$assoc_meta->foreign_key} = "
+                ."{$this->meta->table_name}.{$this->meta->identity_field} "
+                ."LEFT OUTER JOIN {$assoc_meta->table_name} ON "
+                ."{$assoc_meta->join_table}.{$assoc_meta->assoc_foreign_key} = "
+                ."{$assoc_meta->table_name}.{$assoc_meta->identity_field}";
+                break;
+                
+            default:
+                return "LEFT OUTER JOIN {$assoc_meta->table_name} ON "
+                ."{$assoc_meta->table_name}.{$assoc_meta->foreign_key} = "
+                ."{$this->meta->table_name}.{$this->meta->identity_field}";
+        }
     }
     
     protected function sanitize_sql($stmt)
