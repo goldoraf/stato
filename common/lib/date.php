@@ -103,6 +103,17 @@ class SDate
         }
         throw new SDateParsingException();
     }
+    
+    public static function from_array($args)
+    {
+        if (!is_array($args) || count($args) < 3)
+            throw new SDateConstructException('Invalid array parameter.');
+        foreach (array('year', 'month', 'day') as $key)
+            if (!in_array($key, array_keys($args)))
+                throw new SDateConstructException('Invalid array parameter.');
+        
+        return new SDate($args['year'], $args['month'], $args['day']);
+    }
 }
 
 class SDateTime extends SDate
@@ -177,6 +188,25 @@ class SDateTime extends SDate
                                      $matches['hour'], $matches['min'], $matches['sec']);
         }
         throw new SDateParsingException();
+    }
+    
+    public static function from_array($args)
+    {
+        if (!is_array($args) || count($args) < 3)
+            throw new SDateConstructException('Invalid array parameter.');
+        foreach (array('year', 'month', 'day') as $key)
+            if (!in_array($key, array_keys($args)))
+                throw new SDateConstructException('Invalid array parameter.');
+                
+        $hour = 0;
+        $min  = 0;
+        $sec  = 0;
+        
+        foreach (array('hour', 'min', 'sec') as $key)
+            if (in_array($key, array_keys($args))) $$key = $args[$key];
+        
+        return new SDateTime($args['year'], $args['month'], $args['day'],
+                             $hour, $min, $sec);
     }
 }
 

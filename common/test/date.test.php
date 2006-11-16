@@ -20,6 +20,12 @@ class DateTest extends UnitTestCase
         $this->assertEqual('2006-05-01', $d->__toString());
     }
     
+    public function test_date_from_array()
+    {
+        $this->assertEqual(new SDate(1969, 7, 21),
+                           SDate::from_array(array('year' => 1969, 'month' => 7, 'day' => 21)));
+    }
+    
     public function test_date_time()
     {
         $d = new SDateTime(1969, 7, 21, 20, 35, 05);
@@ -28,6 +34,18 @@ class DateTest extends UnitTestCase
         $this->assertEqual('1969-07-21 21:05:05', $d->__toString());
         $d = new SDateTime(1969, 7, 21, 20, 125, 05);
         $this->assertEqual('1969-07-21 22:05:05', $d->__toString());
+    }
+    
+    public function test_date_time_from_array()
+    {
+        $this->assertEqual(new SDateTime(1969, 7, 21),
+                           SDateTime::from_array(array('year' => 1969, 'month' => 7, 'day' => 21)));
+        $this->assertEqual(new SDateTime(1969, 7, 21, 20),
+                           SDateTime::from_array(array('year' => 1969, 'month' => 7, 'day' => 21, 'hour' => 20)));
+        $this->assertEqual(new SDateTime(1969, 7, 21, 20, 35),
+                           SDateTime::from_array(array('year' => 1969, 'month' => 7, 'day' => 21, 'hour' => 20, 'min' => 35)));
+        $this->assertEqual(new SDateTime(1969, 7, 21, 20, 35, 05),
+                           SDateTime::from_array(array('year' => 1969, 'month' => 7, 'day' => 21, 'hour' => 20, 'min' => 35, 'sec' => 05)));
     }
     
     public function test_date_iso8601()
