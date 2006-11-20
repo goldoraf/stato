@@ -11,12 +11,12 @@ class SJavascriptGenerator
     
     public function insert_html($position, $id, $content)
     {
-        return $this->js_call("new Insertion.{$position}", array($id, escape_content($content)));
+        return $this->js_call("new Insertion.{$position}", array($id, $this->escape_content($content)));
     }
     
     public function replace_html($id, $content)
     {
-        return $this->js_call('Element.update', array($id, escape_content($content)));
+        return $this->js_call('Element.update', array($id, $this->escape_content($content)));
     }
     
     private function js_call($function, $args)
