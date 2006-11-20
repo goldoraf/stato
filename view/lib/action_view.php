@@ -2,6 +2,8 @@
 
 class SActionView
 {
+    public $page = null;
+    
     //private $assigns     = array();
     private $controller  = null;
     private $template_dir = null;
@@ -10,6 +12,7 @@ class SActionView
     public function __construct($controller)
     {
         $this->controller = $controller;
+        $this->page = new SJavascriptGenerator();
     }
     
     public function __get($name)
