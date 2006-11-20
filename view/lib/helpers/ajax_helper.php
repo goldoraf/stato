@@ -194,7 +194,7 @@ function options_for_ajax($options)
     $js_options = build_callbacks($options);
     $js_options['asynchronous'] = 'true';
     $js_options['method'] = "'post'";
-    //$js_options['evalScripts'] = ?
+    $js_options['evalScripts'] = true;
     if (isset($options['position']) && in_array($options['position'], array('before', 'after', 'top', 'bottom')))
     {
         $js_options['insertion'] = 'Insertion.'.ucfirst($options['position']);
