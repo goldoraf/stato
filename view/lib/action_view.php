@@ -4,7 +4,6 @@ class SActionView
 {
     public $page = null;
     
-    //private $assigns     = array();
     private $controller  = null;
     private $template_dir = null;
     private $tmp_cache_key = null;
@@ -12,7 +11,6 @@ class SActionView
     public function __construct($controller)
     {
         $this->controller = $controller;
-        $this->page = new SJavascriptGenerator();
     }
     
     public function __get($name)
@@ -29,8 +27,7 @@ class SActionView
     {
         if (!is_readable($template))
             throw new SException('Template not found : '.$template);
-            
-        //$this->assigns = $assigns;
+        
         $this->template_dir = dirname($template);
         
         $compiled = $this->compiled_template_path($template);
@@ -46,6 +43,20 @@ class SActionView
         ob_end_clean();
         
         return $str;
+    }
+    
+    public function render_update($template, $local_assigns = array())
+    {
+        if (!is_readable($template))
+            throw new SException('Template not found : '.$template);
+            
+        $this->template_dir = dirname($template);
+        
+        extract($local_assigns);
+        
+        $this->page = new SJavascriptGenerator();
+        include ($template);
+        return $this->page->__toString();
     }
     
     public function render_partial($partial_path, $local_assigns = array())

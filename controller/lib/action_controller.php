@@ -188,6 +188,14 @@ class SActionController
         $this->render_action($this->action_name(), $status);
     }
     
+    protected function render_update($local_assigns = array())
+    {
+        $template = $this->pjs_path($this->controller_path(), $this->action_name());
+        if (!file_exists($template)) throw new SException('PJS file not found for this action');
+        $this->response->headers['Content-Type'] = 'text/javascript; charset=UTF-8';
+        $this->render_text($this->view->render_update($template, $local_assigns));
+    }
+    
     protected function render_action($action, $status = null)
     {
         $template = $this->template_path($this->controller_path(), $action);
@@ -210,11 +218,13 @@ class SActionController
     protected function render_file($path, $status = null)
     {
         $this->add_variables_to_assigns();
+        $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->render_text($this->view->render($path), $status);
     }
     
     protected function render_component($options = array())
     {
+        $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->render_text($this->component_response($options, true)->body); 
     }
     
@@ -222,6 +232,7 @@ class SActionController
     {
         $this->add_variables_to_assigns();
         if (strpos($partial, '/') === false) $partial = $this->controller_path().'/'.$partial;
+        $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->render_text($this->view->render_partial($partial, $local_assigns));
     }
     
@@ -240,13 +251,17 @@ class SActionController
         
         $this->performed_render = true;
         $this->response->headers['Status'] = (!empty($status)) ? $status : self::DEFAULT_RENDER_STATUS_CODE;
-        $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->response->body = $str;
     }
     
     protected function template_path($controller_path, $action)
     {
         return APP_DIR."/views/$controller_path/$action.php";
+    }
+    
+    protected function pjs_path($controller_path, $action)
+    {
+        return APP_DIR."/views/$controller_path/$action.pjs";
     }
     
     protected function add_variables_to_assigns()
