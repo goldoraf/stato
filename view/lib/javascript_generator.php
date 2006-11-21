@@ -26,6 +26,12 @@ class SJavascriptGenerator
         $this->js_call('Element.update', array($id, $this->escape_content($content)));
     }
     
+    public function remove($ids)
+    {
+        if (!is_array($ids)) $ids = array($ids);
+        $this->add_line($this->array_for_js($ids).'.each(Element.remove)');
+    }
+    
     private function js_call($function, $args)
     {
         $this->add_line("$function (".implode(', ', $this->args_for_js($args)).")");
@@ -45,6 +51,11 @@ class SJavascriptGenerator
     {
         foreach ($args as $k => $v) $args[$k] = "\"$v\"";
         return $args;
+    }
+    
+    private function array_for_js($array)
+    {
+        return '['.implode(', ', $this->args_for_js($array)).']';
     }
 }
 
