@@ -254,6 +254,11 @@ class SActionController
         $this->response->body = $str;
     }
     
+    public function render_nothing($status = null)
+    {
+        $this->render_text(' ', $status);
+    }
+    
     protected function template_path($controller_path, $action)
     {
         return APP_DIR."/views/$controller_path/$action.php";
