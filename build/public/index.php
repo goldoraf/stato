@@ -9,6 +9,7 @@ require(ROOT_DIR.'/core/controller/controller.php');
 require(ROOT_DIR.'/core/model/model.php');
 require(ROOT_DIR.'/core/view/view.php');
 require(ROOT_DIR.'/core/webservice/webservice.php');
+require(ROOT_DIR.'/core/mailer/mailer.php');
 
 include(ROOT_DIR.'/conf/environment.php');
 
