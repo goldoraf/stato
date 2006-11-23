@@ -8,14 +8,15 @@ class SActionView
     private $template_dir = null;
     private $tmp_cache_key = null;
     
-    public function __construct($controller)
+    public function __construct($controller = null)
     {
         $this->controller = $controller;
     }
     
     public function __get($name)
     {
-        if (isset($this->controller->assigns[$name])) return $this->controller->assigns[$name];
+        if ($this->controller !== null && isset($this->controller->assigns[$name])) 
+            return $this->controller->assigns[$name];
     }
     
     public function __set($name, $value)
