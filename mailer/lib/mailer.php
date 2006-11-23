@@ -84,7 +84,7 @@ class SMailer
     protected function render_template($assigns)
     {
         $path = APP_DIR.'/views/mailer/'.$this->template.'.php';
-        return $this->render($path, $assigns);
+        return $this->view->render($path, $assigns);
     }
     
     private static function send($mail)
