@@ -12,7 +12,7 @@ class SValidation
         'alpha', 'alphanum', 'num', 'singleline', 'email', 'ip', 'xml', 'utf8'
     );
     
-    public static function validate_attribute($record, $attr, $method = 'save')
+    public static function validate_attribute($record, $attr, $state = 'save')
     {
         // required ?
         if (in_array($attr, $record->attr_required)) self::validate_presence($record, $attr);
@@ -23,11 +23,11 @@ class SValidation
         {
             foreach ($record->validations[$attr] as $validation => $options)
             {
-                if (!isset($options['on']) || $options['on'] == $method)
+                if (!isset($options['on']) || $options['on'] == $state)
                 {
                     if (in_array($validation, self::$validations))
                     {
-                        $method = 'validate_'.ucfirst($validation);
+                        $method = 'validate_'.$validation;
                         self::$method($record, $attr, $options);
                     }
                     else throw new SException("The validation rule '$validation' does not exist.");
@@ -141,7 +141,7 @@ class SValidation
         
         $confirm_attr = $attr.'_confirmation';
         
-        if ($record->$attr != $record->$confirm_attr)
+        if ($record->$attr != $record[$confirm_attr])
             self::add_error($record, $attr, $config['message']);
     }
     
