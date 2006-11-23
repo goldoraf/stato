@@ -2,11 +2,11 @@
 
 class SMailer
 {
-    protected $template = Null;
-    protected $mail     = Null;
+    protected $template = null;
+    protected $mail     = null;
+    protected $view     = null;
     protected $parts    = array();
     
-    private static $template_path   = 'views/mailing';
     private static $delivery_method = 'php'; // valeurs possibles : php, smtp, sendmail et test (où le mail est loggé)
     private static $defaults       = array
     (
@@ -20,8 +20,8 @@ class SMailer
         'port'     => 25,
         'domain'   => 'localhost.localdomain', // HELO
         'auth'     => false,
-        'username' => Null,
-        'password' => Null
+        'username' => null,
+        'password' => null
     );
     
     public static function create()
@@ -61,11 +61,13 @@ class SMailer
     {
         $this->template = $method_name;
         $this->mail     = new SMail();
+        $this->view     = new SActionView();
     }
     
     public function __set($key, $value)
     {
         if (is_array($this->mail->$key)) array_push($this->mail->$key, $value);
+        elseif ($key == 'body') $this->mail->body = $this->render_template($value);
         else $this->mail->$key = $value;
     }
     
@@ -77,6 +79,12 @@ class SMailer
     public function prepare_mail()
     {
         return $this->mail;
+    }
+    
+    protected function render_template($assigns)
+    {
+        $path = APP_DIR.'/views/mailer/'.$this->template.'.php';
+        return $this->render($path, $assigns);
     }
     
     private static function send($mail)
