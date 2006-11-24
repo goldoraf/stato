@@ -2,27 +2,25 @@
 
 class SMailer
 {
+    public $to = array();
+    public $cc = array();
+    public $bcc = array();
+    public $from = null;
+    public $reply_to = null;
+    public $subject = null;
+    public $body = null;
+    public $content_type = 'text/plain';
+    public $attachments = array();
+    public $parts = array();
+    
     protected $template = null;
     protected $mail     = null;
     protected $view     = null;
-    protected $parts    = array();
     
-    private static $delivery_method = 'php'; // valeurs possibles : php, smtp, sendmail et test (où le mail est loggé)
-    private static $defaults       = array
-    (
-        'charset'     => 'utf-8',
-        'content_type' => 'text/plain',
-        'mime_version' => '1.0'
-    );
-    private static $server_settings = array
-    (
-        'host'     => 'localhost',
-        'port'     => 25,
-        'domain'   => 'localhost.localdomain', // HELO
-        'auth'     => false,
-        'username' => null,
-        'password' => null
-    );
+    public static $eol = "\n";
+    public static $line_length = 70;
+    
+    private static $delivery_method = 'php';
     
     public static function create()
     {
@@ -64,53 +62,50 @@ class SMailer
         $this->view     = new SActionView();
     }
     
-    public function __set($key, $value)
-    {
-        if (is_array($this->mail->$key)) array_push($this->mail->$key, $value);
-        elseif ($key == 'body') $this->mail->body = $this->render_template($value);
-        else $this->mail->$key = $value;
-    }
-    
-    public function __get($key)
-    {
-        return $this->mail->$key;
-    }
-    
     public function prepare_mail()
     {
+        foreach (array('to', 'cc', 'bcc') as $rec_type)
+        {
+            $method = 'add_'.$rec_type;
+            if (!is_array($this->$rec_type)) 
+                $this->$rec_type = array($this->$rec_type);
+            foreach ($this->$rec_type as $rec) 
+                call_user_func_array(array($this->mail, $method), $rec);
+        }
+        
+        if (is_array($this->from))
+            $this->mail->set_from($this->from[0], $this->from[1]);
+        else
+            $this->mail->set_from($this->from);
+            
+        $this->mail->set_subject($this->subject);
+        
+        if ($this->body !== null)
+        {
+            if ($this->content_type = 'text/html')
+                $this->mail->set_html_body($this->render_message($this->template, $this->body));
+            else
+                $this->mail->set_body($this->render_message($this->template, $this->body));
+        }
+        
+        foreach ($this->parts as $params) $this->mail->add_part($params);
+        foreach ($this->attachments as $params) $this->mail->add_attachment($params);
+        
         return $this->mail;
     }
     
-    protected function render_template($assigns)
+    protected function render_message($template, $assigns)
     {
-        $path = APP_DIR.'/views/mailer/'.$this->template.'.php';
+        $path = APP_DIR.'/views/mailer/'.$template.'.php';
         return $this->view->render($path, $assigns);
     }
     
     private static function send($mail)
     {
-        $send_method = self::$delivery_method.'_send';
-        return self::$send_method($mail);
+        $transport_class = 'S'.ucfirst(self::$delivery_method).'MailTransport';
+        $transport = new $transport_class();
+        return $transport->send($mail);
     }
-    
-    // utilise la fonction mail() de PHP
-    private static function php_send($mail)
-    {
-        $headers = $mail->headers();
-        
-        $subject = $headers['Subject'];
-        $to = $headers['To'];
-        unset($headers['Subject']);
-        unset($headers['To']);
-        
-        $headers = implode("\n", $headers);
-        
-        return @mail($to, $subject, $mail->body, $header);
-    }
-    
-    private static function sendmail_send($mail) {}
-    
-    private static function smtp_send($mail) {}
 }
 
 ?>
