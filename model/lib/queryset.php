@@ -89,7 +89,13 @@ class SQuerySet implements Iterator, Countable
             $pk = $this->meta->identity_field;
             if (!empty($this->includes)) $pk = $this->meta->table_name.'.'.$pk;
             
-            if (is_array($args[0])) 
+            if (is_object($args[0]) && get_class($args[0]) == $this->meta->class)
+            {
+                foreach ($args[0]->assigned_values() as $k => $v) 
+                    if ($v !== null) $args[] = $k.' = ?';
+                $args[] = array_values($args[0]->assigned_values());
+            }
+            elseif (is_array($args[0])) 
                 $args[] = $pk.' IN ('.join(',', $args[0]).')';
             elseif (is_numeric($args[0]))
                 $args[] = $pk.' = \''.$args[0].'\'';
