@@ -23,6 +23,11 @@ class SUrlRewriter
         return self::url_for($options) == self::$request->request_uri();
     }
     
+    public static function is_current_controller($controller_name)
+    {
+        return $controller_name == self::$request->controller;
+    }
+    
     public static function url_for($options)
     {
         if (!isset($options['action']))     $options['action'] = 'index';

@@ -57,4 +57,9 @@ function is_current_page($options)
     return SUrlRewriter::is_current_page($options);
 }
 
+function is_current_controller($options)
+{
+    return SUrlRewriter::is_current_controller($options);
+}
+
 ?>
