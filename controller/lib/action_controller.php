@@ -79,6 +79,8 @@ class SActionController
     
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
+    public static $session_store = 'php';
+    
     public static function factory($request, $response)
     {
         if ($request->controller == 'api') 
@@ -461,7 +463,8 @@ class SActionController
         $this->initialize();
         $this->require_dependencies();
         
-        $this->session = new SSession();
+        $session_store_class = 'S'.ucfirst(self::$session_store).'Session';
+        $this->session = new $session_store_class();
         $this->flash   = new SFlash($this->session);
         
         $this->log_processing();
@@ -480,6 +483,8 @@ class SActionController
         
         foreach($this->around_filters as $filter) $filter->after($this);
         $this->process_filters('after');
+        
+        $this->session->store();
         
         if (in_array($this->action_name(), $this->cached_pages) && $this->perform_caching && $this->is_caching_allowed())
             $this->cache_page($this->response->body, array('action' => $this->action_name(), 'params' => $this->params));

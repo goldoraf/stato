@@ -496,7 +496,7 @@ class SQuerySet implements Iterator, Countable
         $clone->excludes = $this->excludes;
         $clone->includes = $this->includes;
         $clone->params   = $this->params;
-        $clone->order_by  = $this->order_by;
+        $clone->order_by = $this->order_by;
         $clone->joins    = $this->joins;
         $clone->offset   = $this->offset;
         $clone->limit    = $this->limit;
