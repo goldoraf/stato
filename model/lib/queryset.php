@@ -188,6 +188,7 @@ class SQuerySet implements Iterator, Countable
         $args = func_get_args();
         $clone = $this->self_clone();
         $clone->includes = array_merge($this->includes, $args);
+        $clone->joins = array_merge($this->joins, $this->include_joins($args));
         return $clone;
     }
     
@@ -272,8 +273,9 @@ class SQuerySet implements Iterator, Countable
                 $field = $matches[2];
                 $cond  = $matches[3];
                 
-                $clone->joins[]   = $this->association_join($assoc_meta);
-                $clone->filters[] = "{$assoc_meta->table_name}.{$field}{$cond}";
+                $clone->includes[] = $matches[1];
+                $clone->joins[]    = $this->association_join($assoc_meta);
+                $clone->filters[]  = "{$assoc_meta->table_name}.{$field}{$cond}";
                 
                 unset($args[$k]);
             }
@@ -297,8 +299,8 @@ class SQuerySet implements Iterator, Countable
     
     protected function sql_joins()
     {
-        if (empty($this->joins) && empty($this->includes)) return null;
-        return implode(' ', array_merge($this->include_joins(), $this->joins));
+        if (empty($this->joins)) return null;
+        return implode(' ', $this->joins);
     }
     
     protected function sql_conditions()
@@ -431,11 +433,11 @@ class SQuerySet implements Iterator, Countable
         return $aliases;
     }
     
-    protected function include_joins()
+    protected function include_joins($includes)
     {
         $joins = array();
         
-        foreach ($this->includes as $r)
+        foreach ($includes as $r)
             $joins[] = $this->association_join($this->meta->attributes[$r]->meta);
             
         return $joins;
