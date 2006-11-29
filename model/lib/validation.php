@@ -50,23 +50,20 @@ class SValidation
         $config = array_merge($config, $options);
         
         $value = $record->$attr;
-        $conditions_sql = $attr.' '.self::attribute_condition($value);
-        $conditions_values = array($value);
+        $qs = new SQuerySet(SActiveRecordMeta::retrieve(get_class($record)));
+        $qs = $qs->filter($attr.self::attribute_condition($value), array($value));
         
-        if ($config['scope'] !== Null)
+        if ($config['scope'] !== null)
         {
-            $scope_value = $record->read_attribute($config['scope']);
-            $conditions_sql.= ' AND '.$config['scope'].' '.self::attribute_condition($scope_value);
-            $conditions_values[] = $scope_value;
+            $scope_field = $config['scope'];
+            $scope_value = $record->$scope_field;
+            $qs = $qs->filter($scope_field.self::attribute_condition($scope_value), array($scope_value));
         }
         
         if (!$record->is_new_record())
-        {
-            $conditions_sql.= ' AND '.$record->identity_field.' <> ?';
-            $conditions_values[] = $record->id;
-        }
-        
-        if (SActiveStore::find_first(get_class($record), array($conditions_sql, $conditions_values)))
+            $qs = $qs->filter($record->identity_field.' <> ?', array($record->id));
+            
+        if ($qs->count() != 0)
             self::add_error($record, $attr, $config['message']);
     }
     
@@ -281,8 +278,8 @@ class SValidation
     
     private static function attribute_condition($value)
     {
-        if ($value === Null) return 'IS ?';
-        return '= ?';
+        if ($value === null) return ' IS ?';
+        return ' = ?';
     }
 }
 
