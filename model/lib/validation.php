@@ -41,7 +41,7 @@ class SValidation
         $config = array('message' => 'ERR_VALID_REQUIRED', 'on' => 'save');
         $config = array_merge($config, $options);
         
-        if ($record->$attr === '') self::add_error($record, $attr, $config['message']);
+        if ($record->$attr === '' || $record->$attr === null) self::add_error($record, $attr, $config['message']);
     }
     
     public static function validate_uniqueness($record, $attr, $options = array())
