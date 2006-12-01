@@ -18,7 +18,7 @@ class SDoubleRenderException extends SException {}
  *{
  *     public function index()
  *     {
- *         $this->posts = SActiveStore::find_all('Post');
+ *         $this->posts = Post::$objects->filter(...);
  *     }
  *      
  *     public function add_comment()
