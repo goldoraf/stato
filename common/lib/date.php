@@ -152,19 +152,41 @@ class SDate
 
 class SDateTime extends SDate
 {
+    protected $offset = 0;
+    
     private static $regex = array
     (
         'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2}) (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/',
         'iso8601' => '/^(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})T(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/'
     );
     
-    public function __construct($year, $month, $day, $hour = 0, $min = 0, $sec = 0)
+    public function __construct($year, $month, $day, $hour = 0, $min = 0, $sec = 0, $offset = 0)
     {
         $ts = mktime($hour, $min, $sec, $month, $day, $year);
         if ($ts === false)
             throw new SDateConstructException('Invalid parameters.');
         
         $this->attributes_from_ts($ts);
+        $this->offset = $offset;
+    }
+    
+    public function step($step=1)
+    {
+        return new SDateTime($this->year, $this->month, $this->day + $step, $this->hour,
+                             $this->min, $this->sec, $this->offset);
+    }
+    
+    public function new_offset($offset)
+    {
+        return new SDateTime($this->year, $this->month, $this->day, $this->hour,
+                             $this->min, $this->sec, $offset);
+    }
+    
+    public function to_utc()
+    {
+        $server_offset = date('Z');
+        return new SDateTime($this->year, $this->month, $this->day, 
+                             $this->hour + ($server_offset + $this->offset) / 3600, $this->min, $this->sec);
     }
     
     public function locale()

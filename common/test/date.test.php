@@ -68,16 +68,24 @@ class DateTest extends UnitTestCase
     
     public function test_step()
     {
-        $date = new SDate(2006, 09, 13);
-        $this->assertEqual($date->step(1), new SDate(2006, 09, 14));
-        $this->assertEqual($date->step(-1), new SDate(2006, 09, 12));
+        $date = new SDate(2006, 9, 13);
+        $this->assertEqual($date->step(1), new SDate(2006, 9, 14));
+        $this->assertEqual($date->step(-1), new SDate(2006, 9, 12));
     }
     
     public function test_modify()
     {
-        $date = new SDate(2006, 09, 13);
-        $this->assertEqual($date->modify('+1 day'), new SDate(2006, 09, 14));
-        $this->assertEqual($date->modify('+1 week'), new SDate(2006, 09, 21));
+        $date = new SDate(2006, 9, 13);
+        $this->assertEqual($date->modify('+1 day'), new SDate(2006, 9, 14));
+        $this->assertEqual($date->modify('+1 week'), new SDate(2006, 9, 21));
+    }
+    
+    public function test_new_offset()
+    {
+        $date = new SDateTime(2006, 9, 13, 20, 25, 05);
+        $this->assertEqual('2006-09-13 20:25:05', $date->__toString());
+        $this->assertEqual('2006-09-13 20:25:05', $date->new_offset(- 6*3600)->__toString());
+        $this->assertEqual('2006-09-13 15:25:05', $date->new_offset(- 6*3600)->to_utc()->__toString());
     }
     
     public function test_alias_now()
@@ -93,19 +101,6 @@ class DateTest extends UnitTestCase
         $d = new SDateTime(1969, 7, 21, 20, 35, 05);
         $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
         $this->assertEqual('19690721T20:35:05', $d->to_iso8601());
-    }
-    
-    public function test_date_rfc822()
-    {
-        $current_tz = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-        
-        $d = new SDate(1969, 7, 21);
-        $this->assertEqual('Mon, 21 Jul 1969 00:00:00 UTC', $d->to_rfc822());
-        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
-        $this->assertEqual('Mon, 21 Jul 1969 20:35:05 UTC', $d->to_rfc822());
-        
-        date_default_timezone_set($current_tz);
     }
 }
 
