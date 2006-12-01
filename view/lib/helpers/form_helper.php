@@ -129,6 +129,15 @@ function default_options($object_name, $method, $object, $options = array())
         $name = "{$object_name}[{$method}]";
         $id = "{$object_name}_{$method}";
     }
+    if (isset($options['error_class']))
+    {
+        if (isset($object->errors[$method]))
+        {
+            if (isset($options['class'])) $options['class'].= ' '.$options['error_class'];
+            else $options['class'] = $options['error_class'];
+        }
+        unset($options['error_class']);
+    }
     $options = array_merge(array('id' => $id), $options);
     return array($name, $object->$method, $options);
 }
