@@ -19,18 +19,8 @@ class SDate
         $ts = mktime(0, 0, 0, $month, $day, $year);
         if ($ts === false)
             throw new SDateConstructException('Invalid parameters.');
-        $date = getdate($ts);
-        $this->attributes = array
-        (
-            'year'  => $date['year'],
-            'month' => $date['mon'],
-            'mon'   => $date['mon'],
-            'day'   => $date['mday'],
-            'yday'  => $date['yday'],
-            'mday'  => $date['mday'],
-            'wday'  => $date['wday'],
-            'week'  => date('W', $ts)
-        );
+        
+        $this->attributes_from_ts($ts);
     }
     
     public function __get($key)
@@ -53,6 +43,16 @@ class SDate
     public function step($step=1)
     {
         return new SDate($this->year, $this->month, $this->day + $step);
+    }
+    
+    public function modify($string)
+    {
+        $ts = strtotime($string, $this->ts());
+        if ($ts === false)
+            throw new SDateException('Unable to modify.');
+        
+        $this->attributes_from_ts($ts);
+        return $this;
     }
     
     public function locale()
@@ -132,6 +132,22 @@ class SDate
         
         return new SDate($args['year'], $args['month'], $args['day']);
     }
+    
+    protected function attributes_from_ts($ts)
+    {
+        $date = getdate($ts);
+        $this->attributes = array
+        (
+            'year'  => $date['year'],
+            'month' => $date['mon'],
+            'mon'   => $date['mon'],
+            'day'   => $date['mday'],
+            'yday'  => $date['yday'],
+            'mday'  => $date['mday'],
+            'wday'  => $date['wday'],
+            'week'  => date('W', $ts)
+        );
+    }
 }
 
 class SDateTime extends SDate
@@ -147,21 +163,8 @@ class SDateTime extends SDate
         $ts = mktime($hour, $min, $sec, $month, $day, $year);
         if ($ts === false)
             throw new SDateConstructException('Invalid parameters.');
-        $date = getdate($ts);
-        $this->attributes = array
-        (
-            'year'  => $date['year'],
-            'month' => $date['mon'],
-            'mon'   => $date['mon'],
-            'day'   => $date['mday'],
-            'yday'  => $date['yday'],
-            'mday'  => $date['mday'],
-            'wday'  => $date['wday'],
-            'hour'  => $date['hours'],
-            'min'   => $date['minutes'],
-            'sec'   => $date['seconds'],
-            'week'  => date('W', $ts)
-        );
+        
+        $this->attributes_from_ts($ts);
     }
     
     public function locale()
@@ -230,6 +233,25 @@ class SDateTime extends SDate
         
         return new SDateTime($args['year'], $args['month'], $args['day'],
                              $hour, $min, $sec);
+    }
+    
+    protected function attributes_from_ts($ts)
+    {
+        $date = getdate($ts);
+        $this->attributes = array
+        (
+            'year'  => $date['year'],
+            'month' => $date['mon'],
+            'mon'   => $date['mon'],
+            'day'   => $date['mday'],
+            'yday'  => $date['yday'],
+            'mday'  => $date['mday'],
+            'wday'  => $date['wday'],
+            'hour'  => $date['hours'],
+            'min'   => $date['minutes'],
+            'sec'   => $date['seconds'],
+            'week'  => date('W', $ts)
+        );
     }
 }
 

@@ -48,29 +48,6 @@ class DateTest extends UnitTestCase
                            SDateTime::from_array(array('year' => 1969, 'month' => 7, 'day' => 21, 'hour' => 20, 'min' => 35, 'sec' => 05)));
     }
     
-    public function test_date_iso8601()
-    {
-        $d = new SDate(1969, 7, 21);
-        $this->assertEqual('1969-07-21', $d->__toString());
-        $this->assertEqual('19690721T00:00:00', $d->to_iso8601());
-        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
-        $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
-        $this->assertEqual('19690721T20:35:05', $d->to_iso8601());
-    }
-    
-    public function test_date_rfc822()
-    {
-        $current_tz = date_default_timezone_get();
-        date_default_timezone_set('UTC');
-        
-        $d = new SDate(1969, 7, 21);
-        $this->assertEqual('Mon, 21 Jul 1969 00:00:00 UTC', $d->to_rfc822());
-        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
-        $this->assertEqual('Mon, 21 Jul 1969 20:35:05 UTC', $d->to_rfc822());
-        
-        date_default_timezone_set($current_tz);
-    }
-    
     public function test_parsing()
     {
         $this->assertEqual(new SDate(1969, 7, 21),
@@ -96,9 +73,39 @@ class DateTest extends UnitTestCase
         $this->assertEqual($date->step(-1), new SDate(2006, 09, 12));
     }
     
+    public function test_modify()
+    {
+        $date = new SDate(2006, 09, 13);
+        $this->assertEqual($date->modify('+1 day'), new SDate(2006, 09, 14));
+        $this->assertEqual($date->modify('+1 week'), new SDate(2006, 09, 21));
+    }
+    
     public function test_alias_now()
     {
         $this->assertEqual(SDateTime::now(), SDateTime::today());
+    }
+    
+    public function test_date_iso8601()
+    {
+        $d = new SDate(1969, 7, 21);
+        $this->assertEqual('1969-07-21', $d->__toString());
+        $this->assertEqual('19690721T00:00:00', $d->to_iso8601());
+        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
+        $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
+        $this->assertEqual('19690721T20:35:05', $d->to_iso8601());
+    }
+    
+    public function test_date_rfc822()
+    {
+        $current_tz = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        
+        $d = new SDate(1969, 7, 21);
+        $this->assertEqual('Mon, 21 Jul 1969 00:00:00 UTC', $d->to_rfc822());
+        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
+        $this->assertEqual('Mon, 21 Jul 1969 20:35:05 UTC', $d->to_rfc822());
+        
+        date_default_timezone_set($current_tz);
     }
 }
 
