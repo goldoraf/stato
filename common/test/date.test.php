@@ -84,6 +84,11 @@ class DateTest extends UnitTestCase
         $this->assertEqual($date->step(1), new SDate(2006, 09, 14));
         $this->assertEqual($date->step(-1), new SDate(2006, 09, 12));
     }
+    
+    public function test_alias_now()
+    {
+        $this->assertEqual(SDateTime::now(), SDateTime::today());
+    }
 }
 
 ?>

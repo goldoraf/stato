@@ -172,11 +172,16 @@ class SDateTime extends SDate
         return mktime($this->hour, $this->min, $this->sec, $this->month, $this->day, $this->year);
     }
     
-    public static function today()
+    public static function now()
     {
         $today = getdate();
         return new SDateTime($today['year'], $today['mon'], $today['mday'], 
                              $today['hours'], $today['minutes'], $today['seconds']);
+    }
+    
+    public static function today()
+    {
+        return self::now();
     }
     
     public static function parse($string)
