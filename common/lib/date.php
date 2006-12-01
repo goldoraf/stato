@@ -67,7 +67,25 @@ class SDate
     
     public function to_iso8601()
     {
+        // PHP constant implies that the timezone offset is appended, and I don't know if it's
+        // compatible with XMLRPC rotocol
+        //return date(DATE_ISO8601, $this->ts());
         return $this->sprintf('%04d%02d%02dT00:00:00');
+    }
+    
+    public function to_rfc822()
+    {
+        return date(DATE_RFC822, $this->ts());
+    }
+    
+    public function to_atom()
+    {
+        return date(DATE_ATOM, $this->ts());
+    }
+    
+    public function to_rss()
+    {
+        return date(DATE_RSS, $this->ts());
     }
     
     public function format($strf)

@@ -58,6 +58,19 @@ class DateTest extends UnitTestCase
         $this->assertEqual('19690721T20:35:05', $d->to_iso8601());
     }
     
+    public function test_date_rfc822()
+    {
+        $current_tz = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        
+        $d = new SDate(1969, 7, 21);
+        $this->assertEqual('Mon, 21 Jul 1969 00:00:00 UTC', $d->to_rfc822());
+        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
+        $this->assertEqual('Mon, 21 Jul 1969 20:35:05 UTC', $d->to_rfc822());
+        
+        date_default_timezone_set($current_tz);
+    }
+    
     public function test_parsing()
     {
         $this->assertEqual(new SDate(1969, 7, 21),
@@ -72,8 +85,6 @@ class DateTest extends UnitTestCase
     {
         $date = new SDate(2000, 1, 1);
         $this->assertTrue($date->is_leap());
-        /*$date = new SDate(1900, 1, 1);
-        $this->assertFalse($date->is_leap());*/
         $date = new SDate(2004, 1, 1);
         $this->assertTrue($date->is_leap());
     }
