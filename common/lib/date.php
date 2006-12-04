@@ -184,9 +184,19 @@ class SDateTime extends SDate
     
     public function to_utc()
     {
-        $server_offset = date('Z');
         return new SDateTime($this->year, $this->month, $this->day, 
-                             $this->hour + ($server_offset + $this->offset) / 3600, $this->min, $this->sec);
+                             $this->hour + ($this->local_offset() + $this->offset) / 3600, $this->min, $this->sec);
+    }
+    
+    public function to_local()
+    {
+        return new SDateTime($this->year, $this->month, $this->day, 
+                             $this->hour + $this->offset / 3600, $this->min, $this->sec);
+    }
+    
+    public function local_offset()
+    {
+        return date('Z');
     }
     
     public function locale()
