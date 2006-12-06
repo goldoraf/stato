@@ -4,7 +4,14 @@ class SConsoleException extends Exception {}
 
 class SConsoleUtils
 {
-    public function read_options($short_options, $long_options = null)
+    public static function get_option($name, $options)
+    {
+        if (isset($options[$name])) return $options[$name];
+        elseif (isset($options[$name{0}])) return $options[$name{0}];
+        else return null;
+    }
+    
+    public static function read_options($short_options, $long_options = null)
     {
         $args = self::read_arguments();
         array_shift($args);
@@ -49,7 +56,7 @@ class SConsoleUtils
      * @access public
      *
      */
-    public function parse_options($args, $short_options, $long_options = null)
+    public static function parse_options($args, $short_options, $long_options = null)
     {
         if (empty($args)) return array(array(), array());
         
