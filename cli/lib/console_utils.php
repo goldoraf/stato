@@ -4,45 +4,11 @@ class SConsoleException extends Exception {}
 
 class SConsoleUtils
 {
-    public static function register_global_options($options_list)
-    {
-        $short_options = '';
-        $long_options  = array();
-        
-        foreach ($options_list as $o)
-        {
-            $lower_o = str_replace('_', '-', strtolower($o));
-            $short_options .= $lower_o.':';
-            $long_options[] = $lower_o.'=';
-        }
-        
-        $options = SConsoleUtils::read_options($short_options, $long_options);
-        
-        foreach ($options_list as $o)
-        {
-            $lower_o = str_replace('_', '-', strtolower($o));
-            
-            if (isset($_SERVER[$o])) $GLOBALS[$o] = $_SERVER[$o];
-            if (($option = SConsoleUtils::get_option($lower_o, $options)) !== null) $GLOBALS[$o] = $option;
-            
-            if (!isset($GLOBALS[$o]))
-                throw new SConsoleException($o.' is undefined !');
-        }
-    }
-    
     public static function get_option($name, $options)
     {
         if (isset($options[$name])) return $options[$name];
         elseif (isset($options[$name{0}])) return $options[$name{0}];
         else return null;
-    }
-    
-    public static function read_options($short_options, $long_options = null)
-    {
-        $args = self::read_arguments();
-        array_shift($args);
-        list($opt, ) = self::parse_options($args, $short_options, $long_options);
-        return $opt;
     }
     
     /**
@@ -94,7 +60,7 @@ class SConsoleUtils
         if ($long_options) sort($long_options);
 
         reset($args);
-        while (list($i, $arg) = each($args))
+        foreach ($args as $i => $arg)
         {
             /* The special element '--' means explicit end of
                options. Treat the rest of the arguments as non-options
