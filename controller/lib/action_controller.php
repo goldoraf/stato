@@ -637,7 +637,7 @@ class SActionController
         $this->assigns['exception']  = $exception;
         $this->assigns['controller_name'] = self::controller_class($this->request->controller);
         $this->assigns['action_name']     = $this->action_name();
-        $this->render_file(ROOT_DIR.'/core/controller/lib/templates/rescue/exception.php');
+        $this->render_file(CORE_DIR.'/controller/lib/templates/rescue/exception.php');
     }
     
     private function log_error($exception)
