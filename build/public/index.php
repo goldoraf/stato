@@ -4,14 +4,14 @@ define('STATO_TIME_START', microtime(true));
 
 define('ROOT_DIR', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
 
-require(ROOT_DIR.'/core/common/common.php');
-require(ROOT_DIR.'/core/controller/controller.php');
-require(ROOT_DIR.'/core/model/model.php');
-require(ROOT_DIR.'/core/view/view.php');
-require(ROOT_DIR.'/core/webservice/webservice.php');
-require(ROOT_DIR.'/core/mailer/mailer.php');
-
 include(ROOT_DIR.'/conf/environment.php');
+
+require(CORE_DIR.'/common/common.php');
+require(CORE_DIR.'/controller/controller.php');
+require(CORE_DIR.'/model/model.php');
+require(CORE_DIR.'/view/view.php');
+require(CORE_DIR.'/webservice/webservice.php');
+require(CORE_DIR.'/mailer/mailer.php');
 
 $controller = new SDispatcher();
 $controller->dispatch();
