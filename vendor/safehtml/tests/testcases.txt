@@ -1,0 +1,35 @@
+<q e="">
+<script><q></script></q>1
+<><< 1 < 2
+<tag attr='val "val"'>
+<a src=wysiwyg:1><a src="data:2"><a src='view-source:3'><a src="ms-its:4"src='mhtml:5'><a src="shell:6"><a src="https:7">
+<!-- comment -->5
+<time:ns attr=val>7
+<thingol@mail.ru>
+<not%a.tag>8
+<pre style='content:url(music.wav)'>
+<a style="background-image: url('javascript:alert(1);');">dssd
+<?xml:namespace prefix = o ns = "urn:schemas-microsoft-com:office:office" />test
+<![if some]> test
+----
+<q e=""></q>
+1
+&lt;>&lt;&lt; 1 &lt; 2
+<tag attr='val "val"'></tag>
+<a><a><a><a><a><a src="https:7"></a></a></a></a></a></a>
+5
+7
+&lt;thingol@mail.ru&gt;
+8
+<pre></pre>
+<a>dssd</a>
+test
+test
+
+
+
+
+----
+<style>some style<style><style><<style></style>0
+----
+-
