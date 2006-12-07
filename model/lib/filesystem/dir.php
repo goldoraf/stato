@@ -25,7 +25,7 @@ class SDir
         $dir = new DirectoryIterator($source);
         foreach ($dir as $file)
         {
-            if ($file->isDot()) continue;
+            if ($file->isDot() || $file->getFilename() == '.svn') continue;
             if ($file->isFile()) 
             {
                 if (!is_file($dest.'/'.$file->getFilename()) || $overwrite)
