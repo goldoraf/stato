@@ -79,6 +79,22 @@ class SMigrator
         return $row['version'];
     }
     
+    public static function migration_files($migrations_path)
+    {
+        $files = array();
+        $dir = new DirectoryIterator($migrations_path);
+        foreach ($dir as $file)
+        {
+            if (preg_match('/([0-9]+)_([_a-z0-9]*)/i', $file->getFileName(), $matches))
+            {
+                if (isset($files[$matches[1]])) throw new SDuplicateVersionMigrationException($matches[1]);
+                else $files[$matches[1]] = $file->getFileName();
+            }
+        }
+        natsort($files);
+        return $files;
+    }
+    
     public function __construct($direction, $migrations_path, $target_version)
     {
         $this->direction = $direction;
@@ -89,7 +105,10 @@ class SMigrator
     
     public function execute_migration()
     {
-        foreach ($this->migration_files() as $file)
+        $migration_files = self::migration_files($this->migrations_path);
+        if ($this->is_down()) $migration_files = array_reverse($migration_files);
+        
+        foreach ($migration_files as $file)
         {
             require_once($this->migrations_path.'/'.$file);
             list($version, $name) = $this->version_and_name($file);
@@ -103,22 +122,6 @@ class SMigrator
                 $this->set_schema_version($version);
             }
         }
-    }
-    
-    private function migration_files()
-    {
-        $files = array();
-        $dir = new DirectoryIterator($this->migrations_path);
-        foreach ($dir as $file)
-        {
-            if (preg_match('/([0-9]+)_([_a-z0-9]*)/i', $file->getFileName(), $matches))
-            {
-                if (isset($files[$matches[1]])) throw new SDuplicateVersionMigrationException($matches[1]);
-                else $files[$matches[1]] = $file->getFileName();
-            }
-        }
-        natsort($files);
-        return $this->is_down() ? array_reverse($files) : $files;
     }
     
     private function migration_class($name)
