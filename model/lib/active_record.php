@@ -12,6 +12,8 @@ class SActiveRecordMeta
     public $attributes       = array();
     public $relationships    = array();
     
+    private $content_attributes = null;
+    
     private static $cache = array();
     
     public static function add_manager_to_class($class)
@@ -64,6 +66,19 @@ class SActiveRecordMeta
     {
         $ref = new ReflectionClass($this->class);
         return $ref->getParentClass()->getName();
+    }
+    
+    public function content_attributes()
+    {
+        if ($this->content_attributes === null)
+        {
+            $this->content_attributes = array();
+            foreach (array_keys($this->attributes) as $a)
+                if ($a != $this->identity_field && !preg_match('/(_id|_count)$/', $a) && $a != $this->inheritance_field)
+                    $this->content_attributes[] = $a;
+        }
+               
+        return $this->content_attributes;
     }
     
     protected function instantiate_associations()
@@ -423,12 +438,12 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     protected static function establish_connection($config = array())
     {
-        $config = include(ROOT_DIR.'/conf/database.php');
-        $driver_class = 'S'.$config[APP_MODE]['driver'].'Driver';
+        $config = include(STATO_APP_ROOT_PATH.'/conf/database.php');
+        $driver_class = 'S'.$config[STATO_APP_MODE]['driver'].'Driver';
         if (!class_exists($driver_class)) 
             throw new SException('Database driver not found !');
         
-        self::$conn = new $driver_class($config[APP_MODE]);
+        self::$conn = new $driver_class($config[STATO_APP_MODE]);
         self::$conn->connect();
     }
 }
