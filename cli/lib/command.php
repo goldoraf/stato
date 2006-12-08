@@ -8,15 +8,21 @@ abstract class SCommand
     protected $allowed_options = array();
     protected $allowed_params  = array();
     
-    public static function load($command_name, $args)
+    public static function load($command_name, $args = null)
     {
-        $command_file = ROOT_DIR."/cli/commands/$command_name.php";
+        if ($args === null)
+        {
+            $args = $_SERVER['argv'];
+            array_shift($args);
+        }
+        
+        $command_file = STATO_CORE_PATH."/cli/lib/commands/$command_name.php";
 
         if (!file_exists($command_file))
             throw new SConsoleException("$command_name command does not exist");
             
         require($command_file);
-        $command_class = ucfirst($command_name).'Command';
+        $command_class = SInflection::camelize($command_name).'Command';
         return new $command_class($args);
     }
     
@@ -28,6 +34,42 @@ abstract class SCommand
     }
     
     abstract public function execute();
+    
+    protected function test_file_existence($path)
+    {
+        $this->test_existence('file', $path);
+    }
+    
+    protected function test_folder_existence($path)
+    {
+        $this->test_existence('folder', $path);
+    }
+    
+    protected function test_existence($type, $path)
+    {
+        if (file_exists($path))
+        {
+            echo "WARNING : $type $path already exists !\n"
+            .'Do you want to overwrite (o), or abort (a) ? ';
+            $answer = fgetc(STDIN);
+            if ($answer == 'a') die("\nFile generation aborted.\n");
+        }
+        return true;
+    }
+    
+    protected function test_module_existence($subdir)
+    {
+        if (!$this->module_exists($subdir))
+            throw new SConsoleException("Module $subdir does not exist");
+    }
+    
+    protected function module_exists($subdir)
+    {
+        return (file_exists(STATO_APP_PATH."/controllers/$subdir")
+             && file_exists(STATO_APP_PATH."/models/$subdir")
+             && file_exists(STATO_APP_PATH."/views/$subdir")
+             && file_exists(STATO_APP_PATH."/helpers/$subdir"));
+    }
 }
 
 ?>

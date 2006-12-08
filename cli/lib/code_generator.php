@@ -28,6 +28,8 @@ class SCodeGenerator
         $str = ob_get_contents();
         ob_end_clean();
         
+        $str = str_replace(array('{{', '}}'), array('<?', '?>'), $str);
+        
         return $str;
     }
     
