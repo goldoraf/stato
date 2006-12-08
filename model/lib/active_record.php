@@ -286,6 +286,11 @@ class SActiveRecord extends SObservable implements ArrayAccess
         return $this->values;
     }
     
+    public function content_attributes()
+    {
+        return $this->meta->content_attributes();
+    }
+    
     protected function attr_exists($name)
     {
         return array_key_exists($name, $this->meta->attributes);
