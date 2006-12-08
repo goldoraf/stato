@@ -8,7 +8,7 @@ class SLocale
     public static function initialize($detect_language = true)
     {
         if ($detect_language) self::detect_language();
-        self::load_strings(ROOT_DIR.'/core/common/lib/locale/');
+        self::load_strings(STATO_CORE_PATH.'/common/lib/locale/');
         self::set_locale();
     }
     
@@ -51,7 +51,7 @@ class SLocale
     {
         foreach (self::get_accepted_languages() as $language)
         {
-            if (file_exists(ROOT_DIR.'/core/common/lib/locale/'.$language.'.php'))
+            if (file_exists(STATO_CORE_PATH.'/common/lib/locale/'.$language.'.php'))
             {
                 self::$language = $language;
                 break;

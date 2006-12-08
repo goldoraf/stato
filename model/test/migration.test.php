@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/model/model.php');
+require_once(STATO_CORE_PATH.'/model/model.php');
 
 class Person extends SActiveRecord
 {

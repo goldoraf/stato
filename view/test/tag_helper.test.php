@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/view/view.php');
+require_once(STATO_CORE_PATH.'/view/view.php');
 
 class TagHelperTest extends HelperTestCase
 {   

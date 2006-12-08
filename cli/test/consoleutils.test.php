@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/cli/cli.php');
+require_once(STATO_CORE_PATH.'/cli/cli.php');
 
 class ConsoleUtilsTest extends UnitTestCase
 {

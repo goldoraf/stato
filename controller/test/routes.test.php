@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/controller/controller.php');
+require_once(STATO_CORE_PATH.'/controller/controller.php');
 
 class RoutesTest extends UnitTestCase
 {

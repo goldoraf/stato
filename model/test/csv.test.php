@@ -4,7 +4,7 @@ class CsvTest extends UnitTestCase
 {
     public function test_iterator_with_file()
     {
-        $csv = new SCsvIterator(fopen(CORE_DIR.'/model/test/fixtures/clients.csv', 'r'));
+        $csv = new SCsvIterator(fopen(STATO_CORE_PATH.'/model/test/fixtures/clients.csv', 'r'));
         $this->assertEqual(array('id', 'name'), $csv->fields());
         $csv->rewind();
         $this->assertEqual(array('id' => 1, 'name' => 'apple'), $csv->current());

@@ -53,7 +53,6 @@ class SActionController
     protected $layout   = false;
     protected $models   = array();
     protected $helpers  = array();
-    protected $scaffold = null;
     
     protected $hidden_actions  = array();
     
@@ -125,7 +124,7 @@ class SActionController
         $this->view    = new SActionView($this);
         $this->logger  = SLogger::get_instance();
         
-        $this->page_cache_dir = ROOT_DIR.'/public/cache';
+        $this->page_cache_dir = STATO_APP_ROOT_PATH.'/public/cache';
     }
     
     public function __get($name)
@@ -212,7 +211,7 @@ class SActionController
         $this->add_variables_to_assigns();
         $this->assigns['layout_content'] = $this->view->render($template);
         
-        $layout = APP_DIR.'/views/layouts/'.$this->layout.'.php';
+        $layout = STATO_APP_PATH.'/views/layouts/'.$this->layout.'.php';
         if (!file_exists($layout)) throw new SException('Layout not found');
         $this->render_file($layout, $status);
     }
@@ -263,12 +262,12 @@ class SActionController
     
     protected function template_path($controller_path, $action)
     {
-        return APP_DIR."/views/$controller_path/$action.php";
+        return STATO_APP_PATH."/views/$controller_path/$action.php";
     }
     
     protected function pjs_path($controller_path, $action)
     {
-        return APP_DIR."/views/$controller_path/$action.pjs";
+        return STATO_APP_PATH."/views/$controller_path/$action.pjs";
     }
     
     protected function add_variables_to_assigns()
@@ -432,7 +431,7 @@ class SActionController
         if (is_array($id))
             list($protocol, $id) = explode('://', $this->url_for($id));
         
-        $file = ROOT_DIR."/cache/fragments/{$id}";
+        $file = STATO_APP_ROOT_PATH."/cache/fragments/{$id}";
         if (file_exists($file)) unlink($file);
     }
     
@@ -450,15 +449,8 @@ class SActionController
     private function perform_action()
     {
         $action = $this->action_name();
-        if (!$this->action_exists($action) && $this->scaffold === null)
+        if (!$this->action_exists($action))
             throw new SUnknownActionException("Action $action not found in ".$this->controller_class_name());
-            
-        if ($this->scaffold !== null)
-        {
-            $this->render_component(array('controller' => 'scaffolding', 'action' => $action,
-                                         'scaffold' => $this->scaffold));
-            return;
-        }
         
         $this->initialize();
         $this->require_dependencies();
@@ -510,11 +502,11 @@ class SActionController
     
     private function require_dependencies()
     {
-        SLocale::load_strings(APP_DIR.'/i18n/'.SDependencies::sub_directory(get_class($this)));
+        SLocale::load_strings(STATO_APP_PATH.'/i18n/'.SDependencies::sub_directory(get_class($this)));
         SUrlRewriter::initialize($this->request);
         
-        if (file_exists(APP_DIR.'/models/mailer/application_mailer.php'))
-            require(APP_DIR.'/models/mailer/application_mailer.php');
+        if (file_exists(STATO_APP_PATH.'/models/mailer/application_mailer.php'))
+            require(STATO_APP_PATH.'/models/mailer/application_mailer.php');
         
         foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
         
@@ -527,7 +519,7 @@ class SActionController
         $controller = $options['controller'];
         $class = SInflection::camelize($controller).'Controller';
         
-        if (!file_exists($path = APP_DIR."/components/{$controller}/{$controller}_controller.php"))
+        if (!file_exists($path = STATO_APP_PATH."/components/{$controller}/{$controller}_controller.php"))
     		throw new SUnknownControllerException(ucfirst($req_controller).' Component not found !');
     		
     	require_once($path);
@@ -620,7 +612,7 @@ class SActionController
     {
         if ($this->is_performed()) $this->erase_results();
         $this->log_error($exception);
-        if (APP_MODE == 'dev') $this->rescue_action_locally($exception);
+        if (STATO_APP_MODE == 'dev') $this->rescue_action_locally($exception);
         else $this->rescue_action_in_public($exception);
     }
     
@@ -628,8 +620,8 @@ class SActionController
     {
         if (in_array(get_class($exception), array('SRoutingException', 
             'SUnknownControllerException', 'SUnknownActionException')))
-            $this->render_text(file_get_contents(ROOT_DIR.'/public/404.html'));
-        else $this->render_text(file_get_contents(ROOT_DIR.'/public/500.html'));
+            $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/404.html'));
+        else $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/500.html'));
     }
     
     private function rescue_action_locally($exception)
@@ -637,7 +629,7 @@ class SActionController
         $this->assigns['exception']  = $exception;
         $this->assigns['controller_name'] = self::controller_class($this->request->controller);
         $this->assigns['action_name']     = $this->action_name();
-        $this->render_file(CORE_DIR.'/controller/lib/templates/rescue/exception.php');
+        $this->render_file(STATO_CORE_PATH.'/controller/lib/templates/rescue/exception.php');
     }
     
     private function log_error($exception)
@@ -724,7 +716,7 @@ class SActionController
     
     private static function controller_file($req_controller)
 	{
-        return APP_DIR.'/controllers/'.$req_controller.'_controller.php';
+        return STATO_APP_PATH.'/controllers/'.$req_controller.'_controller.php';
     }
 }
 

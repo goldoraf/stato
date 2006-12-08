@@ -1,6 +1,6 @@
 <?php
 
-define('XML_HTMLSAX3', CORE_DIR.'/vendor/safehtml/classes/');
+define('XML_HTMLSAX3', STATO_CORE_PATH.'/vendor/safehtml/classes/');
 require_once(XML_HTMLSAX3.'safehtml.php');
 
 function html_escape($html)

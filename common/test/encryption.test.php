@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/common/common.php');
+require_once(STATO_CORE_PATH.'/common/common.php');
 
 class EncryptionTest extends UnitTestCase
 {

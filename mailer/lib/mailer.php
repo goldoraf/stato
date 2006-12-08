@@ -96,7 +96,7 @@ class SMailer
     
     protected function render_message($template, $assigns)
     {
-        $path = APP_DIR.'/views/mailer/'.$template.'.php';
+        $path = STATO_APP_PATH.'/views/mailer/'.$template.'.php';
         return $this->view->render($path, $assigns);
     }
     

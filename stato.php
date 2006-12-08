@@ -1,9 +1,9 @@
 <?php
 
-define('ROOT_DIR', str_replace('\\', '/', realpath(dirname(__FILE__))));
+define('STATO_CORE_PATH', str_replace('\\', '/', realpath(dirname(__FILE__))));
 
-require_once(ROOT_DIR.'/common/common.php');
-require_once(ROOT_DIR.'/cli/cli.php');
+require_once(STATO_CORE_PATH.'/common/common.php');
+require_once(STATO_CORE_PATH.'/cli/cli.php');
 
 $args = $_SERVER['argv'];
 // shift file name

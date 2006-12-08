@@ -166,7 +166,7 @@ class SActionView
     
     private function compiled_template_path($template)
     {
-        return ROOT_DIR.'/cache/templates/'.md5($template);
+        return STATO_APP_ROOT_PATH.'/cache/templates/'.md5($template);
     }
     
     private function partial_pieces($partial_path)
@@ -177,7 +177,7 @@ class SActionView
         {
             $partial = substr(strrchr($partial_path, '/'), 1);
             $sub_path = substr($partial_path, 0, - (strlen($partial) + 1));
-            return array(APP_DIR."/views/$sub_path", $partial);
+            return array(STATO_APP_PATH."/views/$sub_path", $partial);
         }
     }
     
@@ -196,7 +196,7 @@ class SActionView
         if (is_array($id))
             list($protocol, $id) = explode('://', SUrlRewriter::url_for($id));
         
-        return ROOT_DIR."/cache/fragments/{$id}";
+        return STATO_APP_ROOT_PATH."/cache/fragments/{$id}";
     }
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/view/view.php');
+require_once(STATO_CORE_PATH.'/view/view.php');
 
 SLocale::$language = 'en_US';
 SLocale::set_locale();

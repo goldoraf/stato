@@ -1,6 +1,6 @@
 <?php
 
-require_once(CORE_DIR.'/webservice/webservice.php');
+require_once(STATO_CORE_PATH.'/webservice/webservice.php');
 
 class XmlRpcClientTest extends XmlTestCase
 {

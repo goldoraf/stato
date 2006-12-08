@@ -12,7 +12,7 @@ class SLogger
     {
        if (!isset(self::$instance))
        {
-            switch (APP_MODE)
+            switch (STATO_APP_MODE)
             {
                 case 'dev':
                     $filename = 'development.log';
@@ -25,7 +25,7 @@ class SLogger
                     break;
             }
             
-            if (!file_exists($path = ROOT_DIR.'/log/'.$filename))
+            if (!file_exists($path = STATO_APP_ROOT_PATH.'/log/'.$filename))
                 throw new SException('Log file does not exist');
                 
             self::$instance = new SLogger($path);

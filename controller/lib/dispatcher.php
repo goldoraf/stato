@@ -1,6 +1,6 @@
 <?php
 
-define('APP_DIR', ROOT_DIR.'/app');
+define('STATO_APP_PATH', STATO_APP_ROOT_PATH.'/app');
 
 function error_handler($error_type, $message)
 {
@@ -20,7 +20,7 @@ class SDispatcher
     {
     	try
     	{
-            $map = include(ROOT_DIR.'/conf/routes.php');
+            $map = include(STATO_APP_ROOT_PATH.'/conf/routes.php');
             
             SRoutes::initialize($map);
     		
@@ -29,8 +29,8 @@ class SDispatcher
             $request  = new SRequest();
             $response = new SResponse();
             
-    		if (file_exists($path = APP_DIR.'/controllers/application_controller.php')) require_once($path);
-    		if (file_exists($path = APP_DIR.'/helpers/application_helper.php')) require_once($path);
+    		if (file_exists($path = STATO_APP_PATH.'/controllers/application_controller.php')) require_once($path);
+    		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
     		
     		SActionController::factory(SRoutes::recognize($request), $response)->out();
         }
