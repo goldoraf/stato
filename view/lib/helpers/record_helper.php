@@ -37,7 +37,8 @@ function form($object_name, $object, $options=array())
 
 function input($object_name, $method, $object, $options=array())
 {
-    $attr = $object->get_attribute($method);
+    $fields = $object->content_attributes();
+    $attr = $fields[$method];
     
     switch($attr->type)
     {
