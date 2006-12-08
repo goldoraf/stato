@@ -11,7 +11,12 @@ class SCodeGenerator
         ."\n{\n$content\n}\n".self::php_stop();
     }
     
-    public static function render_template($template, $assigns)
+    public static function generate_file($content)
+    {
+        return self::php_start().$content.self::php_stop();
+    }
+    
+    public static function render_template($template, $assigns = array())
     {
         if (!is_readable($template))
             throw new SException('Template not found : '.$template);
