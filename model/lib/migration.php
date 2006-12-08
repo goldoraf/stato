@@ -95,6 +95,13 @@ class SMigrator
         return $files;
     }
     
+    public static function last_version($migrations_path)
+    {
+        $files = self::migration_files($migrations_path);
+        if (empty($files)) return 0;
+        return end(array_keys($files));
+    }
+    
     public function __construct($direction, $migrations_path, $target_version)
     {
         $this->direction = $direction;
