@@ -11,10 +11,8 @@ RewriteEngine On
 #RewriteCond %{HTTP:x-moz} ^prefetch
 #RewriteRule ^/*admin/.* - [F,L]
 
-RewriteRule ^public/(.*)$ public/$1 [L]
-RewriteRule ^data/(.*)$ data/$1 [L]
-
-RewriteRule ^tests/core/(.*)$ tests/core/all_tests.php [L]
-
-RewriteRule ^(.*)$ index.php [L]
+RewriteRule ^$ index.html [QSA]
+RewriteRule ^([^.]+)$ $1.html [QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [QSA,L]
 
