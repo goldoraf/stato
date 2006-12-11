@@ -3,16 +3,16 @@
      *	adapter for SimpleTest to use PEAR PHPUnit test cases
      *	@package	SimpleTest
      *	@subpackage Extensions
-     *	@version	$Id: pear_test_case.php,v 1.4 2005/01/13 01:31:57 lastcraft Exp $
+     *	@version	$Id: pear_test_case.php,v 1.9 2006/11/10 20:59:58 lastcraft Exp $
      */
     
     /**#@+
      * include SimpleTest files
      */
-    require_once dirname(__FILE__) . '/../dumper.php';
-    require_once dirname(__FILE__) . '/../options.php';
-    require_once dirname(__FILE__) . '/../simple_test.php';
-    require_once dirname(__FILE__) . '/../expectation.php';
+    require_once(dirname(__FILE__) . '/../dumper.php');
+    require_once(dirname(__FILE__) . '/../compatibility.php');
+    require_once(dirname(__FILE__) . '/../test_case.php');
+    require_once(dirname(__FILE__) . '/../expectation.php');
 	/**#@-*/
    
     /**
@@ -48,7 +48,7 @@
             } else {
                 $expectation = &new IdenticalExpectation($first);
             }
-            $this->assertExpectation($expectation, $second, $message);
+            $this->assert($expectation, $second, $message);
         }
         
         /**
@@ -58,7 +58,7 @@
          *    @public
          */
         function assertNotNull($value, $message = "%s") {
-            parent::assertTrue(isset($value), $message);
+            parent::assert(new TrueExpectation(), isset($value), $message);
         }
         
         /**
@@ -68,7 +68,7 @@
          *    @public
          */
         function assertNull($value, $message = "%s") {
-            parent::assertTrue(!isset($value), $message);
+            parent::assert(new TrueExpectation(), !isset($value), $message);
         }
         
         /**
@@ -86,7 +86,8 @@
                     "[" . $dumper->describeValue($first) .
                             "] and [" . $dumper->describeValue($second) .
                             "] should reference the same object");
-            return $this->assertTrue(
+            return $this->assert(
+					new TrueExpectation(),
                     SimpleTestCompatibility::isReference($first, $second),
                     $message);
         }
@@ -106,7 +107,8 @@
                     "[" . $dumper->describeValue($first) .
                             "] and [" . $dumper->describeValue($second) .
                             "] should not be the same object");
-            return $this->assertFalse(
+            return $this->assert(
+					new falseExpectation(),
                     SimpleTestCompatibility::isReference($first, $second),
                     $message);
         }
@@ -119,7 +121,7 @@
          *    @public
          */
         function assertTrue($condition, $message = "%s") {
-            parent::assertTrue($condition, $message);
+            parent::assert(new TrueExpectation(), $condition, $message);
         }
         
         /**
@@ -130,7 +132,7 @@
          *    @public
          */
         function assertFalse($condition, $message = "%s") {
-            parent::assertTrue(!$condition, $message);
+            parent::assert(new FalseExpectation(), $condition, $message);
         }
         
         /**
@@ -141,10 +143,7 @@
          *    @public
          */
         function assertRegExp($pattern, $subject, $message = "%s") {
-            $this->assertExpectation(
-                    new WantedPatternExpectation($pattern),
-                    $subject,
-                    $message);
+            $this->assert(new PatternExpectation($pattern), $subject, $message);
         }
         
         /**
@@ -155,7 +154,7 @@
          *    @public
          */
         function assertType($value, $type, $message = "%s") {
-            parent::assertTrue(gettype($value) == strtolower($type), $message);
+            parent::assert(new TrueExpectation(), gettype($value) == strtolower($type), $message);
         }
         
         /**

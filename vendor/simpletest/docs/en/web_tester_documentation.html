@@ -7,50 +7,48 @@
 <body>
 <div class="menu_back">
 <div class="menu">
-<h2>
 <a href="index.html">SimpleTest</a>
-</h2>
-<ul>
-<li>
-<a href="overview.html">Overview</a>
-</li>
-<li>
-<a href="unit_test_documentation.html">Unit tester</a>
-</li>
-<li>
-<a href="group_test_documentation.html">Group tests</a>
-</li>
-<li>
-<a href="server_stubs_documentation.html">Server stubs</a>
-</li>
-<li>
-<a href="mock_objects_documentation.html">Mock objects</a>
-</li>
-<li>
-<a href="partial_mocks_documentation.html">Partial mocks</a>
-</li>
-<li>
-<a href="reporter_documentation.html">Reporting</a>
-</li>
-<li>
-<a href="expectation_documentation.html">Expectations</a>
-</li>
-<li>
-<span class="chosen">Web tester</span>
-</li>
-<li>
-<a href="form_testing_documentation.html">Testing forms</a>
-</li>
-<li>
-<a href="authentication_documentation.html">Authentication</a>
-</li>
-<li>
-<a href="browser_documentation.html">Scriptable browser</a>
-</li>
-</ul>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <span class="chosen">Web tester</span>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
 </div>
 </div>
 <h1>Web tester documentation</h1>
+        This page...
+        <ul>
+<li>
+            Successfully <a href="#fetch">fetching a web page</a>
+        </li>
+<li>
+            Testing the <a href="#content">page content</a>
+        </li>
+<li>
+            <a href="#navigation">Navigating a web site</a>
+            while testing
+        </li>
+<li>
+            <a href="#request">Raw request modifications</a> and debugging methods
+        </li>
+</ul>
 <div class="content">
         <p>
 <a class="target" name="fetch">
@@ -99,7 +97,7 @@
     require_once('simpletest/web_tester.php');</strong>
     require_once('simpletest/reporter.php');
     
-    $test = &amp;new GroupTest('Web site tests');<strong>
+    $test = &amp;new TestSuite('Web site tests');<strong>
     $test-&gt;addTestFile('lastcraft_test.php');</strong>
     exit ($test-&gt;run(new TextReporter()) ? 0 : 1);
 ?&gt;
@@ -153,7 +151,7 @@ class TestOfLastcraft extends WebTestCase {
     
     function testHomepage() {<strong>
         $this-&gt;get('http://www.lastcraft.com/');
-        $this-&gt;assertWantedPattern('/why the last craft/i');</strong>
+        $this-&gt;assertText('Why the last craft');</strong>
     }
 }
 </pre>
@@ -169,16 +167,16 @@ class TestOfLastcraft extends WebTestCase {
 <td><span class="new_code">assertTitle($title)</span></td><td>Pass if title is an exact match</td>
 </tr>
                     <tr>
-<td><span class="new_code">assertWantedPattern($pattern)</span></td><td>A Perl pattern match against the page content</td>
+<td><span class="new_code">assertText($text)</span></td><td>Pass if matches visible and "alt" text</td>
 </tr>
                     <tr>
-<td><span class="new_code">assertNoUnwantedPattern($pattern)</span></td><td>A Perl pattern match to not find content</td>
+<td><span class="new_code">assertNoText($text)</span></td><td>Pass if doesn't match visible and "alt" text</td>
 </tr>
                     <tr>
-<td><span class="new_code">assertWantedText($text)</span></td><td>Pass if matches visible and "alt" text</td>
+<td><span class="new_code">assertPattern($pattern)</span></td><td>A Perl pattern match against the page content</td>
 </tr>
                     <tr>
-<td><span class="new_code">assertNoUnwantedText($text)</span></td><td>Pass if doesn't match visible and "alt" text</td>
+<td><span class="new_code">assertNoPattern($pattern)</span></td><td>A Perl pattern match to not find content</td>
 </tr>
                     <tr>
 <td><span class="new_code">assertLink($label)</span></td><td>Pass if a link with this text is present</td>
@@ -217,10 +215,7 @@ class TestOfLastcraft extends WebTestCase {
 <td><span class="new_code">assertHeader($header, $content)</span></td><td>Pass if a header was fetched matching this value</td>
 </tr>
                     <tr>
-<td><span class="new_code">assertNoUnwantedHeader($header)</span></td><td>Pass if a header was not fetched</td>
-</tr>
-                    <tr>
-<td><span class="new_code">assertHeaderPattern($header, $pattern)</span></td><td>Pass if a header was fetched matching this Perl regex</td>
+<td><span class="new_code">assertNoHeader($header)</span></td><td>Pass if a header was not fetched</td>
 </tr>
                     <tr>
 <td><span class="new_code">assertCookie($name, $value)</span></td><td>Pass if there is currently a matching cookie</td>
@@ -240,6 +235,10 @@ class TestOfLastcraft extends WebTestCase {
                 So now we could instead test against the title tag with...
 <pre>
 <strong>$this-&gt;assertTitle('The Last Craft? Web developer tutorials on PHP, Extreme programming and Object Oriented development');</strong>
+</pre>
+                ...or, if that is too long and fragile...
+<pre>
+<strong>$this-&gt;assertTitle(new PatternExpectation('/The Last Craft/'));</strong>
 </pre>
                 As well as the simple HTML content checks we can check
                 that the MIME type is in a list of allowed types with...
@@ -319,7 +318,7 @@ class TestOfLastcraft extends WebTestCase {
     function testContact() {
         $this-&gt;get('http://www.lastcraft.com/');<strong>
         $this-&gt;clickLink('About');
-        $this-&gt;assertTitle('About Last Craft');</strong>
+        $this-&gt;assertTitle(new PatternExpectation('/About Last Craft/'));</strong>
     }
 }
 </pre>
@@ -327,10 +326,15 @@ class TestOfLastcraft extends WebTestCase {
             </p>
             <p>
                 If the target is a button rather than an anchor tag, then
-                <span class="new_code">clickSubmit()</span> should be used
+                <span class="new_code">clickSubmit()</span> can be used
                 with the button title...
 <pre>
 <strong>$this-&gt;clickSubmit('Go!');</strong>
+</pre>
+                If you are not sure or don't care, the usual case, then just
+                use the <span class="new_code">click()</span> method...
+<pre>
+<strong>$this-&gt;click('Go!');</strong>
 </pre>
             </p>
             <p>
@@ -501,8 +505,48 @@ class TestOfLastcraft extends WebTestCase {
             </p>
         
     </div>
+        References and related information...
+        <ul>
+<li>
+            SimpleTest project page on <a href="http://sourceforge.net/projects/simpletest/">SourceForge</a>.
+        </li>
+<li>
+            SimpleTest download page on <a href="http://www.lastcraft.com/simple_test.php">LastCraft</a>.
+        </li>
+<li>
+            The <a href="http://simpletest.sourceforge.net/">developer's API for SimpleTest</a>
+            gives full detail on the classes and assertions available.
+        </li>
+</ul>
+<div class="menu_back">
+<div class="menu">
+<a href="index.html">SimpleTest</a>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <span class="chosen">Web tester</span>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
+</div>
+</div>
 <div class="copyright">
-            Copyright<br>Marcus Baker, Jason Sweat, Perrick Penet 2004
+            Copyright<br>Marcus Baker 2006
         </div>
 </body>
 </html>

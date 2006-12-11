@@ -7,54 +7,48 @@
 <body>
 <div class="menu_back">
 <div class="menu">
-<h2>
 <a href="index.html">SimpleTest</a>
-</h2>
-<ul>
-<li>
-<a href="overview.html">Overview</a>
-</li>
-<li>
-<a href="unit_test_documentation.html">Unit tester</a>
-</li>
-<li>
-<a href="group_test_documentation.html">Group tests</a>
-</li>
-<li>
-<a href="server_stubs_documentation.html">Server stubs</a>
-</li>
-<li>
-<a href="mock_objects_documentation.html">Mock objects</a>
-</li>
-<li>
-<a href="partial_mocks_documentation.html">Partial mocks</a>
-</li>
-<li>
-<a href="reporter_documentation.html">Reporting</a>
-</li>
-<li>
-<a href="expectation_documentation.html">Expectations</a>
-</li>
-<li>
-<a href="web_tester_documentation.html">Web tester</a>
-</li>
-<li>
-<a href="form_testing_documentation.html">Testing forms</a>
-</li>
-<li>
-<a href="authentication_documentation.html">Authentication</a>
-</li>
-<li>
-<a href="browser_documentation.html">Scriptable browser</a>
-</li>
-</ul>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
 </div>
 </div>
 <h1>Documentation sur le navigateur scriptable</h1>
+        This page...
+        <ul>
+<li>
+            Utiliser le <a href="#scripting">navigateur web dans des scripts</a>
+        </li>
+<li>
+            <a href="#deboguer">D&eacute;boguer</a> les erreurs sur les pages
+        </li>
+<li>
+            <a href="#unit">Tests complexes avec des navigateurs web multiples</a>
+        </li>
+</ul>
 <div class="content">
         
             <p>
-                Le composant de navigation web de SimpleTest peut &ecirc;tre utilis&eacute; non seulement &agrave; l'ext&eacute;rieur de la classe <span class="new_code">WebTestCase</span>, mais aussi ind&eacute;pendamment du frameword SimpleTest lui-m&ecirc;me.
+                Le composant de navigation web de SimpleTest peut &ecirc;tre utilis&eacute; non seulement &agrave; l'ext&eacute;rieur de la classe <span class="new_code">WebTestCase</span>, mais aussi ind&eacute;pendamment du framework SimpleTest lui-m&ecirc;me.
             </p>
         
         <p>
@@ -79,7 +73,7 @@
     print $matches[1];
 ?&gt;
 </pre>
-                Bien s&ucirc;r Il y a des m&eacute;thodes plus simple pour r&eacute;aliser cet exemple en PHP. Par exemple, vous pourriez juste utiliser la commande PHP <span class="new_code">file()</span> sur ce qui est ici une page fixe. Cependant, en utilisant des scripts avec le navigateur web vous vous autorisez l'authentification, la gestion des cookies, le chargement automatique des fen&ecirc;tres, les redirections, la transmission de formulaire et la capacit&eacute; d'examiner les ent&ecirc;tes. De telles m&eacute;thodes sont fragiles dans un site en constante &eacute;volution et vous voudrez employer une m&eacute;thode plus directe pour acc&eacute;der aux donn&eacute;es de fa&ccedil;on permanente, mais pour des t&acirc;ches simples cette technique peut s'av&eacute;rer une solution tr&egrave;s rapide.
+                Bien s&ucirc;r Il y a des m&eacute;thodes plus simple pour r&eacute;aliser cet exemple en PHP. Par exemple, vous pourriez juste utiliser la commande PHP <span class="new_code">file()</span> sur ce qui est ici une page fixe. Cependant, en utilisant des scripts avec le navigateur web vous vous autorisez l'authentification, la gestion des cookies, le chargement automatique des fen&ecirc;tres, les redirections, la transmission de formulaires et la capacit&eacute; d'examiner les ent&ecirc;tes. De telles m&eacute;thodes sont fragiles dans un site en constante &eacute;volution et vous voudrez employer une m&eacute;thode plus directe pour acc&eacute;der aux donn&eacute;es de fa&ccedil;on permanente, mais pour des t&acirc;ches simples cette technique peut s'av&eacute;rer une solution tr&egrave;s rapide.
             </p>
             <p>
                 Toutes les m&eacute;thode de navigation utilis&eacute;es dans <a href="web_tester_documentation.html">WebTestCase</a> sont pr&eacute;sente dans la classe <span class="new_code">SimpleBrowser</span>, mais les assertions sont remplac&eacute;es par de simples accesseurs. Voici une liste compl&egrave;te des m&eacute;thodes de navigation de page &agrave; page...
@@ -153,7 +147,7 @@
 </tr>
                 </tbody>
 </table>
-                Les m&eacute;thode <span class="new_code">SimpleBrowser::useProxy()</span> et <span class="new_code">SimpleBrowser::addHeader()</span> sont sp&eacute;ciales. Une fois appell&eacute;es, elles continuent &agrave; s'appliquer sur les t&eacute;l&eacute;chargements suivants.
+                Les m&eacute;thode <span class="new_code">SimpleBrowser::useProxy()</span> et <span class="new_code">SimpleBrowser::addHeader()</span> sont sp&eacute;ciales. Une fois appel&eacute;es, elles continuent &agrave; s'appliquer sur les t&eacute;l&eacute;chargements suivants.
             </p>
             <p>
                 Naviguer dans les formulaires est similaire &agrave; la <a href="form_testing_documentation.html">navigation des formulaires via WebTestCase</a>...
@@ -194,10 +188,10 @@
 </tr>
                 </tbody>
 </table>
-                A aujourd'hui il n'existe aucune m&eacute;thode pour lister les formulaires et les champs disponibles : ce sera probablement ajout&eacute; dans des versions successives de SimpleTest.
+                Au jourd d'aujourd'hui il n'existe aucune m&eacute;thode pour lister les formulaires et les champs disponibles : ce sera probablement ajout&eacute; dans des versions successives de SimpleTest.
             </p>
             <p>
-                A l'int&eacute;rieur d'une page, les fen&ecirc;tres individuelles peuvent &ecirc;tre s&eacute;lectionn&eacute;es. Si aucune s&eacute;lection n'est r&eacute;alis&eacute;e alors toutes les fen&ecirc;tres sont fusionn&eacute;es ensemble dans un unique et grande page. Le contenu de la page en cours sera une concat&eacute;nation des toutes les fen&ecirc;tres dans l'ordre sp&eacute;cifi&eacute; par les balises "frameset".
+                A l'int&eacute;rieur d'une page, les fen&ecirc;tres individuelles peuvent &ecirc;tre s&eacute;lectionn&eacute;es. Si aucune s&eacute;lection n'est r&eacute;alis&eacute;e alors toutes les fen&ecirc;tres sont fusionn&eacute;es ensemble dans une unique et grande page. Le contenu de la page en cours sera une concat&eacute;nation des toutes les fen&ecirc;tres dans l'ordre sp&eacute;cifi&eacute; par les balises "frameset".
                 <table>
 <tbody>
                     <tr>
@@ -248,13 +242,13 @@
 <td><span class="new_code">getMimeType()</span></td><td>Le type Mime de la page our de la fen&ecirc;tre</td>
 </tr>
                     <tr>
-<td><span class="new_code">getAuthentication()</span></td><td>Le type d'authenficiation dans l'ent&ecirc;te d'une provocation 401</td>
+<td><span class="new_code">getAuthentication()</span></td><td>Le type d'authentification dans l'ent&ecirc;te d'une provocation 401</td>
 </tr>
                     <tr>
 <td><span class="new_code">getRealm()</span></td><td>Le realm d'authentification dans l'ent&ecirc;te d'une provocation 401</td>
 </tr>
                     <tr>
-<td><span class="new_code">setMaximumRedirects($max)</span></td><td>Nombre de redirection avant que la page ne soit charg&eacute;e automatiquement</td>
+<td><span class="new_code">setMaximumRedirects($max)</span></td><td>Nombre de redirections avant que la page ne soit charg&eacute;e automatiquement</td>
 </tr>
                     <tr>
 <td><span class="new_code">setMaximumNestedFrames($max)</span></td><td>Protection contre des framesets r&eacute;cursifs</td>
@@ -267,7 +261,7 @@
 </tr>
                 </tbody>
 </table>
-                Les m&eacute;thodes <span class="new_code">SimpleBrowser::setConnectionTimeout()</span>, <span class="new_code">SimpleBrowser::setMaximumRedirects()</span>,<span class="new_code">SimpleBrowser::setMaximumNestedFrames()</span>, <span class="new_code">SimpleBrowser::ignoreFrames()</span> et <span class="new_code">SimpleBrowser::useFrames()</span> continuent &agrave; s'appliquer sur toutes les requ&ecirc;tes suivantes. Les autres m&eacute;thodes tiennent compte des fen&ecirc;tres. Cela veut dire que si une fen&ecirc;tre individuel ne se charge pas, il suffit de se diriger vers elle avec <span class="new_code">SimpleBrowser::setFrameFocus()</span> : ensuite on utilisera <span class="new_code">SimpleBrowser::getRequest()</span>, etc. pour voir ce qui se passe.
+                Les m&eacute;thodes <span class="new_code">SimpleBrowser::setConnectionTimeout()</span>, <span class="new_code">SimpleBrowser::setMaximumRedirects()</span>,<span class="new_code">SimpleBrowser::setMaximumNestedFrames()</span>, <span class="new_code">SimpleBrowser::ignoreFrames()</span> et <span class="new_code">SimpleBrowser::useFrames()</span> continuent &agrave; s'appliquer sur toutes les requ&ecirc;tes suivantes. Les autres m&eacute;thodes tiennent compte des fen&ecirc;tres. Cela veut dire que si une fen&ecirc;tre individuelle ne se charge pas, il suffit de se diriger vers elle avec <span class="new_code">SimpleBrowser::setFrameFocus()</span> : ensuite on utilisera <span class="new_code">SimpleBrowser::getRequest()</span>, etc. pour voir ce qui se passe.
             </p>
         
         <p>
@@ -292,7 +286,7 @@ class TestOfRegistration extends UnitTestCase {
     }
 }
 </pre>
-                Bien que &ccedil;a puisse &ecirc;tre utile par convenance temporaire, je ne suis pas fan de ce genre de test. Ce test s'applique &agrave; sur plusieurs couches de l'application, &ccedil;a implique qu'il est plus que probable qu'il faudra le remanier lorsque le code change.
+                Bien que &ccedil;a puisse &ecirc;tre utile par convenance temporaire, je ne suis pas fan de ce genre de test. Ce test s'applique &agrave; plusieurs couches de l'application, &ccedil;a implique qu'il est plus que probable qu'il faudra le remanier lorsque le code changera.
             </p>
             <p>
                 Un cas plus utile d'utilisation directe du navigateur est le moment o&ugrave; le <span class="new_code">WebTestCase</span> ne peut plus suivre. Un exemple ? Quand deux navigateurs doivent &ecirc;tre utilis&eacute;s en m&ecirc;me temps.
@@ -322,8 +316,47 @@ class TestOfSecurity extends UnitTestCase {
             </p>
         
     </div>
+        References and related information...
+        <ul>
+<li>
+            La page du projet SimpleTest sur <a href="http://sourceforge.net/projects/simpletest/">SourceForge</a>.
+        </li>
+<li>
+            La page de t&eacute;l&eacute;chargement de SimpleTest sur <a href="http://www.lastcraft.com/simple_test.php">LastCraft</a>.
+        </li>
+<li>
+            <a href="http://simpletest.sourceforge.net/">L'API de d&eacute;veloppeur pour SimpleTest</a> donne tous les d&eacute;tails sur les classes et les assertions disponibles.
+        </li>
+</ul>
+<div class="menu_back">
+<div class="menu">
+<a href="index.html">SimpleTest</a>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
+</div>
+</div>
 <div class="copyright">
-            Copyright<br>Marcus Baker, Jason Sweat, Perrick Penet 2004
+            Copyright<br>Marcus Baker 2006
         </div>
 </body>
 </html>

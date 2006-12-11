@@ -7,50 +7,47 @@
 <body>
 <div class="menu_back">
 <div class="menu">
-<h2>
 <a href="index.html">SimpleTest</a>
-</h2>
-<ul>
-<li>
-<a href="overview.html">Overview</a>
-</li>
-<li>
-<a href="unit_test_documentation.html">Unit tester</a>
-</li>
-<li>
-<a href="group_test_documentation.html">Group tests</a>
-</li>
-<li>
-<a href="server_stubs_documentation.html">Server stubs</a>
-</li>
-<li>
-<a href="mock_objects_documentation.html">Mock objects</a>
-</li>
-<li>
-<a href="partial_mocks_documentation.html">Partial mocks</a>
-</li>
-<li>
-<a href="reporter_documentation.html">Reporting</a>
-</li>
-<li>
-<a href="expectation_documentation.html">Expectations</a>
-</li>
-<li>
-<a href="web_tester_documentation.html">Web tester</a>
-</li>
-<li>
-<a href="form_testing_documentation.html">Testing forms</a>
-</li>
-<li>
-<a href="authentication_documentation.html">Authentication</a>
-</li>
-<li>
-<a href="browser_documentation.html">Scriptable browser</a>
-</li>
-</ul>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
 </div>
 </div>
 <h1>Documentation sur le testeur web</h1>
+        This page...
+        <ul>
+<li>
+            R&eacute;ussir &agrave; <a href="#telecharger">t&eacute;l&eacute;charger une page web</a>
+        </li>
+<li>
+            Tester le <a href="#contenu">contenu de la page</a>
+        </li>
+<li>
+            <a href="#navigation">Naviguer sur un site web</a> pendant le test
+        </li>
+<li>
+            M&eacute;thodes pour <a href="#requete">modifier une requ&ecirc;te</a> et pour d&eacute;boguer
+        </li>
+</ul>
 <div class="content">
         <p>
 <a class="target" name="telecharger">
@@ -58,7 +55,7 @@
 </a>
 </p>
             <p>
-                Tester des classes c'es tr&egrave;s bien. Reste que PHP est avant tout un langage pour cr&eacute;er des fonctionnalit&eacute;s &agrave; l'int&eacute;rieur de pages web. Comment pouvons tester la partie de devant -- celle de l'interface -- dans nos applications en PHP ? Etant donn&eacute; qu'une page web n'est constitu&eacute;e que de texte, nous devrions pouvoir les examiner exactement comme n'importe quelle autre donn&eacute;e de test.
+                Tester des classes c'est tr&egrave;s bien. Reste que PHP est avant tout un langage pour cr&eacute;er des fonctionnalit&eacute;s &agrave; l'int&eacute;rieur de pages web. Comment pouvons tester la partie de devant -- celle de l'interface -- dans nos applications en PHP ? Etant donn&eacute; qu'une page web n'est constitu&eacute;e que de texte, nous devrions pouvoir les examiner exactement comme n'importe quelle autre donn&eacute;e de test.
             </p>
             <p>
                 Cela nous am&egrave;ne &agrave; une situation d&eacute;licate. Si nous testons dans un niveau trop bas, v&eacute;rifier des balises avec un motif ad hoc par exemple, nos tests seront trop fragiles. Le moindre changement dans la pr&eacute;sentation pourrait casser un grand nombre de test. Si nos tests sont situ&eacute;s trop haut, en utilisant une version fantaisie du moteur de template pour donner un cas pr&eacute;cis, alors nous perdons compl&egrave;tement la capacit&eacute; &agrave; automatiser certaines classes de test. Par exemple, l'interaction entre des formulaires et la navigation devra &ecirc;tre test&eacute; manuellement. Ces types de test sont extr&ecirc;mement fastidieux et plut&ocirc;t sensibles aux erreurs.
@@ -322,7 +319,7 @@ class TestOfLastcraft extends WebTestCase {
 <td><span class="new_code">submitFormById($id)</span></td><td>Soumet un formulaire sans valeur de soumission</td>
 </tr>
                     <tr>
-<td><span class="new_code">clickLink($label, $index)</span></td><td>Clique sur un ancre avec ce texte d'&eacute;tiquette visible</td>
+<td><span class="new_code">clickLink($label, $index)</span></td><td>Clique sur une ancre avec ce texte d'&eacute;tiquette visible</td>
 </tr>
                     <tr>
 <td><span class="new_code">clickLinkById($id)</span></td><td>Clique sur une ancre avec cet attribut d'identification</td>
@@ -390,8 +387,47 @@ class TestOfLastcraft extends WebTestCase {
             </p>
         
     </div>
+        References and related information...
+        <ul>
+<li>
+            La page du projet SimpleTest sur <a href="http://sourceforge.net/projects/simpletest/">SourceForge</a>.
+        </li>
+<li>
+            La page de t&eacute;l&eacute;chargement de SimpleTest sur <a href="http://www.lastcraft.com/simple_test.php">LastCraft</a>.
+        </li>
+<li>
+            <a href="http://simpletest.sourceforge.net/">L'API du d&eacute;veloppeur pour SimpleTest</a> donne tous les d&eacute;tails sur les classes et les assertions disponibles.
+        </li>
+</ul>
+<div class="menu_back">
+<div class="menu">
+<a href="index.html">SimpleTest</a>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
+</div>
+</div>
 <div class="copyright">
-            Copyright<br>Marcus Baker, Jason Sweat, Perrick Penet 2004
+            Copyright<br>Marcus Baker 2006
         </div>
 </body>
 </html>

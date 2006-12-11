@@ -1,5 +1,5 @@
 <?php
-    // $Id: shell_test.php,v 1.8 2004/09/24 22:55:18 lastcraft Exp $
+    // $Id: shell_test.php,v 1.9 2005/07/27 15:54:19 lastcraft Exp $
     
     require_once(dirname(__FILE__) . '/../shell_tester.php');
     
@@ -8,7 +8,7 @@
         function testEcho() {
             $shell = &new SimpleShell();
             $this->assertIdentical($shell->execute('echo Hello'), 0);
-            $this->assertWantedPattern('/Hello/', $shell->getOutput());
+            $this->assertPattern('/Hello/', $shell->getOutput());
         }
         
         function testBadCommand() {

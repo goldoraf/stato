@@ -9,50 +9,47 @@
 <body>
 <div class="menu_back">
 <div class="menu">
-<h2>
 <a href="index.html">SimpleTest</a>
-</h2>
-<ul>
-<li>
-<span class="chosen">Overview</span>
-</li>
-<li>
-<a href="unit_test_documentation.html">Unit tester</a>
-</li>
-<li>
-<a href="group_test_documentation.html">Group tests</a>
-</li>
-<li>
-<a href="server_stubs_documentation.html">Server stubs</a>
-</li>
-<li>
-<a href="mock_objects_documentation.html">Mock objects</a>
-</li>
-<li>
-<a href="partial_mocks_documentation.html">Partial mocks</a>
-</li>
-<li>
-<a href="reporter_documentation.html">Reporting</a>
-</li>
-<li>
-<a href="expectation_documentation.html">Expectations</a>
-</li>
-<li>
-<a href="web_tester_documentation.html">Web tester</a>
-</li>
-<li>
-<a href="form_testing_documentation.html">Testing forms</a>
-</li>
-<li>
-<a href="authentication_documentation.html">Authentication</a>
-</li>
-<li>
-<a href="browser_documentation.html">Scriptable browser</a>
-</li>
-</ul>
+                |
+                <span class="chosen">Overview</span>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
 </div>
 </div>
 <h1>Overview of SimpleTest</h1>
+        This page...
+        <ul>
+<li>
+            <a href="#summary">Quick summary</a>
+            of the SimpleTest tool for PHP.
+        </li>
+<li>
+            <a href="#features">List of features</a>,
+            both current ones and those planned.
+        </li>
+<li>
+            There are plenty of <a href="#resources">unit testing resources</a>
+            on the web.
+        </li>
+</ul>
 <div class="content">
         <p>
 <a class="target" name="summary">
@@ -79,7 +76,7 @@
 &lt;?php
 class <strong>MyTestCase</strong> extends UnitTestCase {
     <strong>
-    function testLog() {
+    function testLogWroteMessage() {
         $log = &amp;new Log('my.log');
         $log-&gt;message('Hello');
         $this-&gt;assertTrue(file_exists('my.log'));
@@ -96,7 +93,7 @@ class <strong>MyTestCase</strong> extends UnitTestCase {
                 there are no new languages to learn, testing can start straight away,
                 and the developer can test any part of the code.
                 Basically, all parts that can be accessed by the application code can also be
-                accessed by the test code if they are in the same language.
+                accessed by the test code, if they are in the same programming language.
             </p>
             <p>
                 The simplest type of test case is the
@@ -132,7 +129,7 @@ class <strong>MySiteTest</strong> extends WebTestCase {
         $this-&gt;assertTitle('My Home Page');
         $this-&gt;clickLink('Contact');
         $this-&gt;assertTitle('Contact me');
-        $this-&gt;assertWantedPattern('/Email me at/');
+        $this-&gt;assertPattern('/Email me at/');
     }</strong>
 }
 ?&gt;
@@ -151,8 +148,7 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                 milestones rather depends on time available.
                 Green stuff has been coded, but not necessarily released yet.
                 If you have a pressing need for a green but unreleased feature
-                then you should check-out the code from sourceforge CVS directly.
-                A released feature is marked as "Done".
+                then you should check-out the code from Sourceforge CVS directly.
                 <table>
 <thead>
                     <tr>
@@ -163,12 +159,12 @@ class <strong>MySiteTest</strong> extends WebTestCase {
 <tr>
                         <td>Unit test case</td>
                         <td>Core test case class and assertions</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Html display</td>
                         <td>Simplest possible display</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Autoloading of test cases</td>
@@ -176,41 +172,20 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                             Reading a file with test cases and loading them into a
                             group test automatically
                         </td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
-                        <td>Mock objects code generator</td>
+                        <td>Mock objects</td>
                         <td>
                             Objects capable of simulating other objects removing
                             test dependencies
                         </td>
-                        <td style="color: green;">Done</td>
-                    </tr>
-                    <tr>
-                        <td>Server stubs</td>
-                        <td>
-                            Mocks without expectations to be used outside of test cases,
-                            e.g. for prototyping
-                        </td>
-                        <td style="color: green;">Done</td>
-                    </tr>
-                    <tr>
-                        <td>Integration of other unit testers</td>
-                        <td>
-                            The ability to read and simulate test cases from PHPUnit
-                            and PEAR::PhpUnit
-                        </td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Web test case</td>
-                        <td>Basic pattern matching of fetched pages</td>
-                        <td style="color: green;">Done</td>
-                    </tr>
-                    <tr>
-                        <td>HTML parsing of pages</td>
                         <td>Allows link following and title tag matching</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Partial mocks</td>
@@ -218,32 +193,32 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                             Mocking parts of a class for testing less than a class
                             or for complex simulations
                         </td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Web cookie handling</td>
                         <td>Correct handling of cookies when fetching pages</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Following redirects</td>
                         <td>Page fetching automatically follows 300 redirects</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Form parsing</td>
                         <td>Ability to submit simple forms and read default form values</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Command line interface</td>
                         <td>Test display without the need of a web browser</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Exposure of expectation classes</td>
                         <td>Can create precise tests with mocks as well as test cases</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>XML output and parsing</td>
@@ -251,25 +226,15 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                             Allows multi host testing and the integration of acceptance
                             testing extensions
                         </td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
-                        <td>Command line test case</td>
-                        <td>Allows testing of utilities and file handling</td>
-                        <td style="color: green;">Done</td>
-                    </tr>
-                    <tr>
-                        <td>PHP Documentor compatibility</td>
-                        <td>Fully generated class level documentation</td>
-                        <td style="color: green;">Done</td>
-                    </tr>
-                    <tr>
-                        <td>Browser interface</td>
+                        <td>Browser component</td>
                         <td>
                             Exposure of lower level web browser interface for more
                             detailed test cases
                         </td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>HTTP authentication</td>
@@ -277,31 +242,54 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                             Fetching protected web pages with basic authentication
                             only
                         </td>
-                        <td style="color: green;">Done</td>
-                    </tr>
-                    <tr>
-                        <td>Browser navigation buttons</td>
-                        <td>Back, forward and retry</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>SSL support</td>
                         <td>Can connect to https: pages</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Proxy support</td>
                         <td>Can connect via. common proxies</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
                         <td>Frames support</td>
                         <td>Handling of frames in web test cases</td>
-                        <td style="color: green;">Done</td>
+                        <td style="color: green;">1.0</td>
                     </tr>
                     <tr>
-                        <td>Improved display</td>
-                        <td>Better web GUI with tree display of test cases</td>
+                        <td>File upload testing</td>
+                        <td>Can simulate the input type file tag</td>
+                        <td style="color: green;">1.0.1</td>
+                    </tr>
+                    <tr>
+                        <td>Mocking interfaces</td>
+                        <td>
+                            Can generate mock objects to interfaces as well as classes
+                            and class interfaces are carried for type hints
+                        </td>
+                        <td style="color: green;">1.0.1</td>
+                    </tr>
+                    <tr>
+                        <td>Testing exceptions</td>
+                        <td>Similar to testing PHP errors</td>
+                        <td style="color: green;">1.0.1</td>
+                    </tr>
+                    <tr>
+                        <td>HTML label support</td>
+                        <td>Can access all controls using the visual label</td>
+                        <td style="color: red;">1.0.1</td>
+                    </tr>
+                    <tr>
+                        <td>Code coverage</td>
+                        <td>Reports using the bundled SpikeSource coverage tool</td>
+                        <td style="color: red;">1.0.1</td>
+                    </tr>
+                    <tr>
+                        <td>Reporting machinery enhancements</td>
+                        <td>Improved message passing for better cooperation with IDEs</td>
                         <td style="color: red;">1.1</td>
                     </tr>
                     <tr>
@@ -310,30 +298,45 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                         <td style="color: red;">1.1</td>
                     </tr>
                     <tr>
-                        <td>File upload testing</td>
-                        <td>Can simulate the input type file tag</td>
+                        <td>IFrame support</td>
+                        <td>Reads IFrame content that can be refreshed</td>
                         <td style="color: red;">1.1</td>
                     </tr>
                     <tr>
-                        <td>Mocking interfaces</td>
-                        <td>Can generate mock objects to interfaces as well as classes</td>
+                        <td>Improved mock interface</td>
+                        <td>More compact way of expressing mocks using fluent interfaces</td>
                         <td style="color: red;">2.0</td>
                     </tr>
                     <tr>
-                        <td>Testing exceptions</td>
-                        <td>Similar to testing PHP errors</td>
+                        <td>Assertion packs</td>
+                        <td>Can dynamically add assertions to test cases</td>
                         <td style="color: red;">2.0</td>
                     </tr>
                     <tr>
-                        <td>XPath searching of elements</td>
-                        <td>Can make use of HTML tidy for faster and more flexible content matching</td>
+                        <td>HTML table assertions</td>
+                        <td>Can match table elements to numerical assertions</td>
                         <td style="color: red;">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>XPath searching of HTML elements</td>
+                        <td>More flexible content matching</td>
+                        <td style="color: red;">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>Alternate HTML parsers</td>
+                        <td>Can detect compiled parsers for performance improvements</td>
+                        <td style="color: red;">2.0</td>
+                    </tr>
+                    <tr>
+                        <td>Javascript suport</td>
+                        <td>Use of PECL module to add Javascript</td>
+                        <td style="color: red;">3.0</td>
                     </tr>
                 </tbody>
 </table>
-                PHP5 migraton will start straight after the version 1.1 series,
-                whereupon PHP4 will no longer be supported.
-                SimpleTest is currently compatible with PHP5, but will not
+                PHP5 migraton will start straight after the version 1.0.1 series,
+                whereupon only PHP 5.1+ will be supported.
+                SimpleTest is currently compatible with PHP 5, but will not
                 make use of all of the new features until version 2.
             </p>
         
@@ -352,7 +355,7 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                 which combine various practices to "flatten the cost curve" of software development.
                 More extreme still is <a href="http://www.testdriven.com/modules/news/">Test Driven Development</a>,
                 where you very strictly adhere to the rule of no coding until you have a test.
-                If you're more of a planner or believe that experience trumps evolution,
+                If you're more of a planner, or believe that experience trumps evolution,
                 you may prefer the
                 <a href="http://www.therationaledge.com/content/dec_01/f_spiritOfTheRUP_pk.html">RUP</a> approach.
                 I haven't tried it, but even I can see that you will need test tools (see figure 9).
@@ -375,18 +378,6 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                 existing <a href="http://www.junit.org/">JUnit</a> test cases.
             </p>
             <p>
-                Library writers don't seem to ship tests with their code very often
-                which is a shame.
-                Library code that includes tests can be more safely refactored and
-                the test code can act as additional documentation in a fairly standard
-                form.
-                This can save trawling the source code for clues when problems occour,
-                especially when upgrading such a library.
-                Libraries using SimpleTest for their unit testing include
-                <a href="http://wact.sourceforge.net/">WACT</a> and
-                <a href="http://sourceforge.net/projects/htmlsax">PEAR::XML_HTMLSax</a>.
-            </p>
-            <p>
                 There is currently a sad lack of material on mock objects, which is a shame
                 as unit testing without them is a lot more work.
                 The <a href="http://www.sidewize.com/company/mockobjects.pdf">original mock objects paper</a>
@@ -394,14 +385,15 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                 As a new technology there are plenty of discussions and debate on how to use mocks,
                 often on Wikis such as
                 <a href="http://xpdeveloper.com/cgi-bin/oldwiki.cgi?MockObjects">Extreme Tuesday</a>
-                or <a href="http://www.mockobjects.com/wiki/MocksObjectsPaper">www.mockobjects.com</a>
+                or <a href="http://www.mockobjects.com/MocksObjectsPaper.html">www.mockobjects.com</a>
                 or <a href="http://c2.com/cgi/wiki?MockObject">the original C2 Wiki</a>.
                 Injecting mocks into a class is the main area of debate for which this
                 <a href="http://www-106.ibm.com/developerworks/java/library/j-mocktest.html">paper on IBM</a>
                 makes a good starting point.
             </p>
             <p>
-                There are plenty of web testing tools, but most are written in Java and
+                There are plenty of web testing tools, but the scriptable ones
+                are mostly are written in Java and
                 tutorials and advice are rather thin on the ground.
                 The only hope is to look at the documentation for
                 <a href="http://httpunit.sourceforge.net/">HTTPUnit</a>,
@@ -409,14 +401,61 @@ class <strong>MySiteTest</strong> extends WebTestCase {
                 or <a href="http://jwebunit.sourceforge.net/">JWebUnit</a> and hope for clues.
                 There are some XML driven test frameworks, but again most
                 require Java to run.
+            </p>
+            <p>
+                A new generation of tools that run directly in the web browser
+                are now available.
+                These include
+                <a href="http://www.openqa.org/selenium/">Selenium</a> and
+                <a href="http://wtr.rubyforge.org/">Watir</a>.
                 As SimpleTest does not support JavaScript you would probably
                 have to look at these tools anyway if you have highly dynamic
                 pages.
             </p>
         
     </div>
+        References and related information...
+        <ul>
+<li>
+            <a href="unit_test_documentation.html">Documentation for SimpleTest</a>.
+        </li>
+<li>
+            <a href="http://www.lastcraft.com/first_test_tutorial.php">How to write PHP test cases</a>
+            is a fairly advanced tutorial.
+        </li>
+<li>
+            <a href="http://simpletest.sourceforge.net/">SimpleTest API</a> from phpdoc.
+        </li>
+</ul>
+<div class="menu_back">
+<div class="menu">
+<a href="index.html">SimpleTest</a>
+                |
+                <span class="chosen">Overview</span>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
+</div>
+</div>
 <div class="copyright">
-            Copyright<br>Marcus Baker, Jason Sweat, Perrick Penet 2004
+            Copyright<br>Marcus Baker 2006
         </div>
 </body>
 </html>

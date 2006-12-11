@@ -1,5 +1,5 @@
 <?php
-    // $Id: adapter_test.php,v 1.7 2005/01/13 01:31:57 lastcraft Exp $
+    // $Id: adapter_test.php,v 1.9 2006/11/10 20:59:59 lastcraft Exp $
     
     class SameTestClass {
     }
@@ -48,27 +48,27 @@
     
     class TestOfPhpUnitAdapter extends TestCase {
         function TestOfPhpUnitAdapter() {
-            $this->TestCase("TestOfPhpUnitAdapter");
+            $this->TestCase('TestOfPhpUnitAdapter');
         }
         
         function testBoolean() {
-            $this->assert(true, "PHP Unit true");
+            $this->assert(true, 'PHP Unit true');
         }
         
         function testName() {
-            $this->assertTrue($this->name() == "TestOfPhpUnitAdapter");
+            $this->assert($this->name() == 'TestOfPhpUnitAdapter');
         }
         
         function testEquals() {
-            $this->assertEquals(12, 12, "PHP Unit equality");
+            $this->assertEquals(12, 12, 'PHP Unit equality');
         }
         
         function testMultilineEquals() {
-            $this->assertEquals("a\nb\n", "a\nb\n", "PHP Unit equality");
+            $this->assertEquals("a\nb\n", "a\nb\n", 'PHP Unit equality');
         }
         
         function testRegExp() {
-            $this->assertRegexp('/hello/', "A big hello from me", "PEAR regex");
+            $this->assertRegexp('/hello/', 'A big hello from me', 'PHPUnit regex');
         }
     }
 ?>

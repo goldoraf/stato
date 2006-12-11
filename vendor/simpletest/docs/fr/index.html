@@ -2,57 +2,58 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>
-        T&eacute;l&eacute;charger le framework de tests Simple Test - Tests unitaire et objets fantaisie pour PHP
+        Prise en main rapide de SimpleTest pour PHP - Tests unitaire et objets fantaisie pour PHP
     </title>
 <link rel="stylesheet" type="text/css" href="docs.css" title="Styles">
 </head>
 <body>
 <div class="menu_back">
 <div class="menu">
-<h2>
-<span class="chosen">SimpleTest</span>
-</h2>
-<ul>
+<a href="index.html">SimpleTest</a>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
+</div>
+</div>
+<h1>Prise en main rapide de SimpleTest</h1>
+        This page...
+        <ul>
 <li>
-<a href="overview.html">Overview</a>
-</li>
+            <a href="#unit">Utiliser le testeur rapidement</a>
+            avec un exemple.
+        </li>
 <li>
-<a href="unit_test_documentation.html">Unit tester</a>
-</li>
+            <a href="#group">Groupes de tests</a>
+            pour tester en un seul clic.
+        </li>
 <li>
-<a href="group_test_documentation.html">Group tests</a>
-</li>
+            <a href="#mock">Utiliser les objets fantaisie</a>
+            pour faciliter les tests et gagner en contr&ocirc;le.
+        </li>
 <li>
-<a href="server_stubs_documentation.html">Server stubs</a>
-</li>
-<li>
-<a href="mock_objects_documentation.html">Mock objects</a>
-</li>
-<li>
-<a href="partial_mocks_documentation.html">Partial mocks</a>
-</li>
-<li>
-<a href="reporter_documentation.html">Reporting</a>
-</li>
-<li>
-<a href="expectation_documentation.html">Expectations</a>
-</li>
-<li>
-<a href="web_tester_documentation.html">Web tester</a>
-</li>
-<li>
-<a href="form_testing_documentation.html">Testing forms</a>
-</li>
-<li>
-<a href="authentication_documentation.html">Authentication</a>
-</li>
-<li>
-<a href="browser_documentation.html">Scriptable browser</a>
-</li>
+            <a href="#web">Tester des pages web</a>
+            au niveau de l'HTML.
+        </li>
 </ul>
-</div>
-</div>
-<h1>Simple Test pour PHP</h1>
 <div class="content">
         
             <p>
@@ -191,7 +192,7 @@ class TestOfLogging extends UnitTestCase {
 }
 ?&gt;</strong>
 </pre>
-                Ensuite nous cr&eacute;ons un nouveau fichier appel&eacute; <em>tests/all_tests.php</em>. On y insert le code suivant...
+                Ensuite nous cr&eacute;ons un nouveau fichier appel&eacute; <em>tests/all_tests.php</em>. On y ins&egrave;re le code suivant...
 <pre>
 <strong>&lt;?php
 require_once('simpletest/unit_tester.php');
@@ -205,7 +206,7 @@ $test-&gt;run(new HtmlReporter());
                 Cette m&eacute;thode <span class="new_code">GroupTest::addTestFile()</span> va inclure le fichier de sc&eacute;narios de test et lire parmi toutes les nouvelles classes cr&eacute;&eacute;es celles qui sont issues de <span class="new_code">TestCase</span>. Dans un premier temps, seuls les noms sont stock&eacute;s, de la sorte le lanceur de test peut instancier la classe au fur et &agrave; mesure qu'il ex&eacute;cute votre suite de tests.
             </p>
             <p>
-                Pour que &ccedil;a puisse marcher proprement le fichier de suite de tests ne devrait pas inclure aveuglement d'autres extensions de sc&eacute;narios de test qui n'ex&eacute;cuteraient pas effectivement de test. Le r&eacute;sultat pourrait &ecirc;tre que des tests suppl&eacute;mentaires soient alors &ecirc;tre comptabilis&eacute;s pendant l'ex&eacute;cution des tests. Ce n'est pas un probl&egrave;me grave mais pour &eacute;viter ce d&eacute;sagr&eacute;ment, il suffit d'ajouter la commande <span class="new_code">SimpleTestOptions::ignore()</span> quelque part dans le fichier de sc&eacute;nario de test. Par ailleurs le sc&eacute;nario de test ne devrait pas avoir &eacute;t&eacute; inclus ailleurs ou alors aucun sc&eacute;nario ne sera ajout&eacute; aux groupes de test. Il s'agirait l&agrave; d'une erreur autrement s&eacute;rieuse : si tous les classes de sc&eacute;nario de test sont charg&eacute;es par PHP, alors la m&eacute;thode <span class="new_code">GroupTest::addTestFile()</span> ne pourra pas les d&eacute;tecter.
+                Pour que &ccedil;a puisse marcher proprement le fichier de suite de tests ne devrait pas inclure aveuglement d'autres extensions de sc&eacute;narios de test qui n'ex&eacute;cuteraient pas effectivement de test. Le r&eacute;sultat pourrait &ecirc;tre que des tests suppl&eacute;mentaires soient alors comptabilis&eacute;s pendant l'ex&eacute;cution des tests. Ce n'est pas un probl&egrave;me grave mais pour &eacute;viter ce d&eacute;sagr&eacute;ment, il suffit d'ajouter la commande <span class="new_code">SimpleTestOptions::ignore()</span> quelque part dans le fichier de sc&eacute;nario de test. Par ailleurs le sc&eacute;nario de test ne devrait pas avoir &eacute;t&eacute; inclus ailleurs ou alors aucun sc&eacute;nario ne sera ajout&eacute; aux groupes de test. Il s'agirait l&agrave; d'une erreur autrement s&eacute;rieuse : si toutes les classes de sc&eacute;nario de test sont charg&eacute;es par PHP, alors la m&eacute;thode <span class="new_code">GroupTest::addTestFile()</span> ne pourra pas les d&eacute;tecter.
             </p>
             <p>
                 Pour afficher les r&eacute;sultats, il est seulement n&eacute;cessaire d'invoquer <em>tests/all_tests.php</em> &agrave; partir du serveur web.
@@ -336,8 +337,46 @@ $test-&gt;run(new HtmlReporter());
             </p>
         
     </div>
+        References and related information...
+        <ul>
+<li>
+            <a href="https://sourceforge.net/project/showfiles.php?group_id=76550&amp;release_id=153280">T&eacute;l&eacute;charger PHP Simple Test</a>
+            depuis <a href="http://sourceforge.net/projects/simpletest/">SourceForge</a>.
+        </li>
+<li>
+            L'<a href="http://simpletest.sourceforge.net/">API de SimpleTest pour d&eacute;veloppeur</a>
+            donne tous les d&eacute;tails sur les classes et assertions existantes.
+        </li>
+</ul>
+<div class="menu_back">
+<div class="menu">
+<a href="index.html">SimpleTest</a>
+                |
+                <a href="overview.html">Overview</a>
+                |
+                <a href="unit_test_documentation.html">Unit tester</a>
+                |
+                <a href="group_test_documentation.html">Group tests</a>
+                |
+                <a href="mock_objects_documentation.html">Mock objects</a>
+                |
+                <a href="partial_mocks_documentation.html">Partial mocks</a>
+                |
+                <a href="reporter_documentation.html">Reporting</a>
+                |
+                <a href="expectation_documentation.html">Expectations</a>
+                |
+                <a href="web_tester_documentation.html">Web tester</a>
+                |
+                <a href="form_testing_documentation.html">Testing forms</a>
+                |
+                <a href="authentication_documentation.html">Authentication</a>
+                |
+                <a href="browser_documentation.html">Scriptable browser</a>
+</div>
+</div>
 <div class="copyright">
-            Copyright<br>Marcus Baker, Jason Sweat, Perrick Penet 2004
+            Copyright<br>Marcus Baker 2006
         </div>
 </body>
 </html>
