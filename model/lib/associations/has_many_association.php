@@ -55,7 +55,11 @@ class SHasManyManager extends SManyAssociationManager
     public function before_owner_delete()
     {
         if ($this->meta->dependent === null) return;
-        
+        $this->clear();
+    }
+    
+    public function clear()
+    {
         switch ($this->meta->dependent)
         {
             case 'delete':
@@ -65,16 +69,11 @@ class SHasManyManager extends SManyAssociationManager
                 $this->connection()->execute("DELETE FROM {$this->meta->table_name} WHERE ".$this->get_sql_filter());
                 break;
             case 'nullify':
-                $this->clear();
-                break;
-        }
-    }
-    
-    public function clear()
-    {
-        $this->connection()->execute("UPDATE {$this->meta->table_name} 
+                $this->connection()->execute("UPDATE {$this->meta->table_name} 
                                      SET {$this->meta->table_name}.{$this->meta->foreign_key} = NULL
                                      WHERE ".$this->get_sql_filter());
+                break;
+        }
     }
     
     protected function insert_record($record)
