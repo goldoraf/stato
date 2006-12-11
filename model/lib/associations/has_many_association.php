@@ -68,7 +68,7 @@ class SHasManyManager extends SManyAssociationManager
             case 'delete_all':
                 $this->connection()->execute("DELETE FROM {$this->meta->table_name} WHERE ".$this->get_sql_filter());
                 break;
-            case 'nullify':
+            default:
                 $this->connection()->execute("UPDATE {$this->meta->table_name} 
                                      SET {$this->meta->table_name}.{$this->meta->foreign_key} = NULL
                                      WHERE ".$this->get_sql_filter());
