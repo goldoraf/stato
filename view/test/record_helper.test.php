@@ -17,11 +17,6 @@ class MockContent extends MockRecord
     public function is_new_record() { return $this->new_record; }
     
     public function content_attributes() { return $this->content_attributes; }
-    
-    public function get_attribute($name)
-    {
-        foreach ($this->content_attributes as $attr) if ($attr->name == $name) return $attr;
-    }
 }
 
 if (!class_exists('SUrlRewriter'))
@@ -50,7 +45,7 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
+            'title' => new SAttribute('title', 'string'),
         );
         $this->assertDomEqual(
             input('post', 'title', $this->post),
@@ -63,7 +58,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'Error !';
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
+            'title' => new SAttribute('title', 'string'),
         );
         $this->assertDomEqual(
             input('post', 'title', $this->post),
@@ -78,7 +73,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'Title can\'t be empty';
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
+            'title' => new SAttribute('title', 'string'),
         );
         $this->assertDomEqual(
             error_message_for('post', $this->post),
@@ -105,7 +100,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'can\'t be empty';
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
+            'title' => new SAttribute('title', 'string'),
         );
         $this->assertDomEqual(
             error_message_on('title', $this->post),
@@ -121,8 +116,8 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
-            new SAttribute('body', 'text'),
+            'title' => new SAttribute('title', 'string'),
+            'body' => new SAttribute('body', 'text'),
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -140,8 +135,8 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
-            new SAttribute('private', 'boolean')
+            'title' => new SAttribute('title', 'string'),
+            'private' => new SAttribute('private', 'boolean')
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -163,7 +158,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->new_record = false;
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
+            'title' => new SAttribute('title', 'string'),
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -181,7 +176,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'Title can\'t be empty';
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
+            'title' => new SAttribute('title', 'string'),
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -200,8 +195,8 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
-            new SAttribute('written_on', 'date')
+            'title' => new SAttribute('title', 'string'),
+            'written_on' => new SAttribute('written_on', 'date')
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -254,8 +249,8 @@ class RecordHelperTest extends HelperTestCase
         $this->post->written_on = new SDateTime(2006, 3, 31, 1, 29, 35);
         $this->post->content_attributes = array
         (
-            new SAttribute('title', 'string'),
-            new SAttribute('written_on', 'datetime')
+            'title' => new SAttribute('title', 'string'),
+            'written_on' => new SAttribute('written_on', 'datetime')
         );
         $this->assertDomEqual(
             form('post', $this->post),
