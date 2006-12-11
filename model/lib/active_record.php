@@ -4,15 +4,16 @@ class SAssociationTypeMismatch extends SException { }
 
 class SActiveRecordMeta
 {
-    public $class            = null;
-    public $underscored      = null;
-    public $table_name        = null;
-    public $identity_field    = 'id';
-    public $inheritance_field = 'type';
-    public $attributes       = array();
-    public $relationships    = array();
+    public $class              = null;
+    public $underscored        = null;
+    public $table_name         = null;
+    public $identity_field     = 'id';
+    public $inheritance_field  = 'type';
+    public $attributes         = array();
+    public $relationships      = array();
     
     private $content_attributes = null;
+    private $content_attributes_names = null;
     
     private static $cache = array();
     
@@ -75,7 +76,8 @@ class SActiveRecordMeta
             $this->content_attributes = array();
             foreach ($this->attributes as $name => $attr)
                 if ($name != $this->identity_field && !preg_match('/(_id|_count)$/', $name) && $name != $this->inheritance_field)
-                    $this->content_attributes[$name] = $attr;
+                    if ($this->content_attributes_names === null || in_array($name, $this->content_attributes_names))
+                        $this->content_attributes[$name] = $attr;
         }
                
         return $this->content_attributes;
@@ -92,7 +94,7 @@ class SActiveRecordMeta
     protected function get_meta_from_class()
     {
         $ref = new ReflectionClass($this->class);
-        $props = array('table_name', 'identity_field', 'inheritance_field', 'relationships');
+        $props = array('table_name', 'identity_field', 'inheritance_field', 'relationships', 'content_attributes_names');
         foreach ($props as $p) 
             if ($ref->hasProperty($p)) $this->$p = $ref->getStaticPropertyValue($p);
     }
@@ -100,11 +102,11 @@ class SActiveRecordMeta
 
 class SActiveRecord extends SObservable implements ArrayAccess
 {
-    public $errors        = array();
+    public $errors         = array();
     public $attr_required  = array();
     public $attr_protected = array();
     public $attr_unique    = array();
-    public $validations   = array();
+    public $validations    = array();
     
     public $record_timestamps = False;
     

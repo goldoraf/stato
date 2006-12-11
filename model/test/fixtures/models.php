@@ -26,6 +26,7 @@ class Post extends SActiveRecord
 {
     public static $objects;
     public $record_timestamps = True;
+    public static $content_attributes_names = array('title');
 }
 
 class Employe extends SActiveRecord

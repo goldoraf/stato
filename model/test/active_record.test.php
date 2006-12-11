@@ -25,6 +25,12 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual(175, $bill->price);
     }
     
+    public function test_content_attributes_overloading()
+    {
+        $post = new Post();
+        $this->assertEqual(array('title' => new SAttribute('title', 'string')), $post->content_attributes());
+    }
+    
     public function test_multi_params_assignment()
     {
         $emp = new Employe(array('firstname'=>'Steve', 'lastname'=>'Warson', 
