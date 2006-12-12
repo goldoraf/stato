@@ -35,26 +35,47 @@ abstract class SCommand
     
     abstract public function execute();
     
-    protected function test_file_existence($path)
+    protected function create_dir($path, $base_path)
     {
-        $this->test_existence('file', $path);
-    }
-    
-    protected function test_folder_existence($path)
-    {
-        $this->test_existence('folder', $path);
-    }
-    
-    protected function test_existence($type, $path)
-    {
-        if (file_exists($path))
+        if (file_exists($base_path.'/'.$path))
+            $this->announce("exists $path");
+        else
         {
-            echo "WARNING : $type $path already exists !\n"
-            .'Do you want to overwrite (o), or abort (a) ? ';
-            $answer = fgetc(STDIN);
-            if ($answer == 'a') die("\nFile generation aborted.\n");
+            $this->announce("create $path");
+            SDir::mkdir($base_path.'/'.$path);
         }
-        return true;
+    }
+    
+    protected function create_file($path, $base_path, $content = '')
+    {
+        if (file_exists($base_path.'/'.$path))
+        {
+            if ($content == file_get_contents($base_path.'/'.$path))
+                $this->announce("identical $path");
+            else
+            {
+                $this->announce("overwrite $path ? (y/n)");
+                $answer = fgetc(STDIN);
+                if ($answer == 'n')
+                    $this->announce("skip $path");
+                else
+                {
+                    $this->announce("force $path");
+                    file_put_contents($base_path.'/'.$path, $content);
+                }
+            }
+        }
+        else
+        {
+            $this->announce("create $path");
+            file_put_contents($base_path.'/'.$path, $content);
+        }
+    }
+    
+    protected function copy($source_path, $path, $base_path)
+    {
+        $this->announce("copy $path");
+        SDir::copy($source_path, $base_path.'/'.$path);
     }
     
     protected function test_module_existence($subdir)
@@ -69,6 +90,11 @@ abstract class SCommand
              && file_exists(STATO_APP_PATH."/models/$subdir")
              && file_exists(STATO_APP_PATH."/views/$subdir")
              && file_exists(STATO_APP_PATH."/helpers/$subdir"));
+    }
+    
+    protected function announce($message)
+    {
+        echo "    $message\n";
     }
 }
 
