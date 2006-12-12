@@ -29,6 +29,13 @@ class SQuerySet implements Iterator, Countable
         $this->conn = SActiveRecord::connection();
     }
     
+    public function __clone()
+    {
+        $this->resource = null;
+        $this->count    = 0;
+        $this->cache    = null;
+    }
+    
     /**
      * Iterator methods
      **/
@@ -128,7 +135,7 @@ class SQuerySet implements Iterator, Countable
         elseif ($this->resource === null && is_array($this->cache)) return count($this->cache);
         else
         {
-            $clone = $this->self_clone();
+            $clone = clone $this;
             $clone->order_by = array();
             $clone->includes = array();
             $clone->offset   = null;
@@ -142,7 +149,7 @@ class SQuerySet implements Iterator, Countable
     
     public function delete()
     {
-        $clone = $this->self_clone();
+        $clone = clone $this;
         $clone->includes = array();
         $clone->joins    = array();
         $clone->order_by   = array();
@@ -162,7 +169,7 @@ class SQuerySet implements Iterator, Countable
     
     public function limit($limit, $offset = 0)
     {
-        $clone = $this->self_clone();
+        $clone = clone $this;
         $clone->limit = $limit;
         $clone->offset = $offset;
         return $clone;
@@ -171,21 +178,21 @@ class SQuerySet implements Iterator, Countable
     public function order_by()
     {
         $args = func_get_args();
-        $clone = $this->self_clone();
+        $clone = clone $this;
         $clone->order_by = array_merge($this->order_by, $args);
         return $clone;
     }
     
     public function join($sql)
     {
-        $clone = $this->self_clone();
+        $clone = clone $this;
         $clone->joins[] = $sql;
         return $clone;
     }
     
     public function distinct()
     {
-        $clone = $this->self_clone();
+        $clone = clone $this;
         $clone->distinct = true;
         return $clone;
     }
@@ -193,7 +200,7 @@ class SQuerySet implements Iterator, Countable
     public function includes()
     {
         $args = func_get_args();
-        $clone = $this->self_clone();
+        $clone = clone $this;
         $clone->includes = array_merge($this->includes, $args);
         $clone->joins = array_merge($this->joins, $this->include_joins($args));
         return $clone;
@@ -261,7 +268,7 @@ class SQuerySet implements Iterator, Countable
     protected function filter_or_exclude($args, $exclude = false)
     {
         $numargs = count($args);
-        $clone = $this->self_clone();
+        $clone = clone $this;
         
         if ($numargs > 1 && is_array($args[$numargs - 1]))
         {
@@ -501,22 +508,6 @@ class SQuerySet implements Iterator, Countable
             $stmt = preg_replace('/'.$key.'/i', $this->conn->quote($value), $stmt/*, 1*/);
         }
         return $stmt;
-    }
-    
-    protected function self_clone()
-    {
-        $class = __CLASS__;
-        $clone = new $class($this->meta);
-        $clone->filters  = $this->filters;
-        $clone->excludes = $this->excludes;
-        $clone->includes = $this->includes;
-        $clone->params   = $this->params;
-        $clone->order_by = $this->order_by;
-        $clone->joins    = $this->joins;
-        $clone->offset   = $this->offset;
-        $clone->limit    = $this->limit;
-        $clone->distinct = $this->distinct;
-        return $clone;
     }
 }
 
