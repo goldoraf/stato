@@ -3,7 +3,7 @@
 class GenerateCommand extends SCommand
 {
     protected $allowed_params = array('type' => true, 'name' => true);
-    protected $allowed_types  = array('controller', 'model', 'module');
+    protected $allowed_types  = array('controller', 'model', 'migration', 'module');
     
     public function execute()
     {
@@ -90,6 +90,24 @@ class GenerateCommand extends SCommand
         $this->create_dir("models/$module_name", STATO_APP_PATH);
         $this->create_dir("views/$module_name", STATO_APP_PATH);
         $this->create_dir("helpers/$module_name", STATO_APP_PATH);
+    }
+    
+    private function generate_migration()
+    {
+        $migration_name = $this->params['name'];
+        
+        $migration_class = SInflection::camelize($migration_name);
+        $migration_version = SMigrator::last_version(STATO_APP_ROOT_PATH.'/db/migrate') + 1;
+        $migration_path = "db/migrate/{$migration_version}_{$migration_name}.php";
+        
+        $this->create_file($migration_path, STATO_APP_ROOT_PATH,
+            SCodeGenerator::generate_file(
+                SCodeGenerator::render_template(
+                    STATO_CORE_PATH."/cli/lib/templates/empty_migration.php",
+                    array('class_name' => $migration_class)
+                )
+            )
+        );
     }
 }
 
