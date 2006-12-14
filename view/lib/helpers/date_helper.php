@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * Returns a set of select tags (one for year, month, and day) pre-selected for 
+ * accessing a specified date-based attribute (identified by <var>$method</var>) on an object 
+ * assigned to the template (identified by <var>$object</var>). It’s possible to tailor the 
+ * selects through the <var>$options</var> array.
+ * 
+ * Examples :
+ * <code>
+ * date_select('post', 'written_on');
+ * date_select('post', 'written_on', array('start_year' => 2005));
+ * date_select('post', 'written_on', array('start_year' => 2005, 'use_months_number' => true, 'include_blank' => true));
+ * date_select('post', 'written_on', array('order' => array('year', 'month', 'day'));
+ * </code> 
+ */
 function date_select($object_name, $method, $object, $options = array())
 {
     list($options['prefix'], $value) = default_date_options($object_name, $method, $object);
@@ -11,6 +25,11 @@ function date_select($object_name, $method, $object, $options = array())
     return select_date($date, $options);
 }
 
+/**
+ * Returns a set of select tags (one for year, month, day, hour, and minute) 
+ * pre-selected for accessing a specified datetime-based attribute (identified 
+ * by <var>$method</var>) on an object assigned to the template (identified by <var>$object</var>).
+ */
 function date_time_select($object_name, $method, $object, $options = array())
 {
     list($options['prefix'], $value) = default_date_options($object_name, $method, $object);
