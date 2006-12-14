@@ -42,43 +42,41 @@ class ScaffoldCommand extends SCommand
             'plural_hm_name' => SInflection::humanize(SInflection::pluralize($this->scaffold))
         );
         
-        $controller_path = STATO_APP_PATH."/controllers/{$this->sub_dir}".$this->params['controller_name'].'_controller.php';
-        $this->test_file_existence($controller_path);
-        file_put_contents($controller_path,
+        $controller_path = "controllers/{$this->sub_dir}".$this->params['controller_name'].'_controller.php';
+        $this->create_file($controller_path, STATO_APP_PATH,
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template("{$scaffold_templates_path}/controller.php", $this->assigns)
             )
         );
         
-        $views_dir = STATO_APP_PATH."/views/{$this->sub_dir}".$this->params['controller_name'];
-        $this->test_folder_existence($views_dir);
-        SDir::mkdir($views_dir);
+        $views_dir = "views/{$this->sub_dir}".$this->params['controller_name'];
+        $this->create_dir($views_dir, STATO_APP_PATH);
         
         foreach (array('index', 'view', 'create', 'update') as $view_name)
         {
-            file_put_contents("$views_dir/$view_name.php",
+            $this->create_file("$views_dir/$view_name.php", STATO_APP_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/{$view_name}.php", $this->assigns));
         }
         
         if ($this->ajax)
         {
-            file_put_contents("$views_dir/_objects_list.php",
+            $this->create_file("$views_dir/_objects_list.php", STATO_APP_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/_objects_list.php", $this->assigns));
         }
         
         if ($this->ajax)
-            $scaffold_layout_path = STATO_APP_PATH."/views/layouts/scaffold_ajax.php";
+            $scaffold_layout_path = "views/layouts/scaffold_ajax.php";
         else
-            $scaffold_layout_path = STATO_APP_PATH."/views/layouts/scaffold.php";
+            $scaffold_layout_path = "views/layouts/scaffold.php";
         
-        if (!file_exists($scaffold_layout_path))
-            @copy("{$scaffold_templates_path}/views/layout.php", $scaffold_layout_path);
+        $this->create_file($scaffold_layout_path, STATO_APP_PATH,
+            file_get_contents("{$scaffold_templates_path}/views/layout.php"));
             
         if ($this->ajax)
         {
-            $scaffold_helper_path = STATO_APP_PATH."/helpers/scaffold_ajax_helper.php";
-            if (!file_exists($scaffold_helper_path))
-                @copy("{$scaffold_templates_path}/helper.php", $scaffold_helper_path);
+            $scaffold_helper_path = "helpers/scaffold_ajax_helper.php";
+            $this->create_file($scaffold_helper_path, STATO_APP_PATH,
+                file_get_contents("{$scaffold_templates_path}/helper.php"));
         }
     }
 }
