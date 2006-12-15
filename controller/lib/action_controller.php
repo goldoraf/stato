@@ -50,9 +50,10 @@ class SActionController
     public $flash    = null;
     public $logger   = null;
     
-    protected $layout   = false;
-    protected $models   = array();
-    protected $helpers  = array();
+    protected $layout     = false;
+    protected $models     = array();
+    protected $helpers    = array();
+    protected $components = array();
     
     protected $hidden_actions  = array();
     
@@ -512,6 +513,9 @@ class SActionController
         
         SDependencies::require_dependencies('models', $this->models, get_class($this));
         SDependencies::require_dependencies('helpers', $this->helpers, get_class($this));
+        
+        if (!empty($this->components))
+            SDependencies::require_components($this->components);
     }
     
     private function component_response($options, $reuse_response)

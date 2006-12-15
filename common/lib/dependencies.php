@@ -2,6 +2,17 @@
 
 class SDependencies
 {
+    public static function require_components($components)
+    {
+        foreach ($components as $component)
+        {
+            $path = STATO_CORE_PATH."/components/lib/$component.php";
+            if (!file_exists($path))
+                throw new SException("Missing component $component");
+            require_once($path);
+        }
+    }
+    
     public static function require_dependencies($layer, $dependencies, $relative_to = null)
     {
         foreach ($dependencies as $dependency) self::require_dependency($layer, $dependency, $relative_to);
