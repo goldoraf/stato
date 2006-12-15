@@ -36,22 +36,19 @@ class SFixture
         $this->read_fixture_file();
     }
     
-    /*public function instanciate_fixtures()
+    public function instanciate_fixtures()
     {
         $instances = array();
-        $class = $this->class_name;
-        if (class_exists($class))
+        if (class_exists($this->class_name))
         {
-            $temp = new $class(null, true);
-            $pk = $temp->identity_field;
+            $qs = new SQuerySet(SActiveRecordMeta::retrieve($this->class_name));
             foreach($this->values as $obj => $values)
-            {
-                $instances[$obj] = SActiveStore::find_by_pk($class, $values[$pk]);
-            }
+                $instances[$obj] = $qs->get($values['id']);
+                
             return $instances;
         }
         return false;
-    }*/
+    }
     
     public function delete_existing_fixtures()
     {
