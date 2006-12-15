@@ -4,8 +4,6 @@ define('STATO_TIME_START', microtime(true));
 define('STATO_CORE_PATH', '<?php echo $project_core_path; ?>');
 define('STATO_APP_ROOT_PATH', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
 
-include(STATO_APP_ROOT_PATH.'/conf/environment.php');
-
 require(STATO_CORE_PATH.'/common/common.php');
 require(STATO_CORE_PATH.'/cli/cli.php');
 require(STATO_CORE_PATH.'/controller/controller.php');
@@ -13,3 +11,5 @@ require(STATO_CORE_PATH.'/model/model.php');
 require(STATO_CORE_PATH.'/view/view.php');
 require(STATO_CORE_PATH.'/webservice/webservice.php');
 require(STATO_CORE_PATH.'/mailer/mailer.php');
+
+include(STATO_APP_ROOT_PATH.'/conf/environment.php');
