@@ -1,7 +1,7 @@
 // Dont't change this file. Configuration is done in conf/environment.php
 
 define('STATO_TIME_START', microtime(true));
-define('STATO_CORE_PATH', '<?php echo STATO_CORE_PATH; ?>');
+define('STATO_CORE_PATH', '<?php echo $project_core_path; ?>');
 define('STATO_APP_ROOT_PATH', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
 
 include(STATO_APP_ROOT_PATH.'/conf/environment.php');

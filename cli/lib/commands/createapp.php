@@ -4,8 +4,12 @@ require_once(STATO_CORE_PATH.'/model/lib/filesystem/dir.php');
 
 class CreateAppCommand extends SCommand
 {
-    protected $allowed_options = array('path' => true);
+    protected $allowed_options = array('path' => true, 'compile' => false);
     protected $allowed_params  = array('project_name' => true);
+    
+    private $project_dirs     = array('app', 'cache', 'conf', 'db', 'lib', 'log', 'public', 'scripts');
+    private $project_app_dirs = array('controllers', 'helpers', 'i18n', 'models', 'views');
+    private $core_layers      = array('common', 'controller', 'mailer', 'model', 'view', 'webservice');
     
     public function execute()
     {
@@ -16,11 +20,8 @@ class CreateAppCommand extends SCommand
         
         $this->create_dir('', $project_path);
         
-        foreach (array('app', 'cache', 'conf', 'db', 'lib', 'log', 'public', 'scripts') as $dir)
-            $this->create_dir($dir, $project_path);
-            
-        foreach (array('controllers', 'helpers', 'i18n', 'models', 'views') as $dir)
-            $this->create_dir("app/$dir", $project_path);
+        foreach ($this->project_dirs as $dir) $this->create_dir($dir, $project_path);   
+        foreach ($this->project_app_dirs as $dir) $this->create_dir("app/$dir", $project_path);
         
         $this->create_dir("app/views/layouts", $project_path);
         
@@ -40,15 +41,49 @@ class CreateAppCommand extends SCommand
             SCodeGenerator::generate_class('ApplicationController', '', 'SActionController'));
         
         $this->create_file("app/helpers/application_helper.php", $project_path);
-            
-        $this->create_file("conf/boot.php", $project_path,
-            SCodeGenerator::generate_file(
-                SCodeGenerator::render_template(STATO_CORE_PATH.'/cli/lib/templates/boot.php')
-            )
-        );
         
         $this->create_file("conf/environment.php", $project_path,
-            "<?php\n\ndefine('STATO_APP_MODE', 'dev');\n\n?>");
+            SCodeGenerator::generate_file("define('STATO_APP_MODE', 'dev');"));
+            
+        if (!isset($this->options['compile'])) $project_core_path = STATO_CORE_PATH;
+        else
+        {
+            $project_core_path = "$project_path/core";
+            $this->create_dir("core", $project_path);
+            $this->compile($project_core_path);
+        }
+        
+        $this->create_file("conf/boot.php", $project_path,
+            SCodeGenerator::generate_file(
+                SCodeGenerator::render_template(STATO_CORE_PATH.'/cli/lib/templates/boot.php',
+                    array('project_core_path' => $project_core_path))
+            )
+        );
+    }
+    
+    private function compile($core_path)
+    {
+        foreach ($this->core_layers as $layer)
+        {
+            $source_dir = STATO_CORE_PATH."/$layer/lib";
+            $this->create_dir($layer, $core_path);
+            $this->create_file("$layer/$layer.php", $core_path, SCodeGenerator::generate_file($this->compile_dir($source_dir)));
+        }
+    }
+    
+    private function compile_dir($source_dir, $code = '')
+    {
+        $it = new DirectoryIterator($source_dir);
+        foreach ($it as $file)
+        {
+            if ($file->isDot() || $file->getFilename() == '.svn') continue;
+            
+            if ($file->isFile()) 
+                $code.= str_replace(array('<?php', '?>'), '', file_get_contents($source_dir.'/'.$file->getFilename()));
+            elseif ($file->isDir())
+                $code.= $this->compile_dir($source_dir.'/'.$file->getFilename());
+        }
+        return $code;
     }
 }
 
