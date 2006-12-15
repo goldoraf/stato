@@ -11,7 +11,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
         
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
         $topic->move_lower();
@@ -21,7 +21,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_3'],
                                  $this->topics['list_2'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
         
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
         $topic->move_higher();
@@ -31,7 +31,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
                                  
         $topic = new SListDecorator($this->topics['list_1'], 'forum');
         $topic->move_to_bottom();
@@ -41,7 +41,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_3'],
                                  $this->topics['list_4'],
                                  $this->topics['list_1']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
                                  
         $topic = new SListDecorator($this->topics['list_1'], 'forum');
         $topic->move_to_top();
@@ -51,7 +51,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
                                  
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
         $topic->move_to_bottom();
@@ -61,7 +61,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_3'],
                                  $this->topics['list_4'],
                                  $this->topics['list_2']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
                                  
         $topic = new SListDecorator($this->topics['list_4'], 'forum');
         $topic->move_to_top();
@@ -71,7 +71,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_1'],
                                  $this->topics['list_3'],
                                  $this->topics['list_2']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
                                  
         $topic = new SListDecorator($this->topics['list_3'], 'forum');
         $topic->move_to_bottom();
@@ -81,7 +81,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_1'],
                                  $this->topics['list_2'],
                                  $this->topics['list_3']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
     }
     
     function test_higher_lower()
@@ -138,12 +138,12 @@ class ListDecoratorTest extends ActiveTestCase
         
         $new4->insert_at(3);
         $this->assertEqual(3, $new4->position);
-        $new = new SListDecorator(SActiveStore::find_by_pk('Topic', $new->id), 'forum');
+        $new = new SListDecorator(Topic::$objects->get($new->id), 'forum');
         $this->assertEqual(4, $new->position);
         
         $new->insert_at(2);
         $this->assertEqual(2, $new->position);
-        $new4 = new SListDecorator(SActiveStore::find_by_pk('Topic', $new4->id), 'forum');
+        $new4 = new SListDecorator(Topic::$objects->get($new4->id), 'forum');
         $this->assertEqual(4, $new4->position);
         
         $new5 = new SListDecorator(new Topic(array('forum_id' => 2)), 'forum');
@@ -151,7 +151,7 @@ class ListDecoratorTest extends ActiveTestCase
         $this->assertEqual(5, $new5->position);
         $new5->insert_at(1);
         $this->assertEqual(1, $new5->position);
-        $new4 = new SListDecorator(SActiveStore::find_by_pk('Topic', $new4->id), 'forum');
+        $new4 = new SListDecorator(Topic::$objects->get($new4->id), 'forum');
         $this->assertEqual(5, $new4->position);
     }
     
@@ -161,7 +161,7 @@ class ListDecoratorTest extends ActiveTestCase
                                  $this->topics['list_2'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
                                  
         $topic = new SListDecorator($this->topics['list_2'], 'forum');
         $topic->delete();
@@ -170,7 +170,7 @@ class ListDecoratorTest extends ActiveTestCase
         $this->assertEqual(array($this->topics['list_1'],
                                  $this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
         
         $this->assertEqual(1, $this->topics['list_1']->position);
         $this->assertEqual(2, $this->topics['list_3']->position);
@@ -182,7 +182,7 @@ class ListDecoratorTest extends ActiveTestCase
         
         $this->assertEqual(array($this->topics['list_3'],
                                  $this->topics['list_4']),
-                                 SActiveStore::find_all('Topic', 'forum_id = 1', array('order' => 'position ASC')));
+                                 Topic::$objects->filter('forum_id = 1')->order_by('position')->to_array());
         
         $this->assertEqual(1, $this->topics['list_3']->position);
         $this->assertEqual(2, $this->topics['list_4']->position);

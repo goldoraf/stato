@@ -7,8 +7,8 @@ return array
     'eager_loading',
     'associations',
     'callbacks',
-    //'decorators',
-    //'list_decorator',
+    'decorators',
+    'list_decorator',
     'migration'
 );
 

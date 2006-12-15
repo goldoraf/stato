@@ -148,10 +148,10 @@ class Category extends SActiveRecord
 }
 
 // For ListDecorator tests
-/*class Forum extends SActiveRecord
+class Forum extends SActiveRecord
 {
-    public $table_name = 'forums';
-    public $relationships = array
+    public static $objects;
+    public static $relationships = array
     (
         'topics' => 'has_many'
     );
@@ -159,8 +159,8 @@ class Category extends SActiveRecord
 
 class Topic extends SActiveRecord
 {
-    public $table_name = 'topics';
-}*/
+    public static $objects;
+}
 
 // For validation tests
 /*class User extends SActiveRecord

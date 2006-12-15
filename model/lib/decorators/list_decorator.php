@@ -2,16 +2,18 @@
 
 class SListDecorator extends SActiveRecordDecorator
 {
-    protected $column = null;
-    protected $scope  = null;
+    protected $column  = null;
+    protected $scope   = null;
+    protected $manager = null;
     
     public function __construct($record, $scope = null, $column = 'position')
     {
-        $this->record = $record;
-        $this->column = $column;
-        $this->scope  = $scope;
-        $this->record->add_callback($this, 'beforeCreate', 'addToListBottom');
-        $this->record->add_callback($this, 'afterDelete', 'removeFromList');
+        $this->record  = $record;
+        $this->column  = $column;
+        $this->scope   = $scope;
+        $this->manager = new SManager(get_class($this->record));
+        $this->record->add_callback($this, 'before_create', 'add_to_list_bottom');
+        $this->record->add_callback($this, 'after_delete', 'remove_from_list');
     }
     
     public function insert_at($position = 1)
@@ -90,19 +92,25 @@ class SListDecorator extends SActiveRecordDecorator
     public function higher_item()
     {
         if (!$this->is_in_list()) return null;
-        return SActiveStore::find_first(
-            get_class($this->record),
-            $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) - 1)
-        );
+        try {
+            return $this->manager->get(
+                $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) - 1)
+            );
+        } catch (SActiveRecordDoesNotExist $e) {
+            return null;
+        }
     }
     
     public function lower_item()
     {
         if (!$this->is_in_list()) return null;
-        return SActiveStore::find_first(
-            get_class($this->record),
-            $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) + 1)
-        );
+        try {
+            return $this->manager->get(
+                $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) + 1)
+            );
+        } catch (SActiveRecordDoesNotExist $e) {
+            return null;
+        }
     }
     
     public function add_to_list_top()
@@ -135,7 +143,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     protected function bottom_item()
     {
-        return SActiveStore::find_first(get_class($this->record), $this->scope_condition(), array('order' => "{$this->column} DESC"));
+        return $this->manager->filter($this->scope_condition())->order_by("-{$this->column}")->first();
     }
     
     protected function assume_bottom_position()
@@ -150,8 +158,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     protected function decrement_positions_on_higher_items($position)
     {
-        SActiveStore::update_all(
-            get_class($this->record),
+        $this->manager->update_all(
             "{$this->column} = ({$this->column} - 1)",
             $this->scope_condition()." AND {$this->column} <= {$position}"
         );
@@ -160,8 +167,7 @@ class SListDecorator extends SActiveRecordDecorator
     protected function decrement_positions_on_lower_items()
     {
         if (!$this->is_in_list()) return;
-        SActiveStore::update_all(
-            get_class($this->record),
+        $this->manager->update_all(
             "{$this->column} = ({$this->column} - 1)",
             $this->scope_condition()." AND {$this->column} > ".$this->record->__get($this->column)
         );
@@ -170,8 +176,7 @@ class SListDecorator extends SActiveRecordDecorator
     protected function increment_positions_on_higher_items()
     {
         if (!$this->is_in_list()) return;
-        SActiveStore::update_all(
-            get_class($this->record),
+        $this->manager->update_all(
             "{$this->column} = ({$this->column} + 1)",
             $this->scope_condition()." AND {$this->column} < ".$this->record->__get($this->column)
         );
@@ -179,8 +184,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     protected function increment_positions_on_lower_items($position)
     {
-        SActiveStore::update_all(
-            get_class($this->record),
+        $this->manager->update_all(
             "{$this->column} = ({$this->column} + 1)",
             $this->scope_condition()." AND {$this->column} >= {$position}"
         );
@@ -188,8 +192,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     protected function increment_positions_on_all_items()
     {
-        SActiveStore::update_all(
-            get_class($this->record),
+        $this->manager->update_all(
             "{$this->column} = ({$this->column} + 1)",
             $this->scope_condition()
         );

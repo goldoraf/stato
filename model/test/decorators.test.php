@@ -22,31 +22,27 @@ class DecoratorsTest extends ActiveTestCase
     
     function test_basics()
     {
-        $post = new DummyDecorator(SActiveStore::find_by_pk('Post', 1), 'test');
+        $post = new DummyDecorator(Post::$objects->get(1), 'test');
         $this->assertEqual('Frameworks : A new hope...', $post->title);
         $this->assertEqual(1, $post->test_method());
         $post->title = 'Framework clone wars';
         $this->assertEqual('Framework clone wars', $post->title);
-        $this->assertEqual(array('title', 'author', 'text', 'published'), array_keys($post->content_attributes()));
         $post->save();
-        $post_bis = new DummyDecorator(SActiveStore::find_by_pk('Post', 1), 'test');
+        $post_bis = new DummyDecorator(Post::$objects->get(1), 'test');
         $this->assertEqual($post->title, $post_bis->title);
         $this->assertEqual($post->author, $post_bis->author);
     }
     
     function test_associations()
     {
-        $company = new DummyDecorator(SActiveStore::find_by_pk('Company', 1), 'test');
+        $company = new DummyDecorator(Company::$objects->get(1), 'test');
         $this->assertEqual(1, $company->products->count());
-        $this->assertEqual(1, $company->count_products());
         $product = new Product(array('name'=>'CD-R', 'price'=>'0.75'));
-        $company->products[] = $product;
+        $company->products->add($product);
         $this->assertEqual(2, $company->products->count());
-        $this->assertEqual(2, $company->count_products());
         $company->save();
-        $company_reloaded = new DummyDecorator(SActiveStore::find_by_pk('Company', 1), 'test');
+        $company_reloaded = new DummyDecorator(Company::$objects->get(1), 'test');
         $this->assertEqual(2, $company_reloaded->products->count());
-        $this->assertEqual(2, $company_reloaded->count_products());
     }
 }
 

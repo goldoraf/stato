@@ -11,8 +11,8 @@ require('lib/fixture.php');
 require('lib/migration.php');
 require('lib/paginator.php');
 
-/*require('lib/decorators/base_decorator.php');
-require('lib/decorators/list_decorator.php');*/
+require('lib/decorators/base_decorator.php');
+require('lib/decorators/list_decorator.php');
 
 require('lib/drivers/abstract_driver.php');
 require('lib/drivers/mysql_driver.php');
