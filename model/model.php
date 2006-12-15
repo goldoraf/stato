@@ -18,7 +18,6 @@ require('lib/drivers/abstract_driver.php');
 require('lib/drivers/mysql_driver.php');
 
 require('lib/filesystem/csv.php');
-require('lib/filesystem/folder.php');
 if (extension_loaded('gd')) require('lib/filesystem/image.php');
 if (extension_loaded('zip')) require('lib/filesystem/zip.php');
 
