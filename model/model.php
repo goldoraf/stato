@@ -19,7 +19,6 @@ require('lib/drivers/mysql_driver.php');
 
 require('lib/filesystem/csv.php');
 require('lib/filesystem/folder.php');
-require('lib/filesystem/dir.php');
 if (extension_loaded('gd')) require('lib/filesystem/image.php');
 if (extension_loaded('zip')) require('lib/filesystem/zip.php');
 

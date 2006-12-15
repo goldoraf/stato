@@ -137,7 +137,7 @@ class SActionView
     
     public function write_fragment($key, $content)
     {
-        if (!SFileUtils::mkdirs(dirname($key), 0700, true))
+        if (!SDir::mkdirs(dirname($key), 0700, true))
             throw new SException('Caching failed with dirs creation');
             
         file_put_contents($key, $content);

@@ -407,7 +407,7 @@ class SActionController
         else 
             $path = $options;
         
-        if (!SFileUtils::mkdirs(dirname($this->page_cache_path($path)), 0700, true))
+        if (!SDir::mkdirs(dirname($this->page_cache_path($path)), 0700, true))
             throw new SException('Caching failed with dirs creation');
         file_put_contents($this->page_cache_path($path), $content);
     }

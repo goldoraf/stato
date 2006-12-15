@@ -6,7 +6,7 @@ require('lib/date.php');
 require('lib/locale.php');
 require('lib/encryption.php');
 require('lib/logger.php');
-require('lib/fileutils.php');
+require('lib/dir.php');
 require('lib/inflection.php');
 
 ?>
