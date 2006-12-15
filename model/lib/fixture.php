@@ -43,8 +43,10 @@ class SFixture
         {
             $qs = new SQuerySet(SActiveRecordMeta::retrieve($this->class_name));
             foreach($this->values as $obj => $values)
-                $instances[$obj] = $qs->get($values['id']);
-                
+            {
+                try { $instances[$obj] = $qs->get($values['id']); }
+                catch (SActiveRecordDoesNotExist $e) {}
+            }
             return $instances;
         }
         return false;
