@@ -76,7 +76,7 @@ class SQuerySet implements Iterator, Countable
         return $this->fetch();
     }
     
-    public function dump()
+    public function to_array()
     {
         if (!is_array($this->cache))
         {
@@ -118,7 +118,7 @@ class SQuerySet implements Iterator, Countable
             unset($args[0]);
         }
         $clone = call_user_func_array(array($this, 'filter'), $args);
-        $set = $clone->dump();
+        $set = $clone->to_array();
         if (($count = count($set)) < 1) throw new SActiveRecordDoesNotExist();
         elseif ($count == 1) return $set[0];
         else

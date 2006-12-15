@@ -6,7 +6,7 @@ class EagerLoadingTest extends ActiveTestCase
                              
     public function test_loading_with_one_association()
     {
-        $articles = Article::$objects->includes('comments')->dump();
+        $articles = Article::$objects->includes('comments')->to_array();
         $this->assertTrue($articles[0]->comments->is_loaded());
         $this->assertTrue($articles[1]->comments->is_loaded()); // the assoc must be flagged as loaded even if empty
         $this->assertEqual(2, $articles[0]->comments->count());
@@ -16,19 +16,19 @@ class EagerLoadingTest extends ActiveTestCase
         foreach ($articles[0]->comments->all() as $c) { $i++; }
         $this->assertEqual(2, $i);
         
-        $comments = $articles[0]->comments->dump();
+        $comments = $articles[0]->comments->to_array();
         $this->assertEqual('xxx@yyy.com', array_shift($comments)->author);
         
         $article = Article::$objects->includes('comments')->get("articles.title='PHP6 overview'");
         $this->assertTrue($article->comments->is_loaded());
         $this->assertEqual(2, $article->comments->count());
-        $comments = $article->comments->dump();
+        $comments = $article->comments->to_array();
         $this->assertEqual('xxx@yyy.com', array_shift($comments)->author);
     }
     
     public function test_loading_with_multiple_associations()
     {
-        $articles = Article::$objects->includes('comments', 'categories')->dump();
+        $articles = Article::$objects->includes('comments', 'categories')->to_array();
         $this->assertTrue($articles[0]->comments->is_loaded());
         $this->assertEqual(2, $articles[0]->comments->count());
         $this->assertTrue($articles[0]->categories->is_loaded());

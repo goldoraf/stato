@@ -170,7 +170,7 @@ class SHasManyThroughTest extends ActiveTestCase
     public function test_has_many_join_model()
     {
         $comp = Company::$objects->get(1);
-        $profiles = $comp->profiles->all()->dump();
+        $profiles = $comp->profiles->all()->to_array();
         $this->assertEqual(2, count($profiles));
         $this->assertEqual('blablabla', $profiles[0]->cv);
         $this->assertEqual('xxx', $profiles[1]->cv);
@@ -237,7 +237,7 @@ class SManyToManyTest extends ActiveTestCase
     {
         $richard = Developer::$objects->get(2);
         $proj = $richard->projects->create(array('name' => 'PlzNotAnotherRecursiveAcronym'));
-        $projects = $richard->projects->all()->dump();
+        $projects = $richard->projects->all()->to_array();
         $this->assertEqual($projects[1]->name, $proj->name);
         $this->assertFalse($proj->is_new_record());
     }
