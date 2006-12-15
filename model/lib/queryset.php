@@ -76,6 +76,13 @@ class SQuerySet implements Iterator, Countable
         return $this->fetch();
     }
     
+    public function first()
+    {
+        $this->rewind();
+        if ($this->valid()) return $this->current();
+        else return null;
+    }
+    
     public function to_array()
     {
         if (!is_array($this->cache))
