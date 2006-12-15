@@ -17,10 +17,6 @@ require('lib/decorators/list_decorator.php');*/
 require('lib/drivers/abstract_driver.php');
 require('lib/drivers/mysql_driver.php');
 
-require('lib/filesystem/csv.php');
-if (extension_loaded('gd')) require('lib/filesystem/image.php');
-if (extension_loaded('zip')) require('lib/filesystem/zip.php');
-
 require('lib/associations/association.php');
 require('lib/associations/belongs_to_association.php');
 require('lib/associations/has_one_association.php');

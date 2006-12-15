@@ -71,6 +71,7 @@ class SFixture
     {
         if ($this->mode == self::CSV_MODE)
         {
+            require_once(STATO_CORE_PATH.'/components/lib/csv.php');
             $csv = new SCsvIterator(fopen($this->fixture_path.'.csv', 'r'));
             $i = 1;
             foreach($csv as $data)
