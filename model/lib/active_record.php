@@ -335,10 +335,10 @@ class SActiveRecord extends SObservable implements ArrayAccess
             $type = $this->meta->attributes[$key]->type;
             switch ($type)
             {
-                case 'date':
+                case SColumn::DATE:
                     $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day'];
                     break;
-                case 'datetime':
+                case SColumn::DATETIME:
                     $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
                                   .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
                     break;
@@ -446,11 +446,11 @@ class SActiveRecord extends SObservable implements ArrayAccess
     protected static function establish_connection($config = array())
     {
         $config = include(STATO_APP_ROOT_PATH.'/conf/database.php');
-        $driver_class = 'S'.$config[STATO_APP_MODE]['driver'].'Driver';
-        if (!class_exists($driver_class)) 
-            throw new SException('Database driver not found !');
+        $adapter_class = 'S'.$config[STATO_APP_MODE]['driver'].'Adapter';
+        if (!class_exists($adapter_class)) 
+            throw new SException('Database adapter not found !');
         
-        self::$conn = new $driver_class($config[STATO_APP_MODE]);
+        self::$conn = new $adapter_class($config[STATO_APP_MODE]);
         self::$conn->connect();
     }
 }

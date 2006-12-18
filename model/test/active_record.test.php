@@ -28,7 +28,7 @@ class ActiveRecordTest extends ActiveTestCase
     public function test_content_attributes_overloading()
     {
         $post = new Post();
-        $this->assertEqual(array('title' => new SAttribute('title', 'string')), $post->content_attributes());
+        $this->assertEqual(array('title' => new SColumn('title', SColumn::STRING)), $post->content_attributes());
     }
     
     public function test_multi_params_assignment()

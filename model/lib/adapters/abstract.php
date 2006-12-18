@@ -2,13 +2,12 @@
 
 class SInvalidStatementException extends Exception {}
 
-abstract class SAbstractDriver
+abstract class SAbstractAdapter
 {
     private $conn = null;
     private $log  = array();
     
-    protected $native_db_types   = array();
-    protected $simplified_types = array();
+    protected $native_db_types = array();
     
     public $runtime = 0;
     public $config = array
@@ -65,8 +64,20 @@ abstract class SAbstractDriver
     
     public function simplified_type($sql_type)
     {
-        foreach($this->simplified_types as $regex => $type)
-            if (preg_match($regex, $sql_type)) return $type;
+        if (preg_match('/int/i', $sql_type))
+            return SColumn::INTEGER;
+        elseif (preg_match('/text/i', $sql_type))
+            return SColumn::TEXT;
+        elseif (preg_match('/char|string/i', $sql_type))
+            return SColumn::STRING;
+        elseif (preg_match('/boolean/i', $sql_type))
+            return SColumn::BOOLEAN;
+        elseif (preg_match('/datetime|timestamp/i', $sql_type))
+            return SColumn::DATETIME;
+        elseif (preg_match('/date/i', $sql_type))
+            return SColumn::DATE;
+        elseif (preg_match('/float|double|decimal|numeric/i', $sql_type))
+            return SColumn::FLOAT;
     }
     
     public function quote($value, $attribute_type = Null)
@@ -75,13 +86,13 @@ abstract class SAbstractDriver
         if (is_object($value)) return $this->quote_string($value->__toString());
         switch($attribute_type)
         {
-            case 'date':
+            case SColumn::DATE:
                 return $this->quote_string($value->__toString());
                 break;
-            case 'datetime':
+            case SColumn::DATETIME:
                 return $this->quote_string($value->__toString());
                 break;
-            case 'boolean':
+            case SColumn::BOOLEAN:
                 return ($value === True ? '1' : '0');
                 break;
             default:

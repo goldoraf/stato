@@ -1,7 +1,7 @@
 <?php
 
-require('lib/attribute.php');
-require('lib/definitions.php');
+require('lib/column.php');
+require('lib/table.php');
 require('lib/validation.php');
 require('lib/observable.php');
 require('lib/active_record.php');
@@ -14,8 +14,8 @@ require('lib/paginator.php');
 require('lib/decorators/base_decorator.php');
 require('lib/decorators/list_decorator.php');
 
-require('lib/drivers/abstract_driver.php');
-require('lib/drivers/mysql_driver.php');
+require('lib/adapters/abstract.php');
+require('lib/adapters/mysql.php');
 
 require('lib/associations/association.php');
 require('lib/associations/belongs_to_association.php');

@@ -1,30 +1,19 @@
 <?php
 
-class SMySqlDriver extends SAbstractDriver
+class SMySqlAdapter extends SAbstractAdapter
 {
     public $native_db_types = array
     (
-        'primary_key'   => 'int(11) DEFAULT NULL auto_increment',
-        'string'        => array('name' => 'varchar', 'limit' => 255),
-        'text'          => array('name' => 'text'),
-        'float'         => array('name' => 'float'),
-        'datetime'      => array('name' => 'datetime'),
-        'date'          => array('name' => 'date'),
-        'integer'       => array('name' => 'int', 'limit' => 11),
-        'boolean'       => array('name' => 'tinyint', 'limit' => 1)
+        SColumn::PK       => 'int(11) DEFAULT NULL auto_increment',
+        SColumn::STRING   => array('name' => 'varchar', 'limit' => 255),
+        SColumn::TEXT     => array('name' => 'text'),
+        SColumn::FLOAT    => array('name' => 'float'),
+        SColumn::DATETIME => array('name' => 'datetime'),
+        SColumn::DATE     => array('name' => 'date'),
+        SColumn::INTEGER  => array('name' => 'int', 'limit' => 11),
+        SColumn::BOOLEAN  => array('name' => 'tinyint', 'limit' => 1)
     );
     
-    protected $simplified_types = array
-    (
-        '/tinyint|smallint|mediumint|int|bigint/i'  => 'integer',
-        '/tinytext|text|mediumtext|longtext/i'      => 'text',
-        '/float|double|decimal/i'                   => 'float',
-        '/varchar|char/i'                           => 'string',
-        '/datetime|timestamp/i'                     => 'datetime',
-        '/date/i'                                   => 'date',
-        '/enum|set/i'                               => 'string'
-    );
-
     public function connect()
     {
         $this->conn = @mysql_connect($this->config['host'],
@@ -70,15 +59,18 @@ class SMySqlDriver extends SAbstractDriver
         $rs = $this->execute("SHOW COLUMNS FROM ".$table);
         $fields = array();
         while($row = $this->fetch($rs))
-            $fields[$row['Field']] = new SAttribute($row['Field'], 
-                                                    $this->simplified_type($row['Type']), 
-                                                    $row['Default']);
+            $fields[$row['Field']] = new SColumn($row['Field'], 
+                                                 $this->simplified_type($row['Type']), 
+                                                 $row['Default']);
         return $fields;
     }
     
     public function simplified_type($sql_type)
     {
-        if ($sql_type == 'tinyint(1)') return 'boolean';
+        if ($sql_type == 'tinyint(1)') 
+            return SColumn::BOOLEAN;
+        elseif (preg_match('/enum|set/i', $sql_type))
+            return SColumn::STRING;
         return parent::simplified_type($sql_type);
     }
     
