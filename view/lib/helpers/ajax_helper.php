@@ -19,10 +19,41 @@ function link_to_function($content, $function, $html_options = array())
 }
 
 /**
- * Returns a link to a remote action whose url is defined by $options['url'].
+ * Returns a link to a remote action whose url is defined by <var>$options['url']</var>.
  * This action is called using xmlHttpRequest and the response can be inserted into the page, 
- * in a DOM object whose id is specified by $options['update'].
+ * in a DOM object whose id is specified by <var>$options['update']</var>. Usually, the response would 
+ * be a partial prepared by the controller with either render_partial() or render_partial_collection().
  * 
+ * Example :
+ * <code>link_to_remote("Delete this post", array('update' => 'posts', 
+ *     'url' => array('action' => 'destroy', 'id' => $this->post->id)));</code>
+ *     
+ * You can also specify an array for <var>$options['update']</var> to allow for 
+ * easy redirection of output to an other DOM element if a server-side error occurs.
+ * 
+ * Example :
+ * <code>link_to_remote("Delete this post", array('url' => array('action' => 'destroy', 'id' => $this->post->id),
+ *     'update' => array('success' => 'posts', 'failure' => 'errors')));</code>
+ *     
+ * Optionally, you can use the <var>$options['position']</var> parameter to influence 
+ * how the target DOM element is updated. It must be one of 'before', 'top', 'bottom', or 'after'.
+ * 
+ * By default, these remote requests are processed asynchronous during which various 
+ * JavaScript callbacks can be triggered (for progress indicators and the likes). 
+ * All callbacks get access to the request object, which holds the underlying XMLHttpRequest.
+ * To access the server response, use request.responseText, to find out the HTTP status, use request.status.
+ * 
+ * The callbacks that may be specified are (in order):
+ * <var>loading</var>:     Called when the remote document is being loaded with data by the browser.
+ * <var>loaded</var>:      Called when the browser has finished loading the remote document.
+ * <var>interactive</var>: Called when the user can interact with the remote document, even though it has not finished loading.
+ * <var>success</var>:     Called when the XMLHttpRequest is completed, and the HTTP status code is in the 2XX range.
+ * <var>failure</var>:     Called when the XMLHttpRequest is completed, and the HTTP status code is not in the 2XX range.
+ * <var>complete</var>:    Called when the XMLHttpRequest is complete (fires after success/failure if they are present).
+ * 
+ * Example :
+ * <code>link_to_remote("Delete this post", array('url' => array('action' => 'destroy', 'id' => $this->post->id),
+ *     'update'  => 'posts', 'failure' => "alert('HTTP Error ' + request.status + '!')"));</code>
  * 
  * @return string
  **/
