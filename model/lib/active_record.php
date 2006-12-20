@@ -69,13 +69,13 @@ class SActiveRecordMeta
         return $ref->getParentClass()->getName();
     }
     
-    public function content_attributes()
+    public function content_attributes($filter = array())
     {
         if ($this->content_attributes === null)
         {
             $this->content_attributes = array();
             foreach ($this->attributes as $name => $attr)
-                if ($name != $this->identity_field && !preg_match('/(_id|_count)$/', $name) && $name != $this->inheritance_field)
+                if ($name != $this->identity_field && !preg_match('/(_id|_count)$/', $name) && $name != $this->inheritance_field && !in_array($name, $filter))
                     if ($this->content_attributes_names === null || in_array($name, $this->content_attributes_names))
                         $this->content_attributes[$name] = $attr;
         }
@@ -290,6 +290,9 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     public function content_attributes()
     {
+        if ($this->record_timestamps) 
+            return $this->meta->content_attributes(array('created_on', 'updated_on'));
+        
         return $this->meta->content_attributes();
     }
     
