@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/model/lib/filesystem/dir.php');
-
 class CreateAppCommand extends SCommand
 {
     protected $allowed_options = array('path' => true, 'compile' => false);
