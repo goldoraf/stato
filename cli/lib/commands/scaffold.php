@@ -74,7 +74,7 @@ class ScaffoldCommand extends SCommand
             
         if ($this->ajax)
         {
-            $scaffold_helper_path = "helpers/scaffold_ajax_helper.php";
+            $scaffold_helper_path = "helpers/{$this->sub_dir}scaffold_ajax_helper.php";
             $this->create_file($scaffold_helper_path, STATO_APP_PATH,
                 file_get_contents("{$scaffold_templates_path}/helper.php"));
         }
