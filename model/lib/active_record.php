@@ -438,6 +438,12 @@ class SActiveRecord extends SObservable implements ArrayAccess
         return self::$conn;
     }
     
+    public static function connection_benchmark()
+    {
+        if (!isset(self::$conn)) return 0;
+        return self::$conn->runtime;
+    }
+    
     protected function conn()
     {
         return self::connection();
