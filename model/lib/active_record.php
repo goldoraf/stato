@@ -75,7 +75,8 @@ class SActiveRecordMeta
         {
             $this->content_attributes = array();
             foreach ($this->attributes as $name => $attr)
-                if ($name != $this->identity_field && !preg_match('/(_id|_count)$/', $name) && $name != $this->inheritance_field && !in_array($name, $filter))
+                if ($name != $this->identity_field && !preg_match('/(_id|_count)$/', $name) 
+                    && $name != $this->inheritance_field && !in_array($name, $filter) && $attr instanceof SColumn)
                     if ($this->content_attributes_names === null || in_array($name, $this->content_attributes_names))
                         $this->content_attributes[$name] = $attr;
         }
