@@ -27,12 +27,12 @@ class SRequest
     
     public function is_ssl()
     {
-        return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
+        return @$_SERVER['HTTPS'] == 'on';
     }
     
     public function is_xml_http_request()
     {
-        if (preg_match('/XMLHttpRequest/i', $_SERVER['HTTP_X_REQUESTED_WITH'])) return true;
+        if (preg_match('/XMLHttpRequest/i', @$_SERVER['HTTP_X_REQUESTED_WITH'])) return true;
         return false;
     }
     
