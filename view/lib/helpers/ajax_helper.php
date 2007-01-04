@@ -230,8 +230,8 @@ function options_for_ajax($options)
     {
         $js_options['insertion'] = 'Insertion.'.ucfirst($options['position']);
     }
-    if ($options['form']) $js_options['parameters'] = 'Form.serialize(this)';
-    elseif ($options['with']) $js_options['parameters'] = $options['with'];
+    if (@$options['form'] === true) $js_options['parameters'] = 'Form.serialize(this)';
+    elseif (@$options['with']) $js_options['parameters'] = $options['with'];
     
     return options_for_js($js_options);
 }
