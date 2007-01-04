@@ -3,7 +3,7 @@
 function form_tag($url_options, $options=array())
 {
     $html_options = array_merge(array('method'=>'post'), $options);
-    if ($html_options['multipart'])
+    if (isset($html_options['multipart']) && $html_options['multipart'] === true)
     {
         $html_options['enctype'] = "multipart/form-data";
         unset($html_options['multipart']);
