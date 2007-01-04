@@ -337,7 +337,11 @@ class SRouteSet
     
     public function recognize_path($url)
     {
-        list($path, $query_string) = explode('?', $url);
+        if (strpos($url, '?') !== false)
+            list($path, $query_string) = explode('?', $url);
+        else
+            list($path, $query_string) = array($url, '');
+            
         $options = array();
         $recognized = false;
         
