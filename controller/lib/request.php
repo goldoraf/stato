@@ -27,7 +27,7 @@ class SRequest
     
     public function is_ssl()
     {
-        return $_SERVER['HTTPS'] == 'on';
+        return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
     }
     
     public function is_xml_http_request()
