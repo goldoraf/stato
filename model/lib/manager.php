@@ -6,7 +6,7 @@ class SManager
     
     public function __construct($class)
     {
-        $this->meta = SActiveRecordMeta::retrieve($class);
+        $this->meta = SMapper::retrieve($class);
     }
     
     public function __call($method, $args)

@@ -20,7 +20,7 @@ class ActiveTestCase extends StatoTestCase
         $this->recreate_database();
         $this->loaded_fixtures = SFixture::create_fixtures(STATO_FIXTURES_DIR, $this->fixtures);
         foreach ($this->models as $class) 
-            SActiveRecordMeta::add_manager_to_class(SInflection::camelize($class));
+            SMapper::add_manager_to_class(SInflection::camelize($class));
     }
     
     public function setUp()

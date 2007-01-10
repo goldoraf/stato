@@ -102,7 +102,7 @@ class SAssociationMeta
     
     protected function base_meta()
     {
-        if ($this->base_meta === null) $this->base_meta = SActiveRecordMeta::retrieve($this->class);
+        if ($this->base_meta === null) $this->base_meta = SMapper::retrieve($this->class);
         return $this->base_meta;
     }
 }

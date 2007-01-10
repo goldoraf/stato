@@ -17,7 +17,7 @@ class MigrationTest extends StatoTestCase
     public function __construct()
     {
         parent::UnitTestCase();
-        SActiveRecordMeta::add_manager_to_class('Person');
+        SMapper::add_manager_to_class('Person');
     }
     
     public function tearDown()
@@ -48,7 +48,7 @@ class MigrationTest extends StatoTestCase
         try { Person::connection()->remove_column('people', 'administrator'); }
         catch (Exception $e) { }
         
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
     }
     
     public function test_create_table()
@@ -111,7 +111,7 @@ class MigrationTest extends StatoTestCase
         Person::connection()->add_column('people', 'favorite_day', 'date');
         Person::connection()->add_column('people', 'male', 'boolean');
         
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         
         $p = new Person(array('first_name'=>'Neil', 'last_name'=>'Armstrong', 
         'bio'=>'First man on the moon...', 'age'=>76, 'height'=>1.72, 'male'=>true));
@@ -140,12 +140,12 @@ class MigrationTest extends StatoTestCase
     {
         SActiveRecord::connection()->execute('DELETE FROM people');
         SActiveRecord::connection()->add_column('people', 'girlfriend', 'string');
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $p = new Person(array('girlfriend' => 'bobette'));
         $p->save();
         
         SActiveRecord::connection()->rename_column('people', 'girlfriend', 'exgirlfriend');
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $p = Person::$objects->get(2);
         $this->assertEqual('bobette', $p->exgirlfriend);
         
@@ -188,13 +188,13 @@ class MigrationTest extends StatoTestCase
     public function test_change_column_with_new_default()
     {
         SActiveRecord::connection()->add_column('people', 'administrator', 'boolean', array('default'=>true));
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $p = new Person();
         $this->assertTrue($p->administrator);
         
         SActiveRecord::connection()->change_column('people', 'administrator', 'boolean', array('default'=>false));
         $this->assertNothingThrown();
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $p = new Person();
         $this->assertFalse($p->administrator);
     }
@@ -207,8 +207,8 @@ class MigrationTest extends StatoTestCase
         SMigrator::up(dirname(__FILE__).'/fixtures/migrate');
         
         $this->assertEqual(2, SMigrator::current_version());
-        SActiveRecordMeta::reset_meta_information('Person');
-        SActiveRecordMeta::add_manager_to_class('Reminder');
+        SMapper::reset_meta_information('Person');
+        SMapper::add_manager_to_class('Reminder');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $r = new Reminder(array('content'=>'hello world', 'remind_at'=>SDateTime::today()));
         $r->save();
@@ -217,7 +217,7 @@ class MigrationTest extends StatoTestCase
         SMigrator::down(dirname(__FILE__).'/fixtures/migrate');
         
         $this->assertEqual(0, SMigrator::current_version());
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $this->assertFalse(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $this->assertFalse(in_array('reminders', SActiveRecord::connection()->tables()));
     }
@@ -229,12 +229,12 @@ class MigrationTest extends StatoTestCase
         
         SMigrator::up(dirname(__FILE__).'/fixtures/migrate', 1);
         
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $this->assertFalse(in_array('reminders', SActiveRecord::connection()->tables()));
         
         SMigrator::up(dirname(__FILE__).'/fixtures/migrate', 2);
-        SActiveRecordMeta::add_manager_to_class('Reminder');
+        SMapper::add_manager_to_class('Reminder');
         $r = new Reminder(array('content'=>'hello world', 'remind_at'=>SDateTime::today()));
         $r->save();
         $this->assertEqual('hello world', Reminder::$objects->get(1)->content);
@@ -244,7 +244,7 @@ class MigrationTest extends StatoTestCase
     {
         SMigrator::up(dirname(__FILE__).'/fixtures/migrate');
         SMigrator::down(dirname(__FILE__).'/fixtures/migrate', 1);
-        SActiveRecordMeta::reset_meta_information('Person');
+        SMapper::reset_meta_information('Person');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $this->assertFalse(in_array('reminders', SActiveRecord::connection()->tables()));
     }
@@ -269,8 +269,8 @@ class MigrationTest extends StatoTestCase
         SMigrator::migrate(dirname(__FILE__).'/fixtures/migrate');
         
         $this->assertEqual(2, SMigrator::current_version());
-        SActiveRecordMeta::reset_meta_information('Person');
-        SActiveRecordMeta::add_manager_to_class('Reminder');
+        SMapper::reset_meta_information('Person');
+        SMapper::add_manager_to_class('Reminder');
         $this->assertTrue(in_array('last_name', array_keys(SActiveRecord::connection()->columns('people'))));
         $r = new Reminder(array('content'=>'hello world', 'remind_at'=>SDateTime::today()));
         $r->save();

@@ -30,7 +30,7 @@ class SFixture
         $this->db = $db;
         $this->mode = $mode;
         $this->class_name = ucfirst(SInflection::singularize($table_name));
-        if (class_exists($this->class_name)) SActiveRecordMeta::add_manager_to_class($this->class_name);
+        if (class_exists($this->class_name)) SMapper::add_manager_to_class($this->class_name);
         $this->table_name = $table_name;
         $this->fixture_path = $fixture_path;
         $this->read_fixture_file();
@@ -41,7 +41,7 @@ class SFixture
         $instances = array();
         if (class_exists($this->class_name))
         {
-            $qs = new SQuerySet(SActiveRecordMeta::retrieve($this->class_name));
+            $qs = new SQuerySet(SMapper::retrieve($this->class_name));
             foreach($this->values as $obj => $values)
             {
                 try { $instances[$obj] = $qs->get($values['id']); }

@@ -17,7 +17,7 @@ class SHasManyMeta extends SAssociationMeta
         {
             $this->type = 'SHasManyThrough';
             $through_class = SInflection::camelize(SInflection::singularize($options['through']));
-            $through_meta = SActiveRecordMeta::retrieve($through_class);;
+            $through_meta = SMapper::retrieve($through_class);;
             $this->through_table_name = $through_meta->table_name;
             $this->through_foreign_key = $owner_meta->underscored.'_id';
             
