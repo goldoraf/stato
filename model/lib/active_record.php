@@ -26,10 +26,8 @@ class SActiveRecordMeta
     public static function retrieve($class)
     {
         if (!isset(self::$cache[$class]))
-        {
-            $meta_class = $class.'Meta';
             self::$cache[$class] = new SActiveRecordMeta($class);
-        }
+        
         return self::$cache[$class];
     }
     
