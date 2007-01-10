@@ -26,7 +26,7 @@ class SDependencies
         if (!file_exists($path))
             throw new SException("Missing ".SInflection::singularize($layer)." $dependency");
         require_once($path);
-        if ($layer == 'models') SActiveRecordMeta::add_manager_to_class(SInflection::camelize($class));
+        if ($layer == 'models') SMapper::add_manager_to_class(SInflection::camelize($class));
     }
     
     public static function dependency_file_path($layer, $dependency, $relative_to = null)
