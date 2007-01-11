@@ -40,25 +40,13 @@ class SXmlRpcClient
         $this->credentials = "$username:$password";
     }
     
-    private function send_request($method, $args)
+    public static function encode_request($method, $args)
     {
         $request = new SXmlRpcRequest($method, $args);
-        $headers = array
-        (
-            "Content-Type: text/xml",
-            "User-Agent: {$this->user_agent}",
-            "Content-length: ".$request->length()
-        );
-        $client = new SHttpClient($this->uri, $headers, $this->credentials);
-        $response = $client->post($request->to_xml());
-        
-        if ($response->code != 200)
-            throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
-        
-        return $this->parse_response($response->body);
+        return $request->to_xml();
     }
     
-    private function parse_response($xml_string)
+    public static function decode_response($xml_string)
     {
         try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { throw new SXmlRpcClientException('Failed to parse response'); }
@@ -84,6 +72,23 @@ class SXmlRpcClient
             throw new SXmlRpcClientException('Invalid response : no <value> tag');
             
         return SXmlRpcValue::typecast($xml->params->param->value->asXml());
+    }
+    
+    private function send_request($method, $args)
+    {
+        $headers = array
+        (
+            "Content-Type: text/xml",
+            "User-Agent: {$this->user_agent}",
+            "Content-length: ".$request->length()
+        );
+        $client = new SHttpClient($this->uri, $headers, $this->credentials);
+        $response = $client->post(self::encode_request($method, $args));
+        
+        if ($response->code != 200)
+            throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
+        
+        return self::decode_response($response->body);
     }
 }
 
@@ -199,7 +204,12 @@ class SXmlRpcValue
                 return $value->__toString();
                 break;
             default:
-                return $this->array_to_xml(get_object_vars($value));
+                // if to_array() method exists, the object is an ActiveRecord
+                // or a Struct
+                if (method_exists($value, 'to_array'))
+                    return $this->array_to_xml($value->to_array());
+                else
+                    return $this->array_to_xml(get_object_vars($value));
                 break;
         }
     }

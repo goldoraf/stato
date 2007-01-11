@@ -18,15 +18,11 @@ class XmlRpcServerTest extends XmlTestCase
 </methodCall>
 EOD;
         $server = new SXmlRpcServer();
-        $this->assertEqual(array('test.myMethod', array('hello world', true, 12)),
-                           $server->parse_request($xml));
+        $request = $server->parse_request($xml);
+        $this->assertEqual('test', $request->service);
+        $this->assertEqual('myMethod', $request->method);
+        $this->assertEqual(array('hello world', true, 12), $request->params);
     }
-    
-    /*public function test_server()
-    {
-        $client = new SXmlRpcClient('http://bdtef_v2/api/xmlrpc');
-        echo $client->gestion->centres->hello_world('raphael', 'rougeron');
-    }*/
 }
 
 ?>

@@ -3,7 +3,6 @@
 require_once(STATO_CORE_PATH.'/controller/controller.php');
 require_once(STATO_CORE_PATH.'/view/view.php');
 require_once(STATO_CORE_PATH.'/mailer/mailer.php');
-require_once('controller_mocks.php');
 
 class BasicController extends SActionController
 {
@@ -118,7 +117,7 @@ class AroundController extends SActionController
     }
 }
 
-class FiltersTest extends UnitTestCase
+class FiltersTest extends ControllerTestCase
 {
     public function test_basic()
     {
@@ -173,14 +172,6 @@ class FiltersTest extends UnitTestCase
     {
         $this->assertTrue($this->process('AroundController')->assigns['ran_before']);
         $this->assertTrue($this->process('AroundController')->assigns['ran_after']);
-    }
-    
-    private function process($controller, $action = 'show')
-    {
-        $request = new MockRequest();
-        $request->action = $action;
-        $c = new $controller();
-        return $c->process($request, new MockResponse());
     }
 }
 

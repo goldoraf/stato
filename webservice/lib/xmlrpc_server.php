@@ -32,7 +32,16 @@ class SXmlRpcServer
                 $params[] = SXmlRpcValue::typecast($param->value->asXml());
             }
         }
-        return array($method, $params);
+        
+        $parts = explode('.', $method);
+        if (count($parts) < 2 || count($parts) > 3)
+            throw new SXmlRpcServerException("Requested method does not exist : $method");
+        
+        $method = array_pop($parts);
+        if (count($parts) == 2) $service = $parts[0].'/'.$parts[1];
+        else $service = $parts[0];
+        
+        return new SWebServiceRequest('xmlrpc', $service, $method, $params);
     }
     
     public function write_response($value)

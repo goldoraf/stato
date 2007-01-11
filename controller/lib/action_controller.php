@@ -3,6 +3,7 @@
 class SUnknownControllerException extends SException {}
 class SUnknownActionException extends SException {}
 class SUnknownProtocolException extends SException {}
+class SUnknownServiceException extends SException {}
 class SDoubleRenderException extends SException {}
 
 /**
@@ -70,6 +71,8 @@ class SActionController
     protected $skip_before_filters = array();
     protected $skip_after_filters  = array();
     
+    protected $web_services = array();
+    
     private $sub_directory      = null;
     
     private $performed_render   = false;
@@ -83,10 +86,7 @@ class SActionController
     
     public static function factory($request, $response)
     {
-        if ($request->controller == 'api') 
-            return self::dispatch_web_service_request($request, $response);
-		else 
-            return self::instanciate_controller($request->controller)->process($request, $response);
+        return self::instanciate_controller($request->controller)->process($request, $response);
     }
     
     public static function process_with_exception($request, $response, $exception)
@@ -113,11 +113,6 @@ class SActionController
         else $this->$method();
         
         return $this->response;
-    }
-    
-    public function invoke_direct_web_service($request)
-    {
-        return call_user_func_array(array(&$this, $request->method), $request->params);
     }
     
     public function __construct()
@@ -447,6 +442,30 @@ class SActionController
         return array($paginator, $paginator->current_page());
     }
     
+    protected function add_web_service($name, $instance)
+    {
+        $this->web_services[$name] = $instance;
+    }
+    
+    protected function invoke_web_service($protocol)
+    {
+        if (!in_array($protocol, array('xmlrpc')))
+            throw new SUnknownProtocolException($protocol);
+            
+        $class = 'S'.$protocol.'Server';
+        $server = new $class();
+        
+        $ws_request = $server->parse_request($this->request->raw_post_data());
+        
+        if (!array_key_exists($ws_request->service, $this->web_services))
+            throw new SUnknownServiceException();
+        
+        $return_value = $this->web_services[$ws_request->service]->invoke($ws_request);
+        $raw_response = $server->write_response($return_value);
+        
+        $this->send_data($raw_response, array('type' => 'text/xml', 'disposition' => 'inline'));
+    }
+    
     private function perform_action()
     {
         $action = $this->action_name();
@@ -666,35 +685,6 @@ class SActionController
     {
         return (!$this->request->is_post() && isset($this->response->headers['Status'])
             && $this->response->headers['Status'] < 400);
-    }
-    
-    private static function dispatch_web_service_request($request, $response)
-    {
-        $protocol = $request->action;
-        if (!in_array($protocol, array('xmlrpc')))
-            throw new SUnknownProtocolException($protocol);
-        $class = 'S'.$protocol.'Server';
-        $server = new $class();
-        list($method, $params) = $server->parse_request($request->raw_post_data());
-        $parts = explode('.', $method);
-        if (count($parts) < 2 || count($parts) > 3)
-            throw new SException("Requested method does not exist : $method");
-        $method = array_pop($parts);
-        if (count($parts) == 2) $service = $parts[0].'/'.$parts[1];
-        else $service = $parts[0];
-        
-        $ws_request = new SWebServiceRequest($protocol, $service, $method, $params);
-        $return_value = self::invoke_web_service($ws_request);
-        $response->body = $server->write_response($return_value);
-        return $response;
-    }
-    
-    private static function invoke_web_service($request)
-    {
-        if (file_exists(self::controller_file('api')))
-            return self::instanciate_controller('api')->invoke_delegated_web_service($request);
-        else
-            return self::instanciate_controller($request->service)->invoke_direct_web_service($request);
     }
     
     private static function instanciate_controller($req_controller)

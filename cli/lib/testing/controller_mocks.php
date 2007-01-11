@@ -5,6 +5,7 @@ class MockRequest
     public $controller = Null;
     public $action     = Null;
     public $params     = array();
+    public $raw_post_data = '';
     public $method     = 'GET';
     public $request_uri = '/';
     public $host       = 'test.host';

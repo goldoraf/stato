@@ -28,6 +28,11 @@ class SWebServiceStruct implements ArrayAccess
         return true;
     }
     
+    public function to_array()
+    {
+        return $this->values;
+    }
+    
     public function offsetExists($offset)
     {
         return $this->member_exists($offset);
