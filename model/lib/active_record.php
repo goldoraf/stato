@@ -53,6 +53,11 @@ class SActiveRecord extends SObservable implements ArrayAccess
         return '['.get_class($this)."]\n".$str;
     }
     
+    public function to_array()
+    {
+        return $this->values;
+    }
+    
     public function __repr()
     {
         return $this->id;
