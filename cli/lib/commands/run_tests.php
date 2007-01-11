@@ -8,11 +8,13 @@ require_once(ST_DIR.'/unit_tester.php');
 require_once(ST_DIR.'/reporter.php');
 
 define('TESTS_DIR', STATO_CORE_PATH.'/cli/lib/testing');
-require_once(TESTS_DIR.'/showpasses.php');
-require_once(TESTS_DIR.'/colortextreporter.php');
-require_once(TESTS_DIR.'/statotestcase.php');
-require_once(TESTS_DIR.'/activetestcase.php');
-require_once(TESTS_DIR.'/helpertestcase.php');
+require_once(TESTS_DIR.'/show_passes.php');
+require_once(TESTS_DIR.'/color_text_reporter.php');
+require_once(TESTS_DIR.'/stato_test_case.php');
+require_once(TESTS_DIR.'/active_test_case.php');
+require_once(TESTS_DIR.'/helper_test_case.php');
+require_once(TESTS_DIR.'/controller_test_case.php');
+require_once(TESTS_DIR.'/controller_mocks.php');
 
 // we call session_start() now to avoid triggering "headers already sent" error
 session_start();
