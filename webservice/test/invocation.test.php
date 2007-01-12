@@ -19,24 +19,26 @@ class UserAPI extends SWebServiceAPI
 {
     public function __construct()
     {
-        $this->add_api_method('new_user', array('login' => 'string', 'pwd' => 'string'), 'User');
+        $this->add_api_method('hello_world', null, array('string'));
+        $this->add_api_method('new_user1', array('string', 'string'), 'User');
+        $this->add_api_method('new_user2', array('login' => 'string', 'pwd' => 'string'), 'User');
     }
 }
 
 class UserService extends SWebService
 {
-    public function new_user()
+    public function hello_world()
+    {
+        return 'Hello world';
+    }
+    
+    public function new_user1()
     {
         $user = new User();
         $user->login = $this->params[0];
         $user->pwd   = $this->params[1];
         $user->admin = false;
         return $user;
-    }
-    
-    public function hello_world()
-    {
-        return 'Hello world';
     }
 }
 
@@ -57,9 +59,9 @@ class XmlRpcInvocationTest extends StatoTestCase
 {
     public function testBasic()
     {
-        $this->assertEqual('Hello world', $this->do_method_call('user.hello_world'));
+        $this->assertEqual('Hello world', $this->do_method_call('user.helloWorld'));
         $this->assertEqual(array('login' => 'jdoe', 'pwd' => 'test', 'admin' => false),
-                           $this->do_method_call('user.new_user', array('jdoe', 'test')));
+                           $this->do_method_call('user.newUser1', array('jdoe', 'test')));
     }
     
     private function do_method_call($method, $params = array())

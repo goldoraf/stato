@@ -17,7 +17,7 @@ class SWebService
         $this->request = $request;
         $this->params  =& $this->request->params;
         
-        $method = $this->request->method;
+        $method = SInflection::underscore($this->request->method);
         
         $this->before_invocation();
         $response = $this->$method();
