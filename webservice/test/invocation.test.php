@@ -66,9 +66,10 @@ class XmlRpcInvocationTest extends StatoTestCase
     
     private function do_method_call($method, $params = array())
     {
+        $xml_rpc_request = new SXmlRpcRequest($method, $params);
         $request = new MockRequest();
         $request->action = 'xmlrpc';
-        $request->raw_post_data = SXmlRpcClient::encode_request($method, $params);
+        $request->raw_post_data = $xml_rpc_request->to_xml();
         $c = new ApiController();
         return SXmlRpcClient::decode_response($c->process($request, new MockResponse())->body);
     }

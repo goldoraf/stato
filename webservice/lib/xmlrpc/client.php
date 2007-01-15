@@ -40,13 +40,7 @@ class SXmlRpcClient
         $this->credentials = "$username:$password";
     }
     
-    public static function encode_request($method, $args)
-    {
-        $request = new SXmlRpcRequest($method, $args);
-        return $request->to_xml();
-    }
-    
-    public static function decode_response($xml_string)
+    public function decode_response($xml_string)
     {
         try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { throw new SXmlRpcClientException('Failed to parse response'); }
@@ -76,6 +70,8 @@ class SXmlRpcClient
     
     private function send_request($method, $args)
     {
+        $request = new SXmlRpcRequest($method, $args);
+        
         $headers = array
         (
             "Content-Type: text/xml",
@@ -83,12 +79,12 @@ class SXmlRpcClient
             "Content-length: ".$request->length()
         );
         $client = new SHttpClient($this->uri, $headers, $this->credentials);
-        $response = $client->post(self::encode_request($method, $args));
+        $response = $client->post($request->to_xml());
         
         if ($response->code != 200)
             throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
         
-        return self::decode_response($response->body);
+        return $this->decode_response($response->body);
     }
 }
 
