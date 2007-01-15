@@ -90,6 +90,8 @@ class GenerateCommand extends SCommand
         $this->create_dir("models/$module_name", STATO_APP_PATH);
         $this->create_dir("views/$module_name", STATO_APP_PATH);
         $this->create_dir("helpers/$module_name", STATO_APP_PATH);
+        $this->create_dir("apis/$module_name", STATO_APP_PATH);
+        $this->create_dir("i18n/$module_name", STATO_APP_PATH);
     }
     
     private function generate_migration()
