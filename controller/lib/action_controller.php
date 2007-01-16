@@ -455,13 +455,21 @@ class SActionController
         $class = 'S'.$protocol.'Server';
         $server = new $class();
         
-        $ws_request = $server->parse_request($this->request->raw_post_data());
+        try {
+            $ws_request = $server->parse_request($this->request->raw_post_data());
         
-        if (!array_key_exists($ws_request->service, $this->web_services))
-            throw new SUnknownServiceException();
-        
-        $return_value = $this->web_services[$ws_request->service]->invoke($ws_request);
-        $raw_response = $server->write_response($return_value);
+            if (!array_key_exists($ws_request->service, $this->web_services))
+                throw new SUnknownServiceException();
+            
+            $return_value = $this->web_services[$ws_request->service]->invoke($ws_request);
+            $raw_response = $server->write_response($return_value);
+        }
+        catch (SWebServiceFault $fault) {
+            $raw_response = $server->write_fault($fault->getMessage(), $fault->getCode());
+        }
+        catch (Exception $e) {
+            $raw_response = $server->write_fault('Internal server error', 500);
+        }
         
         $this->send_data($raw_response, array('type' => 'text/xml', 'disposition' => 'inline'));
     }

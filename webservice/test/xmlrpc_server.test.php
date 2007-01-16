@@ -21,7 +21,7 @@ EOD;
         $request = $server->parse_request($xml);
         $this->assertEqual('test', $request->service);
         $this->assertEqual('myMethod', $request->method);
-        $this->assertEqual(array('hello world', true, 12), $request->params);
+        $this->assertEqual(array('hello world', true, 12), $request->casted_params);
     }
 }
 

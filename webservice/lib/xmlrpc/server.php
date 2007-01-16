@@ -44,6 +44,25 @@ class SXmlRpcServer
         return new SWebServiceRequest('xmlrpc', $service, $method, $params);
     }
     
+    public function write_fault($message, $code = 0)
+    {
+        $value = new SXmlRpcValue(array('faultCode' => (integer) $code, 
+                                        'faultString' => (string) $message));
+        $xml_value = $value->to_xml();
+        $xml = <<<EOD
+<?xml version="1.0"?>
+<methodResponse>
+  <fault>
+    <value>
+      $xml_value
+    </value>
+  </fault>
+</methodResponse>
+
+EOD;
+        return $xml;
+    }
+    
     public function write_response($value)
     {
         $value = new SXmlRpcValue($value);

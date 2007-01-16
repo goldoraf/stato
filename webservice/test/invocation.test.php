@@ -22,6 +22,9 @@ class UserAPI extends SWebServiceAPI
         $this->add_api_method('hello_world', null, array('string'));
         $this->add_api_method('new_user1', array('string', 'string'), 'User');
         $this->add_api_method('new_user2', array('login' => 'string', 'pwd' => 'string'), 'User');
+        $this->add_api_method('add_users', array(array('User')), array('integer'));
+        $this->add_api_method('del_users', array(array('integer')), array('boolean'));
+        $this->add_api_method('get_a_fault', null, null);
     }
 }
 
@@ -39,6 +42,40 @@ class UserService extends SWebService
         $user->pwd   = $this->params[1];
         $user->admin = false;
         return $user;
+    }
+    
+    public function new_user2()
+    {
+        $user = new User();
+        $user->login = $this->params['login'];
+        $user->pwd   = $this->params['pwd'];
+        $user->admin = false;
+        return $user;
+    }
+    
+    public function add_users()
+    {
+        $count = 0;
+        foreach ($this->params[0] as $i => $user)
+        {
+            $u = new User();
+            $u->login = 'login'.$i;
+            $u->pwd   = 'pwd'.$i;
+            $u->admin = false;
+            
+            if ($user == $u) $count++;
+        }
+        return $count;
+    }
+    
+    public function del_users()
+    {
+         return $this->params[0] == array(1,2,3);
+    }
+    
+    public function get_a_fault()
+    {
+        throw new SWebServiceFault('ERROR', 42);
     }
 }
 
@@ -62,6 +99,23 @@ class XmlRpcInvocationTest extends StatoTestCase
         $this->assertEqual('Hello world', $this->do_method_call('user.helloWorld'));
         $this->assertEqual(array('login' => 'jdoe', 'pwd' => 'test', 'admin' => false),
                            $this->do_method_call('user.newUser1', array('jdoe', 'test')));
+        $this->assertEqual(array('login' => 'jdoe', 'pwd' => 'test', 'admin' => false),
+                           $this->do_method_call('user.newUser2', array('jdoe', 'test')));
+        $this->assertEqual(array('login' => 'jdoe', 'pwd' => 'test', 'admin' => false),
+                           $this->do_method_call('user.newUser2', array('login' => 'jdoe', 'pwd' => 'test')));
+        $this->assertEqual(true,
+                           $this->do_method_call('user.delUsers', array(array(1,2,3))));
+        $this->assertEqual(2,
+                           $this->do_method_call('user.addUsers', array(array(
+                               array('login' => 'login0', 'pwd' => 'pwd0', 'admin' => false),
+                               array('login' => 'login1', 'pwd' => 'pwd1', 'admin' => false)
+                           ))));
+    }
+    
+    public function testFault()
+    {
+        $this->expectException('SXmlRpcRequestFailedException');
+        $this->do_method_call('user.getAFault');
     }
     
     private function do_method_call($method, $params = array())

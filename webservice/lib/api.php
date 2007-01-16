@@ -7,10 +7,8 @@ class SWebServiceApi
     
     public function add_api_method($name, $expects, $returns)
     {
-        if (!is_array($expects))
-            throw new SException('Expected an array for $expects option');
-        
         $public_name = SInflection::camelize($name);
+        $public_name[0] = strtolower($public_name[0]);
         $this->api_methods[$name] = new SWebServiceMethod($name, $public_name, $expects, $returns);
         $this->api_methods_public_names[$public_name] = $name;
     }
@@ -43,10 +41,10 @@ class SWebServiceApi
 
 class SWebServiceMethod
 {
-    private $name;
-    private $public_name;
-    private $expects;
-    private $returns;
+    public $name;
+    public $public_name;
+    public $expects;
+    public $returns;
     
     public function __construct($name, $public_name, $expects, $returns)
     {
@@ -54,11 +52,6 @@ class SWebServiceMethod
         $this->public_name = $public_name;
         $this->expects = $expects;
         $this->returns = $returns;
-    }
-    
-    public function param_names()
-    {
-        return array_keys($this->expects);
     }
 }
 

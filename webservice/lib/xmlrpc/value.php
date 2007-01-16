@@ -4,18 +4,30 @@ class SXmlRpcValueException extends SException {}
 
 class SXmlRpcValue
 {
-    private $value = null;
+    const TYPE_INTEGER  = 'integer';
+    const TYPE_FLOAT    = 'float';
+    const TYPE_STRING   = 'string';
+    const TYPE_DATETIME = 'datetime';
+    const TYPE_BOOLEAN  = 'boolean';
+    const TYPE_BASE64   = 'base64';
+    const TYPE_ARRAY    = 'array';
+    const TYPE_OBJECT   = 'object';
     
-    public function __construct($value)
+    public $value = null;
+    public $type  = null;
+    
+    public function __construct($value, $type = null)
     {
         $this->value = $value;
+        if ($type === null) $this->type = gettype($this->value);
+        else $this->type = $type;
     }
     
     public static function typecast($xml_string)
     {
         try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { 
-            throw new SXmlRpcValueException("Failed to typecast XML value : $xml_string");
+            throw new SXmlRpcValueException("Failed to parse XML value : $xml_string");
         }
         
         list($type, $value) = each($xml);
@@ -24,25 +36,19 @@ class SXmlRpcValue
         switch ($type)
         {
             case 'i4':
-            
+                // fall through to the next case
             case 'int':
-                return (integer) $value;
-                break;
+                return new SXmlRpcValue((integer) $value, self::TYPE_INTEGER);
             case 'double':
-                return (float) $value;
-                break;
+                return new SXmlRpcValue((float) $value, self::TYPE_FLOAT);
             case 'boolean':
-                return $value == 1;
-                break;
+                return new SXmlRpcValue($value == 1, self::TYPE_BOOLEAN);
             case 'string':
-                return $value;
-                break;
+                return new SXmlRpcValue($value, self::TYPE_STRING);
             case 'dateTime.iso8601':
-                return SDateTime::parse($value);
-                break;
+                return new SXmlRpcValue(SDateTime::parse($value), self::TYPE_DATETIME);
             case 'base64':
-                return base64_decode($value);
-                break;
+                return new SXmlRpcValue(base64_decode($value), self::TYPE_BASE64);
             case 'array':
                 if (!$value instanceof SimpleXMLElement/* || empty($value->data)*/)
                     throw new SXmlRpcValueException('Invalid XML string for array type');
@@ -51,8 +57,7 @@ class SXmlRpcValue
                 foreach ($value->data->value as $element)
                     $values[] = self::typecast($element->asXml());
                 
-                return $values;
-                break;
+                return new SXmlRpcValue($values, self::TYPE_ARRAY);
             case 'struct':
                 if (!$value instanceof SimpleXMLElement)
                     throw new SXmlRpcValueException('Invalid XML string for struct type');
@@ -65,17 +70,26 @@ class SXmlRpcValue
                     
                     $values[(string) $member->name] = self::typecast($member->value->asXml());
                 }
-                return $values;
-                break;
+                return new SXmlRpcValue($values, self::TYPE_ARRAY);
             default:
                 throw new SXmlRpcValueException("$type is not a native XML-RPC type");
-                break;
         }
+    }
+    
+    public function to_php()
+    {
+        if ($this->type != self::TYPE_ARRAY) return $this->value;
+        
+        $value = array();
+        foreach ($this->value as $k => $v)
+            $value[$k] = $v->to_php();
+            
+        return $value;
     }
     
     public function to_xml()
     {
-        switch (gettype($this->value))
+        switch ($this->type)
         {
             case 'boolean':
                 return '<boolean>'.(($this->value) ? '1' : '0').'</boolean>';

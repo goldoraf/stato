@@ -50,7 +50,7 @@ class SXmlRpcClient
             if (empty($xml->fault->value))
                 throw new SXmlRpcClientException('Invalid fault response : no <value> tag');
             
-            try { $fault = SXmlRpcValue::typecast($xml->fault->value->asXml()); }
+            try { $fault = SXmlRpcValue::typecast($xml->fault->value->asXml())->to_php(); }
             catch (SXmlRpcValueException $e) { 
                 throw new SXmlRpcClientException('Invalid fault response');
             }
@@ -65,7 +65,7 @@ class SXmlRpcClient
         elseif (empty($xml->params->param->value))
             throw new SXmlRpcClientException('Invalid response : no <value> tag');
             
-        return SXmlRpcValue::typecast($xml->params->param->value->asXml());
+        return SXmlRpcValue::typecast($xml->params->param->value->asXml())->to_php();
     }
     
     private function send_request($method, $args)
