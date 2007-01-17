@@ -15,6 +15,11 @@ class SWebServiceStruct implements ArrayAccess
         return $this->members[$name];
     }
     
+    public function members_list()
+    {
+        return $this->members;
+    }
+    
     public function __get($name)
     {
         if (!isset($this->values[$name])) return null;
