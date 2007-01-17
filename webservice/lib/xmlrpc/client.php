@@ -32,7 +32,7 @@ class SXmlRpcClient
             $method = implode('.', $this->namespaces).".$method";
             $this->namespaces = array();
         }
-        return $this->send_request($method, $args);
+        return $this->decode_response($this->send_request($method, $args));
     }
     
     public function set_http_credentials($username, $password)
@@ -68,7 +68,7 @@ class SXmlRpcClient
         return SXmlRpcValue::typecast($xml->params->param->value->asXml())->to_php();
     }
     
-    private function send_request($method, $args)
+    public function send_request($method, $args)
     {
         $request = new SXmlRpcRequest($method, $args);
         
@@ -84,7 +84,7 @@ class SXmlRpcClient
         if ($response->code != 200)
             throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
         
-        return $this->decode_response($response->body);
+        return $response->body;
     }
 }
 
@@ -99,10 +99,10 @@ class SXmlRpcRequest
         $this->method = $method;
         $this->args   = $args;
         $this->xml    = '<?xml version="1.0"?>'."\n"
-        . "<methodCall>\n<methodName>{$this->method}</methodName>\n<params>";
+        . "<methodCall>\n  <methodName>{$this->method}</methodName>\n  <params>";
         foreach ($this->args as $arg)
         {
-            $this->xml.= '<param><value>';
+            $this->xml.= '  <param><value>';
             $v = new SXmlRpcValue($arg);
             $this->xml.= $v->to_xml();
             $this->xml.= "</value></param>\n";
