@@ -43,6 +43,16 @@ class SWebService
         return $response;
     }
     
+    public function is_struct_type($type)
+    {
+        try {
+            $ref = new ReflectionClass($type);
+            return $ref->getParentClass()->getName() == 'SWebServiceStruct';
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
     protected function before_invocation() {}
     
     protected function after_invocation() {}
@@ -96,16 +106,6 @@ class SWebService
             throw new SWebServiceCastingException();
             
         return $value->to_php();
-    }
-    
-    private function is_struct_type($type)
-    {
-        try {
-            $ref = new ReflectionClass($type);
-            return $ref->getParentClass()->getName() == 'SWebServiceStruct';
-        } catch (Exception $e) {
-            return false;
-        }
     }
 }
 
