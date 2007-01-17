@@ -37,6 +37,11 @@ class SWebServiceApi
     {
         return $this->api_methods[$name];
     }
+    
+    public function api_methods_names()
+    {
+        return array_keys($this->api_methods_public_names);
+    }
 }
 
 class SWebServiceMethod
