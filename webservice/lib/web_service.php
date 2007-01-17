@@ -9,6 +9,8 @@ class SWebServiceCastingException extends SException
 
 class SWebService
 {
+    protected $models  = array();
+    
     protected $request = null;
     protected $method  = null;
     protected $params  = null;
@@ -21,6 +23,8 @@ class SWebService
             throw new SWebServiceException("$api_class class not found.");
         
         $this->api = new $api_class();
+        
+        SDependencies::require_dependencies('models', $this->models, get_class($this));
     }
     
     public function invoke($request)
