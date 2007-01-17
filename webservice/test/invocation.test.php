@@ -22,6 +22,7 @@ class UserAPI extends SWebServiceAPI
         $this->add_api_method('hello_world', null, array('string'));
         $this->add_api_method('new_user1', array('string', 'string'), 'User');
         $this->add_api_method('new_user2', array('login' => 'string', 'pwd' => 'string'), 'User');
+        $this->add_api_method('new_user3', array(array('login' => 'string', 'pwd' => 'string')), 'User');
         $this->add_api_method('add_users', array(array('User')), array('integer'));
         $this->add_api_method('del_users', array(array('integer')), array('boolean'));
         $this->add_api_method('get_a_fault', null, null);
@@ -49,6 +50,15 @@ class UserService extends SWebService
         $user = new User();
         $user->login = $this->params['login'];
         $user->pwd   = $this->params['pwd'];
+        $user->admin = false;
+        return $user;
+    }
+    
+    public function new_user3()
+    {
+        $user = new User();
+        $user->login = $this->params[0]['login'];
+        $user->pwd   = $this->params[0]['pwd'];
         $user->admin = false;
         return $user;
     }
@@ -103,6 +113,8 @@ class XmlRpcInvocationTest extends StatoTestCase
                            $this->do_method_call('user.newUser2', array('jdoe', 'test')));
         $this->assertEqual(array('login' => 'jdoe', 'pwd' => 'test', 'admin' => false),
                            $this->do_method_call('user.newUser2', array('login' => 'jdoe', 'pwd' => 'test')));
+        $this->assertEqual(array('login' => 'jdoe', 'pwd' => 'test', 'admin' => false),
+                           $this->do_method_call('user.newUser3', array(array('login' => 'jdoe', 'pwd' => 'test'))));
         $this->assertEqual(true,
                            $this->do_method_call('user.delUsers', array(array(1,2,3))));
         $this->assertEqual(2,
