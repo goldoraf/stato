@@ -65,8 +65,17 @@ class SWebService
                 throw new SWebServiceCastingException();
                 
             $casted_value = array();
-            foreach ($value->value as $v)
-                $casted_value[] = $this->cast($v, $type[0]);
+            
+            if (count($type) == 1) // we're waiting for an array of arguments of the same type
+            {
+                foreach ($value->value as $v)
+                    $casted_value[] = $this->cast($v, $type[0]);
+            }
+            else
+            {
+                foreach ($type as $k => $t)
+                    $casted_value[$k] = $this->cast(array_shift($value->value), $t);
+            }
             
             return $casted_value;
         }
