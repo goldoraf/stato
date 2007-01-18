@@ -47,7 +47,7 @@ class SWebService
     {
         try {
             $ref = new ReflectionClass($type);
-            return $ref->getParentClass()->getName() == 'SWebServiceStruct';
+            return $ref->isSubclassOf(new ReflectionClass('SWebServiceStruct'));
         } catch (Exception $e) {
             return false;
         }
