@@ -3,7 +3,7 @@
 class GenerateCommand extends SCommand
 {
     protected $allowed_params = array('type' => true, 'name' => true);
-    protected $allowed_types  = array('controller', 'model', 'migration', 'module');
+    protected $allowed_types  = array('controller', 'model', 'migration', 'module', 'ws_test_controller');
     
     public function execute()
     {
@@ -110,6 +110,43 @@ class GenerateCommand extends SCommand
                 )
             )
         );
+    }
+    
+    private function generate_ws_test_controller()
+    {
+        $views_dir = $this->params['name'];
+        
+        $templates_path = STATO_CORE_PATH.'/cli/lib/templates/web_services_test';
+        
+        if (strpos($views_dir, '/') !== false)
+            list($subdir, $views_dir) = explode('/', $views_dir);
+            
+        $file_name = $views_dir.'_controller';
+        
+        if (!empty($subdir))
+        {
+            $this->test_module_existence($subdir);
+            $controller_path = "controllers/$subdir/$file_name.php";
+            $views_path = "views/$subdir/$views_dir";
+        }
+        else
+        {
+            $controller_path = "controllers/$file_name.php";
+            $views_path = "views/$views_dir";
+        }
+        
+        $this->create_file($controller_path, STATO_APP_PATH,
+            SCodeGenerator::generate_file(
+                SCodeGenerator::render_template("{$templates_path}/controller.php",
+                    array('controller_class_name' => SInflection::camelize($file_name)))
+            )
+        );
+        
+        $this->create_dir($views_path, STATO_APP_PATH);
+        
+        foreach (array('index', 'invoke', 'set_params') as $view_name)
+            $this->create_file("$views_path/$view_name.php", STATO_APP_PATH,
+                file_get_contents("{$templates_path}/views/{$view_name}.php"));
     }
 }
 
