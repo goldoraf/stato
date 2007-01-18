@@ -44,7 +44,7 @@ class SXmlRpcValue
             case 'boolean':
                 return new SXmlRpcValue($value == 1, self::TYPE_BOOLEAN);
             case 'string':
-                return new SXmlRpcValue($value, self::TYPE_STRING);
+                return new SXmlRpcValue((string)$value, self::TYPE_STRING);
             case 'dateTime.iso8601':
                 return new SXmlRpcValue(SDateTime::parse($value), self::TYPE_DATETIME);
             case 'base64':
