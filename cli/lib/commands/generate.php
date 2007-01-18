@@ -175,6 +175,9 @@ class GenerateCommand extends SCommand
         foreach (array('index', 'invoke', 'set_params') as $view_name)
             $this->create_file("$views_path/$view_name.php", STATO_APP_PATH,
                 file_get_contents("{$templates_path}/views/{$view_name}.php"));
+                
+        $this->create_file("views/layouts/test_ws.php", STATO_APP_PATH,
+            file_get_contents("{$templates_path}/views/layout.php"));
     }
 }
 
