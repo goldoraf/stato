@@ -99,15 +99,15 @@ class SXmlRpcRequest
         $this->method = $method;
         $this->args   = $args;
         $this->xml    = '<?xml version="1.0"?>'."\n"
-        . "<methodCall>\n  <methodName>{$this->method}</methodName>\n  <params>";
+        . "<methodCall>\n  <methodName>{$this->method}</methodName>\n  <params>\n";
         foreach ($this->args as $arg)
         {
-            $this->xml.= '  <param><value>';
+            $this->xml.= '    <param><value>';
             $v = new SXmlRpcValue($arg);
             $this->xml.= $v->to_xml();
             $this->xml.= "</value></param>\n";
         }
-        $this->xml.= "</params>\n</methodCall>";
+        $this->xml.= "  </params>\n</methodCall>";
     }
     
     public function length()
