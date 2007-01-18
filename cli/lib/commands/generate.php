@@ -3,7 +3,7 @@
 class GenerateCommand extends SCommand
 {
     protected $allowed_params = array('type' => true, 'name' => true);
-    protected $allowed_types  = array('controller', 'model', 'migration', 'module', 'ws_test_controller');
+    protected $allowed_types  = array('controller', 'model', 'migration', 'module', 'webservice', 'ws_test_controller');
     
     public function execute()
     {
@@ -107,6 +107,34 @@ class GenerateCommand extends SCommand
                 SCodeGenerator::render_template(
                     STATO_CORE_PATH."/cli/lib/templates/empty_migration.php",
                     array('class_name' => $migration_class)
+                )
+            )
+        );
+    }
+    
+    private function generate_webservice()
+    {
+        $file_name = $this->params['name'];
+        
+        if (strpos($file_name, '/') !== false)
+            list($subdir, $file_name) = explode('/', $file_name);
+        
+        if (empty($subdir)) $path = "apis/$file_name.php";
+        else
+        {
+            $this->test_module_existence($subdir);
+            $path = "apis/$subdir/$file_name.php";
+        }
+        
+        $service_cc_name = SInflection::camelize($file_name);
+        $api_class_name = $service_cc_name.'API';
+        $service_class_name = $service_cc_name.'Service';
+        
+        $this->create_file($path, STATO_APP_PATH,
+            SCodeGenerator::generate_file(
+                SCodeGenerator::render_template(
+                    STATO_CORE_PATH."/cli/lib/templates/webservice.php",
+                    array('api_class_name' => $api_class_name, 'service_class_name' => $service_class_name)
                 )
             )
         );
