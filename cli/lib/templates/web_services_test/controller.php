@@ -137,7 +137,11 @@ function method_parameter_input_fields($method, $type, $field_name_base, $idx, $
             
         $params = '';
         if (is_array($type)) $members = $type;
-        else $members = $type->members_list();
+        else
+        {
+            $type = new $type();
+            $members = $type->members_list();
+        }
         foreach ($members as $name => $type)
         {
             $label = method_parameter_label($name, $type);
