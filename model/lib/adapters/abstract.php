@@ -22,6 +22,7 @@ abstract class SAbstractAdapter
     public function __construct($config = array())
     {
         $this->config = array_merge($this->config, $config);
+        $this->connect();
     }
     
     public function select($sql)
@@ -149,6 +150,8 @@ abstract class SAbstractAdapter
     abstract public function fetch($resource, $associative = true);
     
     abstract public function escape_str($str);
+    
+    abstract public function get_last_update($table);
 }
 
 ?>

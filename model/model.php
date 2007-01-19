@@ -18,6 +18,8 @@ require('lib/decorators/list_decorator.php');
 
 require('lib/adapters/abstract.php');
 require('lib/adapters/mysql.php');
+require('lib/adapters/abstract_pdo.php');
+require('lib/adapters/pdo_mysql.php');
 
 require('lib/associations/association.php');
 require('lib/associations/belongs_to_association.php');

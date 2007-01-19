@@ -367,7 +367,6 @@ class SActiveRecord extends SObservable implements ArrayAccess
             throw new SException('Database adapter not found !');
         
         self::$conn = new $adapter_class($config[STATO_APP_MODE]);
-        self::$conn->connect();
     }
 }
 
