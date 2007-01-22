@@ -1,5 +1,7 @@
 <?php
 
+class SMissingTemplateException extends SException {}
+
 class SActionView
 {
     public $page = null;
@@ -27,7 +29,7 @@ class SActionView
     public function render($template, $local_assigns = array())
     {
         if (!is_readable($template))
-            throw new SException('Template not found : '.$template);
+            throw new SMissingTemplateException($template);
         
         $this->template_dir = dirname($template);
         
@@ -49,7 +51,7 @@ class SActionView
     public function render_update($template, $local_assigns = array())
     {
         if (!is_readable($template))
-            throw new SException('Template not found : '.$template);
+            throw new SMissingTemplateException($template);
             
         $this->template_dir = dirname($template);
         

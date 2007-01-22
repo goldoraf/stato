@@ -196,7 +196,7 @@ class SActionController
     protected function render_action($action, $status = null)
     {
         $template = $this->template_path($this->controller_path(), $action);
-        if (!file_exists($template)) throw new SException('Template not found for this action');
+        if (!file_exists($template)) throw new SMissingTemplateException('Template not found for this action');
         
         if ($this->layout) $this->render_with_layout($template, $status);
         else $this->render_file($template, $status);
@@ -658,10 +658,32 @@ class SActionController
     
     private function rescue_action_locally($exception)
     {
-        $this->assigns['exception']  = $exception;
+        $rescue_path = STATO_CORE_PATH.'/controller/lib/templates/rescue/';
+        $this->add_variables_to_assigns();
+        $this->assigns['exception'] = $exception;
         $this->assigns['controller_name'] = self::controller_class($this->request->controller);
-        $this->assigns['action_name']     = $this->action_name();
-        $this->render_file(STATO_CORE_PATH.'/controller/lib/templates/rescue/exception.php');
+        $this->assigns['action_name'] = $this->action_name();
+        $this->assigns['layout_content'] 
+            = $this->view->render($rescue_path.$this->template_file_for_local_rescue($exception).'.php');
+        
+        $this->render_file($rescue_path.'layout.php');
+    }
+    
+    private function template_file_for_local_rescue($exception)
+    {
+        switch (get_class($exception))
+        {
+            case 'SRoutingException':
+                return 'routing_error';
+            case 'SMissingTemplateException':
+                return 'template_missing';
+            case 'SUnknownControllerException':
+                return 'unknown_controller';
+            case 'SUnknownActionException':
+                return 'unknown_action';
+            default:
+                return 'diagnostics';
+        }
     }
     
     private function log_error($exception)
@@ -699,7 +721,7 @@ class SActionController
     private static function instanciate_controller($req_controller)
     {
         if (!file_exists($path = self::controller_file($req_controller)))
-    		throw new SUnknownControllerException(ucfirst($req_controller).'Controller not found !');
+    		throw new SUnknownControllerException(SInflection::camelize($req_controller).'Controller not found !');
     		
     	require_once($path);
     	
