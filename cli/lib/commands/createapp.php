@@ -25,6 +25,7 @@ class CreateAppCommand extends SCommand
         
         $this->create_dir("cache/fragments", $project_path);
         $this->create_dir("cache/templates", $project_path);
+        $this->create_dir("cache/generated_code", $project_path);
         
         $this->create_dir("db/migrate", $project_path);
         

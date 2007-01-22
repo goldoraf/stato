@@ -165,7 +165,7 @@ class SRoute
     public $options    = array();
     public $components = array();
     public $known      = array();
-    public $path_keys   = array();
+    public $path_keys  = array();
     public $keys       = array();
     public $defaults   = array();
     public $regex      = null;
@@ -186,7 +186,6 @@ class SRoute
     {
         $url = new SUrl($options);
         
-        //foreach ($this->components as $comp) $comp->write_generation($url);
         $comps = array_reverse($this->components);
         foreach ($comps as $comp) $comp->write_generation($url);
         $url->parts = array_reverse($url->parts);
@@ -255,10 +254,7 @@ class SRoute
         if (isset($options['subdirectory']))
         {
             if (!in_array('controller', $this->path_keys))
-            {
-                throw new SRoutingException('Subdirectory option must be used 
-                with a route including a ControllerComponent');
-            }
+                throw new SRoutingException('Subdirectory option must be used with a route including a ControllerComponent');
             
             foreach($this->components as $k => $c)
                 if ($c->key() == 'controller') $c->subdir = $options['subdirectory'];
@@ -303,12 +299,21 @@ class SRoute
 
 class SRouteSet
 {
-    private $routes = array();
+    private $routes  = array();
     private $gen_map = array();
     
     public function connect($path, $options = array())
     {
-        $this->routes[] = new SRoute($path, $options);
+        $route = new SRoute($path, $options);
+        $this->routes[] = $route;
+        return $route;
+    }
+    
+    public function __call($method, $args)
+    {
+        $route = call_user_func_array(array($this, 'connect'), $args);
+        SNamedRoutes::connect($method, $route);
+        return $route;
     }
     
     public function generate($options)
@@ -405,6 +410,8 @@ class SRoutes
     {
         self::$map = $map;
         self::$map->draw();
+        
+        SNamedRoutes::install();
     }
   
     public static function recognize($request)
@@ -427,6 +434,44 @@ class SRoutes
     public static function generate($options)
     {
         return self::$map->generate($options);
+    }
+}
+
+class SNamedRoutes
+{
+    private static $helpers = array();
+    
+    public static function connect($name, $route)
+    {
+        $options = array_merge($route->known, $route->defaults);
+        self::$helpers[] = self::code_for_helper($name, $options);
+    }
+    
+    public static function install()
+    {
+        $file_path = STATO_APP_ROOT_PATH.'/cache/generated_code/named_routes.php';
+        $routes_path = STATO_APP_ROOT_PATH.'/conf/routes.php';
+        
+        if (!file_exists($file_path) || filemtime($file_path) < filemtime($routes_path))
+            file_put_contents($file_path, SCodeGenerator::generate_file(implode("\n", self::$helpers)));
+            
+        require($file_path);
+    }
+    
+    private static function code_for_helper($name, $options)
+    {
+        $code = "function {$name}_url(".'$options = array()) {'."\n";
+        $code.= '    if (!is_array($options)) $options = array($options);'."\n";
+        $code.= '    $defaults = array('.self::code_for_defaults_array($options).");\n";
+        $code.= '    return url_for(array_merge($defaults, $options));'."\n}\n";
+        return $code;
+    }
+    
+    private static function code_for_defaults_array($options)
+    {
+        $code = array();
+        foreach ($options as $k => $v) $code[] = "'{$k}' => '{$v}'";
+        return implode(', ', $code);
     }
 }
 

@@ -30,6 +30,21 @@ class SUrlRewriter
     
     public static function url_for($options)
     {
+        if (!is_array($options)) $options = array($options);
+        
+        foreach ($options as $k => $v)
+        {
+            if (is_object($v))
+            {
+                $ref = new ReflectionObject($v);
+                if ($ref->isSubclassOf(new ReflectionClass('SActiveRecord')))
+                {
+                    unset($options[$k]);
+                    $options['id'] = $v->id;
+                }
+            }
+        }
+        
         if (!isset($options['action']))     $options['action'] = 'index';
         if (!isset($options['controller'])) $options['controller'] = self::$request->controller;
         
