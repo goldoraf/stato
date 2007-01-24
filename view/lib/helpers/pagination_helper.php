@@ -1,7 +1,13 @@
 <?php
 
 /**
- * Creates a basic link bar for a given paginator.
+ * Pagination helpers
+ * 
+ * @package Stato
+ * @subpackage view
+ */
+/**
+ * Creates a basic link bar for a given <var>$paginator</var>.
  * 
  * Options :
  * - param_name : the routing name for the paginator (default : page)
@@ -10,12 +16,23 @@
  * - link_to_current_page : whether or not the current page should be linked to (default : false)
  * - params : any additional routing parameters for page URLs
  */
-function pager($paginator, $options = array(), $html_options = array())
+function pagination_links($paginator, $options = array(), $html_options = array())
 {
     $p = new SPaginationHelper($paginator, $options, $html_options);
     return $p->links();
 }
 
+/**
+ * Deprecated alias for pagination_links().
+ */
+function pager($paginator, $options = array(), $html_options = array())
+{
+    return pagination_links($paginator, $options, $html_options);
+}
+
+/**
+ * @ignore
+ */
 class SPaginationHelper
 {
     protected $paginator   = null;
