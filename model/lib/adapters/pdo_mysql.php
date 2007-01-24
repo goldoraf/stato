@@ -18,8 +18,8 @@ class SPDOMySqlAdapter extends SAbstractPDOAdapter
     {
         parent::__construct($config);
         $this->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
-        $this->exec("SET NAMES `utf8`");
-        $this->exec("SET CHARACTER SET `utf8`");
+        $this->exec("SET NAMES 'utf8'");
+        $this->exec("SET CHARACTER SET 'utf8'");
     }
     
     public function dsn()
