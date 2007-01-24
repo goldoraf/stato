@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * Active record helpers
+ * 
+ * Makes it easier to create forms for records kept in instance variables.
+ * 
+ * @package Stato
+ * @subpackage view
+ */
+/**
  * Returns an entire form with input tags and everything for a specified ActiveRecord 
  * object. 
  * 
