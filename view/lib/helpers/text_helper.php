@@ -3,11 +3,27 @@
 define('XML_HTMLSAX3', STATO_CORE_PATH.'/vendor/safehtml/classes/');
 require_once(XML_HTMLSAX3.'safehtml.php');
 
+/**
+ * Text helpers
+ * 
+ * Provides a set of functions for filtering, formatting and transforming strings.
+ * 
+ * @package Stato
+ * @subpackage view
+ */
+/**
+ * Convert special characters to HTML entities
+ */
 function html_escape($html)
 {
     return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * If <var>$text</var> is longer than <var>$length</var>, <var>$text</var> will 
+ * be truncated to the length of <var>$length</var> and the last three characters
+ * will be replaced with the <var>$truncate_string</var>.
+ */
 function truncate($text, $length = 30, $truncate_string = '...')
 {
     if (utf8_strlen($text) > $length)
@@ -38,6 +54,33 @@ function sanitize($html)
     return $safehtml->parse($html);
 }
 
+/**
+ * Creates a SCycle object whose __toString() method cycles through elements of an array every time it is called.
+ * 
+ * This can be used for example, to alternate classes for table rows:
+ * <code>
+ * <? foreach ($this->items as $item) : ? >
+ *  <tr class="<?= cycle(array("even", "odd")); ? >">
+ *    <td>item</td>
+ *  </tr>
+ * <? endforeach; ? >
+ * </code>
+ * 
+ * You can use named cycles to allow nesting in loops. You can manually reset a 
+ * cycle by calling reset_cycle() and passing the name of the cycle.
+ * <code>
+ * <? foreach ($this->items as $item) : ? >
+ *  <tr class="<?= cycle(array("even", "odd"), "row_class"); ? >">
+ *    <td>
+ *    <? foreach ($item->values as $value) : ? >
+ *      <span style="<?= cycle(array("red", "green"), "colors"); ? >">value</span>
+ *    <? endforeach; ? >
+ *    <? reset_cycle("colors"); ? > 
+ *    </td>
+ *  </tr>
+ * <? endforeach; ? >
+ * </code>   
+ */
 function cycle($values, $name = 'default')
 {
     $cycle = SCycle::get_cycle($name);
@@ -52,6 +95,9 @@ function reset_cycle($name = 'default')
     if ($cycle !== null) $cycle->reset();
 }
 
+/**
+ * @ignore
+ */
 class SCycle
 {
     public $values = array();
