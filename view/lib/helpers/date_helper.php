@@ -1,10 +1,24 @@
 <?php
-
+/**
+ * Date form helpers
+ * 
+ * Set of functions for creating select/option tags for different kinds of date elements.
+ * Common options:
+ * <ul> 
+ * <li><var>prefix</var> - overwrites the default prefix of "date" used for the select names. 
+ * So specifying "birthday" would give birthday[month] instead of date[month] if passed to the select_month method.</li>
+ * <li><var>include_blank</var> - set to true if it should be possible to set an empty date.</li>
+ * </ul>
+ * @package Stato
+ * @subpackage view
+ */
+/**
 /**
  * Returns a set of select tags (one for year, month, and day) pre-selected for 
  * accessing a specified date-based attribute (identified by <var>$method</var>) on an object 
- * assigned to the template (identified by <var>$object</var>). It’s possible to tailor the 
- * selects through the <var>$options</var> array.
+ * assigned to the template (identified by <var>$object</var>). 
+ * 
+ * It's possible to tailor the selects through the <var>$options</var> array.
  * 
  * Examples :
  * <code>
@@ -52,6 +66,12 @@ function time_select($object_name, $method, $object, $options = array())
     return select_time($datetime, $options);
 }
 
+/**
+ * Returns a set of select tags (one for year, month, and day) pre-selected with the <var>$date</var>.
+ *  
+ * You can explicitly set the order of the tags using the <var>order</var> option with an array 
+ * of strings <var>year</var>, <var>month</var> and <var>day</var> in the desired order.
+ */
 function select_date($date = Null, $options = array())
 {
     if ($date == Null) $date = SDate::today();
@@ -85,6 +105,12 @@ function select_time($datetime = Null, $options = array())
     return $html;
 }
 
+/**
+ * Returns a select tag with options for each of the days 1 through 31 with the current day selected.
+ *  
+ * <var>$date</var> can be a SDate instance or a day number. You can also override the field name 
+ * using the <var>field_name</var> option ('day' by default).
+ */
 function select_day($date, $options=array())
 {
     $day_options = '';
@@ -101,6 +127,21 @@ function select_day($date, $options=array())
     return select_html($options['field_name'], $day_options, $options);
 }
 
+/**
+ * Returns a select tag with options for each of the months with the current month selected.
+ *  
+ * <var>$date</var> can be a SDate instance or a month number. You can override the field name 
+ * using the <var>field_name</var> option ('day' by default). <var>use_numbers</var>,
+ * <var>use_abbrv</var>, <var>add_numbers</var> options are also available.
+ * 
+ * Examples:
+ * <code>
+ * select_month(SDate::today());                               // "January", "February", ...
+ * select_month(SDate::today(), array('use_numbers' => true)); // "1", "2", ...
+ * select_month(SDate::today(), array('add_numbers' => true)); // "1 - January", "2 - February", ...
+ * select_month(SDate::today(), array('use_abbrv' => true));   // "Jan", "Feb", ...
+ * </code>      
+ */
 function select_month($date, $options=array())
 {
     $month_options = '';
@@ -129,6 +170,13 @@ function select_month($date, $options=array())
     return select_html($options['field_name'], $month_options, $options);
 }
 
+/**
+ * Returns a select tag with options for each of the five years on each side of the current, which is selected. 
+ * 
+ * The five year radius can be changed using the <var>start_year</var> and <var>end_year</var> options.
+ * Both ascending and descending year lists are supported by making <var>start_year</var> less than or 
+ * greater than <var>end_year</var>. <var>$date</var> can be a SDate instance or a year number.   
+ */
 function select_year($date, $options = array())
 {
     $year_options = '';
@@ -157,6 +205,12 @@ function select_second($datetime, $options = array())
     return select_html($options['field_name'], $sec_options, $options);
 }
 
+/**
+ * Returns a select tag with options for each of the minutes 0 through 59 with the current minute selected. 
+ * 
+ * <var>$datetime</var> can be a SDateTime instance or a minute number. You can also
+ * specify a <var>minute_step</var> option. 
+ */
 function select_minute($datetime, $options = array())
 {
     $selected = (get_class($datetime) == 'SDateTime') ? $datetime->min : $datetime;
@@ -174,6 +228,9 @@ function select_hour($datetime, $options = array())
     return select_html($options['field_name'], $hour_options, $options);
 }
 
+/**
+ * @ignore
+ */
 function select_html($type, $date_options, $options = array())
 {
     $html_options = array();
@@ -187,11 +244,17 @@ function select_html($type, $date_options, $options = array())
     return content_tag('select', $date_options, $html_options)."\n";
 }
 
+/**
+ * @ignore
+ */
 function default_date_options($object_name, $method, $object)
 {
     return array("{$object_name}[{$method}]", $object->$method);
 }
 
+/**
+ * @ignore
+ */
 function numerical_options($start, $end, $selected = Null, $step=1)
 {
     $options = '';
@@ -206,6 +269,9 @@ function numerical_options($start, $end, $selected = Null, $step=1)
     return $options;
 }
 
+/**
+ * @ignore
+ */
 function is_date_type($date)
 {
     return in_array(get_class($date), array('SDate', 'SDateTime'));
