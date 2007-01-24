@@ -1,7 +1,14 @@
 <?php
 
 /**
+ * Form options helpers
+ * 
+ * @package Stato
+ * @subpackage view
+ */
+/**
  * Create a select tag and a series of contained option tags for the provided object and method. 
+ * 
  * The option currently held by the object will be selected.
  * See options_for_select for the required format of the <var>$choices</var> argument. 
  * 
@@ -36,16 +43,8 @@ function collection_select($object_name, $method, $object, $collection, $value_p
     return select_tag($name, $options_block, $html_options);
 }
 
-function add_select_options($options_block, $options, $value = null)
-{
-    if ($options['include_blank']) $options_block = '<option value=""></option>'.$options_block;
-    if (empty($value) && isset($options['prompt']))
-        $options_block = '<option value="">'.$options['prompt'].'</option>'.$options_block;
-    return $options_block;
-}
-
 /**
- * Accepts a an array and returns a string of option tags.
+ * Accepts an array and returns a string of option tags.
  * 
  * Examples :  
  * <code>
@@ -55,11 +54,12 @@ function add_select_options($options_block, $options, $value = null)
  * <option value="Calzone">Calzone</option>
  * <option value="Napolitaine">Napolitaine</option>
  *  
- * options_for_select(array('Margharita'=>'7€', 'Calzone'=>'9€', 'Napolitaine'=>'8€'));
+ * options_for_select(array('Margharita'=>'7e', 'Calzone'=>'9e', 'Napolitaine'=>'8e'));
  * // returns :
- * <option value="7€">Margharita</option>
- * <option value="9€">Calzone</option>
- * <option value="8€">Napolitaine</option> 
+ * <option value="7e">Margharita</option>
+ * <option value="9e">Calzone</option>
+ * <option value="8e">Napolitaine</option>
+ * </code> 
  */
 function options_for_select($set, $selected = null, $detect_non_associative = true)
 {
@@ -76,6 +76,19 @@ function options_for_select($set, $selected = null, $detect_non_associative = tr
     return $str;
 }
 
+/**
+ * Returns a string of option tags that have been compiled by iterating over the <var>$collection</var>
+ * and assigning the value of the <var>$value_prop</var> property as the option value and the value 
+ * of the <var>$text_prop</var> property as the option text.
+ * 
+ * Examples :  
+ * <code>
+ * options_from_collection_for_select($this->company->employes, 'id', 'name');
+ * // => returns the equivalent of:
+ * <option value="{$employe->id}">{$employe->name}</option>
+ * ... 
+ * </code> 
+ */
 function options_from_collection_for_select($collection, $value_prop='id', $text_prop=null, $selected=null)
 {
     $set = array();
@@ -87,6 +100,20 @@ function options_from_collection_for_select($collection, $value_prop='id', $text
     return options_for_select($set, $selected, false);
 }
 
+/**
+ * @ignore
+ */
+function add_select_options($options_block, $options, $value = null)
+{
+    if ($options['include_blank']) $options_block = '<option value=""></option>'.$options_block;
+    if (empty($value) && isset($options['prompt']))
+        $options_block = '<option value="">'.$options['prompt'].'</option>'.$options_block;
+    return $options_block;
+}
+
+/**
+ * @ignore
+ */
 function options_groups_from_collection_for_select()
 {
 
