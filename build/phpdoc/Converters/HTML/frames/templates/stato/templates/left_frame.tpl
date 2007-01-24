@@ -40,15 +40,9 @@
     							<div><img class="tree-icon" src="{$subdir}media/images/tutorial.png" alt="Tutorial"><a href="{$info.0.subpackagetutorialnoa}" target="right">{$info.0.subpackagetutorialtitle}</a></div>
     						{/if}
     						{if $info[p].files}
-    							<dt class="folder-title"><img class="tree-icon" src="{$subdir}media/images/folder.png" alt=" ">Files</dt>
+    							<dt class="folder-title"><img class="tree-icon" src="{$subdir}media/images/folder.png" alt=" ">Helpers</dt>
     							{section name=nonclass loop=$info[p].files}
     								<dd><img class="tree-icon" src="{$subdir}media/images/Page.png" alt="File"><a href='{$info[p].files[nonclass].link}' target='right'>{$info[p].files[nonclass].title}</a></dd>
-    							{/section}
-    						{/if}
-    						{if $info[p].functions}
-    							<dt class="folder-title"><img class="tree-icon" src="{$subdir}media/images/function_folder.png" alt=" ">Functions</dt>
-    							{section name=f loop=$info[p].functions}
-    								<dd><img class="tree-icon" src="{$subdir}media/images/Function.png" alt="Function"><a href='{$info[p].functions[f].link}' target='right'>{$info[p].functions[f].title}</a></dd>
     							{/section}
     						{/if}
     					</dl>
