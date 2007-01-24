@@ -29,7 +29,7 @@
  * </form>
  * </code>
  * 
- * It’s possible to specialize the form by providing <var>action</var>, <var>submit_value</var>
+ * It's possible to specialize the form by providing <var>action</var>, <var>submit_value</var>
  * and <var>include</var> HTML block.
  * 
  * Example :

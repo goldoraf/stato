@@ -83,9 +83,8 @@ function text_area($object_name, $method, $object, $options = array())
  * the same name as the checkbox. 
  * Example :
  * <code>check_box('post', 'private', $this->post);
- *      <input name="post[private]" type="hidden" value="0" /></code> 
- *      <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" />
- *       
+ *      <input name="post[private]" type="hidden" value="0" />
+ *      <input checked="checked" id="post_private" name="post[private]" type="checkbox" value="1" /></code>   
  */
 function check_box($object_name, $method, $object, $options = array(), $checked_value = '1', $unchecked_value = '0', $boolean = true)
 {
