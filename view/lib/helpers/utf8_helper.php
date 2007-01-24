@@ -4,6 +4,8 @@
  *
  * @license    LGPL (http://www.gnu.org/copyleft/lesser.html)
  * @author     Andreas Gohr <andi@splitbrain.org>
+ * @package Stato
+ * @subpackage view 
  */
 
 /**
