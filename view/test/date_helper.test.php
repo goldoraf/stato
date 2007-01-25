@@ -226,8 +226,8 @@ EOT;
         <option value="2011">2011</option>
         </select>
 EOT;
-        $this->assertDomEqual($expect, select_year(new SDate(2006, 3, 31)));
-        $this->assertDomEqual($expect, select_year(2006));
+        $this->assertDomEqual($expect, select_year(new SDate(2006, 3, 31), array('start_year' => 2001, 'end_year' => 2011)));
+        $this->assertDomEqual($expect, select_year(2006, array('start_year' => 2001, 'end_year' => 2011)));
     }
     
     public function test_select_year_with_limits()
@@ -376,7 +376,7 @@ EOT;
         <option value="31" selected="selected">31</option>
         </select>
 EOT;
-        $this->assertDomEqual($expect, select_date(new SDate(2006, 3, 31), array('prefix' => 'date[test]')));
+        $this->assertDomEqual($expect, select_date(new SDate(2006, 3, 31), array('prefix' => 'date[test]', 'start_year' => 2001, 'end_year' => 2011)));
     }
     
     public function test_date_select()
@@ -420,7 +420,7 @@ EOT;
         <option value="31" selected="selected">31</option>
         </select>
 EOT;
-        $this->assertDomEqual($expect, date_select('article', 'written_on', $article));
+        $this->assertDomEqual($expect, date_select('article', 'written_on', $article, array('start_year' => 2001, 'end_year' => 2011)));
     }
     
     public function test_date_select_with_order()
@@ -464,7 +464,7 @@ EOT;
         <option value="2011">2011</option>
         </select>
 EOT;
-        $this->assertDomEqual($expect, date_select('article', 'written_on', $article, array('order' => array('day', 'month', 'year'))));
+        $this->assertDomEqual($expect, date_select('article', 'written_on', $article, array('order' => array('day', 'month', 'year'), 'start_year' => 2001, 'end_year' => 2011)));
     }
     
     public function test_date_select_with_blank_and_year_limits()
@@ -613,7 +613,7 @@ EOT;
         <option value="58">58</option><option value="59">59</option>
         </select>
 EOT;
-        $this->assertDomEqual($expect, date_time_select('article', 'written_on', $article));
+        $this->assertDomEqual($expect, date_time_select('article', 'written_on', $article, array('start_year' => 2001, 'end_year' => 2011)));
     }
 }
 
