@@ -31,6 +31,7 @@ class SDispatcher
             
     		if (file_exists($path = STATO_APP_PATH.'/controllers/application_controller.php')) require_once($path);
     		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
+    		if (file_exists($path = STATO_APP_PATH.'/models/mailer/application_mailer.php')) require_once($path);
     		
     		SActionController::factory(SRoutes::recognize($request), $response)->out();
         }

@@ -536,9 +536,6 @@ class SActionController
         SLocale::load_strings(STATO_APP_PATH.'/i18n/'.SDependencies::sub_directory(get_class($this)));
         SUrlRewriter::initialize($this->request);
         
-        if (file_exists(STATO_APP_PATH.'/models/mailer/application_mailer.php') && !class_exists('ApplicationMailer'))
-            require(STATO_APP_PATH.'/models/mailer/application_mailer.php');
-        
         foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
         
         SDependencies::require_dependencies('models', $this->models, get_class($this));
