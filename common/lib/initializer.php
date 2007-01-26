@@ -6,8 +6,14 @@ class SInitializer
     
     public static function boot()
     {
-        define('STATO_TIME_START', microtime(true));
-        define('STATO_ENV', ((isset($_SERVER['STATO_ENV'])) ? $_SERVER['STATO_ENV'] : 'development'));
+        $config = new SConfiguration();
+        
+        require_once(STATO_CORE_PATH.'/common/common.php');
+        require_once(STATO_CORE_PATH.'/cli/cli.php');
+        
+        include(STATO_APP_ROOT_PATH.'/conf/environment.php');
+        
+        self::run($config);
     }
     
     public static function run(SConfiguration $config)
@@ -27,9 +33,7 @@ class SInitializer
     }
     
     private static function require_frameworks()
-    {
-        require_once(STATO_CORE_PATH.'/common/common.php');
-        
+    {   
         foreach (self::$config->frameworks as $framework)
             require(STATO_CORE_PATH."/{$framework}/{$framework}.php");
     }
@@ -53,10 +57,12 @@ class SInitializer
     private static function initialize_database_settings()
     {
         if (in_array('model', self::$config->frameworks))
-        {
             SActiveRecord::$configurations = self::$config->database_configuration();
-            SActiveRecord::establish_connection();
-        }
+    }
+    
+    private static function is_cli_env()
+    {
+        return defined('STDIN') && defined('STDOUT') && defined('STDERR');
     }
 }
 

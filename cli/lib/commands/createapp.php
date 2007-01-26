@@ -40,9 +40,6 @@ class CreateAppCommand extends SCommand
             SCodeGenerator::generate_class('ApplicationController', '', 'SActionController'));
         
         $this->create_file("app/helpers/application_helper.php", $project_path);
-        
-        $this->create_file("conf/environment.php", $project_path,
-            SCodeGenerator::generate_file("define('STATO_APP_MODE', 'dev');"));
             
         if (!isset($this->options['compile'])) $project_core_path = STATO_CORE_PATH;
         else

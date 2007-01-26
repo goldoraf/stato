@@ -1,15 +1,14 @@
-// Dont't change this file. Configuration is done in conf/environment.php
+// Uncomment below to force Stato in production mode
+// when you don't control web server
+// $_SERVER['STATO_ENV'] = 'production';
+
+// Dont't change code below. Configuration is done in conf/environment.php
 
 define('STATO_TIME_START', microtime(true));
 define('STATO_CORE_PATH', '<?php echo $project_core_path; ?>');
 define('STATO_APP_ROOT_PATH', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
+define('STATO_ENV', ((isset($_SERVER['STATO_ENV'])) ? $_SERVER['STATO_ENV'] : 'development'));
 
-require(STATO_CORE_PATH.'/common/common.php');
-require(STATO_CORE_PATH.'/cli/cli.php');
-require(STATO_CORE_PATH.'/controller/controller.php');
-require(STATO_CORE_PATH.'/model/model.php');
-require(STATO_CORE_PATH.'/view/view.php');
-require(STATO_CORE_PATH.'/webservice/webservice.php');
-require(STATO_CORE_PATH.'/mailer/mailer.php');
+require(STATO_CORE_PATH.'/common/lib/initializer.php');
 
-include(STATO_APP_ROOT_PATH.'/conf/environment.php');
+SInitializer::boot();
