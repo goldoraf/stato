@@ -636,10 +636,14 @@ class SActionController
     private function log_benchmarking()
     {
         $runtime = microtime(true) - STATO_TIME_START;
-        $db_runtime = SActiveRecord::connection_benchmark();
-        $db_percentage = ($db_runtime * 100) / $runtime;
-        $this->logger->info('Completed in '.sprintf("%.5f", $runtime)
-                            .' seconds | DB: '.sprintf("%.5f", $db_runtime).' ('.sprintf("%d", $db_percentage).' %)');
+        $info = 'Completed in '.sprintf("%.5f", $runtime).' seconds';
+        if (class_exists('SActiveRecord'))
+        {
+            $db_runtime = SActiveRecord::connection_benchmark();
+            $db_percentage = ($db_runtime * 100) / $runtime;
+            $info.= ' | DB: '.sprintf("%.5f", $db_runtime).' ('.sprintf("%d", $db_percentage).' %)';
+        }
+        $this->logger->info($info);
     }
     
     private function rescue_action($exception)
