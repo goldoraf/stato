@@ -19,7 +19,7 @@ class SCsvIterator implements Iterator
     public function __construct($resource, $config = array())
     {
         if (!is_resource($resource)) 
-            throw new SException('Resource provided is not valid');
+            throw new Exception('Resource provided is not valid');
             
         $this->resource = $resource;
         $this->config = array_merge($this->config, $config);
@@ -83,7 +83,7 @@ class SCsvIterator implements Iterator
     private function fetch_assoc()
     {
         if (count($this->fields) != count($this->data))
-            throw new SException("Wrong field count at line {$this->line}");
+            throw new Exception("Wrong field count at line {$this->line}");
         
         $row = array();
         foreach ($this->fields as $key => $value) 

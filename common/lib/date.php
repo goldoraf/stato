@@ -1,8 +1,8 @@
 <?php
 
-class SDateException extends SException {}
-class SDateConstructException extends SException {}
-class SDateParsingException extends SException {}
+class SDateException extends Exception {}
+class SDateConstructException extends Exception {}
+class SDateParsingException extends Exception {}
 
 class SDate
 {

@@ -8,7 +8,7 @@ class SDependencies
         {
             $path = STATO_CORE_PATH."/components/lib/$component.php";
             if (!file_exists($path))
-                throw new SException("Missing component $component");
+                throw new Exception("Missing component $component");
             require_once($path);
         }
     }
@@ -24,7 +24,7 @@ class SDependencies
         if (class_exists($class)) return;
         $path = STATO_APP_PATH."/$layer/$subdir".SInflection::underscore($class).'.php';
         if (!file_exists($path))
-            throw new SException("Missing ".SInflection::singularize($layer)." $dependency");
+            throw new Exception("Missing ".SInflection::singularize($layer)." $dependency");
         require_once($path);
         if ($layer == 'models') SMapper::add_manager_to_class(SInflection::camelize($class));
     }

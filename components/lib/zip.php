@@ -1,7 +1,7 @@
 <?php
 
 if (!extension_loaded('zip'))
-    throw new SException('ZIP extension is required for SZipIterator component');
+    throw new Exception('ZIP extension is required for SZipIterator component');
 
 class SZipIterator implements Iterator
 {
@@ -35,7 +35,7 @@ class SZipIterator implements Iterator
     public function current()
     {
         if (!zip_entry_open($this->resource, $this->entry))
-            throw new SException("Zip file entry can not be read");
+            throw new Exception("Zip file entry can not be read");
         
         $buffer = zip_entry_read($this->entry, zip_entry_filesize($this->entry));
         zip_entry_close($this->entry);
@@ -59,7 +59,7 @@ class SZipIterator implements Iterator
     {
         $this->resource = zip_open($this->filepath);
         if (!$this->resource) 
-            throw new SException("Zip file {$this->filepath} does not exist");
+            throw new Exception("Zip file {$this->filepath} does not exist");
     }
 }
 

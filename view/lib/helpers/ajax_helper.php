@@ -110,7 +110,7 @@ function update_element_function($element_id, $options = array())
             "Element.remove('$element_id')";
             break;
         default:
-            throw new SException("Invalid action, choose one of 'update', 'remove', 'empty'");
+            throw new Exception("Invalid action, choose one of 'update', 'remove', 'empty'");
     }
     
     $js.= ";\n";

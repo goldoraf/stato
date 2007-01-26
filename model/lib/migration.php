@@ -1,7 +1,7 @@
 <?php
 
-class SIrreversibleMigrationException extends SException {}
-class SDuplicateVersionMigrationException extends SException
+class SIrreversibleMigrationException extends Exception {}
+class SDuplicateVersionMigrationException extends Exception
 {
     public function __construct($version)
     {

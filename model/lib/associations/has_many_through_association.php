@@ -1,6 +1,6 @@
 <?php
 
-class SHasManyThroughException extends SException
+class SHasManyThroughException extends Exception
 {
     public function __construct()
     {

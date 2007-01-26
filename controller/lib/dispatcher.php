@@ -8,11 +8,11 @@ function error_handler($error_type, $message)
     // and we don't want to bother with "var is deprecated"
     // Ideally, we could log this type of errors
     if ($error_type != E_NOTICE && $error_type != E_STRICT)
-        throw new SException($message, $error_type);
+        throw new Exception($message, $error_type);
 }
 set_error_handler('error_handler');
 
-class SDispatchException extends SException {}
+class SDispatchException extends Exception {}
 
 class SDispatcher
 {	

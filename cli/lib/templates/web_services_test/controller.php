@@ -50,7 +50,7 @@ class <?php echo $controller_class_name; ?> extends ApplicationController
         if (is_array($type))
         {
             if (!is_array($value))
-                throw new SException();
+                throw new Exception();
                 
             $casted_value = array();
             
@@ -65,7 +65,7 @@ class <?php echo $controller_class_name; ?> extends ApplicationController
         if (SWebService::is_struct_type($type))
         {
             if (!is_array($value))
-                throw new SException();
+                throw new Exception();
             
             $struct = new $type();
             foreach ($value as $k => $v)

@@ -1,6 +1,6 @@
 <?php
 
-class SActiveRecordDoesNotExist extends SException {}
+class SActiveRecordDoesNotExist extends Exception {}
 
 class SQuerySet implements Iterator, Countable
 {
@@ -288,7 +288,7 @@ class SQuerySet implements Iterator, Countable
             if (preg_match('/^([a-zA-Z_]+)\->([a-zA-Z_]+)(.*)/', $arg, $matches))
             {
                 if (!isset($this->meta->attributes[$matches[1]]))
-                    throw new SException('Association '.$matches[1].' does not exist.');
+                    throw new Exception('Association '.$matches[1].' does not exist.');
                 
                 $assoc_meta = $this->meta->attributes[$matches[1]]->meta;
                 $field = $matches[2];

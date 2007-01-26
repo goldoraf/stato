@@ -42,7 +42,7 @@ class SHasManyMeta extends SAssociationMeta
             if (isset($options['dependent']))
             {
                 if (!in_array($options['dependent'], array('delete', 'delete_all', 'nullify')))
-                    throw new SException("The 'dependent' option expects either 'delete', 'delete_all', or 'nullify'");
+                    throw new Exception("The 'dependent' option expects either 'delete', 'delete_all', or 'nullify'");
                 
                 $this->dependent = $options['dependent'];
             }

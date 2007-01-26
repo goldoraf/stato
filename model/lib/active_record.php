@@ -1,8 +1,8 @@
 <?php
 
-class SAdapterNotSpecified extends SException { }
-class SAdapterNotFound extends SException { }
-class SAssociationTypeMismatch extends SException { }
+class SAdapterNotSpecified extends Exception { }
+class SAdapterNotFound extends Exception { }
+class SAssociationTypeMismatch extends Exception { }
 
 class SActiveRecord extends SObservable implements ArrayAccess
 {

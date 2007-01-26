@@ -30,7 +30,7 @@ class SValidation
                         $method = 'validate_'.$validation;
                         self::$method($record, $attr, $options);
                     }
-                    else throw new SException("The validation rule '$validation' does not exist.");
+                    else throw new Exception("The validation rule '$validation' does not exist.");
                 }
             }
         }
@@ -74,10 +74,10 @@ class SValidation
         $config = array_merge($config, $options);
         
         if ($config['pattern'] === Null)
-            throw new SException('A pattern must be supplied for format validation.');
+            throw new Exception('A pattern must be supplied for format validation.');
             
         if (!in_array($config['pattern'], self::$patterns))
-            throw new SException('The pattern provided does not exist.');
+            throw new Exception('The pattern provided does not exist.');
         
         $method = 'is_'.ucfirst($config['pattern']);
             
@@ -114,7 +114,7 @@ class SValidation
         $config = array_merge($config, $options);
         
         if (!isset($config['choices']) || !is_array($config['choices']))
-            throw new SException('An array of choices must be supplied.');
+            throw new Exception('An array of choices must be supplied.');
             
         if (!in_array($record->$attr, $config['choices']))
             self::add_error($record, $attr, $config['message']);
@@ -126,7 +126,7 @@ class SValidation
         $config = array_merge($config, $options);
         
         if (!isset($config['choices']) || !is_array($config['choices']))
-            throw new SException('An array of choices must be supplied.');
+            throw new Exception('An array of choices must be supplied.');
             
         if (in_array($record->$attr, $config['choices']))
             self::add_error($record, $attr, $config['message']);

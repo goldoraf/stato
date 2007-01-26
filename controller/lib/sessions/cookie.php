@@ -1,6 +1,6 @@
 <?php
 
-class SAuthException extends SException {}
+class SAuthException extends Exception {}
 
 class SCookie
 {

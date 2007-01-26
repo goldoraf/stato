@@ -39,7 +39,7 @@ class SAssociationMeta
             $options = array();
             $options['assoc_type'] = $type;
         }
-        if (!isset($options['assoc_type'])) throw new SException('Type of relationship is required.');
+        if (!isset($options['assoc_type'])) throw new Exception('Type of relationship is required.');
         $options['assoc_type'] = 'S'.SInflection::camelize($options['assoc_type']);
         $instance_class = $options['assoc_type'].'Meta';
         return new $instance_class($owner_meta, $assoc_name, $options);
@@ -96,7 +96,7 @@ class SAssociationMeta
         foreach(array_keys($options) as $key)
         {
             if (!in_array($key, $valid_options))
-                throw new SException($key.' is not a valid mapping option.');
+                throw new Exception($key.' is not a valid mapping option.');
         }
     }
     

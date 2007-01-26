@@ -1,8 +1,8 @@
 <?php
 
-class SWebServiceException extends SException {}
-class SWebServiceFault extends SException {}
-class SWebServiceCastingException extends SException
+class SWebServiceException extends Exception {}
+class SWebServiceFault extends Exception {}
+class SWebServiceCastingException extends Exception
 {
     protected $message = 'Calling parameters do not match API definition';
 }

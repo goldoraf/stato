@@ -1,6 +1,6 @@
 <?php
 
-class SMissingTemplateException extends SException {}
+class SMissingTemplateException extends Exception {}
 
 class SActionView
 {
@@ -23,7 +23,7 @@ class SActionView
     
     public function __set($name, $value)
     {
-        throw new SException('You\'re not allowed to reassign template variables !');
+        throw new Exception('You\'re not allowed to reassign template variables !');
     }
     
     public function render($template, $local_assigns = array())
@@ -140,7 +140,7 @@ class SActionView
     public function write_fragment($key, $content)
     {
         if (!SDir::mkdirs(dirname($key), 0700, true))
-            throw new SException('Caching failed with dirs creation');
+            throw new Exception('Caching failed with dirs creation');
             
         file_put_contents($key, $content);
     }

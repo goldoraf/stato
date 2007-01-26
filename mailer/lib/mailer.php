@@ -27,7 +27,7 @@ class SMailer
         $args = func_get_args();
         
         if (empty($args))
-            throw new SException('Mailer : mail method required.'); // pas top comme msg
+            throw new Exception('Mailer : mail method required.'); // pas top comme msg
         
         $method_name = $args[0];
         unset($args[0]);
@@ -47,7 +47,7 @@ class SMailer
         $args = func_get_args();
         
         if (empty($args))
-            throw new SException('Mailer : mail method required.'); // pas top comme msg
+            throw new Exception('Mailer : mail method required.'); // pas top comme msg
             
         if (is_object($args[0]) && get_class($args[0]) == 'SMail') $mail = $args[0];
         else $mail = call_user_func_array(array(self, 'create'), $args);

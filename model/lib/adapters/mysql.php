@@ -222,7 +222,7 @@ class SMySqlAdapter extends SAbstractAdapter
         elseif (isset($options['name']))
             return $options['name'];
         else
-            throw new SException('You must specify the index name');
+            throw new Exception('You must specify the index name');
     }
     
     public function type_to_sql($type, $limit = null)

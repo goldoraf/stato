@@ -129,7 +129,7 @@ class SListDecorator extends SActiveRecordDecorator
         elseif (ctype_alpha($this->scope))
         {
             if (!$this->model_exists($this->scope))
-                throw new SException('The scope provided does not seem to be an existent model.');
+                throw new Exception('The scope provided does not seem to be an existent model.');
         }
         $fk = strtolower($this->scope).'_id';
         return $fk." = '".$this->record->__get($fk)."'";

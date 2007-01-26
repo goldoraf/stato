@@ -1,6 +1,6 @@
 <?php
 
-class SRoutingException extends SException {}
+class SRoutingException extends Exception {}
 
 class SComponent
 {

@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 
 if (!extension_loaded('gd'))
-    throw new SException('GD extension is required for SImage component');
+    throw new Exception('GD extension is required for SImage component');
 
 class SImage 
 {

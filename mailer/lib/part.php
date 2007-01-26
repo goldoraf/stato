@@ -12,7 +12,7 @@ class SPart
     public function __construct($params)
     {
         if (!isset($params['body']) || !isset($params['content_type']))
-            throw new SException('Body and content-type are required parameters.');
+            throw new Exception('Body and content-type are required parameters.');
         
         $ref = new ReflectionClass(get_class($this));
         foreach ($params as $k => $v)

@@ -15,7 +15,7 @@ class SLogger
     
     public static function initialize($path)
     {
-        if (!file_exists($path)) throw new SException('Log file does not exist');
+        if (!file_exists($path)) throw new Exception('Log file does not exist');
         self::$instance = new SLogger($path);
     }
     

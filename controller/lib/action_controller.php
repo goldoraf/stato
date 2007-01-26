@@ -1,10 +1,10 @@
 <?php
 
-class SUnknownControllerException extends SException {}
-class SUnknownActionException extends SException {}
-class SUnknownProtocolException extends SException {}
-class SUnknownServiceException extends SException {}
-class SDoubleRenderException extends SException {}
+class SUnknownControllerException extends Exception {}
+class SUnknownActionException extends Exception {}
+class SUnknownProtocolException extends Exception {}
+class SUnknownServiceException extends Exception {}
+class SDoubleRenderException extends Exception {}
 
 /**
  * Front-web controller class
@@ -190,7 +190,7 @@ class SActionController
     protected function render_update($local_assigns = array())
     {
         $template = $this->pjs_path($this->controller_path(), $this->action_name());
-        if (!file_exists($template)) throw new SException('PJS file not found for this action');
+        if (!file_exists($template)) throw new Exception('PJS file not found for this action');
         $this->response->headers['Content-Type'] = 'text/javascript; charset=UTF-8';
         $this->render_text($this->view->render_update($template, $local_assigns));
     }
@@ -210,7 +210,7 @@ class SActionController
         $this->assigns['layout_content'] = $this->view->render($template);
         
         $layout = STATO_APP_PATH.'/views/layouts/'.$this->layout.'.php';
-        if (!file_exists($layout)) throw new SException('Layout not found');
+        if (!file_exists($layout)) throw new Exception('Layout not found');
         $this->render_file($layout, $status);
     }
     
@@ -308,7 +308,7 @@ class SActionController
         if (isset($_SERVER['HTTP_REFERER'])) $this->redirect_to($_SERVER['HTTP_REFERER']);
         else
         {
-            throw new SException('No HTTP_REFERER was set in the request to this action, 
+            throw new Exception('No HTTP_REFERER was set in the request to this action, 
                 so redirectBack() could not be called successfully');
         }
     }
@@ -370,7 +370,7 @@ class SActionController
     protected function send_file($path, $params=array())
     {
         if (!file_exists($path) || !is_readable($path)) 
-            throw new SException('Cannot read file : '.$path);
+            throw new Exception('Cannot read file : '.$path);
         
         $defaults = array
         (
@@ -406,7 +406,7 @@ class SActionController
             $path = $options;
         
         if (!SDir::mkdirs(dirname($this->page_cache_path($path)), 0700, true))
-            throw new SException('Caching failed with dirs creation');
+            throw new Exception('Caching failed with dirs creation');
         file_put_contents($this->page_cache_path($path), $content);
     }
     

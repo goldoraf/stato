@@ -1,7 +1,7 @@
 <?php
 
-class SXmlRpcClientException extends SException {}
-class SXmlRpcRequestFailedException extends SException {}
+class SXmlRpcClientException extends Exception {}
+class SXmlRpcRequestFailedException extends Exception {}
 
 class SXmlRpcClient
 {

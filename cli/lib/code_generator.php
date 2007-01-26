@@ -19,7 +19,7 @@ class SCodeGenerator
     public static function render_template($template, $assigns = array())
     {
         if (!is_readable($template))
-            throw new SException('Template not found : '.$template);
+            throw new Exception('Template not found : '.$template);
             
         extract($assigns);
             

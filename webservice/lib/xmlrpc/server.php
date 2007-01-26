@@ -1,6 +1,6 @@
 <?php
 
-class SXmlRpcServerException extends SException {}
+class SXmlRpcServerException extends Exception {}
 
 class SXmlRpcServer
 {

@@ -1,6 +1,6 @@
 <?php
 
-class SHttpClientException extends SException {}
+class SHttpClientException extends Exception {}
 
 class SHttpClient
 {   
