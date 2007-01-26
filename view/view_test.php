@@ -1,5 +1,8 @@
 <?php
 
+require_once(STATO_TESTING_PATH.'/xml_test_case.php');
+require_once(STATO_TESTING_PATH.'/helper_test_case.php');
+
 return array
 (
     'tag_helper',
@@ -8,7 +11,7 @@ return array
     'form_helper',
     'form_options_helper',
     'date_helper',
-    'record_helper',
+    //'active_record_helper',
     'number_helper'
 );
 

@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/cli/cli.php');
-
 class ConsoleUtilsTest extends UnitTestCase
 {
     public function test_parsing_long_options()

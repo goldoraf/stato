@@ -1,5 +1,7 @@
 <?php
 
+require_once(STATO_TESTING_PATH.'/active_test_case.php');
+
 return array
 (
     'active_record',

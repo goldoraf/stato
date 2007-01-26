@@ -1,20 +1,13 @@
 <?php
 
-define('STATO_APP_MODE', 'test');
+define('STATO_ENV', 'test');
+
+require(STATO_CORE_PATH.'/common/lib/initializer.php');
 
 define('ST_DIR', STATO_CORE_PATH.'/vendor/simpletest');
 require_once(ST_DIR.'/mock_objects.php');
 require_once(ST_DIR.'/unit_tester.php');
 require_once(ST_DIR.'/reporter.php');
-
-define('TESTS_DIR', STATO_CORE_PATH.'/cli/lib/testing');
-require_once(TESTS_DIR.'/show_passes.php');
-require_once(TESTS_DIR.'/color_text_reporter.php');
-require_once(TESTS_DIR.'/stato_test_case.php');
-require_once(TESTS_DIR.'/active_test_case.php');
-require_once(TESTS_DIR.'/helper_test_case.php');
-require_once(TESTS_DIR.'/controller_test_case.php');
-require_once(TESTS_DIR.'/controller_mocks.php');
 
 // we call session_start() now to avoid triggering "headers already sent" error
 session_start();
@@ -22,34 +15,41 @@ session_start();
 class RunTestsCommand extends SCommand
 {
     protected $allowed_options = array('path' => true);
-    protected $allowed_params  = array('package' => true);
+    protected $allowed_params  = array('framework' => true);
    
     public function execute()
     {
         if (isset($this->options['path']))
             define('STATO_APP_ROOT_PATH', $this->options['path']);
             
-        if (strpos($this->params['package'], '/') !== false)
-        {
-            list($package, $file) = explode('/', $this->params['package']);
-            $class = ucfirst(str_replace('_', '', $file)).'Test';
-            require_once(STATO_CORE_PATH."/{$package}/test/{$file}.test.php");
-            $test = new $class();
-        }
-        else
-        {
-            $package = $this->params['package'];
-            $test =& new GroupTest(ucfirst($package).' tests');
-            $this->add_package_tests($test, $package);
-        }
+        $framework = $this->params['framework'];
+        $this->initialize($framework);
+        $this->require_testing_classes();
+        $test =& new GroupTest(ucfirst($framework).' tests');
+        $this->add_framework_tests($test, $framework);
         
         $test->run(new TextReporter());
     }
     
-    private function add_package_tests($group_test, $package)
+    private function initialize($framework)
     {
-        $test_files = include(STATO_CORE_PATH."/{$package}/{$package}_test.php");
-        set_include_path(get_include_path() . PATH_SEPARATOR . STATO_CORE_PATH."/{$package}/test/");
+        $config = new SConfiguration;
+        if ($framework != 'cli' && $framework != 'common') $config->frameworks = array($framework);
+        SInitializer::run($config);
+    }
+    
+    private function require_testing_classes()
+    {
+        define('STATO_TESTING_PATH', STATO_CORE_PATH.'/cli/lib/testing');
+        require_once(STATO_TESTING_PATH.'/show_passes.php');
+        require_once(STATO_TESTING_PATH.'/color_text_reporter.php');
+        require_once(STATO_TESTING_PATH.'/stato_test_case.php');
+    }
+    
+    private function add_framework_tests($group_test, $framework)
+    {
+        $test_files = include(STATO_CORE_PATH."/{$framework}/{$framework}_test.php");
+        set_include_path(get_include_path() . PATH_SEPARATOR . STATO_CORE_PATH."/{$framework}/test/");
         foreach ($test_files as $file) $group_test->addTestFile($file.'.test.php');
     }
 }

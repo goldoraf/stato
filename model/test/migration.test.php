@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/model/model.php');
-
 class Person extends SActiveRecord
 {
     public static $objects;

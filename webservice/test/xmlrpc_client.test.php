@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/webservice/webservice.php');
-
 class XmlRpcClientTest extends XmlTestCase
 {
     public function test_request_to_xml()

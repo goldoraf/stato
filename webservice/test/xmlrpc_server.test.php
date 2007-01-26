@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/webservice/webservice.php');
-
 class XmlRpcServerTest extends XmlTestCase
 {
     public function test_basic_request_parsing()

@@ -2,7 +2,6 @@
 
 define('STATO_FIXTURES_DIR', STATO_CORE_PATH.'/model/test/fixtures');
 
-require_once(STATO_CORE_PATH.'/model/model.php');
 require_once(STATO_FIXTURES_DIR.'/models.php');
 
 class ActiveTestCase extends StatoTestCase

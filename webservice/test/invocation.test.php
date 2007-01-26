@@ -1,9 +1,7 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/webservice/webservice.php');
 require_once(STATO_CORE_PATH.'/controller/controller.php');
 require_once(STATO_CORE_PATH.'/view/view.php');
-require_once(STATO_CORE_PATH.'/mailer/mailer.php');
 
 class User extends SWebServiceStruct
 {

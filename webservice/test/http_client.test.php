@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/webservice/webservice.php');
-
 class HttpClientTest extends UnitTestCase
 {
     public function test_get_request()

@@ -28,8 +28,7 @@ class SInitializer
     
     private static function require_frameworks()
     {
-        require(STATO_CORE_PATH.'/common/common.php');
-        //require(STATO_CORE_PATH.'/cli/cli.php');
+        require_once(STATO_CORE_PATH.'/common/common.php');
         
         foreach (self::$config->frameworks as $framework)
             require(STATO_CORE_PATH."/{$framework}/{$framework}.php");
@@ -53,8 +52,11 @@ class SInitializer
     
     private static function initialize_database_settings()
     {
-        SActiveRecord::$configurations = self::$config->database_configuration();
-        SActiveRecord::establish_connection();
+        if (in_array('model', self::$config->frameworks))
+        {
+            SActiveRecord::$configurations = self::$config->database_configuration();
+            SActiveRecord::establish_connection();
+        }
     }
 }
 
