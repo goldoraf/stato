@@ -28,7 +28,7 @@ abstract class SAbstractMailTransport
         {
             $this->boundary = md5(uniqid(time()));
             
-            $p = new SPart(array('content_type' => 'multipart/mixed',
+            $p = new SPart(array('content_type' => 'multipart/mixed', 'content_disposition' => null,
                                  'body' => 'This part of the E-mail should never be seen. 
                                  If you are reading this, consider upgrading your e-mail
                                  client to a MIME-compatible client.'));

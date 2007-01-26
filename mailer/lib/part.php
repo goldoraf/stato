@@ -31,15 +31,20 @@ class SPart
     {
         $headers = array();
         
-        $headers['Content-Type'] = $this->content_type.'; charset="'.$this->charset.'"';
+        $headers['Content-Type'] = $this->content_type;
+        if ($this->charset !== null && $boundary === null) 
+            $headers['Content-Type'].= '; charset="'.$this->charset.'"';
         if ($boundary !== null)
-            $headers['Content-Type'].= ';'.SMailer::$eol.' boundary="'.$boundary.'"';
+            $headers['Content-Type'].= '; boundary="'.$boundary.'"';
             
         $headers['Content-Transfert-Encoding'] = $this->encoding;
         
-        $headers['Content-Disposition'] = $this->content_disposition;
-        if ($this->filename !== null)
-            $headers['Content-Disposition'].= '; filename="'.$this->filename.'"';
+        if ($this->content_disposition !== null)
+        {
+            $headers['Content-Disposition'] = $this->content_disposition;
+            if ($this->filename !== null)
+                $headers['Content-Disposition'].= '; filename="'.$this->filename.'"';
+        }
         
         return $headers;
     }

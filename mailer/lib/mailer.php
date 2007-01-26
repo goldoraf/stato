@@ -17,8 +17,8 @@ class SMailer
     protected $mail     = null;
     protected $view     = null;
     
-    public static $eol = "\n";
-    public static $line_length = 70;
+    public static $eol = "\r\n";
+    public static $line_length = 74;
     
     private static $delivery_method = 'php';
     
@@ -82,7 +82,7 @@ class SMailer
         
         if ($this->body !== null)
         {
-            if ($this->content_type = 'text/html')
+            if ($this->content_type == 'text/html')
                 $this->mail->set_html_body($this->render_message($this->template, $this->body));
             else
                 $this->mail->set_body($this->render_message($this->template, $this->body));
