@@ -10,27 +10,13 @@ class SLogger
 	
 	public static function get_instance()
     {
-       if (!isset(self::$instance))
-       {
-            switch (STATO_APP_MODE)
-            {
-                case 'dev':
-                    $filename = 'development.log';
-                    break;
-                case 'prod':
-                    $filename = 'production.log';
-                    break;
-                case 'test':
-                    $filename = 'test.log';
-                    break;
-            }
-            
-            if (!file_exists($path = STATO_APP_ROOT_PATH.'/log/'.$filename))
-                throw new SException('Log file does not exist');
-                
-            self::$instance = new SLogger($path);
-       }
        return self::$instance;
+    }
+    
+    public static function initialize($path)
+    {
+        if (!file_exists($path)) throw new SException('Log file does not exist');
+        self::$instance = new SLogger($path);
     }
     
     public function __construct($path)

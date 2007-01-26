@@ -58,11 +58,10 @@ class SActionController
     
     protected $hidden_actions  = array();
     
-    protected $cached_pages    = array();
-    protected $cached_actions  = array();
-    protected $page_cache_dir   = null;
-    protected $page_cache_ext   = '.html';
-    protected $perform_caching = True;
+    protected $cached_pages   = array();
+    protected $cached_actions = array();
+    protected $page_cache_dir = null;
+    protected $page_cache_ext = '.html';
     
     protected $before_filters = array();
     protected $after_filters  = array();
@@ -83,6 +82,9 @@ class SActionController
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
     public static $session_store = 'php';
+    public static $consider_all_requests_local = true;
+    public static $perform_caching = true;
+    
     
     public static function factory($request, $response)
     {
@@ -644,7 +646,7 @@ class SActionController
     {
         if ($this->is_performed()) $this->erase_results();
         $this->log_error($exception);
-        if (STATO_APP_MODE == 'dev') $this->rescue_action_locally($exception);
+        if (self::$consider_all_requests_local) $this->rescue_action_locally($exception);
         else $this->rescue_action_in_public($exception);
     }
     

@@ -1,5 +1,7 @@
 <?php
 
+class SAdapterNotSpecified extends SException { }
+class SAdapterNotFound extends SException { }
 class SAssociationTypeMismatch extends SException { }
 
 class SActiveRecord extends SObservable implements ArrayAccess
@@ -12,6 +14,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     public $record_timestamps = False;
     
+    public static $configurations    = null;
     public static $table_name_prefix = null;
     public static $table_name_suffix = null;
     
@@ -342,6 +345,33 @@ class SActiveRecord extends SObservable implements ArrayAccess
     /**
      * CONNECTION MANAGEMENT ===================================================
      **/
+    public static function establish_connection($config = null)
+    {
+        if ($config === null)
+        {
+            if (!defined('STATO_ENV')) throw new SAdapterNotSpecified;
+            self::establish_connection(STATO_ENV);
+        }
+        elseif (is_string($config))
+        {
+            if (isset(self::$configurations[$config]))
+                self::establish_connection(self::$configurations[$config]);
+            else
+                throw new SAdapterNotSpecified("$config database is not configured");
+        }
+        else
+        {
+            if (!isset($config['adapter']))
+                throw new SAdapterNotSpecified("database configuration does not specify adapter");
+            
+            $adapter_class = 'S'.$config['adapter'].'Adapter';
+            if (!class_exists($adapter_class)) 
+                throw new SAdapterNotFound("database configuration specifies nonexistent {$config['adapter']} adapter");
+                
+            self::$conn = new $adapter_class($config);
+        }
+    }
+    
     public static function connection()
     {
         if (!isset(self::$conn)) self::establish_connection();
@@ -357,16 +387,6 @@ class SActiveRecord extends SObservable implements ArrayAccess
     protected function conn()
     {
         return self::connection();
-    }
-    
-    protected static function establish_connection($config = array())
-    {
-        $config = include(STATO_APP_ROOT_PATH.'/conf/database.php');
-        $adapter_class = 'S'.$config[STATO_APP_MODE]['driver'].'Adapter';
-        if (!class_exists($adapter_class)) 
-            throw new SException('Database adapter not found !');
-        
-        self::$conn = new $adapter_class($config[STATO_APP_MODE]);
     }
 }
 
