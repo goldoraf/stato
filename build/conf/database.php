@@ -2,17 +2,17 @@
 
 $config = array
 (
-    'dev' => array
+    'development' => array
     (
-        'driver'  => 'MySql',
+        'adapter' => 'MySql',
         'host'    => 'localhost',
         'user'    => '',
         'pass'    => '',
         'dbname'  => ''
     ),
-    'prod' => array
+    'production' => array
     (
-        'driver'  => 'MySql',
+        'adapter' => 'MySql',
         'host'    => 'localhost',
         'user'    => '',
         'pass'    => '',
