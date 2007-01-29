@@ -19,8 +19,7 @@ class SMailer
     
     public static $eol = "\r\n";
     public static $line_length = 74;
-    
-    private static $delivery_method = 'php';
+    public static $delivery_method = 'php';
     
     public static function create()
     {
