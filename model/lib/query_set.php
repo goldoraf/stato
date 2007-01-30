@@ -145,6 +145,7 @@ class SQuerySet implements Iterator, Countable
             $clone = clone $this;
             $clone->order_by = array();
             $clone->includes = array();
+            $clone->joins    = array();
             $clone->offset   = null;
             $clone->limit    = null;
             
@@ -159,7 +160,7 @@ class SQuerySet implements Iterator, Countable
         $clone = clone $this;
         $clone->includes = array();
         $clone->joins    = array();
-        $clone->order_by   = array();
+        $clone->order_by = array();
         $this->conn->execute("DELETE FROM {$this->meta->table_name} ".$clone->sql_clause());
         return;
     }
