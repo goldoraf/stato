@@ -17,7 +17,7 @@ class SLocale
         putenv("LANG=".self::$language."");
         if (count($exp = explode('_', self::$language)) != 1) $win_language = $exp[0];
         else $win_language = self::$language;
-        setlocale(LC_TIME, $win_language, self::$language, self::$language.'.utf8');
+        setlocale(LC_TIME, self::$language.'.utf8', self::$language, $win_language);
     }
     
     public static function translate($key)
@@ -98,6 +98,7 @@ class SLocale
                 list($pref, $suff) = explode('-', $candidat);
                 $candidat = $pref.'_'.strtoupper($suff);
             }
+            else $candidat = $candidat.'_'.strtoupper($candidat); // for IE < 7
             
             $resultat[$i] = $candidat;
             
