@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if (!extension_loaded('gd'))
     throw new Exception('GD extension is required for SImage component');
