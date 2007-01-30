@@ -17,6 +17,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
     public static $configurations    = null;
     public static $table_name_prefix = null;
     public static $table_name_suffix = null;
+    public static $log_sql           = false;
     
     protected static $conn = null;
     protected $values      = array();

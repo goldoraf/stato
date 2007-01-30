@@ -512,8 +512,10 @@ class SActionController
         if (in_array($this->action_name(), $this->cached_pages) && $this->perform_caching && $this->is_caching_allowed())
             $this->cache_page($this->response->body, array('action' => $this->action_name(), 'params' => $this->params));
         
-        //SActiveRecord::connection()->write_log();
         $this->log_benchmarking();
+        
+        if (class_exists('SActiveRecord') && SActiveRecord::$log_sql === true)
+            SActiveRecord::connection()->write_log();
     }
     
     private function action_exists($action)
