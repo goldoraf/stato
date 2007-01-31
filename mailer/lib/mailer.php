@@ -48,6 +48,13 @@ class SMailer
         return $this->send($this->create_mail($method_name, $args));
     }
     
+    public function send($mail)
+    {
+        $transport_class = 'S'.ucfirst(self::$delivery_method).'MailTransport';
+        $transport = new $transport_class();
+        return $transport->send($mail);
+    }
+    
     protected function prepare_mail()
     {
         $mail = new SMail();
@@ -105,13 +112,6 @@ class SMailer
         $this->content_type = 'text/plain';
         $this->attachments = array();
         $this->parts = array();
-    }
-    
-    private function send($mail)
-    {
-        $transport_class = 'S'.ucfirst(self::$delivery_method).'MailTransport';
-        $transport = new $transport_class();
-        return $transport->send($mail);
     }
 }
 
