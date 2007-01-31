@@ -2,104 +2,112 @@
 
 class SMailer
 {
-    public $to = array();
-    public $cc = array();
-    public $bcc = array();
-    public $from = null;
-    public $reply_to = null;
-    public $subject = null;
-    public $body = null;
-    public $content_type = 'text/plain';
-    public $attachments = array();
-    public $parts = array();
+    public $to;
+    public $cc;
+    public $bcc;
+    public $from;
+    public $reply_to;
+    public $subject;
+    public $body;
+    public $content_type;
+    public $attachments;
+    public $parts;
     
     protected $template = null;
-    protected $mail     = null;
     protected $view     = null;
     
     public static $eol = "\r\n";
     public static $line_length = 74;
     public static $delivery_method = 'php';
     
-    public static function create()
+    public function __construct()
     {
-        $args = func_get_args();
-        
-        if (empty($args))
-            throw new Exception('Mailer : mail method required.'); // pas top comme msg
-        
-        $method_name = $args[0];
-        unset($args[0]);
-        // PHP5 ne gère pas bien l'héritage de fonctions statiques, aussi sommes-nous
-        // obligés de préciser que nous voulons instancier la classe ApplicationMailer.
-        // Cela contraint l'user à nommer sa classe ApplicationMailer...
-        $mailer = new ApplicationMailer($method_name);
-        
-        // appel de la méthode définie par l'user
-        call_user_func_array(array($mailer, $method_name),$args);
-        
-        return $mailer->prepare_mail();
+        $this->view = new SActionView();
+        $this->reset();
     }
     
-    public static function deliver()
+    public function __call($method, $args)
     {
-        $args = func_get_args();
-        
-        if (empty($args))
-            throw new Exception('Mailer : mail method required.'); // pas top comme msg
-            
-        if (is_object($args[0]) && get_class($args[0]) == 'SMail') $mail = $args[0];
-        else $mail = call_user_func_array(array(self, 'create'), $args);
-        
-        return self::send($mail);
+        if (preg_match('/^deliver_([a-zA-Z0-9_]*)$/', $method, $m))
+            return $this->deliver_mail($m[1], $args);
+        elseif (preg_match('/^create_([a-zA-Z0-9_]*)$/', $method, $m))
+            return $this->create_mail($m[1], $args);
+        else
+            throw new Exception("Method $method does not exist");
     }
     
-    public function __construct($method_name)
+    public function create_mail($method_name, $args)
     {
         $this->template = $method_name;
-        $this->mail     = new SMail();
-        $this->view     = new SActionView();
+        call_user_func_array(array($this, $method_name), $args);
+        return $this->prepare_mail();
     }
     
-    public function prepare_mail()
+    public function deliver_mail($method_name, $args)
     {
+        return $this->send($this->create_mail($method_name, $args));
+    }
+    
+    protected function prepare_mail()
+    {
+        $mail = new SMail();
+        
         foreach (array('to', 'cc', 'bcc') as $rec_type)
         {
             $method = 'add_'.$rec_type;
             if (!is_array($this->$rec_type)) 
                 $this->$rec_type = array($this->$rec_type);
             foreach ($this->$rec_type as $rec) 
-                call_user_func_array(array($this->mail, $method), $rec);
+                call_user_func_array(array($mail, $method), $rec);
         }
         
         if (is_array($this->from))
-            $this->mail->set_from($this->from[0], $this->from[1]);
+            $mail->set_from($this->from[0], $this->from[1]);
         else
-            $this->mail->set_from($this->from);
+            $mail->set_from($this->from);
             
-        $this->mail->set_subject($this->subject);
+        $mail->set_subject($this->subject);
         
         if ($this->body !== null)
         {
             if ($this->content_type == 'text/html')
-                $this->mail->set_html_body($this->render_message($this->template, $this->body));
+                $mail->set_html_body($this->render_message($this->template, $this->body));
             else
-                $this->mail->set_body($this->render_message($this->template, $this->body));
+                $mail->set_body($this->render_message($this->template, $this->body));
         }
         
-        foreach ($this->parts as $params) $this->mail->add_part($params);
-        foreach ($this->attachments as $params) $this->mail->add_attachment($params);
+        foreach ($this->parts as $params) $mail->add_part($params);
+        foreach ($this->attachments as $params) $mail->add_attachment($params);
         
-        return $this->mail;
+        $this->reset();
+        
+        return $mail;
     }
     
     protected function render_message($template, $assigns)
     {
-        $path = STATO_APP_PATH.'/views/mailer/'.$template.'.php';
+        $path = STATO_APP_PATH.'/views/'
+        .SDependencies::sub_directory(get_class($this))
+        .SInflection::underscore(get_class($this))
+        ."/$template.php";
         return $this->view->render($path, $assigns);
     }
     
-    private static function send($mail)
+    protected function reset()
+    {
+        $this->to = array();
+        $this->cc = array();
+        $this->bcc = array();
+        $this->from = null;
+        $this->reply_to = null;
+        $this->subject = null;
+        $this->body = null;
+        $this->content_type = 'text/plain';
+        $this->attachments = array();
+        $this->parts = array();
+    }
+    
+    private function send($mail)
     {
         $transport_class = 'S'.ucfirst(self::$delivery_method).'MailTransport';
         $transport = new $transport_class();

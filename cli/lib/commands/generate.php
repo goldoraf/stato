@@ -3,7 +3,8 @@
 class GenerateCommand extends SCommand
 {
     protected $allowed_params = array('type' => true, 'name' => true);
-    protected $allowed_types  = array('controller', 'model', 'migration', 'module', 'webservice', 'ws_test_controller');
+    protected $allowed_types  = array('controller', 'model', 'migration', 'module', 
+                                      'webservice', 'ws_test_controller', 'mailer');
     
     public function execute()
     {
@@ -74,6 +75,33 @@ class GenerateCommand extends SCommand
         $class_name = SInflection::camelize($file_name);
             
         $content = SCodeGenerator::generate_class($class_name, '', 'ApplicationController');
+        
+        $this->create_file($path, STATO_APP_PATH, $content);
+        $this->create_dir($views_path, STATO_APP_PATH);
+    }
+    
+    private function generate_mailer()
+    {
+        $file_name = $this->params['name'];
+        
+        if (strpos($file_name, '/') !== false)
+            list($subdir, $file_name) = explode('/', $file_name);
+        
+        if (empty($subdir))
+        {
+            $path = "models/$file_name.php";
+            $views_path = "views/$file_name";
+        }
+        else
+        {
+            $this->test_module_existence($subdir);
+            $path = "models/$subdir/$file_name.php";
+            $views_path = "views/$subdir/$file_name";
+        }
+        
+        $class_name = SInflection::camelize($file_name);
+            
+        $content = SCodeGenerator::generate_class($class_name, '', 'SMailer');
         
         $this->create_file($path, STATO_APP_PATH, $content);
         $this->create_dir($views_path, STATO_APP_PATH);
