@@ -55,7 +55,7 @@ class SInflection
 			if (preg_match($rule, $word))
                 return preg_replace($rule, $replace, $word);
 		}
-		return false;
+		return $word;
     }
     
     public static function singularize($word)
@@ -65,7 +65,7 @@ class SInflection
 			if (preg_match($rule, $word))
                 return preg_replace($rule, $replace, $word);
 		}
-		return false;
+		return $word;
     }
     
     public static function underscore($camel_cased_word)
