@@ -2,7 +2,7 @@
 
 require_once(STATO_CORE_PATH.'/view/view.php');
 
-if (!class_exists('SUrlRewriter'))
+if (!class_exists('SUrlRewriter', false))
 {
     class SUrlRewriter
     {

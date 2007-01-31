@@ -19,7 +19,7 @@ class SWebService
     public function __construct()
     {
         $api_class = str_replace('Service', '', get_class($this)).'Api';
-        if (!class_exists($api_class))
+        if (!class_exists($api_class, false))
             throw new SWebServiceException("$api_class class not found.");
         
         $this->api = new $api_class();

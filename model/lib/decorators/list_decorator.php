@@ -207,7 +207,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     protected function model_exists($class_name)
     {
-        if (class_exists($class_name)) return true;
+        if (class_exists($class_name, false)) return true;
         else
         {
             try { SDependencies::require_dependency('models', $class_name, get_class($this->record)); }

@@ -1,7 +1,31 @@
 <?php
 
+spl_autoload_register(array('SDependencies', 'auto_require_model'));
+
+class SDependencyNotFound extends Exception {}
+
 class SDependencies
 {
+    private static $subdirs = null;
+    
+    public static function auto_require_model($class_name)
+    {
+        $file_name = SInflection::underscore($class_name).'.php';
+        $possible_paths = array($file_name);
+        
+        foreach (self::subdirs_list() as $subdir) $possible_paths[] = "$subdir/$file_name";
+        
+        foreach ($possible_paths as $path)
+        {
+            $complete_path = STATO_APP_PATH."/models/$path";
+            if (file_exists($complete_path))
+            {
+                self::require_with_path('models', $class_name, $complete_path);
+                return;
+            }
+        }
+    }
+    
     public static function require_components($components)
     {
         foreach ($components as $component)
@@ -20,13 +44,26 @@ class SDependencies
     
     public static function require_dependency($layer, $dependency, $relative_to = null)
     {
-        list($subdir, $class) = self::dependency_sub_dir($dependency, $relative_to);
-        if (class_exists($class)) return;
-        $path = STATO_APP_PATH."/$layer/$subdir".SInflection::underscore($class).'.php';
+        list($subdir, $dependency) = self::dependency_sub_dir($dependency, $relative_to);
+        
+        $file_name  = SInflection::underscore($dependency);
+        $class_name = SInflection::camelize($dependency);
+        
+        if (class_exists($class_name, false)) return;
+        
+        $path = STATO_APP_PATH."/$layer/{$subdir}{$file_name}.php";
         if (!file_exists($path))
-            throw new Exception("Missing ".SInflection::singularize($layer)." $dependency");
+            throw new SDependencyNotFound("Missing ".SInflection::singularize($layer)." $dependency");
+        
+        self::require_with_path($layer, $class_name, $path);
+    }
+    
+    public static function require_with_path($layer, $class_name, $path)
+    {
         require_once($path);
-        if ($layer == 'models') SMapper::add_manager_to_class(SInflection::camelize($class));
+        
+        if ($layer == 'models' && self::descends_from_active_record($class_name))
+            SMapper::add_manager_to_class($class_name);
     }
     
     public static function dependency_file_path($layer, $dependency, $relative_to = null)
@@ -66,6 +103,31 @@ class SDependencies
             list($subdir, $dependency) = explode('/', $dependency);
             return array($subdir.'/', $dependency);
         }
+    }
+    
+    private static function descends_from_active_record($class_name)
+    {
+        try {
+            $ref = new ReflectionClass($class_name);
+            return $ref->isSubclassOf(new ReflectionClass('SActiveRecord'));
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
+    private static function subdirs_list()
+    {
+        if (self::$subdirs !== null) return self::$subdirs;
+        
+        self::$subdirs = array();
+        $dir = new DirectoryIterator(STATO_APP_PATH.'/models');
+        foreach ($dir as $file)
+        {
+            if ($file->isFile() || $file->isDot() || $file->getFilename() == '.svn') continue;
+            elseif ($file->isDir()) self::$subdirs[] = $file->getFilename();
+        }
+        
+        return self::$subdirs;
     }
 }
 

@@ -19,7 +19,7 @@ class MockContent extends MockRecord
     public function content_attributes() { return $this->content_attributes; }
 }
 
-if (!class_exists('SUrlRewriter'))
+if (!class_exists('SUrlRewriter', false))
 {
     class SUrlRewriter
     {

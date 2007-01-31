@@ -514,7 +514,7 @@ class SActionController
         
         $this->log_benchmarking();
         
-        if (class_exists('SActiveRecord') && SActiveRecord::$log_sql === true)
+        if (class_exists('SActiveRecord', false) && SActiveRecord::$log_sql === true)
             SActiveRecord::connection()->write_log();
     }
     
@@ -537,6 +537,13 @@ class SActionController
     {
         SLocale::load_strings(STATO_APP_PATH.'/i18n/'.SDependencies::sub_directory(get_class($this)));
         SUrlRewriter::initialize($this->request);
+        
+        try
+        {
+            SDependencies::require_dependency('models', SInflection::singularize($this->controller_name()), get_class($this));
+            SDependencies::require_dependency('helpers', $this->controller_name().'Helper', get_class($this));
+        }
+        catch (SDependencyNotFound $e) {}
         
         foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
         
@@ -636,7 +643,7 @@ class SActionController
     {
         $runtime = microtime(true) - STATO_TIME_START;
         $info = 'Completed in '.sprintf("%.5f", $runtime).' seconds';
-        if (class_exists('SActiveRecord'))
+        if (class_exists('SActiveRecord', false))
         {
             $db_runtime = SActiveRecord::connection_benchmark();
             $db_percentage = ($db_runtime * 100) / $runtime;

@@ -366,7 +366,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
                 throw new SAdapterNotSpecified("database configuration does not specify adapter");
             
             $adapter_class = 'S'.$config['adapter'].'Adapter';
-            if (!class_exists($adapter_class)) 
+            if (!class_exists($adapter_class, false)) 
                 throw new SAdapterNotFound("database configuration specifies nonexistent {$config['adapter']} adapter");
                 
             self::$conn = new $adapter_class($config);
