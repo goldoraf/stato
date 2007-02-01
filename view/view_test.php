@@ -11,7 +11,7 @@ return array
     'form_helper',
     'form_options_helper',
     'date_helper',
-    //'active_record_helper',
+    'active_record_helper',
     'number_helper'
 );
 

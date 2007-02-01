@@ -45,7 +45,7 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
+            'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
             input('post', 'title', $this->post),
@@ -58,7 +58,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'Error !';
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
+            'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
             input('post', 'title', $this->post),
@@ -73,7 +73,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'Title can\'t be empty';
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
+            'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
             error_message_for('post', $this->post),
@@ -100,7 +100,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'can\'t be empty';
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
+            'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
             error_message_on('title', $this->post),
@@ -116,8 +116,8 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
-            'body' => new SAttribute('body', 'text'),
+            'title' => new SColumn('title', 'string'),
+            'body' => new SColumn('body', 'text'),
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -135,8 +135,8 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
-            'private' => new SAttribute('private', 'boolean')
+            'title' => new SColumn('title', 'string'),
+            'private' => new SColumn('private', 'boolean')
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -158,7 +158,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->new_record = false;
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
+            'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -176,7 +176,7 @@ class RecordHelperTest extends HelperTestCase
         $this->post->errors['title'] = 'Title can\'t be empty';
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
+            'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -195,8 +195,8 @@ class RecordHelperTest extends HelperTestCase
     {
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
-            'written_on' => new SAttribute('written_on', 'date')
+            'title' => new SColumn('title', 'string'),
+            'written_on' => new SColumn('written_on', 'date')
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -205,12 +205,12 @@ class RecordHelperTest extends HelperTestCase
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_written_on">Written on</label>
             <select name="post[written_on][year]">
-            <option value="2001">2001</option><option value="2002">2002</option>
+            <option value="2002">2002</option>
             <option value="2003">2003</option><option value="2004">2004</option>
             <option value="2005">2005</option><option value="2006" selected="selected">2006</option>
             <option value="2007">2007</option><option value="2008">2008</option>
             <option value="2009">2009</option><option value="2010">2010</option>
-            <option value="2011">2011</option>
+            <option value="2011">2011</option><option value="2012">2012</option>
             </select>
             <select name="post[written_on][month]">
             <option value="1">January</option><option value="2">February</option>
@@ -249,8 +249,8 @@ class RecordHelperTest extends HelperTestCase
         $this->post->written_on = new SDateTime(2006, 3, 31, 1, 29, 35);
         $this->post->content_attributes = array
         (
-            'title' => new SAttribute('title', 'string'),
-            'written_on' => new SAttribute('written_on', 'datetime')
+            'title' => new SColumn('title', 'string'),
+            'written_on' => new SColumn('written_on', 'datetime')
         );
         $this->assertDomEqual(
             form('post', $this->post),
@@ -259,12 +259,12 @@ class RecordHelperTest extends HelperTestCase
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_written_on">Written on</label>
             <select name="post[written_on][year]">
-            <option value="2001">2001</option><option value="2002">2002</option>
+            <option value="2002">2002</option>
             <option value="2003">2003</option><option value="2004">2004</option>
             <option value="2005">2005</option><option value="2006" selected="selected">2006</option>
             <option value="2007">2007</option><option value="2008">2008</option>
             <option value="2009">2009</option><option value="2010">2010</option>
-            <option value="2011">2011</option>
+            <option value="2011">2011</option><option value="2012">2012</option>
             </select>
             <select name="post[written_on][month]">
             <option value="1">January</option><option value="2">February</option>
