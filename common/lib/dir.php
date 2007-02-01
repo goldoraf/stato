@@ -87,6 +87,18 @@ class SDir extends DirectoryIterator
             }
         }
     }
+    
+    public static function entries($dirname)
+    {
+        if (!self::exists($dirname))
+            throw new Exception('Directory does not exist.');
+            
+        $entries = array();
+        $dir = new DirectoryIterator($dirname);
+        foreach ($dir as $file) if ($file->isFile()) $entries[] = $file->getFilename();
+        
+        return $entries;
+    }
 }
 
 ?>
