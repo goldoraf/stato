@@ -146,7 +146,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
         $id = $this->read_id();
         if ($id !== null)
             return !$this->conn()->select_one("SELECT 1 FROM {$this->meta->table_name} 
-                                             WHERE {$this->meta->identity_field}=$id LIMIT 1");
+                                             WHERE {$this->meta->identity_field}='$id' LIMIT 1");
         return true;
     }
     
