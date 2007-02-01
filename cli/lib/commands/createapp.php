@@ -5,7 +5,7 @@ class CreateAppCommand extends SCommand
     protected $allowed_options = array('path' => true, 'compile' => false);
     protected $allowed_params  = array('project_name' => true);
     
-    private $project_dirs     = array('app', 'cache', 'conf', 'db', 'lib', 'log', 'public', 'scripts');
+    private $project_dirs     = array('app', 'cache', 'conf', 'db', 'lib', 'log', 'public', 'scripts', 'test');
     private $project_app_dirs = array('controllers', 'helpers', 'i18n', 'models', 'views', 'apis');
     private $core_layers      = array('common', 'controller', 'mailer', 'model', 'view', 'webservice');
     
