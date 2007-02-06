@@ -35,7 +35,7 @@ abstract class SAbstractAdapter
         $rs = $this->select($sql);
         $set = array();
         while($row = $this->fetch($rs)) $set[] = $row;
-        $this->free($rs);
+        $this->free_result($rs);
         return $set;
     }
     
