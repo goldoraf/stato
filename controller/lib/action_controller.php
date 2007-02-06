@@ -84,6 +84,7 @@ class SActionController
     public static $session_store = 'php';
     public static $consider_all_requests_local = true;
     public static $perform_caching = true;
+    public static $template_class = 'SActionView';
     
     
     public static function factory($request, $response)
@@ -119,9 +120,8 @@ class SActionController
     
     public function __construct()
     {
-        $this->view    = new SActionView($this);
-        $this->logger  = SLogger::get_instance();
-        
+        $this->initialize_template_class();
+        $this->logger = SLogger::get_instance();
         $this->page_cache_dir = STATO_APP_ROOT_PATH.'/public/cache';
     }
     
@@ -347,7 +347,7 @@ class SActionController
     {
         $this->performed_redirect = false;
         $this->response->redirected_to = null;
-        $this->response->headers['Status'] = self::default_render_status_code;
+        $this->response->headers['Status'] = self::DEFAULT_RENDER_STATUS_CODE;
         unset($this->response->headers['location']);
     }
     
@@ -662,10 +662,11 @@ class SActionController
     
     private function rescue_action_in_public($exception)
     {
+        $status = $this->response_code_for_rescue($exception);
         if (in_array(get_class($exception), array('SRoutingException', 
             'SUnknownControllerException', 'SUnknownActionException')))
-            $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/404.html'));
-        else $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/500.html'));
+            $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/404.html'), $status);
+        else $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/500.html'), $status);
     }
     
     private function rescue_action_locally($exception)
@@ -678,7 +679,7 @@ class SActionController
         $this->assigns['layout_content'] 
             = $this->view->render($rescue_path.$this->template_file_for_local_rescue($exception).'.php');
         
-        $this->render_file($rescue_path.'layout.php');
+        $this->render_file($rescue_path.'layout.php', $this->response_code_for_rescue($exception));
     }
     
     private function template_file_for_local_rescue($exception)
@@ -696,6 +697,15 @@ class SActionController
             default:
                 return 'diagnostics';
         }
+    }
+    
+    private function response_code_for_rescue($exception)
+    {
+        if (in_array(get_class($exception), array('SRoutingException', 
+            'SUnknownControllerException', 'SUnknownActionException')))
+            return '404 Page Not Found';
+        else
+            return '500 Internal Error';
     }
     
     private function log_error($exception)
@@ -728,6 +738,12 @@ class SActionController
     {
         return (!$this->request->is_post() && isset($this->response->headers['Status'])
             && $this->response->headers['Status'] < 400);
+    }
+    
+    private function initialize_template_class()
+    {
+        $view_class = self::$template_class;
+        $this->view = new $view_class($this);
     }
     
     private static function instanciate_controller($req_controller)
