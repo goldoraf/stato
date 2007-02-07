@@ -3,15 +3,20 @@
 define('ST_DIR', STATO_CORE_PATH.'/vendor/simpletest');
 require_once(ST_DIR.'/mock_objects.php');
 require_once(ST_DIR.'/unit_tester.php');
+require_once(ST_DIR.'/web_tester.php');
 require_once(ST_DIR.'/reporter.php');
 
 define('STATO_TESTING_PATH', STATO_CORE_PATH.'/cli/lib/testing');
 require_once(STATO_TESTING_PATH.'/show_passes.php');
 require_once(STATO_TESTING_PATH.'/color_text_reporter.php');
 require_once(STATO_TESTING_PATH.'/stato_test_case.php');
+require_once(STATO_TESTING_PATH.'/controller_test_case.php');
+require_once(STATO_TESTING_PATH.'/controller_mocks.php');
 
 // we call session_start() now to avoid triggering "headers already sent" error
 session_start();
+
+SRoutes::initialize(include(STATO_APP_ROOT_PATH.'/conf/routes.php'));
 
 class RunAppTestsCommand extends SCommand
 {
@@ -19,6 +24,9 @@ class RunAppTestsCommand extends SCommand
    
     public function execute()
     {
+        set_include_path(get_include_path() . PATH_SEPARATOR . STATO_APP_PATH.'/controllers/'
+                                            . PATH_SEPARATOR . STATO_APP_PATH.'/views/');
+        
         if (isset($this->params['test_file']))
         {
             $file_path = STATO_APP_ROOT_PATH.'/test/'.$this->params['test_file'];

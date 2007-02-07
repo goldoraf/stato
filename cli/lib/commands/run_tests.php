@@ -7,6 +7,7 @@ require(STATO_CORE_PATH.'/common/lib/initializer.php');
 define('ST_DIR', STATO_CORE_PATH.'/vendor/simpletest');
 require_once(ST_DIR.'/mock_objects.php');
 require_once(ST_DIR.'/unit_tester.php');
+require_once(ST_DIR.'/web_tester.php');
 require_once(ST_DIR.'/reporter.php');
 
 // we call session_start() now to avoid triggering "headers already sent" error
