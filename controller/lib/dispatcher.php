@@ -4,6 +4,11 @@ define('STATO_APP_PATH', STATO_APP_ROOT_PATH.'/app');
 
 function error_handler($error_type, $message)
 {
+    if ($error_type == E_USER_ERROR && preg_match('/^Missing ([a-zA-Z0-9_]*) model$/', $message))
+    {
+        SActionController::process_with_exception(new SRequest(), new SResponse(), new Exception($message, $error_type))->out();
+        die();
+    }
     // No exception thrown for notices : Stato uses some PHP4 librairies
     // and we don't want to bother with "var is deprecated"
     // Ideally, we could log this type of errors

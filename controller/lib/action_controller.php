@@ -716,9 +716,15 @@ class SActionController
     
     private function clean_backtrace($exception)
     {
-        $trace = array();
         foreach ($exception->getTrace() as $t)
-            $trace[] = $t['file'].':'.$t['line'].' in \''.$t['function'].'\'';
+        {
+            $str = '';
+            if (isset($t['file']) && isset($t['line'])) $str.= $t['file'].':'.$t['line'];
+            else $str.= 'undefined';
+            if (isset($t['class'])) $str.= ' in \''.$t['class'].$t['type'].$t['function'].'\'';
+            else $str.= ' in \''.$t['function'].'\'';
+            $trace [] = $str;
+        }
         return $trace;
     }
     

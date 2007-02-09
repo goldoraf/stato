@@ -5,11 +5,11 @@
     <caption>Stack trace</caption>
     <tr><th>#</th><th>File</th><th>Line</th><th>Function</th></tr>
     <? foreach ($this->exception->getTrace() as $num => $trace) : ?>
-    <tr>
-        <td><?= $num + 1; ?></td>
-        <td><?= $trace['file']; ?></td>
-        <td><?= $trace['line']; ?></td>
-        <td><?= $trace['class'].$trace['type'].$trace['function']; ?></td>
-    </tr>
+        <tr>
+            <td><?= $num + 1; ?></td>
+            <td><?= (isset($trace['file'])) ? $trace['file'] : ''; ?></td>
+            <td><?= (isset($trace['line'])) ? $trace['line'] : ''; ?></td>
+            <td><?= (isset($trace['class'])) ? $trace['class'].$trace['type'].$trace['function'] : $trace['function']; ?></td>
+        </tr>
     <? endforeach; ?>
 </table>

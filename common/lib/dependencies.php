@@ -24,6 +24,11 @@ class SDependencies
                 return;
             }
         }
+        
+        // we don't throw an exception because __autoload forbids to catch it
+        // and instead returns a fatal error. Triggering an error will allow 
+        // our error handler to convert into a proper exception.
+        trigger_error("Missing $class_name model", E_USER_ERROR);
     }
     
     public static function require_components($components)
