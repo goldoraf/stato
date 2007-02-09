@@ -57,9 +57,6 @@ class SAssociationMeta
             {
                 list($subdir, $class) = explode('/', $options['class_name']);
                 $this->class = SInflection::camelize($class);
-                
-                if (!class_exists($this->class, false))
-                    SDependencies::require_dependency('models', $options['class_name'], $owner_meta->class);
             }
         }
         else
@@ -69,9 +66,6 @@ class SAssociationMeta
             else 
                 $this->class = SInflection::camelize($assoc_name);
         }
-        
-        if (!class_exists($this->class, false))
-            SDependencies::require_dependency('models', $this->class, $owner_meta->class);
     }
     
     public function __get($key)
