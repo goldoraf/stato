@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('JAVASCRIPT_DEFAULT_SOURCES'))
-    define('JAVASCRIPT_DEFAULT_SOURCES', 'prototype;controls;dragdrop;effects;lowpro');
+    define('JAVASCRIPT_DEFAULT_SOURCES', 'prototype;effects;controls;dragdrop;lowpro');
 
 function image_tag($filename, $options = array())
 {
