@@ -8,7 +8,7 @@ class SQuerySet implements Iterator, Countable
     public $excludes = array();
     public $includes = array();
     public $params   = array();
-    public $order_by  = array();
+    public $order_by = array();
     public $joins    = array();
     public $offset   = null;
     public $limit    = null;
@@ -145,7 +145,6 @@ class SQuerySet implements Iterator, Countable
             $clone = clone $this;
             $clone->order_by = array();
             $clone->includes = array();
-            $clone->joins    = array();
             $clone->offset   = null;
             $clone->limit    = null;
             
@@ -210,7 +209,6 @@ class SQuerySet implements Iterator, Countable
         $args = func_get_args();
         $clone = clone $this;
         $clone->includes = array_merge($this->includes, $args);
-        $clone->joins = array_merge($this->joins, $this->include_joins($args));
         return $clone;
     }
     
@@ -221,7 +219,7 @@ class SQuerySet implements Iterator, Countable
         $v->filters  = $this->filters;
         $v->excludes = $this->excludes;
         $v->params   = $this->params;
-        $v->order_by  = $this->order_by;
+        $v->order_by = $this->order_by;
         $v->limit    = $this->limit;
         $v->offset   = $this->offset;
         $v->distinct = $this->distinct;
@@ -296,7 +294,6 @@ class SQuerySet implements Iterator, Countable
                 $cond  = $matches[3];
                 
                 $clone->includes[] = $matches[1];
-                $clone->joins[]    = $this->association_join($assoc_meta);
                 $clone->filters[]  = "{$assoc_meta->table_name}.{$field}{$cond}";
                 
                 unset($args[$k]);
@@ -320,9 +317,9 @@ class SQuerySet implements Iterator, Countable
     }
     
     protected function sql_joins()
-    {
-        if (empty($this->joins)) return null;
-        return implode(' ', $this->joins);
+    {  
+        if (empty($this->joins) && empty($this->includes)) return null;
+        return implode(' ', array_merge($this->joins, $this->include_joins($this->includes)));
     }
     
     protected function sql_conditions()
