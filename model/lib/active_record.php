@@ -268,6 +268,8 @@ class SActiveRecord extends SObservable implements ArrayAccess
                     $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
                                   .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
                     break;
+                default:
+                    $this->$key = $value;
             }
         }
     }
