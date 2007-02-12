@@ -7,7 +7,7 @@ class SHasOneMeta extends SAssociationMeta
     public function __construct($owner_meta, $assoc_name, $options)
     {
         parent::__construct($owner_meta, $assoc_name, $options);
-        $this->assert_valid_options($options);
+        $this->assert_valid_options($options, array('dependent'));
         if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
         else $this->foreign_key = $owner_meta->underscored.'_id';
         
