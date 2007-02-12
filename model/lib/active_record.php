@@ -112,15 +112,27 @@ class SActiveRecord extends SObservable implements ArrayAccess
     public function save()
     {
         if (!$this->is_valid()) return false;
+        
+        if ($this->record_timestamps) $this->save_with_timestamps();
+        foreach($this->meta->relationships as $k => $v) 
+                $this->$k->before_owner_save();
+        
         $this->set_state('before_save');
         if ($this->is_new_record()) $this->create_record();
         else $this->update_record();
         $this->set_state('after_save');
+        
+        foreach($this->meta->relationships as $k => $v) 
+            $this->$k->after_owner_save();
+        
         return true;
     }
     
     public function delete()
     {
+        foreach($this->meta->relationships as $k => $v) 
+            $this->$k->before_owner_delete();
+        
         $this->set_state('before_delete');
         if ($this->is_new_record()) return false;
         $sql = 'DELETE FROM '.$this->meta->table_name.
@@ -287,24 +299,11 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     protected function after_update() {}
     
-    protected function before_save()
-    {
-        if ($this->record_timestamps) $this->save_with_timestamps();
-        foreach($this->meta->relationships as $k => $v) 
-                $this->$k->before_owner_save();
-    }
+    protected function before_save() {}
     
-    protected function after_save()
-    {
-        foreach($this->meta->relationships as $k => $v) 
-            $this->$k->after_owner_save();
-    }
+    protected function after_save() {}
     
-    protected function before_delete()
-    {
-        foreach($this->meta->relationships as $k => $v) 
-            $this->$k->before_owner_delete();
-    }
+    protected function before_delete() {}
     
     protected function after_delete() {}
     
