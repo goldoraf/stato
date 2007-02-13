@@ -33,6 +33,25 @@ function truncate($text, $length = 30, $truncate_string = '...')
 }
 
 /**
+ * Attempts to pluralize the <var>$singular</var> word unless count is 1. 
+ * It will use <var>$plural</var> if supplied, the <var>SInflection</var> class if defined,
+ * otherwise it will just add an 's' to the string. 
+ * 
+ * <code>
+ * pluralize(1, 'person');  => 1 person
+ * pluralize(2, 'person');  => 2 people
+ * pluralize(3, 'person', 'users');  => 3 users
+ * </code>
+ */
+function pluralize($count, $singular, $plural = null)
+{
+    if ($count == 1) return $count.' '.$singular;
+    if ($plural !== null) return $count.' '.$plural;
+    if (class_exists('SInflection')) return $count.' '.SInflection::pluralize($singular);
+    return $count.' '.$singular.'s';
+}
+
+/**
  * Sanitize the given HTML using safeHTML library. It is better than PHP function 
  * strip_tags(), who does not modify any attributes on the tags that you allow.
  *
