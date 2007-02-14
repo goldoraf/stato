@@ -272,6 +272,13 @@ abstract class SManyAssociationManager
         $this->replace($qs->get($ids));
     }
     
+    public function ids()
+    {
+        $ids = array();
+        foreach ($this->all() as $record) $ids[] = $record->id;
+        return $ids;
+    }
+    
     public function set_query_set($qs)
     {
         $this->qs = $qs;
