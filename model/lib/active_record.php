@@ -4,12 +4,32 @@ class SAdapterNotSpecified extends Exception { }
 class SAdapterNotFound extends Exception { }
 class SAssociationTypeMismatch extends Exception { }
 
+/**
+ * ORM class
+ * 
+ * <var>SActiveRecord</var> objects don't specify their attributes directly, 
+ * but rather infer them from the table definition with which they're linked. 
+ * Any change in the schema of the table is though instantly reflected in the objects.  
+ * 
+ * @package Stato
+ * @subpackage model
+ */
 class SActiveRecord extends SObservable implements ArrayAccess
 {
     public $errors         = array();
-    public $attr_required  = array();
-    public $attr_protected = array();
     public $attr_unique    = array();
+    
+    /**
+     * DEPRECATED
+     */
+    public $attr_required  = array();
+    /**
+     * DEPRECATED
+     */
+    public $attr_protected = array();
+    /**
+     * DEPRECATED
+     */
     public $validations    = array();
     
     public $record_timestamps = False;
@@ -219,11 +239,6 @@ class SActiveRecord extends SObservable implements ArrayAccess
         return $this->meta->content_attributes();
     }
     
-    protected function attr_exists($name)
-    {
-        return array_key_exists($name, $this->meta->attributes);
-    }
-    
     protected function read_attribute($name)
     {
         if (!$this->attr_exists($name)) return;
@@ -237,60 +252,6 @@ class SActiveRecord extends SObservable implements ArrayAccess
     {
         if (!$this->attr_exists($name)) return;
         $this->values[$name] = $this->meta->attributes[$name]->typecast($this, $value);
-    }
-    
-    protected function read_id()
-    {
-        return $this->read_attribute($this->meta->identity_field);
-    }
-    
-    protected function write_id($value)
-    {
-        $this->write_attribute($this->meta->identity_field, $value);
-    }
-    
-    /**
-     * Creates string values for all attributes that needs more than one single parameter
-     * (such as Dates).
-     */
-    protected function assign_multiparams_attributes($params)
-    {
-        $errors = array();
-        foreach($params as $key => $value)
-        {
-            $type = $this->meta->attributes[$key]->type;
-            switch ($type)
-            {
-                case SColumn::DATE:
-                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day'];
-                    break;
-                case SColumn::DATETIME:
-                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
-                                  .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
-                    break;
-                default:
-                    $this->$key = $value;
-            }
-        }
-    }
-    
-    protected function prepare_sql_set()
-    {
-        $set = array();
-        foreach($this->meta->attributes as $column => $attr)
-            if (!array_key_exists($column, $this->meta->relationships))
-                $set[] = "$column = ".$this->conn()->quote($this->$column, $attr->type);
-        
-        return 'SET '.join(',', $set);
-    }
-    
-    protected function save_with_timestamps()
-    {
-        $t = SDateTime::today();
-        if ($this->is_new_record())
-            if ($this->attr_exists('created_on')) $this->values['created_on'] = $t;
-        
-        if ($this->attr_exists('updated_on')) $this->values['updated_on'] = $t;
     }
     
     protected function before_create() {}
@@ -313,10 +274,236 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     protected function after_validate() {}
     
-    protected function run_validations($method)
+    /**
+     * Validates that the specified attributes are not blank. 
+     * 
+     * By blank, understand not null and not empty.
+     * Example :
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_presence_of('username', 'email', 'password');
+     *     }     
+     * }
+     * </code>                        
+     */
+    protected function validate_presence_of()
+    {
+        $attr_names = func_get_args();
+        foreach ($attr_names as $attr)
+            SValidation::validate_presence($this, $attr);
+    }
+    
+    /**
+     * Validates whether the value of the specified attribute is unique in the table.
+     * 
+     * You can limit the scope of the uniquness constraint with the 'scope' option.
+     * When the record is created, a check is performed to make sure that no record 
+     * exists in the table with the given value for the specified attribute. When 
+     * the record is updated, the same check is made but disregarding the record itself.     
+     * Example :
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_uniqueness_of('username', array('scope' => 'cluster_id'));
+     *     }     
+     * }
+     * </code>
+     * Options:
+     * - <var>message</var> - A custom error message.
+     * - <var>scope</var> - A column by which to limit the scope of the uniqueness constraint.
+     */
+    protected function validate_uniqueness_of($attr_name, $options = array())
+    {
+        SValidation::validate_uniqueness($this, $attr_name, $options);
+    }
+    
+    /**
+     * Validates whether the value of the specified attribute is of the correct form 
+     * by matching it against the regular expression provided.
+     * 
+     * <var>pattern</var> option can be a regex, or one of the following patterns : <var>alpha</var>, 
+     * <var>alphanum</var>, <var>num</var>, <var>singleline</var>, <var>email</var>, <var>ip</var>, <var>xml</var>, <var>utf8</var>.
+     * Example :
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_format_of('mail', array('pattern' => 'email'));
+     *     }     
+     * }
+     * </code>
+     * Options:
+     * - <var>message</var> - A custom error message.
+     * - <var>pattern</var> - A regex.                         
+     */
+    protected function validate_format_of($attr_name, $options = array())
+    {
+        SValidation::validate_format($this, $attr_name, $options);
+    }
+    
+    /**
+     * Validates that the specified attribute matches the length restrictions supplied.
+     * 
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_length_of('first_name', array('max_length' => 30));
+     *         $this->validate_length_of('last_name', array('max_length' => 30, 'message' => 'less than %d characters...'));
+     *         $this->validate_length_of('password', array('min_length' => 6, 'max_length' => 12, 'message' => 'Between 6 and 12 chars plz...'));    
+     *         $this->validate_length_of('username', array('min_length' => 4, 'max_length' => 30, 'too_long' => 'Choose a shorter name', 'too_short' => 'Choose a longer name'));      
+     *     }     
+     * }
+     * </code>
+     * Options:
+     * - <var>message</var> - A custom error message.
+     * - <var>min_length</var>
+     * - <var>max_length</var>
+     * - <var>too_long</var> - The error message if the attribute goes over the maximum.  
+     * - <var>too_short</var> - The error message if the attribute goes under the minimum.                         
+     */
+    protected function validate_length_of($attr_name, $options = array())
+    {
+        SValidation::validate_length($this, $attr_name, $options);
+    }
+    
+    /**
+     * Validates whether the value of the specified attribute is available in an array of choices.
+     * 
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_inclusion_of('sex', array('choices' => array('m', 'f'), 'message' => 'Uuuuuh ?!?'));
+     *     }     
+     * }
+     * </code>
+     * Options:
+     * - <var>message</var> - A custom error message.
+     * - <var>choices</var> - An array of available items.                  
+     */
+    protected function validate_inclusion_of($attr_name, $options = array())
+    {
+        SValidation::validate_inclusion($this, $attr_name, $options);
+    }
+    
+    /**
+     * Validates that the value of the specified attribute is not in an array of choices.
+     * 
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_exclusion_of('username', array('choices' => array('admin', 'root')));
+     *     }     
+     * }
+     * </code>
+     * Options:
+     * - <var>message</var> - A custom error message.
+     * - <var>choices</var> - An array of unavailable items.                  
+     */
+    protected function validate_exclusion_of($attr_name, $options = array())
+    {
+        SValidation::validate_exclusion($this, $attr_name, $options);
+    }
+    
+    /**
+     * Encapsulates the pattern of wanting to validate a password or email address field with a confirmation.
+     * 
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_confirmation_of('password');
+     *     }     
+     * }
+     * 
+     * // in the view :
+     * <?= $f->password_field('password'); ? >
+     * <?= $f->password_field('password_confirmation'); ? >
+     * </code>     
+     * 
+     * The 'password_confirmation' attribute is entirely virtual. No database column is needed.                                    
+     */
+    protected function validate_confirmation_of($attr_name, $options = array())
+    {
+        SValidation::validate_confirmation($this, $attr_name, $options);
+    }
+    
+    /**
+     * Encapsulates the pattern of wanting to validate the acceptance of a terms of service check box.
+     * 
+     * <code>
+     * class User extends SActiveRecord
+     * {
+     *     public function validate()
+     *     {
+     *         $this->validate_acceptance_of('terms_of_service');
+     *     }     
+     * }             
+     * </code>
+     * 
+     * The 'terms_of_service' attribute is entirely virtual. No database column is needed.                
+     */
+    protected function validate_acceptance_of($attr_name, $options = array())
+    {
+        SValidation::validate_acceptance($this, $attr_name, $options);
+    }
+    
+    private function run_validations($method)
     {
         foreach (array_keys($this->values) as $key)
             SValidation::validate_attribute($this, $key, $method);
+    }
+    
+    private function attr_exists($name)
+    {
+        return array_key_exists($name, $this->meta->attributes);
+    }
+    
+    private function read_id()
+    {
+        return $this->read_attribute($this->meta->identity_field);
+    }
+    
+    private function write_id($value)
+    {
+        $this->write_attribute($this->meta->identity_field, $value);
+    }
+    
+    /**
+     * Creates string values for all attributes that needs more than one single parameter
+     * (such as Dates).
+     */
+    private function assign_multiparams_attributes($params)
+    {
+        $errors = array();
+        foreach($params as $key => $value)
+        {
+            $type = $this->meta->attributes[$key]->type;
+            switch ($type)
+            {
+                case SColumn::DATE:
+                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day'];
+                    break;
+                case SColumn::DATETIME:
+                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
+                                  .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
+                    break;
+                default:
+                    $this->$key = $value;
+            }
+        }
     }
     
     private function create_record()
@@ -336,6 +523,25 @@ class SActiveRecord extends SObservable implements ArrayAccess
                ' WHERE '.$this->meta->identity_field.' = \''.$this->id.'\'';
         $this->conn()->update($sql);
         $this->set_state('after_update');
+    }
+    
+    private function prepare_sql_set()
+    {
+        $set = array();
+        foreach($this->meta->attributes as $column => $attr)
+            if (!array_key_exists($column, $this->meta->relationships))
+                $set[] = "$column = ".$this->conn()->quote($this->$column, $attr->type);
+        
+        return 'SET '.join(',', $set);
+    }
+    
+    private function save_with_timestamps()
+    {
+        $t = SDateTime::today();
+        if ($this->is_new_record())
+            if ($this->attr_exists('created_on')) $this->values['created_on'] = $t;
+        
+        if ($this->attr_exists('updated_on')) $this->values['updated_on'] = $t;
     }
     
     private function ensure_proper_type()
