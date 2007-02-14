@@ -4,17 +4,19 @@ class SManyToManyMeta extends SAssociationMeta
 {
     public $assoc_foreign_key = null;
     public $join_table = null;
+    public $scope = null;
     
     public function __construct($owner_meta, $assoc_name, $options)
     {
         parent::__construct($owner_meta, $assoc_name, $options);
-        $this->assert_valid_options($options, array('association_foreign_key', 'join_table'));
+        $this->assert_valid_options($options, array('association_foreign_key', 'join_table', 'scope'));
         if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
         else $this->foreign_key = $owner_meta->underscored.'_id';
         if (isset($options['association_foreign_key'])) $this->assoc_foreign_key = $options['association_foreign_key'];
         else $this->assoc_foreign_key = SInflection::underscore($this->class).'_id';
         if (isset($options['join_table'])) $this->join_table = $options['join_table'];
         else $this->join_table = $this->join_table_name($owner_meta->class, $this->class);
+        if (isset($options['scope'])) $this->scope = $options['scope'];
     }
     
     private function join_table_name($first_name, $second_name)
@@ -81,7 +83,9 @@ class SManyToManyManager extends SManyAssociationManager
     
     protected function get_sql_filter()
     {
-        return "{$this->meta->join_table}.{$this->meta->foreign_key} = '{$this->owner->id}'";
+        $sql = "{$this->meta->join_table}.{$this->meta->foreign_key} = '{$this->owner->id}'";
+        if ($this->meta->scope !== null) $sql.= ' AND '.$this->meta->scope;
+        return $sql;
     }
 }
 
