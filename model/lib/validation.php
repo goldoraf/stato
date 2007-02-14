@@ -76,14 +76,14 @@ class SValidation
         if ($config['pattern'] === Null)
             throw new Exception('A pattern must be supplied for format validation.');
             
-        if (!in_array($config['pattern'], self::$patterns))
-            throw new Exception('The pattern provided does not exist.');
+        if (in_array($config['pattern'], self::$patterns))
+        {
+            $method = 'is_'.ucfirst($config['pattern']);
+            $bool = self::$method($record->$attr);
+        }
+        else $bool = (preg_match($config['pattern'], $record->$attr) == 0);
         
-        $method = 'is_'.ucfirst($config['pattern']);
-            
-        if ($config['message'] === Null) $config['message'] = self::$messages[$method];
-        
-        if (!self::$method($record->$attr)) self::add_error($record, $attr, $config['message']);
+        if (!$bool) self::add_error($record, $attr, $config['message']);
     }
     
     public static function validate_length($record, $attr, $options = array())
