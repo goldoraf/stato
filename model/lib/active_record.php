@@ -497,6 +497,12 @@ class SActiveRecord extends SObservable implements ArrayAccess
         $errors = array();
         foreach($params as $key => $value)
         {
+            if (in_array($key, $this->attr_serialized))
+            {
+                $this->$key = $value;
+                continue;
+            }
+            
             $type = $this->meta->attributes[$key]->type;
             switch ($type)
             {

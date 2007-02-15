@@ -55,6 +55,19 @@ class ActiveRecordTest extends ActiveTestCase
             array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3)),
             $user_reloaded->preferences
         );
+        $user = UserWithSerialization::$objects->create(array(
+            'username' => 'toto',
+            'preferences' => array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3))
+        ));
+        $this->assertEqual(
+            array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3)),
+            $user->preferences
+        );
+        $user_reloaded = UserWithSerialization::$objects->get($user->id);
+        $this->assertEqual(
+            array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3)),
+            $user_reloaded->preferences
+        );
     }
     
     public function test_is_new_record()
