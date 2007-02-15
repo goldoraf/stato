@@ -16,6 +16,8 @@ class SWebService
     protected $params  = null;
     protected $api     = null;
     
+    private static $base_types = array('integer', 'float', 'string', 'datetime', 'boolean', 'base64');
+    
     public function __construct()
     {
         $api_class = str_replace('Service', '', get_class($this)).'Api';
@@ -45,6 +47,8 @@ class SWebService
     
     public function is_struct_type($type)
     {
+        if (in_array($type, self::$base_types)) return false;
+        
         try {
             $ref = new ReflectionClass($type);
             return $ref->isSubclassOf(new ReflectionClass('SWebServiceStruct'));
