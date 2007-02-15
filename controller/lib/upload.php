@@ -19,20 +19,15 @@ class SUpload
         }
     }
     
-    public function save($folder, $name=Null)
+    public function save($folder, $name = null)
     {
-        if ($name === Null) $name = $this->name;
-        if ($this->is_success() && @move_uploaded_file($this->temp, $folder.'/'.$name))
-        {
-            return true;
-        } 
-        return false;
+        if ($name === null) $name = $this->name;
+        return ($this->is_success() && @move_uploaded_file($this->temp, $folder.'/'.$name));
     }
     
     public function is_success()
     {
-        if ($this->error == UPLOAD_ERR_OK) return true;
-        return false;
+        return ($this->error == UPLOAD_ERR_OK);
     }
 }
 
