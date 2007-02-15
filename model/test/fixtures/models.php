@@ -38,18 +38,25 @@ class Employe extends SActiveRecord
 class Contract extends SActiveRecord
 {
     public static $objects;
-    public $attr_required = array('code');
+    //public $attr_required = array('code');
 }
 
 class Product extends SActiveRecord
 {
     public static $objects;
-    public $attr_required = array('name');
+    //public $attr_required = array('name');
 }
 
 class SuperProduct extends Product
 {
 
+}
+
+class UserWithSerialization extends SActiveRecord
+{
+    public static $objects;
+    public static $table_name = 'users';
+    public $attr_serialized = array('preferences');
 }
 
 // For belongsTo tests

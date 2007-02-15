@@ -147,5 +147,6 @@ CREATE TABLE `users` (
 `password` VARCHAR( 255 ) default NULL,
 `sex` VARCHAR( 255 ) default NULL,
 `mail` VARCHAR( 255 ) default NULL,
+`preferences` TEXT default NULL,
 PRIMARY KEY ( `id` )
 ) TYPE = MYISAM ;

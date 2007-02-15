@@ -3,6 +3,7 @@
 class ActiveRecordTest extends ActiveTestCase
 {
     public $fixtures = array('posts', 'products', 'contracts', 'employes');
+    public $models = array('user_with_serialization');
     
     public function test_attribute_access()
     {
@@ -37,6 +38,23 @@ class ActiveRecordTest extends ActiveTestCase
                                  'date_of_birth'=>array('year'=>'1962', 'month'=>'09', 'day'=>'12')));
         $this->assertIsA($emp->date_of_birth, 'SDate');
         $this->assertEqual('1962-09-12', $emp->date_of_birth->__toString());
+    }
+    
+    public function test_serialized_attributes()
+    {
+        $user = new UserWithSerialization();
+        $user->username = 'toto';
+        $user->preferences = array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3));
+        $this->assertEqual(
+            array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3)),
+            $user->preferences
+        );
+        $user->save();
+        $user_reloaded = UserWithSerialization::$objects->get($user->id);
+        $this->assertEqual(
+            array('news' => 'left', 'max_friends' => 3, 'modules' => array(1,2,3)),
+            $user_reloaded->preferences
+        );
     }
     
     public function test_is_new_record()

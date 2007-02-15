@@ -29,7 +29,6 @@ class SColumn
     public function typecast($owner, $data)
     {
         if ($data === null || $data === '') return null;
-        //if (in_array($this->type, array('boolean', 'integer', 'float')) && $data === '') return null;
         
         switch($this->type)
         {

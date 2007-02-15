@@ -16,8 +16,9 @@ class SAssociationTypeMismatch extends Exception { }
  */
 class SActiveRecord extends SObservable implements ArrayAccess
 {
-    public $errors         = array();
-    public $attr_unique    = array();
+    public $errors          = array();
+    public $attr_protected  = array();
+    public $attr_serialized = array();
     
     /**
      * DEPRECATED
@@ -26,7 +27,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
     /**
      * DEPRECATED
      */
-    public $attr_protected = array();
+    public $attr_unique    = array();
     /**
      * DEPRECATED
      */
@@ -134,8 +135,12 @@ class SActiveRecord extends SObservable implements ArrayAccess
         if (!$this->is_valid()) return false;
         
         if ($this->record_timestamps) $this->save_with_timestamps();
+        
         foreach($this->meta->relationships as $k => $v) 
                 $this->$k->before_owner_save();
+                
+        foreach ($this->attr_serialized as $k)
+            $this->values[$k] = serialize($this->values[$k]);
         
         $this->set_state('before_save');
         if ($this->is_new_record()) $this->create_record();
@@ -244,8 +249,10 @@ class SActiveRecord extends SObservable implements ArrayAccess
         if (!$this->attr_exists($name)) return;
         if (!isset($this->values[$name]))
             $this->values[$name] = $this->meta->attributes[$name]->default_value($this);
-        
-        return $this->values[$name];
+        if (in_array($name, $this->attr_serialized) && is_string($this->values[$name]))
+            return unserialize($this->values[$name]);
+        else
+            return $this->values[$name];
     }
     
     protected function write_attribute($name, $value)
@@ -500,8 +507,6 @@ class SActiveRecord extends SObservable implements ArrayAccess
                     $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
                                   .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
                     break;
-                default:
-                    $this->$key = $value;
             }
         }
     }
@@ -530,7 +535,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
         $set = array();
         foreach($this->meta->attributes as $column => $attr)
             if (!array_key_exists($column, $this->meta->relationships))
-                $set[] = "$column = ".$this->conn()->quote($this->$column, $attr->type);
+                $set[] = "$column = ".$this->conn()->quote($this->values[$column], $attr->type);
         
         return 'SET '.join(',', $set);
     }
