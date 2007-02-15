@@ -89,6 +89,10 @@ class UserService extends SWebService
 
 class ApiController extends SActionController
 {
+    protected function log_processing() {}
+    protected function log_benchmarking() {}
+    protected function rescue_action($exception) { throw $exception; }
+    
     protected function initialize()
     {
         $this->add_web_service('user', new UserService());

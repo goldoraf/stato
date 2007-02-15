@@ -163,37 +163,24 @@ class Topic extends SActiveRecord
 }
 
 // For validation tests
-/*class User extends SActiveRecord
+class User extends SActiveRecord
 {
-    public $table_name = 'users';
+    public static $objects;
     
-    public $attributes = array
-    (
-        'id'         => 'integer',
-        'nick_name'  => 'string',
-        'password'   => 'string',
-        'sex'        => 'string',
-        'email'      => 'string'
-    );
+    public function validate()
+    {
+        $this->validate_presence_of('username', 'password', 'mail');
+        $this->validate_format_of('mail', array('pattern' => 'email'));
+        $this->validate_format_of('password', array('pattern' => '/^[a-z0-9]{6,12}$/i', 'message' => 'Only alphanumerical characters plz !'));
+        $this->validate_length_of('username', array('min_length' => 4, 'max_length' => 20, 'message' => '4 to 20 chars plz !'));
+        $this->validate_inclusion_of('sex', array('choices' => array('M', 'F')));
+    }
     
-    public $validations = array
-    (
-        'nick_name' => array
-        (
-            'format' => array('pattern' => 'alphanum'),
-            'length' => array('max_length' => 30)
-        ),
-        'password' => array
-        (
-            'format'       => array('pattern' => 'alphanum', 'message' => 'Only alphanumerical characters plz !'),
-            'length'       => array('min_length' => 6, 'max_length' => 15, 'wrong_size' => '6 to 15 chars plz !'),
-            'confirmation' => array('on' => 'create', 'message' => 'Please confirm your password !')
-        ),
-        'sex' => array
-        (
-            'inclusion' => array('choices' => array('M', 'F'))
-        )
-    );
-}*/
+    public function validate_on_create()
+    {
+        $this->validate_confirmation_of('password', array('message' => 'Please confirm your password !'));
+        $this->validate_acceptance_of('terms_of_services');
+    }
+}
 
 ?>

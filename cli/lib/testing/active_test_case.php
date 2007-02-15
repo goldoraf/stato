@@ -57,7 +57,7 @@ class ActiveTestCase extends StatoTestCase
         $db->execute("DROP DATABASE IF EXISTS $dbname");
         $db->execute("CREATE DATABASE $dbname");
         $db->execute("USE $dbname");
-        $sql = file_get_contents(STATO_FIXTURES_DIR.'/test_framework.sql');
+        $sql = file_get_contents(STATO_FIXTURES_DIR.'/database_schema.sql');
         $requetes = explode(';', $sql);
         array_pop($requetes);
         foreach($requetes as $req) $db->execute($req);

@@ -1,6 +1,6 @@
 <?php
 
-define('STATO_ENV', 'test');
+define('STATO_APP_ROOT_PATH', 'dummy');
 
 require(STATO_CORE_PATH.'/common/lib/initializer.php');
 
@@ -15,13 +15,13 @@ session_start();
 
 class RunTestsCommand extends SCommand
 {
-    protected $allowed_options = array('path' => true);
+    protected $allowed_options = array('adapter' => true);
     protected $allowed_params  = array('framework' => true);
    
     public function execute()
     {
-        if (isset($this->options['path']))
-            define('STATO_APP_ROOT_PATH', $this->options['path']);
+        if (!isset($this->options['adapter'])) $this->options['adapter'] = 'mysql';
+        define('STATO_TESTING_ADAPTER', $this->options['adapter']);
             
         $framework = $this->params['framework'];
         $this->initialize($framework);
@@ -36,7 +36,7 @@ class RunTestsCommand extends SCommand
     {
         $config = new SConfiguration;
         if ($framework != 'cli' && $framework != 'common') $config->frameworks = array($framework);
-        SInitializer::run($config);
+        SInitializer::require_frameworks($config);
     }
     
     private function require_testing_classes()

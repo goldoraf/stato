@@ -2,6 +2,11 @@
 
 require_once(STATO_TESTING_PATH.'/active_test_case.php');
 
+if (!file_exists(STATO_CORE_PATH.'/model/test/connections/'.STATO_TESTING_ADAPTER.'.php'))
+    throw new Exception(STATO_TESTING_ADAPTER.' adapter not found');
+
+require_once(STATO_CORE_PATH.'/model/test/connections/'.STATO_TESTING_ADAPTER.'.php');
+
 return array
 (
     'active_record',

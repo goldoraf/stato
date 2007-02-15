@@ -21,20 +21,20 @@ class SInitializer
         self::$config = $config;
         
         self::load_environment($config);
-        self::require_frameworks();
+        self::require_frameworks($config);
         self::initialize_logger();
         self::initialize_frameworks_settings();
         self::initialize_database_settings();
     }
     
-    private static function load_environment($config)
+    public static function load_environment(SConfiguration $config)
     {
         include($config->environment_path());
     }
     
-    private static function require_frameworks()
+    public static function require_frameworks(SConfiguration $config)
     {   
-        foreach (self::$config->frameworks as $framework)
+        foreach ($config->frameworks as $framework)
             require(STATO_CORE_PATH."/{$framework}/{$framework}.php");
     }
     

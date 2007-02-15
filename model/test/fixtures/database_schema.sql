@@ -140,3 +140,12 @@ CREATE TABLE `people` (
   `first_name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
+
+CREATE TABLE `users` (
+`id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+`username` VARCHAR( 255 ) default NULL,
+`password` VARCHAR( 255 ) default NULL,
+`sex` VARCHAR( 255 ) default NULL,
+`mail` VARCHAR( 255 ) default NULL,
+PRIMARY KEY ( `id` )
+) TYPE = MYISAM ;

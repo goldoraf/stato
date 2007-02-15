@@ -4,7 +4,14 @@ require_once(STATO_CORE_PATH.'/controller/controller.php');
 require_once(STATO_CORE_PATH.'/view/view.php');
 require_once(STATO_CORE_PATH.'/mailer/mailer.php');
 
-class BasicController extends SActionController
+class TestController extends SActionController
+{
+    protected function log_processing() {}
+    protected function log_benchmarking() {}
+    protected function rescue_action($exception) { throw $exception; }
+}
+
+class BasicController extends TestController
 {
     public $before_filters = array('ensure_login');
     public $after_filters  = array('clean_up');
@@ -25,7 +32,7 @@ class BasicController extends SActionController
     }
 }
 
-class ConditionalFilterController extends SActionController
+class ConditionalFilterController extends TestController
 {
     public function show()
     {
@@ -103,7 +110,7 @@ class AroundFilter
     }
 }
 
-class AroundController extends SActionController
+class AroundController extends TestController
 {
     public function __construct()
     {
