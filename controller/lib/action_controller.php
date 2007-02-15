@@ -477,6 +477,40 @@ class SActionController
         $this->send_data($raw_response, array('type' => 'text/xml', 'disposition' => 'inline'));
     }
     
+    protected function log_processing()
+    {
+        $log = "\n\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
+            .'() for '.$this->request->remote_ip().' at '
+            .SDateTime::today()->__toString().' ['.$this->request->method().']';
+        if (($sess_id = $this->session->session_id()) != '') $log.= "\n    Session ID: ".$sess_id;
+        $log.= "\n    Parameters: ".serialize($this->params);
+        $this->logger->info($log);
+    }
+    
+    protected function log_benchmarking()
+    {
+        $runtime = microtime(true) - STATO_TIME_START;
+        $info = 'Completed in '.sprintf("%.5f", $runtime).' seconds';
+        if (class_exists('SActiveRecord', false))
+        {
+            $db_runtime = SActiveRecord::connection_benchmark();
+            $db_percentage = ($db_runtime * 100) / $runtime;
+            $info.= ' | DB: '.sprintf("%.5f", $db_runtime).' ('.sprintf("%d", $db_percentage).' %)';
+        }
+        $this->logger->info($info);
+        
+        if (class_exists('SActiveRecord', false) && SActiveRecord::$log_sql === true)
+            SActiveRecord::connection()->write_log();
+    }
+    
+    protected function rescue_action($exception)
+    {
+        if ($this->is_performed()) $this->erase_results();
+        $this->log_error($exception);
+        if (self::$consider_all_requests_local) $this->rescue_action_locally($exception);
+        else $this->rescue_action_in_public($exception);
+    }
+    
     private function perform_action()
     {
         $action = $this->action_name();
@@ -513,9 +547,6 @@ class SActionController
             $this->cache_page($this->response->body, array('action' => $this->action_name(), 'params' => $this->params));
         
         $this->log_benchmarking();
-        
-        if (class_exists('SActiveRecord', false) && SActiveRecord::$log_sql === true)
-            SActiveRecord::connection()->write_log();
     }
     
     private function action_exists($action)
@@ -627,37 +658,6 @@ class SActionController
         // IE6 fix on opening downloaded files
         /*if ($this->response->headers['Cache-Control'] == 'no-cache')
             $this->response->headers['Cache-Control'] = 'private';*/
-    }
-    
-    private function log_processing()
-    {
-        $log = "\n\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
-            .'() for '.$this->request->remote_ip().' at '
-            .SDateTime::today()->__toString().' ['.$this->request->method().']';
-        if (($sess_id = $this->session->session_id()) != '') $log.= "\n    Session ID: ".$sess_id;
-        $log.= "\n    Parameters: ".serialize($this->params);
-        $this->logger->info($log);
-    }
-    
-    private function log_benchmarking()
-    {
-        $runtime = microtime(true) - STATO_TIME_START;
-        $info = 'Completed in '.sprintf("%.5f", $runtime).' seconds';
-        if (class_exists('SActiveRecord', false))
-        {
-            $db_runtime = SActiveRecord::connection_benchmark();
-            $db_percentage = ($db_runtime * 100) / $runtime;
-            $info.= ' | DB: '.sprintf("%.5f", $db_runtime).' ('.sprintf("%d", $db_percentage).' %)';
-        }
-        $this->logger->info($info);
-    }
-    
-    private function rescue_action($exception)
-    {
-        if ($this->is_performed()) $this->erase_results();
-        $this->log_error($exception);
-        if (self::$consider_all_requests_local) $this->rescue_action_locally($exception);
-        else $this->rescue_action_in_public($exception);
     }
     
     private function rescue_action_in_public($exception)
