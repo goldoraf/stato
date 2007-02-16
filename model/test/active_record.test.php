@@ -105,14 +105,21 @@ class ActiveRecordTest extends ActiveTestCase
     {
         $post = Post::$objects->get(1);
         $this->assertTrue($post->published);
-        $post->published = False;
+        $post->published = false;
         $this->assertFalse($post->published);
         $post->published = 'True';
         $this->assertTrue($post->published);
-        $post->published = False;
+        $post->published = false;
         $post->save();
         $post_bis = Post::$objects->get(1);
         $this->assertFalse($post_bis->published);
+        
+        $post = new Post(array('title'=>'test', 'published'=>false));
+        $this->assertFalse($post->published);
+        $post->save();
+        $this->assertFalse($post->published);
+        $post_reloaded = Post::$objects->get($post->id);
+        $this->assertFalse($post_reloaded->published);
     }
     
     public function test_preserving_date_objects()

@@ -121,7 +121,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
             if (is_array($value)) $multi_params_attributes[$key] = $value;
             elseif (!in_array($key, array_merge($this->attr_protected, array_keys($this->meta->relationships))))
             {
-                if (!is_object($value) && $value !== null) $this->$key = stripslashes($value);
+                if (!is_object($value) && $value !== null && !is_bool($value)) $this->$key = stripslashes($value);
                 else $this->$key = $value;
             }
             if (!$this->attr_exists($key)) $this->values[$key] = $value;
@@ -541,7 +541,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
         $set = array();
         foreach($this->meta->attributes as $column => $attr)
             if (!array_key_exists($column, $this->meta->relationships))
-                $set[] = "$column = ".$this->conn()->quote($this->values[$column], $attr->type);
+                $set[] = "`$column` = ".$this->conn()->quote($this->values[$column], $attr->type);
         
         return 'SET '.join(',', $set);
     }
