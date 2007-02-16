@@ -29,6 +29,11 @@ class Post extends SActiveRecord
     public static $content_attributes_names = array('title');
 }
 
+class BooleanFalseByDefaultPost extends SActiveRecord
+{
+    public static $objects;
+}
+
 class Employe extends SActiveRecord
 {
     public static $objects;
@@ -38,13 +43,11 @@ class Employe extends SActiveRecord
 class Contract extends SActiveRecord
 {
     public static $objects;
-    //public $attr_required = array('code');
 }
 
 class Product extends SActiveRecord
 {
     public static $objects;
-    //public $attr_required = array('name');
 }
 
 class SuperProduct extends Product

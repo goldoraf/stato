@@ -18,6 +18,13 @@ CREATE TABLE `posts` (
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
+CREATE TABLE `boolean_false_by_default_posts` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `title` varchar(255) default NULL,
+  `published` tinyint(1) default '0',
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;
+
 
 CREATE TABLE `companies` (
   `id` int(10) unsigned NOT NULL auto_increment,

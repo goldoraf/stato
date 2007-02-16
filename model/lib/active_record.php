@@ -138,9 +138,6 @@ class SActiveRecord extends SObservable implements ArrayAccess
         
         foreach($this->meta->relationships as $k => $v) 
                 $this->$k->before_owner_save();
-                
-        foreach ($this->attr_serialized as $k)
-            $this->values[$k] = serialize($this->values[$k]);
         
         $this->set_state('before_save');
         if ($this->is_new_record()) $this->create_record();
@@ -539,11 +536,23 @@ class SActiveRecord extends SObservable implements ArrayAccess
     private function prepare_sql_set()
     {
         $set = array();
-        foreach($this->meta->attributes as $column => $attr)
-            if (!array_key_exists($column, $this->meta->relationships))
-                $set[] = "`$column` = ".$this->conn()->quote($this->values[$column], $attr->type);
+        foreach ($this->attributes_with_quotes() as $column => $value)
+            $set[] = "`$column` = $value";
         
         return 'SET '.join(',', $set);
+    }
+    
+    private function attributes_with_quotes()
+    {
+        $quoted = array();
+        foreach ($this->meta->attributes as $name => $column)
+        {
+            if (array_key_exists($name, $this->meta->relationships)) continue;
+            if (in_array($name, $this->attr_serialized)) $value = serialize($this->$name);
+            else $value = $this->$name;
+            $quoted[$name] = $this->conn()->quote($value, $column->type);
+        }
+        return $quoted;
     }
     
     private function save_with_timestamps()

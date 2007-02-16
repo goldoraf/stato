@@ -3,7 +3,7 @@
 class ActiveRecordTest extends ActiveTestCase
 {
     public $fixtures = array('posts', 'products', 'contracts', 'employes');
-    public $models = array('user_with_serialization');
+    public $models = array('user_with_serialization', 'boolean_false_by_default_post');
     
     public function test_attribute_access()
     {
@@ -120,6 +120,22 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertFalse($post->published);
         $post_reloaded = Post::$objects->get($post->id);
         $this->assertFalse($post_reloaded->published);
+    }
+    
+    public function test_boolean_false_by_default()
+    {
+        $post = new BooleanFalseByDefaultPost();
+        $this->assertFalse($post->published);
+        $post->title = 'test';
+        $post->save();
+        $this->assertFalse($post->published);
+        $post_reloaded = BooleanFalseByDefaultPost::$objects->get($post->id);
+        $this->assertFalse($post_reloaded->published);
+        $post_reloaded->published = true;
+        $this->assertTrue($post_reloaded->published);
+        $post_reloaded->save();
+        $post_reloaded2 = BooleanFalseByDefaultPost::$objects->get($post_reloaded->id);
+        $this->assertTrue($post_reloaded2->published);
     }
     
     public function test_preserving_date_objects()
