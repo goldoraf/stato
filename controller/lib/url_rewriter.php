@@ -28,6 +28,13 @@ class SUrlRewriter
         return $controller_name == self::$request->controller;
     }
     
+    public static function current_module()
+    {
+        if (strpos(self::$request->controller, '/') === false) return null;
+        list($module, $controller) = explode('/', self::$request->controller);
+        return $module;
+    }
+    
     public static function url_for($options)
     {
         if (!is_array($options)) $options = array($options);
