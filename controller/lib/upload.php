@@ -19,10 +19,13 @@ class SUpload
         }
     }
     
-    public function save($folder, $name = null)
+    public function save($folder, $name = null, $chmod = null)
     {
         if ($name === null) $name = $this->name;
-        return ($this->is_success() && @move_uploaded_file($this->temp, $folder.'/'.$name));
+        if ($this->is_success()) $mv_success = @move_uploaded_file($this->temp, $folder.'/'.$name);
+        $chmod_success = true;
+        if ($chmod !== null && $mv_success) $chmod_success = @chmod($folder.'/'.$name, $chmod);
+        return ($mv_success && $chmod_success);
     }
     
     public function is_success()
