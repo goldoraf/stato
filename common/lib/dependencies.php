@@ -10,6 +10,20 @@ class SDependencies
     
     public static function auto_require_model($class_name)
     {
+        if (($complete_path = self::model_exists($class_name)) !== false)
+        {
+            self::require_with_path('models', $class_name, $complete_path);
+            return;
+        }
+        
+        // we don't throw an exception because __autoload forbids to catch it
+        // and instead returns a fatal error. Triggering an error will allow 
+        // our error handler to convert into a proper exception.
+        trigger_error("Missing $class_name model", E_USER_ERROR);
+    }
+    
+    public static function model_exists($class_name)
+    {
         $file_name = SInflection::underscore($class_name).'.php';
         $possible_paths = array($file_name);
         
@@ -18,17 +32,9 @@ class SDependencies
         foreach ($possible_paths as $path)
         {
             $complete_path = STATO_APP_PATH."/models/$path";
-            if (file_exists($complete_path))
-            {
-                self::require_with_path('models', $class_name, $complete_path);
-                return;
-            }
+            if (file_exists($complete_path)) return $complete_path;
         }
-        
-        // we don't throw an exception because __autoload forbids to catch it
-        // and instead returns a fatal error. Triggering an error will allow 
-        // our error handler to convert into a proper exception.
-        trigger_error("Missing $class_name model", E_USER_ERROR);
+        return false;
     }
     
     public static function require_components($components)

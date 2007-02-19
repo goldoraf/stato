@@ -266,8 +266,10 @@ class SQuerySet implements Iterator, Countable
     protected function fetch_row($row)
     {
         if (in_array($this->meta->inheritance_field, array_keys($this->meta->attributes))
-            && class_exists($row[$this->meta->inheritance_field])) $class = $row[$this->meta->inheritance_field];
-        else $class = $this->meta->class;
+            && (SDependencies::model_exists($row[$this->meta->inheritance_field])) !== false) 
+            $class = $row[$this->meta->inheritance_field];
+        else
+            $class = $this->meta->class;
         return new $class($row);
     }
     
