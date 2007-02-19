@@ -136,30 +136,34 @@ class SActiveRecord extends SObservable implements ArrayAccess
         
         if ($this->record_timestamps) $this->save_with_timestamps();
         
+        $this->set_state('before_save');
+        
         foreach($this->meta->relationships as $k => $v) 
                 $this->$k->before_owner_save();
-        
-        $this->set_state('before_save');
+                
         if ($this->is_new_record()) $this->create_record();
         else $this->update_record();
-        $this->set_state('after_save');
         
         foreach($this->meta->relationships as $k => $v) 
             $this->$k->after_owner_save();
+        
+        $this->set_state('after_save');
         
         return true;
     }
     
     public function delete()
     {
+        $this->set_state('before_delete');
+        
         foreach($this->meta->relationships as $k => $v) 
             $this->$k->before_owner_delete();
         
-        $this->set_state('before_delete');
         if ($this->is_new_record()) return false;
         $sql = 'DELETE FROM '.$this->meta->table_name.
                ' WHERE '.$this->meta->identity_field.' = \''.$this->id.'\'';
         $this->conn()->update($sql);
+        
         $this->set_state('after_delete');
     }
     
