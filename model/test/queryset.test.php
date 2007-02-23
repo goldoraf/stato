@@ -24,12 +24,28 @@ class QuerySetTest extends ActiveTestCase
         $emp = Employe::$objects->get("firstname = 'John'", "lastname = 'Doe'");
         $this->assertEqual(1, $emp->id);
         $this->assertEqual('John', $emp->firstname);
-        $emps = Employe::$objects->get(array(1, 2));
+    }
+    
+    public function test_in_bulk()
+    {
+        $emps = Employe::$objects->in_bulk(array(1, 2));
         $this->assertTrue(is_array($emps));
+        $this->assertEqual(2, count($emps));
         $this->assertEqual(1, $emps[1]->id);
         $this->assertEqual('John', $emps[1]->firstname);
         $this->assertEqual(2, $emps[2]->id);
         $this->assertEqual('Bridget', $emps[2]->firstname);
+        $emps = Employe::$objects->in_bulk(array(2));
+        $this->assertTrue(is_array($emps));
+        $this->assertEqual(1, count($emps));
+        $this->assertEqual(2, $emps[2]->id);
+        $this->assertEqual('Bridget', $emps[2]->firstname);
+        $emps = Employe::$objects->in_bulk(array(999));
+        $this->assertTrue(is_array($emps));
+        $this->assertEqual(0, count($emps));
+        $emps = Employe::$objects->in_bulk(array());
+        $this->assertTrue(is_array($emps));
+        $this->assertEqual(0, count($emps));
     }
     
     public function test_count()

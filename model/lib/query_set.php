@@ -136,6 +136,21 @@ class SQuerySet implements Iterator, Countable
         }
     }
     
+    public function in_bulk($ids)
+    {
+        if (!is_array($ids))
+            throw new Exception('in_bulk() must be provided with a list of IDs');
+        if (count($ids) == 0) return array();
+        
+        $clone = call_user_func_array(array($this, 'filter'), $this->meta->identity_field.' IN ('.join(',', $ids).')');
+        $clone->limit = null;
+        $clone->offset = null;
+        
+        $set = array();
+        foreach ($clone as $o) $set[$o->id] = $o;
+        return $set;
+    }
+    
     public function count()
     {
         if ($this->resource !== null) return $this->conn->row_count($this->resource);
