@@ -8,6 +8,7 @@ require('lib/response.php');
 require('lib/routes.php');
 require('lib/upload.php');
 require('lib/url_rewriter.php');
+require('lib/mime_type.php');
 
 require('lib/sessions/cookie.php');
 require('lib/sessions/abstract_session.php');
