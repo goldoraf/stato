@@ -1,14 +1,13 @@
 <?php
 
-define('STATO_FIXTURES_DIR', STATO_CORE_PATH.'/model/test/fixtures');
-
-require_once(STATO_FIXTURES_DIR.'/models.php');
+if (!defined('STATO_FIXTURES_DIR'))
+    define('STATO_FIXTURES_DIR', STATO_APP_ROOT_PATH.'/test/fixtures');
 
 class ActiveTestCase extends StatoTestCase
 {
     public $models = array();
     public $fixtures = array();
-    public $use_instantiated_fixtures = False;
+    public $use_instantiated_fixtures = false;
     
     private $loaded_fixtures = array();
     private $fixture_instances = array();

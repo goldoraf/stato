@@ -1,5 +1,7 @@
 <?php
 
+define('STATO_FIXTURES_DIR', STATO_CORE_PATH.'/model/test/fixtures');
+require_once(STATO_FIXTURES_DIR.'/models.php');
 require_once(STATO_TESTING_PATH.'/active_test_case.php');
 
 if (!file_exists(STATO_CORE_PATH.'/model/test/connections/'.STATO_TESTING_ADAPTER.'.php'))
