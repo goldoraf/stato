@@ -81,7 +81,7 @@ class SValidation
             $method = 'is_'.ucfirst($config['pattern']);
             $bool = self::$method($record->$attr);
         }
-        else $bool = (preg_match($config['pattern'], $record->$attr) == 0);
+        else $bool = (preg_match($config['pattern'], $record->$attr) != 0);
         
         if (!$bool) self::add_error($record, $attr, $config['message']);
     }
