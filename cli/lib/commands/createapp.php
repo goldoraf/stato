@@ -29,7 +29,8 @@ class CreateAppCommand extends SCommand
         
         $this->create_dir("db/migrate", $project_path);
         
-        $this->create_dir("test/fixtures", $project_path);
+        foreach (array('fixtures', 'functional', 'mocks', 'unit') as $dir)
+            $this->create_dir("test/$dir", $project_path);
         
         $this->copy(STATO_CORE_PATH.'/build/conf', 'conf', $project_path);
         $this->copy(STATO_CORE_PATH.'/build/public', 'public', $project_path);
