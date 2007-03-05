@@ -350,6 +350,8 @@ class SRouteSet
         $options = array();
         $recognized = false;
         
+        if (substr($path, -1) == '/') $path = substr($path, 0, -1);
+        
         foreach($this->routes as $route)
         {
             if (preg_match($route->regex, $path, $matches))
