@@ -3,11 +3,12 @@
 class ScaffoldCommand extends SCommand
 {
     protected $allowed_params  = array('model_name' => true, 'controller_name' => false);
-    protected $allowed_options = array('ajax' => false);
+    protected $allowed_options = array('ajax' => false, 'dry' => false);
     
     private $assigns  = array();
     private $scaffold = null;
     private $ajax     = false;
+    private $dry      = false;
     private $sub_dir  = '';
     
     public function execute()
@@ -15,9 +16,12 @@ class ScaffoldCommand extends SCommand
         $this->scaffold = $this->params['model_name'];
         
         if (isset($this->options['ajax'])) $this->ajax = true;
+        if (isset($this->options['dry']) && !isset($this->options['ajax'])) $this->dry = true;
         
         if ($this->ajax)
             $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding_ajax';
+        elseif ($this->dry)
+            $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding_dry';
         else
             $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding';
         
@@ -57,6 +61,10 @@ class ScaffoldCommand extends SCommand
             $this->create_file("$views_dir/$view_name.php", STATO_APP_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/{$view_name}.php", $this->assigns));
         }
+        
+        if (!$this->dry && !$this->ajax)
+            $this->create_file("$views_dir/_form.php", STATO_APP_PATH,
+                SCodeGenerator::render_template("{$scaffold_templates_path}/views/_form.php", $this->assigns));
         
         if ($this->ajax)
         {

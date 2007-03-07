@@ -1,13 +1,12 @@
 class <?php echo $controller_class_name; ?> extends ApplicationController
 {
-    public $models  = array('<?php echo $scaffold; ?>');
-    public $helpers = array('scaffold_ajax');
-    public $layout  = 'scaffold_ajax';
+    protected $helpers = array('scaffold_ajax');
+    protected $layout  = 'scaffold_ajax';
     
     public function index()
     {
         $qs = <?php echo $model_class_name; ?>::$objects->all();
-        $qs = $this->order_by_current_key($qs, array_keys(SActiveRecordMeta::retrieve('<?php echo $model_class_name; ?>')->content_attributes()));
+        $qs = $this->order_by_current_key($qs, array_keys(SMapper::retrieve('<?php echo $model_class_name; ?>')->content_attributes()));
         
         list($this-><?php echo $plural_us_name; ?>_pages, $this-><?php echo $plural_us_name; ?>) = $this->paginate($qs, 20);
             
