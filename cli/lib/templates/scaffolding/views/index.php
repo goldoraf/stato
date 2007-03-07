@@ -5,13 +5,13 @@
 {{ else : }}
     <table>
         <tr>
-            {{ foreach (SActiveRecordMeta::retrieve('<?php echo $model_class_name; ?>')->content_attributes() as $attr) : }}
+            {{ foreach (SMapper::retrieve('<?php echo $model_class_name; ?>')->content_attributes() as $attr) : }}
                 <th>{{= SInflection::humanize($attr->name); }}</th>
             {{ endforeach; }}
         </tr>
         {{ foreach ($this-><?php echo $plural_us_name; ?> as $<?php echo $singular_us_name; ?>) : }}
             <tr>
-                {{ foreach (SActiveRecordMeta::retrieve('<?php echo $model_class_name; ?>')->content_attributes() as $attr) : }}
+                {{ foreach (SMapper::retrieve('<?php echo $model_class_name; ?>')->content_attributes() as $attr) : }}
                     <td>{{= truncate($<?php echo $singular_us_name; ?>->{$attr->name}); }}</td>
                 {{ endforeach; }}
                 <td>{{= link_to('View', array('action' => 'view', 'id' => $<?php echo $singular_us_name; ?>->id)); }}</td>
