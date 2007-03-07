@@ -87,41 +87,30 @@ function input($object_name, $method, $object, $options=array())
 {
     $fields = $object->content_attributes();
     $attr = $fields[$method];
-    
-    switch($attr->type)
-    {
-        case 'string':
-            $str = text_field($object_name, $method, $object, $options);
-            break;
-        case 'text':
-            $str = text_area($object_name, $method, $object, $options);
-            break;
-        case 'date':
-            $str = date_select($object_name, $method, $object);
-            break;
-        case 'datetime':
-            $str = date_time_select($object_name, $method, $object);
-            break;
-        case 'integer':
-            $str = text_field($object_name, $method, $object, $options);
-            break;
-        case 'float':
-            $str = text_field($object_name, $method, $object, $options);
-            break;
-        case 'boolean':
-            $str = check_box($object_name, $method, $object, $options);
-            break;
-        default:
-            $str = hidden_field($object_name, $method, $object);
-            break;
-    }
-    
-    return error_wrapping($str, isset($object->errors[$method]));
+    $helper = form_helper_for_attribute($attr);
+    return error_wrapping($helper($object_name, $method, $object, $options), isset($object->errors[$method]));
 }
 
 function error_wrapping($tag, $has_error)
 {
     return $has_error ? "<div class=\"field-with-errors\">$tag</div>" : $tag;
+}
+
+function form_helper_for_attribute($attr)
+{
+    static $mapping = array
+    (
+        'string'   => 'text_field',
+        'text'     => 'text_area',
+        'date'     => 'date_select',
+        'datetime' => 'date_time_select',
+        'integer'  => 'text_field',
+        'float'    => 'text_field',
+        'boolean'  => 'check_box'
+    );
+    
+    if (!isset($mapping[$attr->type])) return 'hidden_field';
+    return $mapping[$attr->type];
 }
 
 /**
