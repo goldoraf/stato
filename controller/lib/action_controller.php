@@ -765,10 +765,13 @@ class SActionController
     
     private static function controller_class($req_controller)
     {
-        if (strpos($req_controller, '/'))
-    	   list( , $controller_name) = explode('/', $req_controller);
+        if (strpos($req_controller, '/') === false) $controller_name = $req_controller; 
     	else
-    	   $controller_name = $req_controller;
+    	{
+            list($module, $controller_name) = explode('/', $req_controller);
+            if (file_exists($path = STATO_APP_PATH.'/controllers/'.$module.'/base_controller.php'))
+                require_once($path);
+        }
     	   
     	return SInflection::camelize($controller_name).'Controller';
     }

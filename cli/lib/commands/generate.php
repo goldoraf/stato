@@ -120,6 +120,9 @@ class GenerateCommand extends SCommand
         $this->create_dir("helpers/$module_name", STATO_APP_PATH);
         $this->create_dir("apis/$module_name", STATO_APP_PATH);
         $this->create_dir("i18n/$module_name", STATO_APP_PATH);
+        
+        $this->create_file("controllers/$module_name/base_controller.php", STATO_APP_PATH,
+            SCodeGenerator::generate_class(SInflection::camelize($module_name).'BaseController', '', 'ApplicationController'));
     }
     
     private function generate_migration()
