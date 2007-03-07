@@ -754,12 +754,11 @@ class SActionController
     
     private static function instanciate_controller($req_controller)
     {
+        $class_name = self::controller_class($req_controller);
         if (!file_exists($path = self::controller_file($req_controller)))
     		throw new SUnknownControllerException(SInflection::camelize($req_controller).'Controller not found !');
     		
     	require_once($path);
-    	
-        $class_name = self::controller_class($req_controller);
 		return new $class_name();
     }
     
