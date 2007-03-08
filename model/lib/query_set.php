@@ -1,6 +1,7 @@
 <?php
 
 class SActiveRecordDoesNotExist extends Exception {}
+class SAssertionError extends Exception {}
 
 class SQuerySet implements Iterator, Countable
 {
@@ -128,12 +129,7 @@ class SQuerySet implements Iterator, Countable
         $set = $clone->to_array();
         if (($count = count($set)) < 1) throw new SActiveRecordDoesNotExist();
         elseif ($count == 1) return $set[0];
-        else
-        {
-            $new_set = array();
-            foreach ($set as $o) $new_set[$o->id] = $o;
-            return $new_set;
-        }
+        else throw new SAssertionError();
     }
     
     public function in_bulk($ids)

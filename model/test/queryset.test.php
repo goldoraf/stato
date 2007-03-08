@@ -24,6 +24,11 @@ class QuerySetTest extends ActiveTestCase
         $emp = Employe::$objects->get("firstname = 'John'", "lastname = 'Doe'");
         $this->assertEqual(1, $emp->id);
         $this->assertEqual('John', $emp->firstname);
+        Employe::$objects->create(array('firstname' => 'John', 'lastname' => 'Ryan'));
+        $this->expectException('SAssertionError');
+        $emp = Employe::$objects->get("firstname = 'John'");
+        $this->expectException('SActiveRecordDoesNotExist');
+        $emp = Employe::$objects->get(999);
     }
     
     public function test_in_bulk()
