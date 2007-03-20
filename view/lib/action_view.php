@@ -4,8 +4,7 @@ class SMissingTemplateException extends Exception {}
 
 class SActionView
 {
-    public $page = null;
-    
+    private $generator = null;
     private $controller  = null;
     private $template_dir = null;
     private $tmp_cache_key = null;
@@ -24,6 +23,11 @@ class SActionView
     public function __set($name, $value)
     {
         throw new Exception('You\'re not allowed to reassign template variables !');
+    }
+    
+    public function page()
+    {
+        return $this->generator;
     }
     
     public function render($template, $local_assigns = array())
@@ -57,9 +61,9 @@ class SActionView
         
         extract($local_assigns);
         
-        $this->page = new SJavascriptGenerator();
+        $this->generator = new SJavascriptGenerator();
         include ($template);
-        return $this->page->__toString();
+        return $this->generator->__toString();
     }
     
     public function render_partial($partial_path, $local_assigns = array())
