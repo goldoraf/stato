@@ -5,6 +5,7 @@ class SUnknownActionException extends Exception {}
 class SUnknownProtocolException extends Exception {}
 class SUnknownServiceException extends Exception {}
 class SDoubleRenderException extends Exception {}
+class SHttp404 extends Exception {}
 
 /**
  * Front-web controller class
@@ -663,7 +664,7 @@ class SActionController
     private function rescue_action_in_public($exception)
     {
         $status = $this->response_code_for_rescue($exception);
-        if (in_array(get_class($exception), array('SRoutingException', 
+        if (in_array(get_class($exception), array('SHttp404', 'SRoutingException', 
             'SUnknownControllerException', 'SUnknownActionException')))
             $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/404.html'), $status);
         else $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/500.html'), $status);

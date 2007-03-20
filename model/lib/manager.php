@@ -39,6 +39,15 @@ class SManager
         SActiveRecord::connection()->execute("UPDATE {$this->meta->table_name} SET {$set} WHERE {$condition}");
     }
     
+    public function get_or_404()
+    {
+        $args = func_get_args();
+        try { return call_user_func_array(array($this, 'get'), $args); }
+        catch (Exception $e) { 
+            throw new SHttp404();
+        }
+    }
+    
     /*public function get_or_create()
     {
         try { return call_user_func_array(array($this, 'get'), func_get_args()); }
