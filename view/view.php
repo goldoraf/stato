@@ -19,5 +19,6 @@ require('lib/helpers/text_helper.php');
 require('lib/helpers/utf8_helper.php');
 require('lib/helpers/i18n_helper.php');
 require('lib/helpers/number_helper.php');
+require('lib/helpers/debug_helper.php');
 
 ?>

@@ -118,6 +118,11 @@ abstract class SAbstractAdapter
         foreach ($this->log as $log) $logger->debug($log);
     }
     
+    public function get_log()
+    {
+        return $this->log;
+    }
+    
     protected function quote_string($value)
     {
         return "'".$this->escape_str($value)."'";

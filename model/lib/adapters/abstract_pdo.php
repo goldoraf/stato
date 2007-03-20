@@ -162,6 +162,11 @@ abstract class SAbstractPDOAdapter extends PDO
                        ." (".sprintf("%.5f", $time).")\n    $sql";
     }
     
+    public function get_log()
+    {
+        return $this->log;
+    }
+    
     abstract public function dsn();
     
     abstract public function limit($count, $offset=0);
