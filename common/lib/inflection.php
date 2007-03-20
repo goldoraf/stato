@@ -88,6 +88,16 @@ class SInflection
     {
         return ucfirst(preg_replace('/_/', ' ', preg_replace('/_id/', '', $word)));
     }
+    
+    public static function urlize($sentence)
+    {
+        $sentence = utf8_deaccent($sentence);
+        $sentence = preg_replace('/[^a-z0-9_-\s]/','',strtolower($sentence));
+        $sentence = preg_replace('/[\s]+/',' ',trim($sentence));
+        $sentence = str_replace(' ','-',$sentence);
+        
+        return $sentence;
+    }
 }
 
 ?>
