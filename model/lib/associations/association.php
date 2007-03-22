@@ -269,7 +269,7 @@ abstract class SManyAssociationManager
     public function singular_ids($ids)
     {
         $qs = new SQuerySet($this->meta);
-        $this->replace($qs->get($ids));
+        $this->replace($qs->in_bulk($ids));
     }
     
     public function ids()
