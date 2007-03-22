@@ -24,13 +24,7 @@ function link_to($label, $url_options=array(), $html_options=array())
 {
     if (is_array($url_options)) $url = url_for($url_options);
     else $url = html_escape($url_options);
-    
-    if (isset($html_options['confirm']))
-    {
-        $html_options['onclick'] = "input=confirm('{$html_options['confirm']}');return input;";
-        unset($html_options['confirm']);
-    }
-    
+    $html_options = convert_options_to_js($html_options);
     return content_tag('a', $label, array_merge(array('href' => $url), $html_options));
 }
 
@@ -70,13 +64,7 @@ function button_to($label, $url_options=array(), $html_options=array())
 {
     if (is_array($url_options)) $url = url_for($url_options);
     else $url = html_escape($url_options);
-    
-    if (isset($html_options['confirm']))
-    {
-        $html_options['onclick'] = "input=confirm('{$html_options['confirm']}');return input;";
-        unset($html_options['confirm']);
-    }
-    
+    $html_options = convert_options_to_js($html_options);
     $html_options = array_merge(array('type'=>'submit', 'value'=>$label), $html_options);
     
     return "<form method=\"post\" action=\"{$url}\" class=\"button-to\"><div>"
@@ -121,6 +109,37 @@ function is_current_page($options)
 function is_current_controller($controller_name)
 {
     return SUrlRewriter::is_current_controller($controller_name);
+}
+
+function convert_options_to_js($options)
+{
+    if (isset($options['confirm']) && isset($options['popup']))
+    {
+        $options['onclick'] = 'if ('.confirm_js_function($options['confirm']).') {'.popup_js_function($options['popup']).'};return false;';
+        unset($options['confirm']);
+        unset($options['popup']);
+    }
+    elseif (isset($options['confirm']))
+    {
+        $options['onclick'] = 'return '.confirm_js_function($options['confirm']).';';
+        unset($options['confirm']);
+    }
+    elseif (isset($options['popup']))
+    {
+        $options['onclick'] = popup_js_function($options['popup']).'return false;';
+        unset($options['popup']);
+    }
+    return $options;
+}
+
+function confirm_js_function($message)
+{
+    return "confirm('".escape_javascript($message)."')";
+}
+
+function popup_js_function($popup)
+{
+    return (is_array($popup)) ? "window.open(this.href,'".escape_javascript($popup[0])."','{$popup[1]}');" : "window.open(this.href);";
 }
 
 ?>
