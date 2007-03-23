@@ -164,6 +164,13 @@ class Topic extends SActiveRecord
     public static $decorators = array('list' => array('scope' => 'forum'));
 }
 
+// For TreeDecorator tests
+class Page extends SActiveRecord
+{
+    public static $objects;
+    public static $decorators = array('tree' => array());
+}
+
 // For validation tests
 class User extends SActiveRecord
 {

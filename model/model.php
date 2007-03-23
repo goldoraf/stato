@@ -15,6 +15,7 @@ require('lib/paginator.php');
 
 require('lib/decorators/base_decorator.php');
 require('lib/decorators/list_decorator.php');
+require('lib/decorators/tree_decorator.php');
 
 require('lib/adapters/abstract.php');
 require('lib/adapters/mysql.php');

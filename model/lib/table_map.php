@@ -74,6 +74,15 @@ class STableMap
         $props = array('table_name', 'identity_field', 'inheritance_field', 'relationships', 'decorators', 'content_attributes_names');
         foreach ($props as $p) 
             if ($ref->hasProperty($p)) $this->$p = $ref->getStaticPropertyValue($p);
+        
+        foreach ($this->decorators as $decorator => $config)
+        {
+            $decorator_class = 'S'.SInflection::camelize($decorator).'Decorator';
+            if (!class_exists($decorator_class, false))
+                throw new Exception("Unknown decorator $decorator");
+            if (method_exists($decorator_class, 'alter_table_map'))
+                call_user_func(array($decorator_class, 'alter_table_map'), $this);
+        }
     }
 }
 

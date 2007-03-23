@@ -157,3 +157,10 @@ CREATE TABLE `users` (
 `preferences` TEXT default NULL,
 PRIMARY KEY ( `id` )
 ) TYPE = MYISAM ;
+
+CREATE TABLE `pages` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `name` varchar(50) default NULL,
+  `parent_id` int(11) default NULL,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;

@@ -260,25 +260,25 @@ class SQuerySet implements Iterator, Countable
         return implode(' ', array($select, $fields, "FROM {$this->meta->table_name}", $this->sql_clause()));
     }
     
-    public function instanciate_record($row)
+    public function instanciate_record($row, $meta = null)
     {
+        if ($meta === null) $meta = $this->meta;
+        
         if ($row !== null 
-            && in_array($this->meta->inheritance_field, array_keys($this->meta->attributes))
-            && (SDependencies::model_exists($row[$this->meta->inheritance_field])) !== false
-            && isset($row[$this->meta->inheritance_field])) 
-            $class = $row[$this->meta->inheritance_field];
+            && in_array($meta->inheritance_field, array_keys($meta->attributes))
+            && (SDependencies::model_exists($row[$meta->inheritance_field])) !== false
+            && isset($row[$meta->inheritance_field])) 
+            $class = $row[$meta->inheritance_field];
         else
-            $class = $this->meta->class;
+            $class = $meta->class;
         
         $record = new $class($row);
         
-        if (!empty($this->meta->decorators))
+        if (count($meta->decorators) != 0)
         {
-            foreach ($this->meta->decorators as $decorator => $config)
+            foreach ($meta->decorators as $decorator => $config)
             {
                 $decorator_class = 'S'.SInflection::camelize($decorator).'Decorator';
-                if (!class_exists($decorator_class, false))
-                    throw new Exception("Unknown decorator $decorator");
                 $record = new $decorator_class($record, $config);
             }
         }
@@ -413,8 +413,7 @@ class SQuerySet implements Iterator, Countable
                     $record = $this->extract_record($assoc_meta->table_name, $row);
                     if ($record)
                     {
-                        $assoc_class = $assoc_meta->class;
-                        $assoc = new $assoc_class($record);
+                        $assoc = $this->instanciate_record($record, $assoc_meta);
                         if (in_array($k, $many_assocs))
                         {
                             if (!isset($records_many_assocs[$id][$k][$assoc->id])) 
