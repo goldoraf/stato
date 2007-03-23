@@ -21,8 +21,7 @@ class SManager
     
     public function create($attributes = null)
     {
-        $class = $this->meta->class;
-        $object = new $class($attributes);
+        $object = $this->get_query_set()->instanciate_record($attributes);
         $object->save();
         return $object;
     }

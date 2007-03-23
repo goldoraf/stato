@@ -142,34 +142,26 @@ class Article extends SActiveRecord
 class Comment extends SActiveRecord
 {
     public static $objects;
-    public static $relationships = array
-    (
-        'article' => 'belongs_to'
-    );
+    public static $relationships = array('article' => 'belongs_to');
 }
 
 class Category extends SActiveRecord
 {
     public static $objects;
-    public static $relationships = array
-    (
-        'articles' => 'many_to_many'
-    );
+    public static $relationships = array('articles' => 'many_to_many');
 }
 
 // For ListDecorator tests
 class Forum extends SActiveRecord
 {
     public static $objects;
-    public static $relationships = array
-    (
-        'topics' => 'has_many'
-    );
+    public static $relationships = array('topics' => 'has_many');
 }
 
 class Topic extends SActiveRecord
 {
     public static $objects;
+    public static $decorators = array('list' => array('scope' => 'forum'));
 }
 
 // For validation tests

@@ -260,6 +260,31 @@ class SQuerySet implements Iterator, Countable
         return implode(' ', array($select, $fields, "FROM {$this->meta->table_name}", $this->sql_clause()));
     }
     
+    public function instanciate_record($row)
+    {
+        if ($row !== null 
+            && in_array($this->meta->inheritance_field, array_keys($this->meta->attributes))
+            && (SDependencies::model_exists($row[$this->meta->inheritance_field])) !== false
+            && isset($row[$this->meta->inheritance_field])) 
+            $class = $row[$this->meta->inheritance_field];
+        else
+            $class = $this->meta->class;
+        
+        $record = new $class($row);
+        
+        if (!empty($this->meta->decorators))
+        {
+            foreach ($this->meta->decorators as $decorator => $config)
+            {
+                $decorator_class = 'S'.SInflection::camelize($decorator).'Decorator';
+                if (!class_exists($decorator_class, false))
+                    throw new Exception("Unknown decorator $decorator");
+                $record = new $decorator_class($record, $config);
+            }
+        }
+        return $record;
+    }
+    
     protected function fetch()
     {
         $class = $this->meta->class;
@@ -270,18 +295,8 @@ class SQuerySet implements Iterator, Countable
             $this->resource = null;
             return false;
         }
-        $this->cache[] = $this->fetch_row($row);
+        $this->cache[] = $this->instanciate_record($row);
         return true;
-    }
-    
-    protected function fetch_row($row)
-    {
-        if (in_array($this->meta->inheritance_field, array_keys($this->meta->attributes))
-            && (SDependencies::model_exists($row[$this->meta->inheritance_field])) !== false) 
-            $class = $row[$this->meta->inheritance_field];
-        else
-            $class = $this->meta->class;
-        return new $class($row);
     }
     
     protected function filter_or_exclude($args, $exclude = false)
@@ -387,7 +402,7 @@ class SQuerySet implements Iterator, Countable
         {
             $id = $row[$pk];
             if (!isset($records[$id]))
-                $records_in_order[] = $records[$id] = new $class($this->extract_record($this->meta->table_name, $row));
+                $records_in_order[] = $records[$id] = $this->instanciate_record($this->extract_record($this->meta->table_name, $row));
             
             foreach ($this->includes as $k)
             {
@@ -540,7 +555,7 @@ class SValuesQuerySet extends SQuerySet
         return parent::prepare_select($fields);
     }
     
-    protected function fetch_row($row)
+    public function instanciate_record($row)
     {
         if (count($this->fields) == 1) return $row[$this->fields[0]];
         return $row;

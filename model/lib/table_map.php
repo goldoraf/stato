@@ -9,6 +9,7 @@ class STableMap
     public $inheritance_field  = 'type';
     public $attributes         = array();
     public $relationships      = array();
+    public $decorators         = array();
     
     private $content_attributes = null;
     private $content_attributes_names = null;
@@ -70,7 +71,7 @@ class STableMap
     protected function get_meta_from_class()
     {
         $ref = new ReflectionClass($this->class);
-        $props = array('table_name', 'identity_field', 'inheritance_field', 'relationships', 'content_attributes_names');
+        $props = array('table_name', 'identity_field', 'inheritance_field', 'relationships', 'decorators', 'content_attributes_names');
         foreach ($props as $p) 
             if ($ref->hasProperty($p)) $this->$p = $ref->getStaticPropertyValue($p);
     }

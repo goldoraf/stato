@@ -6,11 +6,11 @@ class SListDecorator extends SActiveRecordDecorator
     protected $scope   = null;
     protected $manager = null;
     
-    public function __construct($record, $scope = null, $column = 'position')
+    public function __construct($record, $config = array())
     {
         $this->record  = $record;
-        $this->column  = $column;
-        $this->scope   = $scope;
+        $this->column  = (isset($config['column'])) ? $config['column'] : 'position';
+        $this->scope   = (isset($config['scope']))  ? $config['scope']  : null;
         $this->manager = new SManager(get_class($this->record));
         $this->record->add_callback($this, 'before_create', 'add_to_list_bottom');
         $this->record->add_callback($this, 'after_delete', 'remove_from_list');
@@ -23,7 +23,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     public function move_lower()
     {
-        $lower_item = new SListDecorator($this->lower_item(), $this->scope);
+        $lower_item = $this->lower_item();
         if ($lower_item === null) return;
         // transaction...
         $lower_item->decrement_position();
@@ -32,7 +32,7 @@ class SListDecorator extends SActiveRecordDecorator
     
     public function move_higher()
     {
-        $higher_item = new SListDecorator($this->higher_item(), $this->scope);
+        $higher_item = $this->higher_item();
         if ($higher_item === null) return;
         // transaction...
         $higher_item->increment_position();
@@ -138,7 +138,7 @@ class SListDecorator extends SActiveRecordDecorator
     protected function bottom_position()
     {
         $item = $this->bottom_item();
-        return $item ? $item[$this->column] : 0;
+        return $item ? $item->{$this->column} : 0;
     }
     
     protected function bottom_item()

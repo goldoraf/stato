@@ -4,7 +4,7 @@ class SActiveRecordDecorator
 {
     protected $record = null;
     
-    public function __construct($record)
+    public function __construct($record, $config = array())
     {
         $this->record = $record;
     }
