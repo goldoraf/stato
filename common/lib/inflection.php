@@ -98,6 +98,16 @@ class SInflection
         
         return $sentence;
     }
+    
+    public static function sanitize_filename($filename)
+    {
+        $filename = utf8_deaccent($filename);
+        $filename = preg_replace('/[^a-z0-9_\.-\s]/','',strtolower($filename));
+        $filename = preg_replace('/[\s]+/',' ',trim($filename));
+        $filename = str_replace(' ','_',$filename);
+        
+        return $filename;
+    }
 }
 
 ?>
