@@ -126,6 +126,11 @@ class SPathComponent extends SDynamicComponent
         $this->key = $key;
         $this->optional = true;
     }
+    
+    public function regex()
+    {
+        return '(?P<'.$this->key.'>[a-z0-9_/]*)';
+    }
 }
 
 class SUrl

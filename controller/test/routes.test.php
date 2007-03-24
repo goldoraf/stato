@@ -177,6 +177,24 @@ class RoutesTest extends UnitTestCase
         $this->assertEqual(array('process/images/index', array()),
             $this->gen(array('controller'=>'processing/images', 'action'=>'index')));
     }
+    
+    function test_path()
+    {
+        $map = new SRouteSet();
+        $map->connect('articles/:action/:id', array('controller'=>'articles'));
+        $map->connect('downloads/*filepath', array('controller'=>'downloads', 'action' => 'send_file'));
+        $map->connect('*path', array('controller' => 'pages', 'action' => 'view'));
+        $this->set_map($map);
+        
+        $this->assertEqual(array('controller'=>'articles', 'action'=>'edit', 'id'=>15),
+            $this->rec('articles/edit/15'));
+        $this->assertEqual(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php'),
+            $this->rec('products/web/cms/php'));
+        $this->assertEqual(array('controller'=>'pages', 'action'=>'view', 'path'=>''),
+            $this->rec(''));
+        $this->assertEqual(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'),
+            $this->rec('downloads/pdf/my_book'));
+    }
 }
 
 ?>
