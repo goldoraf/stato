@@ -195,6 +195,18 @@ class RoutesTest extends UnitTestCase
         $this->assertEqual(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'),
             $this->rec('downloads/pdf/my_book'));
     }
+    
+    function test_trailing_slash()
+    {
+        $map = new SRouteSet();
+        $map->connect(':controller/:action/:id');
+        $this->set_map($map);
+        
+        $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
+            $this->rec('posts/view/45/'));
+        $this->assertEqual(array('controller'=>'posts', 'action'=>'new'),
+            $this->rec('posts/new/'));
+    }
 }
 
 ?>
