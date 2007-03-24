@@ -194,6 +194,11 @@ class RoutesTest extends UnitTestCase
             $this->rec(''));
         $this->assertEqual(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'),
             $this->rec('downloads/pdf/my_book'));
+            
+        $this->assertEqual(array('products/web/cms/php', array()),
+            $this->gen(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php')));
+        $this->assertEqual(array('downloads/pdf/my_book', array()),
+            $this->gen(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book')));
     }
     
     function test_trailing_slash()
