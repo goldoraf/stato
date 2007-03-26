@@ -50,7 +50,7 @@ class SValidation
         $config = array_merge($config, $options);
         
         $value = $record->$attr;
-        $meta  = SActiveRecordMeta::retrieve(get_class($record));
+        $meta  = SMapper::retrieve(get_class($record));
         $qs = new SQuerySet($meta);
         $qs = $qs->filter($attr.self::attribute_condition($value), array($value));
         
@@ -63,7 +63,7 @@ class SValidation
         
         if (!$record->is_new_record())
             $qs = $qs->filter($meta->identity_field.' <> ?', array($record->id));
-            
+             
         if ($qs->count() != 0)
             self::add_error($record, $attr, $config['message']);
     }
