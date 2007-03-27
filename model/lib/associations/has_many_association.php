@@ -3,6 +3,7 @@
 class SHasManyMeta extends SAssociationMeta
 {
     public $dependent = null;
+    public $order     = null;
     
     public $through_table_name  = null;
     public $through_foreign_key = null;
@@ -11,7 +12,7 @@ class SHasManyMeta extends SAssociationMeta
     public function __construct($owner_meta, $assoc_name, $options)
     {
         parent::__construct($owner_meta, $assoc_name, $options);
-        $this->assert_valid_options($options, array('dependent', 'through'));
+        $this->assert_valid_options($options, array('dependent', 'through', 'order'));
         
         if (isset($options['through']))
         {
@@ -38,6 +39,8 @@ class SHasManyMeta extends SAssociationMeta
         {
             if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
             else $this->foreign_key = $owner_meta->underscored.'_id';
+            
+            if (isset($options['order'])) $this->order = $options['order'];
             
             if (isset($options['dependent']))
             {
@@ -98,7 +101,9 @@ class SHasManyManager extends SManyAssociationManager
     protected function get_query_set()
     {
         $qs = new SQuerySet($this->meta);
-        return $qs->filter($this->get_sql_filter());
+        $qs = $qs->filter($this->get_sql_filter());
+        if ($this->meta->order !== null) $qs = $qs->order_by($this->meta->order);
+        return $qs;
     }
     
     protected function get_sql_filter()
