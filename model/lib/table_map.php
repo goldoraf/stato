@@ -81,7 +81,7 @@ class STableMap
             if (!class_exists($decorator_class, false))
                 throw new Exception("Unknown decorator $decorator");
             if (method_exists($decorator_class, 'alter_table_map'))
-                call_user_func(array($decorator_class, 'alter_table_map'), $this);
+                call_user_func(array($decorator_class, 'alter_table_map'), $this, $config);
         }
     }
 }
