@@ -44,7 +44,8 @@ class SJavascriptGenerator
     
     private function escape_content($content)
     {
-        return preg_replace('/\r\n|\n|\r/', '\\n', addslashes($content));
+        //return addcslashes($content, "\0..\37\\'\"\177..\377\/");
+        return addcslashes($content, "\0..\37\\'\"\/");
     }
     
     private function args_for_js($args)
