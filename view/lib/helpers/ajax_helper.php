@@ -240,6 +240,23 @@ function auto_complete_field($id, $options = array())
     
     return javascript_tag($js);
 }
+
+function draggable_element($id, $options = array())
+{
+    return javascript_tag("new Draggable('$id', ".options_for_js($options).");");
+}
+
+function drop_receiving_element($id, $options = array())
+{
+    if (!isset($options['with'])) $options['with'] = "'id=' + encodeURIComponent(element.id)";
+    if (!isset($options['onDrop'])) $options['onDrop'] = "function(element){".remote_function($options)."}";
+    foreach ($options as $k => $v) if (in_array($k, ajax_options())) unset($options[$k]);
+    //if (isset($options['accept'])) 
+    //options[:accept] = array_or_string_for_javascript(options[:accept]) if options[:accept]    
+    if (isset($options['hoverclass'])) $options['hoverclass'] = "'".$options['hoverclass']."'";
+    return javascript_tag("Droppables.add('$id', ".options_for_js($options).");");
+}
+
 /**
  * Returns the JavaScript needed for a remote function. Takes the same arguments as link_to_remote.
  * 
@@ -293,7 +310,7 @@ function options_for_ajax($options)
     $js_options = build_callbacks($options);
     $js_options['asynchronous'] = 'true';
     $js_options['method'] = "'post'";
-    $js_options['evalScripts'] = true;
+    $js_options['evalScripts'] = 'true';
     if (isset($options['position']) && in_array($options['position'], array('before', 'after', 'top', 'bottom')))
     {
         $js_options['insertion'] = 'Insertion.'.ucfirst($options['position']);
@@ -337,6 +354,15 @@ function build_observer($class, $id, $options = array())
     $js.= ")";
     
     return javascript_tag($js);
+}
+/**
+ * @ignore
+ */
+function ajax_options()
+{
+    return array('before', 'after', 'condition', 'url',
+    'asynchronous', 'method', 'insertion', 'position', 'form', 'with', 'update', 'script',
+    'uninitialized', 'loading', 'loaded', 'interactive', 'complete', 'failure', 'success');
 }
 /**
  * @ignore
