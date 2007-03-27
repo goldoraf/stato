@@ -11,14 +11,14 @@ class STreeDecorator extends SActiveRecordDecorator
         $this->record       = $record;
         $this->foreign_key  = (isset($config['foreign_key'])) ? $config['foreign_key'] : 'parent_id';
         $this->order        = (isset($config['order'])) ? $config['order']  : null;
-        $this->manager      = new SManager(get_class($this->record));
+        $this->manager      = new SManager($this->record->class_name());
     }
     
     public static function alter_table_map($meta, $config = array())
     {
         $config = array_merge(array('foreign_key' => 'parent_id', 'order' => null), $config);
         $meta->relationships['parent']   = array('assoc_type' => 'belongs_to', 'class_name' => $meta->class, 'foreign_key' => $config['foreign_key']);
-        $meta->relationships['children'] = array('assoc_type' => 'has_many', 'class_name' => $meta->class, 'foreign_key' => $config['foreign_key'], 'dependent' => 'delete');
+        $meta->relationships['children'] = array('assoc_type' => 'has_many', 'class_name' => $meta->class, 'foreign_key' => $config['foreign_key'], 'dependent' => 'delete', 'order' => $config['order']);
     }
     
     public function roots() // should be static but PHP is not Ruby...

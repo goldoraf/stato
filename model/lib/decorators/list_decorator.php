@@ -11,7 +11,7 @@ class SListDecorator extends SActiveRecordDecorator
         $this->record  = $record;
         $this->column  = (isset($config['column'])) ? $config['column'] : 'position';
         $this->scope   = (isset($config['scope']))  ? $config['scope']  : null;
-        $this->manager = new SManager(get_class($this->record));
+        $this->manager = new SManager($this->record->class_name());
         $this->record->add_callback($this, 'before_create', 'add_to_list_bottom');
         $this->record->add_callback($this, 'after_delete', 'remove_from_list');
     }
@@ -128,8 +128,11 @@ class SListDecorator extends SActiveRecordDecorator
         if ($this->scope === null) return '1 = 1';
         elseif (ctype_alpha($this->scope))
         {
-           $fk = strtolower($this->scope).'_id';
-            return $fk." = '".$this->record->__get($fk)."'"; 
+            $fk = strtolower($this->scope).'_id';
+            if ($this->record->__get($fk) === null)
+                return "$fk IS NULL";
+            else
+                return $fk."='".$this->record->__get($fk)."'";
         }
     }
     
