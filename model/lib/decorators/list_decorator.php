@@ -128,11 +128,9 @@ class SListDecorator extends SActiveRecordDecorator
         if ($this->scope === null) return '1 = 1';
         elseif (ctype_alpha($this->scope))
         {
-            if (!$this->model_exists($this->scope))
-                throw new Exception('The scope provided does not seem to be an existent model.');
+           $fk = strtolower($this->scope).'_id';
+            return $fk." = '".$this->record->__get($fk)."'"; 
         }
-        $fk = strtolower($this->scope).'_id';
-        return $fk." = '".$this->record->__get($fk)."'";
     }
     
     protected function bottom_position()
@@ -203,17 +201,6 @@ class SListDecorator extends SActiveRecordDecorator
         $this->remove_from_list();
         $this->increment_positions_on_lower_items($position);
         $this->update_attribute($this->column, $position);
-    }
-    
-    protected function model_exists($class_name)
-    {
-        if (class_exists($class_name, false)) return true;
-        else
-        {
-            try { SDependencies::require_dependency('models', $class_name, get_class($this->record)); }
-            catch (Exception $e) { return false; }
-        }
-        return true;
     }
 }
 
