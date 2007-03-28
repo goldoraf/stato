@@ -176,6 +176,27 @@ function observe_form($id, $options = array())
         return build_observer('Form.EventObserver', $id, $options);
 }
 
+function visual_effect($name, $id = false, $options = array())
+{
+    $element = ($id) ? "'$id'" : "element";
+    
+    if (isset($options['queue']))
+    {
+        if (is_array($options['queue']))
+        {
+            $temp = array();
+            foreach ($options['queue'] as $k => $v) $temp[] = ($k == 'limit') ? "$k:$v" : "$k:'$v'";
+            $options['queue'] = '{'.implode(',', $temp).'}';
+        }
+        else $options['queue'] = "'".$options['queue']."'";
+    }
+    
+    if (in_array($name, array('toggle_appear', 'toggle_slide', 'toggle_blind')))
+        return "Effect.toggle($element, '".str_replace('toggle_', '', $name)."', ".options_for_js($options).");";
+    else
+        return "new Effect.".SInflection::camelize($name)."($element, ".options_for_js($options).");";
+}
+
 function in_place_editor_field($object_name, $method, $object, $tag_options = array(), $editor_options = array())
 {
     $tag_options = array_merge(array('id' => "${object_name}_${method}_".$object->id."_in_place_editor",
@@ -239,6 +260,18 @@ function auto_complete_field($id, $options = array())
     $js.= ', '.options_for_js($js_options).')';
     
     return javascript_tag($js);
+}
+
+function sortable_element($id, $options = array())
+{
+    if (!isset($options['with'])) $options['with'] = "Sortable.serialize('$id')";
+    if (!isset($options['onUpdate'])) $options['onUpdate'] = "function(){".remote_function($options)."}";
+    foreach ($options as $k => $v) if (in_array($k, ajax_options())) unset($options[$k]);
+    foreach (array('tag', 'overlap', 'constraint', 'handle') as $option)
+        if (isset($options[$option])) $options[$option] = "'".$options[$option]."'";
+    //options[:containment] = array_or_string_for_javascript(options[:containment]) if options[:containment]
+    //options[:only] = array_or_string_for_javascript(options[:only]) if options[:only]
+    return javascript_tag("Sortable.create('$id', ".options_for_js($options).");");
 }
 
 function draggable_element($id, $options = array())
