@@ -266,11 +266,14 @@ function sortable_element($id, $options = array())
 {
     if (!isset($options['with'])) $options['with'] = "Sortable.serialize('$id')";
     if (!isset($options['onUpdate'])) $options['onUpdate'] = "function(){".remote_function($options)."}";
+    
     foreach ($options as $k => $v) if (in_array($k, ajax_options())) unset($options[$k]);
     foreach (array('tag', 'overlap', 'constraint', 'handle') as $option)
         if (isset($options[$option])) $options[$option] = "'".$options[$option]."'";
-    //options[:containment] = array_or_string_for_javascript(options[:containment]) if options[:containment]
-    //options[:only] = array_or_string_for_javascript(options[:only]) if options[:only]
+    
+    if (isset($options['containment'])) $options['containment'] = array_or_string_for_js($options['containment']);
+    if (isset($options['only'])) $options['only'] = array_or_string_for_js($options['only']);
+    
     return javascript_tag("Sortable.create('$id', ".options_for_js($options).");");
 }
 
@@ -283,10 +286,12 @@ function drop_receiving_element($id, $options = array())
 {
     if (!isset($options['with'])) $options['with'] = "'id=' + encodeURIComponent(element.id)";
     if (!isset($options['onDrop'])) $options['onDrop'] = "function(element){".remote_function($options)."}";
+    
     foreach ($options as $k => $v) if (in_array($k, ajax_options())) unset($options[$k]);
-    //if (isset($options['accept'])) 
-    //options[:accept] = array_or_string_for_javascript(options[:accept]) if options[:accept]    
+    
+    if (isset($options['accept'])) $options['accept'] = array_or_string_for_js($options['accept']);  
     if (isset($options['hoverclass'])) $options['hoverclass'] = "'".$options['hoverclass']."'";
+    
     return javascript_tag("Droppables.add('$id', ".options_for_js($options).");");
 }
 
@@ -396,6 +401,16 @@ function ajax_options()
     return array('before', 'after', 'condition', 'url',
     'asynchronous', 'method', 'insertion', 'position', 'form', 'with', 'update', 'script',
     'uninitialized', 'loading', 'loaded', 'interactive', 'complete', 'failure', 'success');
+}
+/**
+ * @ignore
+ */
+function array_or_string_for_js($option)
+{
+    if (is_array($option))
+        return "['".implode("','", $option)."']";
+    else
+        return "'$option'";
 }
 /**
  * @ignore
