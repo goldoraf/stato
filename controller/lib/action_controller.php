@@ -185,7 +185,7 @@ class SActionController
     
     protected function render($status = null)
     {
-        $this->render_action($this->action_name(), $status);
+        $this->render_action($this->action_name(), $status, $xml);
     }
     
     protected function render_update($local_assigns = array())
@@ -194,6 +194,15 @@ class SActionController
         if (!file_exists($template)) throw new Exception('PJS file not found for this action');
         $this->response->headers['Content-Type'] = 'text/javascript; charset=UTF-8';
         $this->render_text($this->view->render_update($template, $local_assigns));
+    }
+    
+    protected function render_xml($status = null)
+    {
+        $template = $this->template_path($this->controller_path(), $this->action_name());
+        if (!file_exists($template)) throw new Exception('Template not found for this action');
+        $this->response->headers['Content-Type'] = 'text/xml; charset=utf-8';
+        $this->render_text('<?xml version="1.0" encoding="UTF-8"?'.">\n"
+                           .$this->view->render($template), $status);
     }
     
     protected function render_action($action, $status = null)
