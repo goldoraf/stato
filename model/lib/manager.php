@@ -47,13 +47,18 @@ class SManager
         }
     }
     
-    /*public function get_or_create()
+    public function get_or_create($attributes)
     {
-        try { return call_user_func_array(array($this, 'get'), func_get_args()); }
-        catch (SActiveRecordDoesNotExist $e) { 
-            return call_user_func_array(array($this, 'create'), func_get_args());
+        try { 
+            $args = array();
+            foreach ($attributes as $k => $v) $args[] = "$k = :$k";
+            $args[] = $attributes;
+            return call_user_func_array(array($this, 'get'), $args);
         }
-    }*/
+        catch (SActiveRecordDoesNotExist $e) { 
+            return $this->create($attributes);
+        }
+    }
     
     protected function get_query_set()
     {
