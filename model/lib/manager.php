@@ -19,9 +19,14 @@ class SManager
         return $this->get_query_set();
     }
     
+    public function build($attributes = null)
+    {
+        return $this->get_query_set()->instanciate_record($attributes);
+    }
+    
     public function create($attributes = null)
     {
-        $object = $this->get_query_set()->instanciate_record($attributes);
+        $object = $this->build($attributes);
         $object->save();
         return $object;
     }
@@ -47,17 +52,32 @@ class SManager
         }
     }
     
+    public function get_or_build($attributes)
+    {
+        try { 
+            return $this->get_by_attributes($attributes);
+        }
+        catch (SActiveRecordDoesNotExist $e) { 
+            return $this->build($attributes);
+        }
+    }
+    
     public function get_or_create($attributes)
     {
         try { 
-            $args = array();
-            foreach ($attributes as $k => $v) $args[] = "$k = :$k";
-            $args[] = $attributes;
-            return call_user_func_array(array($this, 'get'), $args);
+            return $this->get_by_attributes($attributes);
         }
         catch (SActiveRecordDoesNotExist $e) { 
             return $this->create($attributes);
         }
+    }
+    
+    protected function get_by_attributes($attributes)
+    {
+        $args = array();
+        foreach ($attributes as $k => $v) $args[] = "$k = :$k";
+        $args[] = $attributes;
+        return call_user_func_array(array($this, 'get'), $args);
     }
     
     protected function get_query_set()
