@@ -1,9 +1,58 @@
 <?php
 
+class SCsv
+{
+    public static function open($path, $mode = 'r', $config = array())
+    {
+        if ($mode == 'r') return new SCsvIterator(fopen($path, 'r'), $config);
+        return new SCsvWriter(fopen($path, 'w'), $config);
+    }
+}
+
+class SCsvWriter
+{
+    private $resource = null;
+    private $config   = array
+    (
+        'separator' => ';',
+        'delimiter' => '"',
+        'encoding'  => 'UTF-8',
+        'convert_encoding' => true
+    );
+    
+    public function __construct($resource, $config = array())
+    {
+        if (!is_resource($resource)) 
+            throw new Exception('Resource provided is not valid');
+            
+        $this->resource = $resource;
+        $this->config = array_merge($this->config, $config);
+    }
+    
+    public function add_row($row)
+    {
+        foreach ($row as $key => $value) 
+            $row[$key] = $this->convert_encoding($value);
+        
+        fputcsv($this->resource, $row, $this->config['separator'], $this->config['delimiter']);
+    }
+    
+    public function close()
+    {
+        fclose($this->resource);
+    }
+    
+    private function convert_encoding($value)
+    {
+        if (!$this->config['convert_encoding']) return $value;
+        else return mb_convert_encoding($value, $this->config['encoding'], "UTF-8");
+    }
+}
+
 class SCsvIterator implements Iterator
 {
     private $fields    = array();
-    private $resource  = Null;
+    private $resource  = null;
     private $data      = false;
     private $line      = 0;
     private $config = array
