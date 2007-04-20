@@ -370,10 +370,17 @@ class SActionController
         );
         $params = array_merge($defaults, $params);
         
-        if (!isset($params['length'])) $params['length'] = strlen($data);
+        if (!isset($params['length']) && !is_resource($data)) $params['length'] = strlen($data);
         
         $this->send_file_headers($params);
         
+        if (is_resource($data))
+        {
+            $this->response->send_headers();
+            rewind($data);
+            fpassthru($data);
+            exit();
+        }
         $this->render_text($data);
     }
     
