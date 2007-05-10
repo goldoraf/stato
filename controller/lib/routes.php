@@ -129,7 +129,7 @@ class SPathComponent extends SDynamicComponent
     
     public function regex()
     {
-        return '(?P<'.$this->key.'>[a-z0-9_/]*)';
+        return '(?P<'.$this->key.'>[a-z0-9_/-]*)';
     }
 }
 
