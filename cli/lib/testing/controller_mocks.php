@@ -12,8 +12,7 @@ class MockRequest
     public $port       = 80;
     public $remote_ip   = '0.0.0.0';
     public $ssl        = false;
-    
-    public $relative_url_root = Null;
+    public $relative_url_root = '/';
     
     public function __call($method, $args)
     {
@@ -53,13 +52,6 @@ class MockRequest
     public function host_with_port()
     {
         return $this->host.$this->port_string();
-    }
-    
-    public function relative_url_root()
-    {
-        if (!isset($this->relative_url_root))
-            $this->relative_url_root = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
-        return $this->relative_url_root;
     }
 }
 

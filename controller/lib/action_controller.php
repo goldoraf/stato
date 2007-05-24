@@ -85,6 +85,7 @@ class SActionController
     public static $session_store = 'php';
     public static $consider_all_requests_local = true;
     public static $perform_caching = true;
+    public static $use_relative_urls = false;
     public static $template_class = 'SActionView';
     
     

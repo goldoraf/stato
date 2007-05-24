@@ -413,12 +413,12 @@ class SRoutes
 {
     private static $map = null;
     
-    public function initialize($map)
+    public static function initialize($map, $use_named_routes = true)
     {
         self::$map = $map;
         self::$map->draw();
         
-        SNamedRoutes::install();
+        if ($use_named_routes) SNamedRoutes::install();
     }
   
     public static function recognize($request)

@@ -67,7 +67,7 @@ class SUrlRewriter
     {
         $url = '';
         
-        if (!isset($options['only_path']) || $options['only_path'] == false)
+        if (SActionController::$use_relative_urls === false && (!isset($options['only_path']) || $options['only_path'] == false))
         {
             $url.= isset($options['protocol']) ? $options['protocol'] : self::$request->protocol();
             $url.= isset($options['host']) ? $options['host'] : self::$request->host_with_port();
