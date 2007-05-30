@@ -16,11 +16,22 @@ class SUrlRewriter
         return self::$request->params;
     }
     
+    public static function request_param($param)
+    {
+        if (isset(self::$request->params[$param])) return self::$request->params[$param];
+        return null;
+    }
+    
+    public static function request_uri()
+    {
+        return self::$request->request_uri();
+    }
+    
     public static function is_current_page($options)
     {
         $options['only_path'] = true;
         $options['skip_relative_url_root'] = true;
-        return self::url_for($options) == self::$request->request_uri();
+        return self::url_for($options) == self::request_uri();
     }
     
     public static function is_current_controller($controller_name)
