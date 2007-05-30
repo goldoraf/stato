@@ -415,7 +415,7 @@ class SActionController
     
     protected function cache_page($content = null, $options = array())
     {
-        if (!$this->perform_caching) return;
+        if (!self::$perform_caching) return;
         
         if ($content == null) $content = $this->response->body;
         if (is_array($options))
@@ -430,7 +430,7 @@ class SActionController
     
     protected function expire_page($options = array())
     {
-        if (!$this->perform_caching) return;
+        if (!self::$perform_caching) return;
         
         if (is_array($options))
             $path = $this->url_for(array_merge($options, array('only_path' => true, 'skip_relative_url_root' => true)));
@@ -442,7 +442,7 @@ class SActionController
     
     protected function expire_fragment($id)
     {
-        if (!$this->perform_caching) return;
+        if (!self::$perform_caching) return;
         
         if (is_array($id))
             list($protocol, $id) = explode('://', $this->url_for($id));
@@ -561,7 +561,7 @@ class SActionController
         
         $this->session->store();
         
-        if (in_array($this->action_name(), $this->cached_pages) && $this->perform_caching && $this->is_caching_allowed())
+        if (in_array($this->action_name(), $this->cached_pages) && self::$perform_caching && $this->is_caching_allowed())
             $this->cache_page($this->response->body, array('action' => $this->action_name(), 'params' => $this->params));
         
         $this->log_benchmarking();
