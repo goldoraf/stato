@@ -111,6 +111,11 @@ function is_current_controller($controller_name)
     return SUrlRewriter::is_current_controller($controller_name);
 }
 
+function request_param($param)
+{
+    return SUrlRewriter::request_param($param);
+}
+
 function convert_options_to_js($options)
 {
     if (isset($options['confirm']) && isset($options['popup']))
