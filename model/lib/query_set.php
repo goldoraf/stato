@@ -321,7 +321,7 @@ class SQuerySet implements Iterator, Countable
                 $field = $matches[2];
                 $cond  = $matches[3];
                 
-                $clone->includes[] = $matches[1];
+                $clone->joins[] = $this->association_join($assoc_meta);
                 $clone->filters[]  = "{$assoc_meta->table_name}.{$field}{$cond}";
                 
                 unset($args[$k]);
