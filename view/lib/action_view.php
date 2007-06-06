@@ -25,6 +25,16 @@ class SActionView
         throw new Exception('You\'re not allowed to reassign template variables !');
     }
     
+    public function __isset($name)
+    {
+        return $this->controller !== null && isset($this->controller->assigns[$name]);
+    }
+    
+    public function __unset($name)
+    {
+        throw new Exception('You\'re not allowed to unset template variables !');
+    }
+    
     public function page()
     {
         return $this->generator;

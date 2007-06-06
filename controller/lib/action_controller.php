@@ -137,6 +137,16 @@ class SActionController
         $this->assigns[$name] = $value;
     }
     
+    public function __isset($name)
+    {
+        return isset($this->assigns[$name]);
+    }
+    
+    public function __unset($name)
+    {
+        unset($this->assigns[$name]);
+    }
+    
     /**
      * Converts the class name from something like "WeblogController" to "weblog"
      */
