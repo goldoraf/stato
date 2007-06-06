@@ -30,7 +30,7 @@ abstract class SAbstractPDOAdapter extends PDO
         try {
             $affected_rows = $this->exec($sql);
         } catch (PDOException $e) {
-            throw new SInvalidStatementException($e->getMessage());
+            throw new SInvalidStatementException($e->getMessage()."\nSQL used : $sql");
         }
         
         $time = microtime(true) - $start;
@@ -47,7 +47,7 @@ abstract class SAbstractPDOAdapter extends PDO
         try {
             $stmt = $this->query($sql);
         } catch (PDOException $e) {
-            throw new SInvalidStatementException($e->getMessage());
+            throw new SInvalidStatementException($e->getMessage()."\nSQL used : $sql");
         }
         
         $time = microtime(true) - $start;
