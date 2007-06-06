@@ -437,7 +437,7 @@ class SActionController
         else 
             $path = $options;
             
-        if (file_exists($this->page_cache_path($path))) unlink($this->page_cache_path($path));
+        if (file_exists($this->page_cache_path($path))) @unlink($this->page_cache_path($path));
     }
     
     protected function expire_fragment($id)
@@ -448,7 +448,17 @@ class SActionController
             list($protocol, $id) = explode('://', $this->url_for($id));
         
         $file = STATO_APP_ROOT_PATH."/cache/fragments/{$id}";
-        if (file_exists($file)) unlink($file);
+        if (file_exists($file)) @unlink($file);
+    }
+    
+    protected function expire_cache($relative_dir = null)
+    {
+        if (!self::$perform_caching) return;
+        
+        $cache_dir = $this->page_cache_dir;
+        if ($relative_dir !== null) $cache_dir.= $relative_dir;
+        
+        if (is_dir($cache_dir)) SDir::rmdirs($cache_dir);
     }
     
     protected function paginate($query_set, $per_page=10, $param='page')
