@@ -56,10 +56,17 @@ class SDir extends DirectoryIterator
     
     public static function rmdirs($path)
     {   
+        if (!self::exists($path)) return false;
+        
         $dir = new RecursiveDirectoryIterator($path);
-        foreach (new RecursiveIteratorIterator($dir) as $file) unlink($file);
-        foreach ($dir as $subDir) if(!@rmdir($subDir)) self::rmdirs($subDir);
+        foreach($dir as $entry)
+        {
+            if ($entry->isDir()) self::rmdirs($entry->getPathname());
+            else unlink($entry->getPathname());
+        }
+        unset($dir);
         rmdir($path);
+        return true;
     }
     
     public static function copy($source, $dest, $overwrite = false)
@@ -86,6 +93,7 @@ class SDir extends DirectoryIterator
                 self::copy($source.'/'.$file->getFilename(), $dest.'/'.$file->getFilename());
             }
         }
+        unset($dir);
     }
     
     public static function entries($dirname)
@@ -96,7 +104,7 @@ class SDir extends DirectoryIterator
         $entries = array();
         $dir = new DirectoryIterator($dirname);
         foreach ($dir as $file) if ($file->isFile()) $entries[] = $file->getFilename();
-        
+        unset($dir);
         return $entries;
     }
 }
