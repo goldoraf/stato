@@ -114,6 +114,8 @@ class SDate
     
     public static function parse($string)
     {
+        if (is_array($string)) return self::from_array($string);
+        
         foreach (self::$regex as $regex)
         {
             if (preg_match($regex, $string, $matches))
