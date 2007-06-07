@@ -253,7 +253,14 @@ class SQuerySet implements Iterator, Countable
     {
         if ($fields === null)
         {
-            if (empty($this->includes)) $fields = '*';
+            if (empty($this->includes) && empty($this->joins)) $fields = '*';
+            elseif (empty($this->includes) && !empty($this->joins))
+            {
+                $columns = array_keys($this->conn->columns($this->meta->table_name));
+                foreach ($columns as $k => $column) 
+                    $columns[$k] = $this->meta->table_name.'.'.$column;
+                $fields = implode(', ', $columns);
+            }
             else $fields = implode(', ', $this->column_aliases());
         }
         $select = ($this->distinct) ? 'SELECT DISTINCT' : 'SELECT';
