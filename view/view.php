@@ -1,6 +1,7 @@
 <?php
 
 require('lib/action_view.php');
+require('lib/caching.php');
 require('lib/form_builder.php');
 require('lib/javascript_generator.php');
 

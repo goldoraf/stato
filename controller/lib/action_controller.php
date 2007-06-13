@@ -83,6 +83,9 @@ class SActionController
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
     public static $session_store = 'php';
+    public static $fragment_cache_store = 'file';
+    public static $file_store_path = '/cache/fragments';
+    public static $memcache_hosts = array('localhost');
     public static $consider_all_requests_local = true;
     public static $perform_caching = true;
     public static $use_relative_urls = false;
@@ -452,13 +455,7 @@ class SActionController
     
     protected function expire_fragment($id)
     {
-        if (!self::$perform_caching) return;
-        
-        if (is_array($id))
-            list($protocol, $id) = explode('://', $this->url_for($id));
-        
-        $file = STATO_APP_ROOT_PATH."/cache/fragments/{$id}";
-        if (file_exists($file)) @unlink($file);
+        $this->view->expire_fragment($id);
     }
     
     protected function expire_cache($relative_dir = null)

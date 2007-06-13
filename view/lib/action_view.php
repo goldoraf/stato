@@ -8,10 +8,13 @@ class SActionView
     private $controller  = null;
     private $template_dir = null;
     private $tmp_cache_key = null;
+    private $fragment_cache_store = null;
     
     public function __construct($controller = null)
     {
         $this->controller = $controller;
+        $cache_store_class = 'S'.SActionController::$fragment_cache_store.'Store';
+        $this->fragment_cache_store = new $cache_store_class();
     }
     
     public function __get($name)
@@ -109,62 +112,69 @@ class SActionView
         else return implode('', $partials_collec);
     }
     
-    public function cache_start($id = null, $lifetime = 30)
+    public function cache_start($key = null, $lifetime = 0)
     {
         if (!SActionController::$perform_caching) return;
         
-        if ($id === null) $id = array('controller' => $this->controller->controller_path(),
-                                      'action' => $this->controller->action_name());
+        if ($key === null) $key = array('controller' => $this->controller->controller_path(),
+                                        'action' => $this->controller->action_name());
         
-        $cache_key = $this->fragment_cache_key($id);
-        if (($cache = $this->read_fragment($cache_key, $lifetime)) !== false)
+        if (($cache = $this->read_fragment($key, $lifetime)) !== false)
         {
             echo $cache;
             return true;
         }
-        $this->tmp_cache_key = $cache_key;
+        $this->tmp_cache_key = $key;
         ob_start();
         return false;
     }
     
-    public function cache_end($id = null)
+    public function cache_end($key = null, $lifetime = 0)
     {
         if (!SActionController::$perform_caching) return;
         
-        if ($id !== null) $cache_key = $id;
-        else
+        if ($key === null)
         {
-            $cache_key = $this->tmp_cache_key;
+            $key = $this->tmp_cache_key;
             $this->tmp_cache_key = null;
         }
         
         $content = ob_get_contents();
         ob_end_clean();
         
-        $this->write_fragment($cache_key, $content);
+        $this->write_fragment($key, $content, $lifetime);
         echo $content;
     }
     
-    public function read_fragment($key, $lifetime = 30)
+    public function read_fragment($key, $lifetime = 0)
     {
-        if ($this->is_fragment_cache_valid($key, $lifetime)) return file_get_contents($key);
-        return false;
+        if (!SActionController::$perform_caching) return;
+        
+        return $this->fragment_cache_store->read($this->fragment_cache_key($key), $lifetime);
+        
     }
     
-    public function write_fragment($key, $content)
+    public function write_fragment($key, $content, $lifetime = 0)
     {
-        if (!SDir::mkdirs(dirname($key), 0700, true))
-            throw new Exception('Caching failed with dirs creation');
-            
-        file_put_contents($key, $content);
+        if (!SActionController::$perform_caching) return;
+        
+        $this->fragment_cache_store->write($this->fragment_cache_key($key), $content, $lifetime);
     }
     
-    public function fragment_cache_key($id)
+    public function expire_fragment($key)
     {
-        if (is_array($id))
-            $id = SUrlRewriter::url_for(array_merge($id, array('only_path' => true, 
-                                                               'skip_relative_url_root' => true)));
-        return STATO_APP_ROOT_PATH."/cache/fragments/{$id}";
+        if (!SActionController::$perform_caching) return;
+        
+        $this->fragment_cache_store->delete($this->fragment_cache_key($key));
+        
+    }
+    
+    public function fragment_cache_key($key)
+    {
+        if (is_array($key))
+            $key = SUrlRewriter::url_for(array_merge($key, array('only_path' => true, 
+                                                                 'skip_relative_url_root' => true)));
+        return $key;
     }
     
     private function compile($template, $compiled_path)
@@ -203,16 +213,6 @@ class SActionView
             $sub_path = substr($partial_path, 0, - (strlen($partial) + 1));
             return array(STATO_APP_PATH."/views/$sub_path", $partial);
         }
-    }
-    
-    private function is_fragment_cache_valid($file, $lifetime)
-    {
-        if (file_exists($file))
-        {
-            if ($lifetime === null || (time() < filemtime($file) + $lifetime)) return true;
-            else return false;
-        }
-        return false;
     }
 }
 
