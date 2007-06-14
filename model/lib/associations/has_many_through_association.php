@@ -13,7 +13,7 @@ class SHasManyThroughManager extends SHasManyManager
 {
     protected function get_query_set()
     {
-        if ($this->source_assoc_type == 'belongs_to')
+        if ($this->meta->source_assoc_type == 'belongs_to')
         {
             $assoc_pk = $this->meta->identity_field;
             $source_pk = $this->meta->foreign_key;
