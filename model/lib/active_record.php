@@ -115,11 +115,12 @@ class SActiveRecord extends SObservable implements ArrayAccess
     public function populate($values=array())
     {
         $multi_params_attributes = array();
+        $attr_protected = array_merge($this->attr_protected, array_keys($this->meta->relationships));
         
         foreach($values as $key => $value)
         {
             if (is_array($value)) $multi_params_attributes[$key] = $value;
-            elseif (!in_array($key, array_merge($this->attr_protected, array_keys($this->meta->relationships))))
+            elseif (!in_array($key, $attr_protected))
             {
                 if (!is_object($value) && $value !== null && !is_bool($value)) $this->$key = stripslashes($value);
                 else $this->$key = $value;
