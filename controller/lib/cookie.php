@@ -23,10 +23,10 @@ class SCookie
         }
         else
         {
-            if (!array_key_exists(self::$cookie_name, $_cookie))
+            if (!array_key_exists(self::$cookie_name, $_COOKIE))
                 throw new SAuthException('No cookie !');
                 
-            $this->unpackage($_cookie[self::$cookie_name]);
+            $this->unpackage($_COOKIE[self::$cookie_name]);
         }
     }
     

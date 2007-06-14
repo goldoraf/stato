@@ -82,7 +82,7 @@ class SActionController
     
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
-    public static $session_store = 'php';
+    public static $session_handler = 'default';
     public static $fragment_cache_store = 'file';
     public static $file_store_path = '/cache/fragments';
     public static $memcache_hosts = array('localhost');
@@ -116,6 +116,8 @@ class SActionController
         $this->response = $response;
         $this->params   =& $this->request->params;
         $this->assigns  =& $this->response->assigns;
+        $this->session  = new SPhpSession();
+        $this->flash    = new SFlash($this->session);
         
         if ($arguments != null) $this->$method($arguments);
         else $this->$method();
@@ -517,7 +519,7 @@ class SActionController
         $log = "\n\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
             .'() for '.$this->request->remote_ip().' at '
             .SDateTime::today()->__toString().' ['.$this->request->method().']';
-        if (($sess_id = $this->session->session_id()) != '') $log.= "\n    Session ID: ".$sess_id;
+        if (($sess_id = $this->session->id()) != '') $log.= "\n    Session ID: ".$sess_id;
         $log.= "\n    Parameters: ".serialize($this->params);
         $this->logger->info($log);
     }
@@ -555,9 +557,7 @@ class SActionController
         $this->initialize();
         $this->require_dependencies();
         
-        $session_store_class = 'S'.ucfirst(self::$session_store).'Session';
-        $this->session = new $session_store_class();
-        $this->flash   = new SFlash($this->session);
+        $this->session->start();
         
         $this->log_processing();
         
