@@ -165,7 +165,7 @@ class SMySqlAdapter extends SAbstractAdapter
     
     public function add_column($table_name, $column_name, $type, $options = array())
     {
-        $sql = "ALTER TABLE $table_name ADD $column_name ".self::type_to_sql($type, $options['limit']);
+        $sql = "ALTER TABLE $table_name ADD $column_name ".self::type_to_sql($type, $options);
         $sql = self::add_column_options($sql, $type, $options);
         $this->execute($sql);
     }
@@ -183,7 +183,7 @@ class SMySqlAdapter extends SAbstractAdapter
             $options['default'] = $column['Default'];
         }
         $sql = "ALTER TABLE $table_name CHANGE $column_name $column_name "
-        .self::type_to_sql($type, $options['limit']);
+        .self::type_to_sql($type, $options);
         $sql = self::add_column_options($sql, $type, $options);
         $this->execute($sql);
     }
@@ -225,24 +225,24 @@ class SMySqlAdapter extends SAbstractAdapter
             throw new Exception('You must specify the index name');
     }
     
-    public function type_to_sql($type, $limit = null)
+    public function type_to_sql($type, $options = array())
     {
         $native = $this->native_db_types[$type];
         if (!is_array($native)) $sql = $native;
         else
         {
-            if ($limit === null && isset($native['limit'])) $limit = $native['limit'];
+            if (!isset($options['limit']) && isset($native['limit'])) $options['limit'] = $native['limit'];
             $sql = $native['name'];
-            if ($limit !== null) $sql.= "($limit)";
+            if (isset($options['limit'])) $sql.= '('.$options['limit'].')';
         }
         return $sql;
     }
     
     public function add_column_options($sql, $type, $options)
     {
-        if ($options['default'] !== null)
+        if (isset($options['default']) && $options['default'] !== null)
             $sql.= ' DEFAULT '.$this->quote($options['default'], $type);
-        if ($options['null'] === false) $sql.= ' NOT NULL';
+        if (isset($options['null']) && $options['null'] === false) $sql.= ' NOT NULL';
         if (isset($options['after'])) $sql.= ' AFTER '.$options['after'];
         return $sql;
     }
