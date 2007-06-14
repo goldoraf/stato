@@ -283,7 +283,8 @@ class SQuerySet implements Iterator, Countable
         
         if (count($meta->decorators) != 0)
         {
-            foreach ($meta->decorators as $decorator => $config)
+            // the @ is a dirty fix for a stupid notice added to "fix" http://bugs.php.net/bug.php?id=38146
+            foreach (@$meta->decorators as $decorator => $config)
             {
                 $decorator_class = 'S'.SInflection::camelize($decorator).'Decorator';
                 $record = new $decorator_class($record, $config);
