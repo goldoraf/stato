@@ -1,5 +1,8 @@
 <?php
 
+// we call session_start() now to avoid triggering "headers already sent" error
+session_start();
+
 define('STATO_APP_ROOT_PATH', 'dummy');
 
 require(STATO_CORE_PATH.'/common/lib/initializer.php');
@@ -9,9 +12,6 @@ require_once(ST_DIR.'/mock_objects.php');
 require_once(ST_DIR.'/unit_tester.php');
 require_once(ST_DIR.'/web_tester.php');
 require_once(ST_DIR.'/reporter.php');
-
-// we call session_start() now to avoid triggering "headers already sent" error
-session_start();
 
 class RunTestsCommand extends SCommand
 {
@@ -26,7 +26,7 @@ class RunTestsCommand extends SCommand
         $framework = $this->params['framework'];
         $this->initialize($framework);
         $this->require_testing_classes();
-        $test =& new GroupTest(ucfirst($framework).' tests');
+        $test = new GroupTest(ucfirst($framework).' tests');
         $this->add_framework_tests($test, $framework);
         
         $test->run(new TextReporter());
