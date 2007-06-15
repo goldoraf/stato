@@ -101,7 +101,8 @@ class SWebService
             
             $struct = new $type();
             foreach ($value->value as $k => $v)
-                $struct->$k = $this->cast($v, $struct->member_type($k));
+                if ($struct->member_exists($k)) 
+                    $struct->$k = $this->cast($v, $struct->member_type($k));
                 
             return $struct;
         }

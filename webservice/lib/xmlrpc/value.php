@@ -143,6 +143,9 @@ class SXmlRpcValue
             $xml = "<struct>\n";
             foreach ($array as $name => $value)
             {
+                // a null value will return <value></value> and we prefer to avoid that
+                if ($value === null) continue;
+                
                 $v = new SXmlRpcValue($value);
                 $xml.= "  <member><name>$name</name><value>";
                 $xml.= $v->to_xml()."</value></member>\n";

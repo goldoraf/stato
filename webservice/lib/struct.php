@@ -20,6 +20,11 @@ class SWebServiceStruct implements ArrayAccess
         return $this->members;
     }
     
+    public function member_exists($name)
+    {
+        return in_array($name, array_keys($this->members));
+    }
+    
     public function __get($name)
     {
         if (!isset($this->values[$name])) return null;
@@ -56,11 +61,6 @@ class SWebServiceStruct implements ArrayAccess
     public function offsetUnset($offset)
     {
         if ($this->member_exists($offset)) $this->values[$offset] = null;
-    }
-    
-    protected function member_exists($name)
-    {
-        return in_array($name, array_keys($this->members));
     }
 }
 
