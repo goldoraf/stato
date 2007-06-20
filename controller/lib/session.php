@@ -95,4 +95,14 @@ class SPhpSession implements ArrayAccess
     }
 }
 
+interface SPhpSessionHandler
+{
+    public function open();
+    public function close();
+    public function read($key);
+    public function write($key, $data);
+    public function destroy($key);
+    public function gc($max);
+}
+
 ?>
