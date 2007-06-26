@@ -41,6 +41,8 @@ class SInitializer
     private static function initialize_logger()
     {
         SLogger::initialize(self::$config->log_path);
+        $logger = SLogger::get_instance();
+        $logger->formatter = new SBasicFormatter();
     }
     
     private static function initialize_frameworks_settings()

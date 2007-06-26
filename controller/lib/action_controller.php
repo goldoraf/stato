@@ -516,7 +516,7 @@ class SActionController
     
     protected function log_processing()
     {
-        $log = "\n\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
+        $log = "\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
             .'() for '.$this->request->remote_ip().' at '
             .SDateTime::today()->__toString().' ['.$this->request->method().']';
         if (($sess_id = $this->session->id()) != '') $log.= "\n    Session ID: ".$sess_id;
