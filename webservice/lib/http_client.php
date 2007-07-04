@@ -54,7 +54,7 @@ class SHttpClient
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // win2k hack
         }
         
-        $reponse = new SHttpResponse();
+        $response = new SHttpResponse();
         $response->body = curl_exec($ch);
         
         if (curl_errno($ch) != 0)
