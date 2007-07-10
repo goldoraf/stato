@@ -11,12 +11,12 @@ class SActiveRecordDecorator
     
     public function __get($name)
     {
-        return $this->record->__get($name);
+        return $this->record->$name;
     }
     
     public function __set($name, $value)
     {
-        return $this->record->__set($name, $value);
+        $this->record->$name = $value;
     }
     
     public function __call($method_missing, $args)
