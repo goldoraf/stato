@@ -71,8 +71,14 @@ function compute_public_path($source, $dir = 'images', $ext = Null)
     if (strpos($source, '.') === false) $source.= ".{$ext}";
     
     if ($relative_url_root == null)
-        $relative_url_root = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
-    return "{$relative_url_root}{$dir}/{$source}";
+    {
+        if (SActionController::$asset_host === null)
+            $relative_url_root = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']);
+        else
+            $relative_url_root = SActionController::$asset_host;
+    }
+        
+    return "{$relative_url_root}/{$dir}/{$source}";
 }
 
 ?>

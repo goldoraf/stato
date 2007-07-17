@@ -86,6 +86,7 @@ class SActionController
     public static $fragment_cache_store = 'file';
     public static $file_store_path = '/cache/fragments';
     public static $memcache_hosts = array('localhost');
+    public static $asset_host = null;
     public static $consider_all_requests_local = true;
     public static $perform_caching = true;
     public static $use_relative_urls = false;
