@@ -15,8 +15,6 @@ class SActionView
         $this->controller = $controller;
         $cache_store_class = 'S'.SActionController::$fragment_cache_store.'Store';
         $this->fragment_cache_store = new $cache_store_class();
-        
-        clearstatcache();
     }
     
     public function __get($name)
