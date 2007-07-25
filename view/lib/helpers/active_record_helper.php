@@ -147,26 +147,28 @@ function error_message_on($method, $object, $prepend_text='', $append_text='', $
 function error_message_for($object_name, $object, $options=array())
 {
     $errors = $object->errors;
-    if (!empty($errors))
+    if (empty($errors)) return;
+    
+    $header_tag = 'h2';
+    if (isset($options['header_tag']))
     {
-        $header_tag = 'h2';
-        if (isset($options['header_tag']))
-        {
-            $header_tag = $options['header_tag'];
-            unset($options['header_tag']);
-        }
-        
-        if (!isset($options['id']))    $options['id'] = 'form-errors';
-        if (!isset($options['class'])) $options['class'] = 'form-errors';
-        
-        $list = '';
-        foreach($errors as $field => $error)
-            $list.= '<li>'.link_to_function($error, "Field.focus('{$object_name}_{$field}')").'</li>';
-            
-        return content_tag('div', 
-        content_tag($header_tag, SLocale::translate('ERR_VALID_FORM'))."<ul>{$list}</ul>", 
-        $options);
+        $header_tag = $options['header_tag'];
+        unset($options['header_tag']);
     }
+    
+    if (!isset($options['id']))    $options['id'] = 'form-errors';
+    if (!isset($options['class'])) $options['class'] = 'form-errors';
+    
+    $list = '';
+    foreach($errors as $field => $error)
+        $list.= '<li>'.link_to_function($error, "Field.focus('{$object_name}_{$field}')").'</li>';
+        
+    $header = SValidation::ERR_VALID_FORM;
+    if (class_exists('SLocale')) $header = SLocale::translate($header);
+        
+    return content_tag('div', 
+        content_tag($header_tag, $header)."<ul>{$list}</ul>", 
+        $options);
 }
 
 ?>

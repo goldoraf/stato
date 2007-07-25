@@ -2,6 +2,18 @@
 
 class SValidation
 {
+    const ERR_VALID_FORM      = 'Please correct the following errors :';
+    const ERR_VALID_REQUIRED  = '%s is required.';
+    const ERR_VALID_UNIQUE    = '%s is taken.';
+    const ERR_VALID_FORMAT    = '%s is invalid.';
+    const ERR_VALID_LENGTH    = '%s is too long or too short (%d characters required).';
+    const ERR_VALID_MINLENGTH = '%s is too short (min is %d characters).';
+    const ERR_VALID_MAXLENGTH = '%s is too long (max is %d characters).';
+    const ERR_VALID_INCLUSION = '%s is not included in the list.';
+    const ERR_VALID_EXCLUSION = '%s is reserved.';
+    const ERR_VALID_CONFIRM   = '%s doesn\'t match confirmation.';
+    const ERR_VALID_ACCEPT    = '%s must be accepted.';
+    
     public static $validations = array
     (
         'presence', 'uniqueness', 'format', 'length', 'confirmation', 'inclusion', 'exclusion', 'acceptance'
@@ -38,7 +50,7 @@ class SValidation
     
     public static function validate_presence($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_REQUIRED', 'on' => 'save');
+        $config = array('message' => self::ERR_VALID_REQUIRED, 'on' => 'save');
         $config = array_merge($config, $options);
         
         if ($record->$attr === '' || $record->$attr === null) self::add_error($record, $attr, $config['message']);
@@ -46,7 +58,7 @@ class SValidation
     
     public static function validate_uniqueness($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_UNIQUE', 'on' => 'save', 'scope' => Null);
+        $config = array('message' => self::ERR_VALID_UNIQUE, 'on' => 'save', 'scope' => Null);
         $config = array_merge($config, $options);
         
         $value = $record->$attr;
@@ -70,7 +82,7 @@ class SValidation
     
     public static function validate_format($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_FORMAT', 'on' => 'save', 'pattern' => Null);
+        $config = array('message' => self::ERR_VALID_FORMAT, 'on' => 'save', 'pattern' => Null);
         $config = array_merge($config, $options);
         
         if ($config['pattern'] === Null)
@@ -90,9 +102,9 @@ class SValidation
     {
         $config = array
         (
-            'too_long'   => 'ERR_VALID_MAXLENGTH',
-            'too_short'  => 'ERR_VALID_MINLENGTH',
-            'wrong_size' => 'ERR_VALID_LENGTH'
+            'too_long'   => self::ERR_VALID_MAXLENGTH,
+            'too_short'  => self::ERR_VALID_MINLENGTH,
+            'wrong_size' => self::ERR_VALID_LENGTH
         );
         $config = array_merge($config, $options);
         
@@ -110,7 +122,7 @@ class SValidation
     
     public static function validate_inclusion($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_INCLUSION', 'on' => 'save');
+        $config = array('message' => self::ERR_VALID_INCLUSION, 'on' => 'save');
         $config = array_merge($config, $options);
         
         if (!isset($config['choices']) || !is_array($config['choices']))
@@ -122,7 +134,7 @@ class SValidation
     
     public static function validate_exclusion($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_EXCLUSION', 'on' => 'save');
+        $config = array('message' => self::ERR_VALID_EXCLUSION, 'on' => 'save');
         $config = array_merge($config, $options);
         
         if (!isset($config['choices']) || !is_array($config['choices']))
@@ -134,7 +146,7 @@ class SValidation
     
     public static function validate_confirmation($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_CONFIRM', 'on' => 'save');
+        $config = array('message' => self::ERR_VALID_CONFIRM, 'on' => 'save');
         $config = array_merge($config, $options);
         
         $confirm_attr = $attr.'_confirmation';
@@ -145,7 +157,7 @@ class SValidation
     
     public static function validate_acceptance($record, $attr, $options = array())
     {
-        $config = array('message' => 'ERR_VALID_ACCEPT', 'on' => 'save', 'accept' => '1');
+        $config = array('message' => self::ERR_VALID_ACCEPT, 'on' => 'save', 'accept' => '1');
         $config = array_merge($config, $options);
         
         if ($record->$attr != $config['accept'])
@@ -270,8 +282,13 @@ class SValidation
     
     private static function add_error($record, $attr, $message, $var = null)
     {
-        $message = SLocale::translate($message);
-        $human_readable_attr = SLocale::translate($attr);
+        if (!class_exists('SLocale')) $human_readable_attr = $attr;
+        else
+        {
+            $message = SLocale::translate($message);
+            $human_readable_attr = SLocale::translate($attr);
+        }
+        
         if ($human_readable_attr == $attr) $human_readable_attr = str_replace('_', ' ', $attr);
         $message = ucfirst(sprintf($message, $human_readable_attr, $var));
         if (!isset($record->errors[$attr])) $record->errors[$attr] = $message;
