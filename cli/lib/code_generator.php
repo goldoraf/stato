@@ -2,6 +2,7 @@
 
 class SCodeGenerator
 {
+    private static $indent = '    ';
     private static $start_block_delimiter = '// --------- GENERATED CODE ------------------------------------------------';
     private static $end_block_delimiter   = '// --------- END OF GENERATED CODE -----------------------------------------';
     
@@ -14,6 +15,20 @@ class SCodeGenerator
     public static function generate_file($content)
     {
         return self::php_start().$content.self::php_stop();
+    }
+    
+    public static function array_to_string($array, $level = 1)
+    {
+        $strings = array();
+        foreach ($array as $k => $v)
+        {
+            if (is_array($v))
+                $strings[] = str_repeat(self::$indent, $level)."'$k' => ".self::array_to_string($v, $level+1);
+            else
+                $strings[] = str_repeat(self::$indent, $level)."'$k' => '$v'";
+        }
+        return "array\n".str_repeat(self::$indent, $level-1)."(\n".implode(",\n", $strings)
+                        ."\n".str_repeat(self::$indent, $level-1).")";
     }
     
     public static function render_template($template, $assigns = array())
