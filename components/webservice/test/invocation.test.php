@@ -1,6 +1,6 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/controller/controller.php');
+require_once(STATO_CORE_PATH.'/gemini/gemini.php');
 
 class User extends SWebServiceStruct
 {

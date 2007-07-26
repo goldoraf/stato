@@ -10,8 +10,8 @@ class SInitializer
         
         require_once(STATO_CORE_PATH.'/common/common.php');
         require_once(STATO_CORE_PATH.'/cli/cli.php');
-        require_once(STATO_CORE_PATH.'/controller/controller.php');
-        require_once(STATO_CORE_PATH.'/model/model.php');
+        require_once(STATO_CORE_PATH.'/gemini/gemini.php');
+        require_once(STATO_CORE_PATH.'/mercury/mercury.php');
         
         include(STATO_APP_ROOT_PATH.'/conf/environment.php');
         
