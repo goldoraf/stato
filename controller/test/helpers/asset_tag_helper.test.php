@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/view/view.php');
-
 class AssetTagHelperTest extends HelperTestCase
 {   
     private $tmp_script_name = null;

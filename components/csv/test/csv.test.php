@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/components/components.php');
-
 class CsvTest extends UnitTestCase
 {
     public function test_iterator_with_file()

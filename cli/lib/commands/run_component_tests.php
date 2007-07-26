@@ -10,28 +10,24 @@ require_once(ST_DIR.'/unit_tester.php');
 require_once(ST_DIR.'/web_tester.php');
 require_once(ST_DIR.'/reporter.php');
 
-class RunTestsCommand extends SCommand
+class RunComponentTestsCommand extends SCommand
 {
-    protected $allowed_options = array('adapter' => true);
-    protected $allowed_params  = array('framework' => true);
+    protected $allowed_params  = array('component' => true);
    
     public function execute()
-    {
-        if (!isset($this->options['adapter'])) $this->options['adapter'] = 'mysql';
-        define('STATO_TESTING_ADAPTER', $this->options['adapter']);
-            
-        $framework = $this->params['framework'];
-        $this->initialize($framework);
+    {   
+        $component = $this->params['component'];
+        $this->initialize($component);
         $this->require_testing_classes();
-        $test = new GroupTest(ucfirst($framework).' tests');
-        $this->add_framework_tests($test, $framework);
+        $test = new GroupTest(ucfirst($component).' tests');
+        $this->add_component_tests($test, $component);
         
         $test->run(new TextReporter());
     }
     
-    private function initialize($framework)
+    private function initialize($component)
     {
-        require_once(STATO_CORE_PATH."/{$framework}/{$framework}.php");
+        require_once(STATO_CORE_PATH."/components/{$component}/{$component}.php");
     }
     
     private function require_testing_classes()
@@ -42,10 +38,14 @@ class RunTestsCommand extends SCommand
         require_once(STATO_TESTING_PATH.'/stato_test_case.php');
     }
     
-    private function add_framework_tests($group_test, $framework)
+    private function add_component_tests($group_test, $component)
     {
-        $test_files = include(STATO_CORE_PATH."/{$framework}/{$framework}_test.php");
-        set_include_path(get_include_path() . PATH_SEPARATOR . STATO_CORE_PATH."/{$framework}/test/");
+        $path = STATO_CORE_PATH."/components/{$component}/{$component}_test.php";
+        if (!file_exists($path))
+            throw new SConsoleException("There is no tests defined for $component component");
+            
+        $test_files = include($path);
+        set_include_path(get_include_path() . PATH_SEPARATOR . STATO_CORE_PATH."/components/{$component}/test/");
         foreach ($test_files as $file) $group_test->addTestFile($file.'.test.php');
     }
 }

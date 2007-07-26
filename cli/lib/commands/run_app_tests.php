@@ -14,9 +14,6 @@ require_once(STATO_TESTING_PATH.'/active_test_case.php');
 require_once(STATO_TESTING_PATH.'/controller_test_case.php');
 require_once(STATO_TESTING_PATH.'/controller_mocks.php');
 
-// we call session_start() now to avoid triggering "headers already sent" error
-session_start();
-
 SRoutes::initialize(include(STATO_APP_ROOT_PATH.'/conf/routes.php'));
 
 class RunAppTestsCommand extends SCommand

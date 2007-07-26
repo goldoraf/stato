@@ -1,10 +1,7 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/view/view.php');
 require_once(STATO_CORE_PATH.'/model/lib/column.php');
-require_once(STATO_CORE_PATH.'/common/lib/locale.php');
-
-SLocale::initialize(false);
+require_once(STATO_CORE_PATH.'/model/lib/validation.php');
 
 class MockContent extends MockRecord
 {

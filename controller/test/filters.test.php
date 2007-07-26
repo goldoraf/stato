@@ -1,9 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/controller/controller.php');
-require_once(STATO_CORE_PATH.'/view/view.php');
-require_once(STATO_CORE_PATH.'/mailer/mailer.php');
-
 class TestController extends SActionController
 {
     protected function log_processing() {}
@@ -137,42 +133,42 @@ class FiltersTest extends ControllerTestCase
     {
         $this->assertEqual('ensure_login', $this->process('ExceptConditionController')->assigns['ran_before_filter']);
         $this->assertEqual('ensure_login', $this->process('ExceptConditionController', 'another_action')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('ExceptConditionController', 'show_without_filter')->assigns['ran_before_filter']);
+        $this->assertTrue(!isset($this->process('ExceptConditionController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_except_condition_array()
     {
         $this->assertEqual('ensure_login', $this->process('ExceptConditionArrayController')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('ExceptConditionArrayController', 'another_action')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('ExceptConditionArrayController', 'show_without_filter')->assigns['ran_before_filter']);
+        $this->assertTrue(!isset($this->process('ExceptConditionArrayController', 'another_action')->assigns['ran_before_filter']));
+        $this->assertTrue(!isset($this->process('ExceptConditionArrayController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_only_condition()
     {
         $this->assertEqual('ensure_login', $this->process('OnlyConditionController')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('OnlyConditionController', 'another_action')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('OnlyConditionController', 'show_without_filter')->assigns['ran_before_filter']);
+        $this->assertTrue(!isset($this->process('OnlyConditionController', 'another_action')->assigns['ran_before_filter']));
+        $this->assertTrue(!isset($this->process('OnlyConditionController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_only_condition_array()
     {
         $this->assertEqual('ensure_login', $this->process('OnlyConditionArrayController')->assigns['ran_before_filter']);
         $this->assertEqual('ensure_login', $this->process('OnlyConditionArrayController', 'another_action')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('OnlyConditionArrayController', 'show_without_filter')->assigns['ran_before_filter']);
+        $this->assertTrue(!isset($this->process('OnlyConditionArrayController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_before_and_after_condition()
     {
         $this->assertEqual('ensure_login', $this->process('BeforeAndAfterConditionController')->assigns['ran_before_filter']);
         $this->assertEqual('clean_up', $this->process('BeforeAndAfterConditionController')->assigns['ran_after_filter']);
-        $this->assertEqual(Null, $this->process('BeforeAndAfterConditionController', 'another_action')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('BeforeAndAfterConditionController', 'show_without_filter')->assigns['ran_after_filter']);
+        $this->assertTrue(!isset($this->process('BeforeAndAfterConditionController', 'another_action')->assigns['ran_before_filter']));
+        $this->assertTrue(!isset($this->process('BeforeAndAfterConditionController', 'show_without_filter')->assigns['ran_after_filter']));
     }
     
     public function test_skipping()
     {
-        $this->assertEqual(Null, $this->process('SkippingController', 'home_page')->assigns['ran_before_filter']);
-        $this->assertEqual(Null, $this->process('SkippingController', 'home_page')->assigns['ran_after_filter']);
+        $this->assertTrue(!isset($this->process('SkippingController', 'home_page')->assigns['ran_before_filter']));
+        $this->assertTrue(!isset($this->process('SkippingController', 'home_page')->assigns['ran_after_filter']));
     }
     
     public function test_around()

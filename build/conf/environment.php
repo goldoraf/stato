@@ -1,7 +1,7 @@
 <?php
 
-// Choose frameworks you're going to use (all by default)
-// $config->frameworks = array('controller', 'view');
+// Choose components you're going to use
+// $config->components = array('mailer', 'webservice');
 
 // Add new inflection rules:
 // (Example)

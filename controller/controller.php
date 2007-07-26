@@ -1,6 +1,8 @@
 <?php
 
 require('lib/action_controller.php');
+require('lib/action_view.php');
+require('lib/caching.php');
 require('lib/dispatcher.php');
 require('lib/flash.php');
 require('lib/request.php');
@@ -11,5 +13,6 @@ require('lib/url_rewriter.php');
 require('lib/mime_type.php');
 require('lib/cookie.php');
 require('lib/session.php');
+require('lib/helpers.php');
 
 ?>

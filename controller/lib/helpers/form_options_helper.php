@@ -105,7 +105,8 @@ function options_from_collection_for_select($collection, $value_prop='id', $text
  */
 function add_select_options($options_block, $options, $value = null)
 {
-    if ($options['include_blank']) $options_block = '<option value=""></option>'.$options_block;
+    if (isset($options['include_blank']) && $options['include_blank'] === true)
+        $options_block = '<option value=""></option>'.$options_block;
     if (empty($value) && isset($options['prompt']))
         $options_block = '<option value="">'.$options['prompt'].'</option>'.$options_block;
     return $options_block;

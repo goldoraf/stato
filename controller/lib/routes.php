@@ -196,7 +196,7 @@ class SRoute
         $url->parts = array_reverse($url->parts);
         
         if ($url->has_gaps())
-            throw new SRoutingException("No url can be generated for the options : $options");
+            throw new SRoutingException("No url can be generated for the options : ".serialize($options));
             
         foreach($this->known as $k => $v)
             if (array_key_exists($k, $url->params)) unset($url->params[$k]);
@@ -335,7 +335,7 @@ class SRouteSet
         }
         else $actions = $this->gen_map[$options['controller']];
         
-        if (!isset($actions[$options['action']]))
+        if (!isset($options['action']) || !isset($actions[$options['action']]))
         {
             if (isset($actions['*'])) $route = $actions['*'];
             else $route = $this->gen_map['*']['*'];

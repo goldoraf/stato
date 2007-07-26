@@ -664,7 +664,7 @@ class SActionController
             }
             else $result = $this->call_filter($filter, $state);
             
-            if ($result === false) return false;
+            if (@$result === false) return false;
         }
     }
     

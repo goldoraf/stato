@@ -10,6 +10,8 @@ class SInitializer
         
         require_once(STATO_CORE_PATH.'/common/common.php');
         require_once(STATO_CORE_PATH.'/cli/cli.php');
+        require_once(STATO_CORE_PATH.'/controller/controller.php');
+        require_once(STATO_CORE_PATH.'/model/model.php');
         
         include(STATO_APP_ROOT_PATH.'/conf/environment.php');
         
@@ -21,9 +23,9 @@ class SInitializer
         self::$config = $config;
         
         self::load_environment($config);
-        self::require_frameworks($config);
+        self::require_components($config);
         self::initialize_logger();
-        self::initialize_frameworks_settings();
+        self::initialize_main_classes_settings();
         self::initialize_database_settings();
     }
     
@@ -32,10 +34,10 @@ class SInitializer
         include($config->environment_path());
     }
     
-    public static function require_frameworks(SConfiguration $config)
+    public static function require_components(SConfiguration $config)
     {   
-        foreach ($config->frameworks as $framework)
-            require(STATO_CORE_PATH."/{$framework}/{$framework}.php");
+        foreach ($config->components as $comp)
+            require(STATO_CORE_PATH."/components/{$comp}/{$comp}.php");
     }
     
     private static function initialize_logger()
@@ -45,10 +47,12 @@ class SInitializer
         $logger->formatter = new SBasicFormatter();
     }
     
-    private static function initialize_frameworks_settings()
+    private static function initialize_main_classes_settings()
     {
-        foreach (self::$config->frameworks_main_classes() as $ns => $class)
+        foreach (self::$config->main_classes() as $ns => $class)
         {
+            if (!class_exists($class, false)) continue;
+            
             $ref = new ReflectionClass($class);
             foreach (self::$config->$ns->keys() as $prop)
                 if ($ref->hasProperty($prop)) 
@@ -58,8 +62,7 @@ class SInitializer
     
     private static function initialize_database_settings()
     {
-        if (in_array('model', self::$config->frameworks))
-            SActiveRecord::$configurations = self::$config->database_configuration();
+        SActiveRecord::$configurations = self::$config->database_configuration();
     }
     
     private static function is_cli_env()
@@ -78,7 +81,7 @@ class SConfiguration
     
     public $log_path;
     public $database_config_file;
-    public $frameworks;
+    public $components;
     
     private $main_classes = array
     (
@@ -108,7 +111,7 @@ class SConfiguration
         
         $this->log_path = STATO_APP_ROOT_PATH.'/log/'.STATO_ENV.'.log';
         $this->database_config_file = STATO_APP_ROOT_PATH.'/conf/database.php';
-        $this->frameworks = array('controller', 'model', 'view', 'webservice', 'mailer');
+        $this->components = array();
     }
     
     public function environment_path()
@@ -121,11 +124,11 @@ class SConfiguration
         return include($this->database_config_file);
     }
     
-    public function frameworks_main_classes()
+    public function main_classes()
     {
         $classes = array();
-        foreach ($this->frameworks as $f) 
-            $classes[$this->namespaces[$f]] = $this->main_classes[$f];
+        foreach ($this->namespaces as $k => $ns) 
+            $classes[$ns] = $this->main_classes[$k];
         return $classes;
     }
 }

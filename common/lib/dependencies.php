@@ -41,7 +41,7 @@ class SDependencies
     {
         foreach ($components as $component)
         {
-            $path = STATO_CORE_PATH."/components/lib/$component.php";
+            $path = STATO_CORE_PATH."/components/$component/$component.php";
             if (!file_exists($path))
                 throw new Exception("Missing component $component");
             require_once($path);

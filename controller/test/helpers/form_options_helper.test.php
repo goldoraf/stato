@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/view/view.php');
-
 class MockRole extends MockRecord
 {
     protected $attributes = array('flag', 'lib');

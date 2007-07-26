@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/view/view.php');
-
 class NumberHelperTest extends HelperTestCase
 {   
     public function test_number_with_delimiter()

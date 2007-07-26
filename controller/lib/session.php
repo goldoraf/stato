@@ -32,7 +32,7 @@ class SPhpSession implements ArrayAccess
 			session_id(sha1(uniqid(rand(),true)));
         
         session_name($this->cookie_name);
-        session_start();
+        @session_start();
         $this->data = $_SESSION;
     }
     

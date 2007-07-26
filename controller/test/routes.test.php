@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/controller/controller.php');
-
 class RoutesTest extends UnitTestCase
 {
     function set_map($map)

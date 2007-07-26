@@ -1,7 +1,5 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/view/view.php');
-
 class MockPost extends MockRecord
 {
     protected $attributes = array('title', 'author', 'body', 'private', 'written_on');
