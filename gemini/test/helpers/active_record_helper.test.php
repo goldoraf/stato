@@ -1,7 +1,7 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/model/lib/column.php');
-require_once(STATO_CORE_PATH.'/model/lib/validation.php');
+require_once(STATO_CORE_PATH.'/mercury/lib/column.php');
+require_once(STATO_CORE_PATH.'/mercury/lib/validation.php');
 
 class MockContent extends MockRecord
 {
