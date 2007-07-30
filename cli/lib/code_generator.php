@@ -23,9 +23,9 @@ class SCodeGenerator
         foreach ($array as $k => $v)
         {
             if (is_array($v))
-                $strings[] = str_repeat(self::$indent, $level)."'$k' => ".self::array_to_string($v, $level+1);
+                $strings[] = str_repeat(self::$indent, $level)."\"$k\" => ".self::array_to_string($v, $level+1);
             else
-                $strings[] = str_repeat(self::$indent, $level)."'$k' => '$v'";
+                $strings[] = str_repeat(self::$indent, $level)."\"$k\" => \"$v\"";
         }
         return "array\n".str_repeat(self::$indent, $level-1)."(\n".implode(",\n", $strings)
                         ."\n".str_repeat(self::$indent, $level-1).")";
