@@ -105,7 +105,7 @@ class DateTest extends UnitTestCase
     
     public function test_localize()
     {
-        setlocale(LC_ALL, 'en');
+        setlocale(LC_ALL, 'en_US');
         $d = new SDate(1969, 7, 21);
         $this->assertEqual($d->localize(), '07/21/69');
         $d = new SDateTime(1969, 7, 21, 20, 35, 05);
