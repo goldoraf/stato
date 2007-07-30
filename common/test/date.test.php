@@ -102,6 +102,15 @@ class DateTest extends UnitTestCase
         $this->assertEqual('1969-07-21 20:35:05', $d->__toString());
         $this->assertEqual('19690721T20:35:05', $d->to_iso8601());
     }
+    
+    public function test_localize()
+    {
+        setlocale(LC_ALL, 'en');
+        $d = new SDate(1969, 7, 21);
+        $this->assertEqual($d->localize(), '07/21/69');
+        $d = new SDateTime(1969, 7, 21, 20, 35, 05);
+        $this->assertEqual($d->localize(), '07/21/69 20:35:05');
+    }
 }
 
 ?>

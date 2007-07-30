@@ -55,9 +55,9 @@ class SDate
         return $this;
     }
     
-    public function locale()
+    public function localize()
     {
-        return $this->format(SLocale::translate('FORMAT_DATE'));
+        return $this->format('%x');
     }
     
     public function __toString()
@@ -201,9 +201,9 @@ class SDateTime extends SDate
         return date('Z');
     }
     
-    public function locale()
+    public function localize()
     {
-        return $this->format(SLocale::translate('FORMAT_DATETIME'));
+        return $this->format('%x %X');
     }
     
     public function __toString()
