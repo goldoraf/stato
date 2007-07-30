@@ -602,7 +602,6 @@ class SActionController
     
     private function require_dependencies()
     {
-        SLocale::load_strings(STATO_APP_PATH.'/i18n/'.SDependencies::sub_directory(get_class($this)));
         SUrlRewriter::initialize($this->request);
         
         try
@@ -707,7 +706,7 @@ class SActionController
     
     private function rescue_action_locally($exception)
     {
-        $rescue_path = STATO_CORE_PATH.'/controller/lib/templates/rescue/';
+        $rescue_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue/';
         $this->add_variables_to_assigns();
         $this->assigns['exception'] = $exception;
         $this->assigns['controller_name'] = self::controller_class($this->request->controller);

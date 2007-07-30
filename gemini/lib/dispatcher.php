@@ -28,8 +28,6 @@ class SDispatcher
             $map = include(STATO_APP_ROOT_PATH.'/conf/routes.php');
             
             SRoutes::initialize($map);
-    		
-    		SLocale::initialize();
             
             $request  = new SRequest();
             $response = new SResponse();
