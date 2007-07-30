@@ -90,7 +90,7 @@ class SDate
     
     public function format($strf)
     {
-        if (SLocale::is_server_windows()) 
+        if ($this->is_server_windows()) 
             return utf8_encode(strftime($strf, $this->ts()));
         else
             return strftime($strf, $this->ts());
@@ -149,6 +149,11 @@ class SDate
             'wday'  => $date['wday'],
             'week'  => date('W', $ts)
         );
+    }
+    
+    protected function is_server_windows()
+    {
+        return (strtoupper(substr(PHP_OS, 0, 3) == 'WIN'));
     }
 }
 
