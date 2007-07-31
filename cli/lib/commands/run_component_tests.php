@@ -27,7 +27,7 @@ class RunComponentTestsCommand extends SCommand
     
     private function initialize($component)
     {
-        require_once(STATO_CORE_PATH."/components/{$component}/{$component}.php");
+        SDependencies::require_component($component);
     }
     
     private function require_testing_classes()

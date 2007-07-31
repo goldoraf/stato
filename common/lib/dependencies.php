@@ -40,15 +40,17 @@ class SDependencies
     
     public static function require_components($components)
     {
-        foreach ($components as $component)
-        {
-            $path = STATO_CORE_PATH."/components/$component/$component.php";
-            if (!file_exists($path))
-                throw new Exception("Missing component $component");
-            
-            self::$loaded_components[] = $component;
-            require_once($path);
-        }
+        foreach ($components as $component) self::require_component($component);
+    }
+    
+    public static function require_component($component)
+    {
+        $path = STATO_CORE_PATH."/components/$component/$component.php";
+        if (!file_exists($path))
+            throw new Exception("Missing component $component");
+        
+        self::$loaded_components[] = $component;
+        require_once($path);
     }
     
     public static function is_loaded_component($component)
