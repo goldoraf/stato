@@ -7,6 +7,7 @@ class SDependencyNotFound extends Exception {}
 class SDependencies
 {
     private static $subdirs = null;
+    private static $loaded_components = array();
     
     public static function auto_require_model($class_name)
     {
@@ -44,8 +45,15 @@ class SDependencies
             $path = STATO_CORE_PATH."/components/$component/$component.php";
             if (!file_exists($path))
                 throw new Exception("Missing component $component");
+            
+            self::$loaded_components[] = $component;
             require_once($path);
         }
+    }
+    
+    public static function is_loaded_component($component)
+    {
+        return in_array($component, self::$loaded_components);
     }
     
     public static function require_dependencies($layer, $dependencies, $relative_to = null)
