@@ -1,8 +1,5 @@
 <?php
 
-SLocale::$language = 'en_US';
-SLocale::set_locale();
-
 class MockArticle extends MockRecord
 {
     protected $attributes = array('written_on');

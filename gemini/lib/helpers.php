@@ -13,7 +13,6 @@ require('helpers/behaviour_helper.php');
 require('helpers/active_record_helper.php');
 require('helpers/text_helper.php');
 require('helpers/utf8_helper.php');
-require('helpers/i18n_helper.php');
 require('helpers/number_helper.php');
 require('helpers/debug_helper.php');
 require('helpers/form_builder.php');

@@ -164,7 +164,7 @@ function error_message_for($object_name, $object, $options=array())
         $list.= '<li>'.link_to_function($error, "Field.focus('{$object_name}_{$field}')").'</li>';
         
     $header = SValidation::ERR_VALID_FORM;
-    if (class_exists('SLocale')) $header = SLocale::translate($header);
+    if (SDependencies::is_loaded_component('i18n')) $header = __($header);
         
     return content_tag('div', 
         content_tag($header_tag, $header)."<ul>{$list}</ul>", 

@@ -282,7 +282,7 @@ class SValidation
     
     private static function add_error($record, $attr, $message, $var = null)
     {
-        if (!class_exists('SLocale')) $human_readable_attr = $attr;
+        if (!SDependencies::is_loaded_component('i18n')) $human_readable_attr = $attr;
         else
         {
             $message = SLocale::translate($message);

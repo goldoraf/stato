@@ -151,11 +151,11 @@ function select_month($date, $options=array())
         if (isset($options['use_numbers']) && $options['use_numbers'] == True)
             $month = $i;
         elseif (isset($options['use_abbrv']) && $options['use_abbrv'] == True)
-            $month = (SLocale::is_server_windows()) ? utf8_encode(strftime('%b', mktime(0,0,0,$i,1,2005)))
-                                                    : strftime('%b', mktime(0,0,0,$i,1,2005));
+            $month = (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') ? utf8_encode(strftime('%b', mktime(0,0,0,$i,1,2005)))
+                                                                 : strftime('%b', mktime(0,0,0,$i,1,2005));
         else
-            $month = (SLocale::is_server_windows()) ? utf8_encode(strftime('%B', mktime(0,0,0,$i,1,2005)))
-                                                    : strftime('%B', mktime(0,0,0,$i,1,2005));
+            $month = (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') ? utf8_encode(strftime('%B', mktime(0,0,0,$i,1,2005)))
+                                                                 : strftime('%B', mktime(0,0,0,$i,1,2005));
         
         if (isset($options['add_numbers']) && $options['add_numbers'] == True)
             $month = $i.' - '.$month;
