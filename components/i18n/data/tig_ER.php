@@ -1,0 +1,16 @@
+<?php
+
+return array
+(
+    'language_type' => 'tig',
+    'currency_format' => '¤#,##0.00',
+    'date_formats' => array
+    (
+        'full' => '%A፡ %%d %B ዮም %%G G',
+        'long' => '%%d %B %%G',
+        'medium' => '%%d-%b-%%G',
+        'short' => '%%d/%%M/%%y'
+    )
+);
+
+?>

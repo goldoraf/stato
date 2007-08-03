@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<xliff version="1.0">
+  <file orginal="global" source-language="en_US" datatype="plaintext">
+    <body>
+      <group restype="x-gettext-plurals">
+        <trans-unit id="3[0]" xml:space="preserve">
+          <source>%d file</source>
+          <target>%d plik</target>
+        </trans-unit>
+        <trans-unit id="3[1]" xml:space="preserve">
+          <source>%d files</source>
+          <target>%d pliki</target>
+        </trans-unit>
+        <trans-unit id="3[2]" xml:space="preserve">
+          <source>%d files</source>
+          <target>%d pliko'w</target>
+        </trans-unit>
+    </group>
+    </body>
+  </file>
+</xliff>
+
