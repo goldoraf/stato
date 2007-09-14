@@ -424,7 +424,7 @@ class SActionController
             $this->response->send_headers();
             $fp = @fopen($path, "rb");
             fpassthru($fp);
-            exit();
+            return;
         }
         else $this->render_text(file_get_contents($path));
     }
