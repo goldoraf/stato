@@ -107,6 +107,11 @@ class SDir extends DirectoryIterator
         unset($dir);
         return $entries;
     }
+    
+    public static function tmpdir()
+    {
+        return sys_get_temp_dir();
+    }
 }
 
 ?>
