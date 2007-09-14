@@ -2,6 +2,7 @@
 
 require('lib/action_controller.php');
 require('lib/action_view.php');
+require('lib/presenter.php');
 require('lib/caching.php');
 require('lib/dispatcher.php');
 require('lib/flash.php');

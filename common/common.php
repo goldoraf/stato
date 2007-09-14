@@ -6,6 +6,7 @@ require('lib/base64.php');
 require('lib/encryption.php');
 require('lib/logger.php');
 require('lib/dir.php');
+require('lib/tempfile.php');
 require('lib/inflection.php');
 
 ?>
