@@ -200,7 +200,7 @@ function visual_effect($name, $id = false, $options = array())
 function in_place_editor_field($object_name, $method, $object, $tag_options = array(), $editor_options = array())
 {
     $tag_options = array_merge(array('id' => "${object_name}_${method}_".$object->id."_in_place_editor",
-    'class' => 'in_place_editor'), $tag_options);
+    'class' => 'in_place_editor', 'tag' => 'span'), $tag_options);
     
     if (!isset($editor_options['url'])) 
         $editor_options['url'] = array('action' => "set_${object_name}_${method}", 'id' => $object->id);
