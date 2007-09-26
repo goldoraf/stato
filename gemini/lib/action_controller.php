@@ -78,8 +78,6 @@ class SActionController
     private $performed_render   = false;
     private $performed_redirect = false;
     
-    public $parent_controller  = null;
-    
     const DEFAULT_RENDER_STATUS_CODE = '200 OK';
     
     public static $session_handler = 'default';
@@ -102,13 +100,6 @@ class SActionController
     {
         $controller = new SActionController();
         return $controller->process($request, $response, 'rescue_action', $exception);
-    }
-    
-    public static function process_with_component($class, $request, $response, $parent_controller = null)
-    {
-        $controller = new $class();
-        $controller->parent_controller = $parent_controller;
-        return $controller->process($request, $response);
     }
     
     public function process($request, $response, $method = 'perform_action', $arguments = null)
@@ -246,12 +237,6 @@ class SActionController
         $this->add_variables_to_assigns();
         $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->render_text($this->view->render($path), $status);
-    }
-    
-    protected function render_component($options = array())
-    {
-        $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
-        $this->render_text($this->component_response($options, true)->body); 
     }
     
     protected function render_partial($partial, $local_assigns = array())
@@ -618,28 +603,6 @@ class SActionController
         
         if (!empty($this->components))
             SDependencies::require_components($this->components);
-    }
-    
-    private function component_response($options, $reuse_response)
-    {
-        $controller = $options['controller'];
-        $class = SInflection::camelize($controller).'Controller';
-        
-        if (!file_exists($path = STATO_APP_PATH."/components/{$controller}/{$controller}_controller.php"))
-    		throw new SUnknownControllerException(ucfirst($req_controller).' Component not found !');
-    		
-    	require_once($path);
-        
-        $request = $this->request_for_component($options);
-        $response = ($reuse_response) ? $this->response : new SResponse();
-        return SActionController::process_with_component($class, $request, $response, $this);
-    }
-    
-    private function request_for_component($options)
-    {
-        $request = clone $this->request;
-        $request->params = array_merge($request->params, $options);
-        return $request;
     }
     
     private function process_filters($state)
