@@ -89,7 +89,7 @@ class SActionController
     public static $perform_caching = true;
     public static $use_relative_urls = false;
     public static $template_class = 'SActionView';
-    
+    public static $exception_notifier = null;
     
     public static function factory($request, $response)
     {
@@ -660,6 +660,14 @@ class SActionController
     
     private function rescue_action_in_public($exception)
     {
+        if (($class = self::$exception_notifier) !== null)
+        {
+            $notifier = new $class();
+            $notifier->notify($exception, $this->request, $this->session,
+                              self::controller_class($this->request->controller),
+                              $this->action_name());
+        }
+        
         $status = $this->response_code_for_rescue($exception);
         if (in_array(get_class($exception), array('SHttp404', 'SRoutingException', 
             'SUnknownControllerException', 'SUnknownActionException')))
@@ -774,7 +782,7 @@ class SActionController
     }
     
     private static function controller_file($req_controller)
-	{
+    {
         return STATO_APP_PATH.'/controllers/'.$req_controller.'_controller.php';
     }
 }

@@ -93,11 +93,7 @@ class SMailer
     
     protected function render_message($template, $assigns)
     {
-        $path = STATO_APP_PATH.'/views/'
-        .SDependencies::sub_directory(get_class($this))
-        .SInflection::underscore(get_class($this))
-        ."/$template.php";
-        return $this->view->render($path, $assigns);
+        return $this->view->render($this->template_path($template), $assigns);
     }
     
     protected function reset()
@@ -112,6 +108,14 @@ class SMailer
         $this->content_type = 'text/plain';
         $this->attachments = array();
         $this->parts = array();
+    }
+    
+    protected function template_path($template)
+    {
+        return STATO_APP_PATH.'/views/'
+        .SDependencies::sub_directory(get_class($this))
+        .SInflection::underscore(get_class($this))
+        ."/$template.php";
     }
 }
 

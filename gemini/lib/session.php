@@ -12,24 +12,23 @@ class SPhpSession implements ArrayAccess
     public function __construct()
     {
         if (function_exists('ini_get'))
-		{
-			$this->cookie_path   = ini_get('session.cookie_path');
-			$this->cookie_domain = ini_get('session.cookie_domain');
-			$this->cookie_secure = ini_get('session.cookie_secure');
-		}
+	{
+	    $this->cookie_path   = ini_get('session.cookie_path');
+	    $this->cookie_domain = ini_get('session.cookie_domain');
+	    $this->cookie_secure = ini_get('session.cookie_secure');
+	}
         
         if (SActionController::$session_handler != 'default') $this->set_handler();
     }
     
     public function __destruct()
-	{
-		if (isset($_SESSION)) session_write_close();
-	}
+    {
+	if (isset($_SESSION)) session_write_close();
+    }
 	
-	public function start()
-	{
-        if (!isset($_COOKIE[$this->cookie_name]))
-			session_id(sha1(uniqid(rand(),true)));
+    public function start()
+    {
+        if (!isset($_COOKIE[$this->cookie_name])) session_id(sha1(uniqid(rand(),true)));
         
         session_name($this->cookie_name);
         @session_start();
@@ -45,8 +44,8 @@ class SPhpSession implements ArrayAccess
     {
         $_SESSION = array();
         session_unset();
-		session_destroy();
-		// Firefox only remove the cookie when you submit the same values for all parameters, 
+	session_destroy();
+	// Firefox only remove the cookie when you submit the same values for all parameters, 
         // except the date, which sould be in the past
         setcookie(session_name(), false, time() -600, $this->cookie_path, $this->cookie_domain, $this->cookie_secure);
     }
@@ -54,6 +53,11 @@ class SPhpSession implements ArrayAccess
     public function id()
     {
         return session_id();
+    }
+    
+    public function data()
+    {
+	return $this->data;
     }
     
     public function offsetExists($offset)
@@ -85,13 +89,13 @@ class SPhpSession implements ArrayAccess
         $this->handler = new $handler_class();
         
         session_set_save_handler(
-			array(&$this->handler, 'open'),
-			array(&$this->handler, 'close'),
-			array(&$this->handler, 'read'),
-			array(&$this->handler, 'write'),
-			array(&$this->handler, 'destroy'),
-			array(&$this->handler, 'gc')
-		);
+	    array(&$this->handler, 'open'),
+	    array(&$this->handler, 'close'),
+	    array(&$this->handler, 'read'),
+	    array(&$this->handler, 'write'),
+	    array(&$this->handler, 'destroy'),
+	    array(&$this->handler, 'gc')
+	);
     }
 }
 
