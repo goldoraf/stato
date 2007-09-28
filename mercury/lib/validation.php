@@ -282,16 +282,18 @@ class SValidation
     
     private static function add_error($record, $attr, $message, $var = null)
     {
-        if (!SDependencies::is_loaded_component('i18n')) $human_readable_attr = $attr;
-        else
-        {
-            $message = SLocale::translate($message);
+        $human_readable_attr = $attr;
+        if (SDependencies::is_loaded_component('i18n')) 
             $human_readable_attr = SLocale::translate($attr);
-        }
+        if ($human_readable_attr == $attr) 
+            $human_readable_attr = str_replace('_', ' ', $attr);
         
-        if ($human_readable_attr == $attr) $human_readable_attr = str_replace('_', ' ', $attr);
-        $message = ucfirst(sprintf($message, $human_readable_attr, $var));
-        if (!isset($record->errors[$attr])) $record->errors[$attr] = $message;
+        if (!SDependencies::is_loaded_component('i18n'))
+            $message = sprintf($message, $human_readable_attr, $var);
+        else
+            $message = SLocale::translate($message, array($human_readable_attr, $var));
+        
+        if (!isset($record->errors[$attr])) $record->errors[$attr] = ucfirst($message);
     }
     
     private static function attribute_condition($value)
