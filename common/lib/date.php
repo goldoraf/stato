@@ -55,9 +55,9 @@ class SDate
         return $this;
     }
     
-    public function localize()
+    public function localize($format = '%x')
     {
-        return $this->format('%x');
+        return $this->format($format);
     }
     
     public function __toString()
@@ -206,9 +206,9 @@ class SDateTime extends SDate
         return date('Z');
     }
     
-    public function localize()
+    public function localize($format = '%x %X')
     {
-        return $this->format('%x %X');
+        return $this->format($format);
     }
     
     public function __toString()
