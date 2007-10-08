@@ -151,6 +151,7 @@ class SQuerySet implements Iterator, Countable
     {
         if ($this->resource !== null) return $this->conn->row_count($this->resource);
         elseif ($this->resource === null && is_array($this->cache)) return count($this->cache);
+        elseif (!empty($this->includes)) return count($this->to_array());
         else
         {
             $clone = clone $this;
