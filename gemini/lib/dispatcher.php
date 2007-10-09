@@ -6,7 +6,13 @@ function error_handler($error_type, $message)
 {
     if ($error_type == E_USER_ERROR && preg_match('/^Missing ([a-zA-Z0-9_]*) model$/', $message))
     {
-        SActionController::process_with_exception(new SRequest(), new SResponse(), new Exception($message, $error_type))->out();
+        $exception = new Exception($message, $error_type);
+        
+        if (defined('STDIN') && defined('STDOUT') && defined('STDERR')) // CLI environment
+            throw $exception;
+        else
+            SActionController::process_with_exception(new SRequest(), new SResponse(), $exception)->out();
+        
         die();
     }
     // No exception thrown for notices : Stato uses some PHP4 librairies
