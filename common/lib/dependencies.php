@@ -40,12 +40,17 @@ class SDependencies
     
     public static function engine_start($engine)
     {
+        self::require_engine($engine);
+        call_user_func(array($engine.'Engine', 'start'));
+    }
+    
+    public static function require_engine($engine)
+    {
         $path = STATO_CORE_PATH."/engines/$engine/lib/{$engine}_engine.php";
         if (!file_exists($path))
             throw new Exception("Missing engine $engine");
         
         require_once($path);
-        call_user_func(array($engine.'Engine', 'start'));
     }
     
     public static function require_components($components)
