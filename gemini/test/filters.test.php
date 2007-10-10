@@ -93,7 +93,7 @@ class SkippingController extends BasicController
     }
 }
 
-class AroundFilter
+class TestAroundFilter implements SAroundFilter
 {
     public function before($controller)
     {
@@ -111,7 +111,7 @@ class AroundController extends TestController
     public function __construct()
     {
         parent::__construct();
-        $this->around_filters[] = new AroundFilter();
+        $this->around_filters[] = new TestAroundFilter();
     }
     
     public function show()

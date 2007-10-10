@@ -15,5 +15,6 @@ require('lib/mime_type.php');
 require('lib/cookie.php');
 require('lib/session.php');
 require('lib/helpers.php');
+require('lib/filters.php');
 
 ?>
