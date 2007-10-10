@@ -232,6 +232,13 @@ class SDateTime extends SDate
         return mktime($this->hour, $this->min, $this->sec, $this->month, $this->day, $this->year);
     }
     
+    public static function at($ts)
+    {
+        $date = getdate($ts);
+        return new SDateTime($date['year'], $date['mon'], $date['mday'], 
+                             $date['hours'], $date['minutes'], $date['seconds']);
+    }
+    
     public static function now()
     {
         $today = getdate();
