@@ -77,8 +77,10 @@ class SMailer
         
         if ($this->body !== null)
         {
-            if ($this->content_type == 'text/html')
-                $mail->set_html_body($this->render_message($this->template, $this->body));
+            if (preg_match('/^text\/html/', $this->content_type))
+                $mail->set_html_body($this->render_message($this->template, $this->body), $this->content_type);
+            elseif (!empty($this->content_type))
+                $mail->set_body($this->render_message($this->template, $this->body), $this->content_type);
             else
                 $mail->set_body($this->render_message($this->template, $this->body));
         }

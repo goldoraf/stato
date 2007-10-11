@@ -36,7 +36,10 @@ class SPart
             case 'quoted-printable':
                 return $this->encode_quoted_printable($this->body);
             default:
-                return wordwrap($this->body, SMailer::$line_length);
+                if (preg_match('/format=flowed/', $this->content_type))
+                    return $this->body;
+                else
+                    return wordwrap($this->body, SMailer::$line_length);
         }
     }
     
@@ -55,7 +58,7 @@ class SPart
         $headers = array();
         
         $headers['Content-Type'] = $this->content_type;
-        if ($this->charset !== null && $boundary === null) 
+        if ($this->charset !== null && $boundary === null && !preg_match('/charset=/', $this->content_type)) 
             $headers['Content-Type'].= '; charset="'.$this->charset.'"';
         if ($boundary !== null)
             $headers['Content-Type'].= '; boundary="'.$boundary.'"';

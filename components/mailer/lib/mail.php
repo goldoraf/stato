@@ -40,14 +40,14 @@ class SMail
         $this->headers['Subject'] = $this->encode_header($text);
     }
     
-    public function set_body($text)
+    public function set_body($text, $content_type = 'text/plain')
     {
-        $this->parts[] = new SPart(array('content_type' => 'text/plain', 'body' => $text));
+        $this->parts[] = new SPart(array('content_type' => $content_type, 'body' => $text));
     }
     
-    public function set_html_body($text)
+    public function set_html_body($text, $content_type = 'text/html')
     {
-        $this->parts[] = new SPart(array('content_type' => 'text/html', 'body' => $text));
+        $this->parts[] = new SPart(array('content_type' => $content_type, 'body' => $text));
     }
     
     public function add_part($params)
