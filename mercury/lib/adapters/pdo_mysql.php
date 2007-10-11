@@ -83,11 +83,12 @@ class SPDOMySqlAdapter extends SAbstractPDOAdapter
         return in_array($name, $this->tables());
     }
     
-    public function create_table($name, $table_def, $options = array())
+    public function create_table($name, $table_def, $options = null)
     {
         $sql = "CREATE TABLE $name (";
         $sql.= $table_def->to_sql();
         $sql.= ")";
+        if ($options !== null) $sql.= ' '.$options;
         
         $this->execute($sql);
     }
