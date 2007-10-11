@@ -128,6 +128,11 @@ class SMySqlAdapter extends SAbstractAdapter
         return "`$name`";
     }
     
+    public function supports_transactions()
+    {
+        return false;
+    }
+    
     /**
      * SCHEMA STATEMENTS =======================================================
      **/

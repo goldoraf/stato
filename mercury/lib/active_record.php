@@ -41,6 +41,8 @@ class SActiveRecord extends SObservable implements ArrayAccess
     public static $log_sql           = false;
     
     protected static $conn = null;
+    protected static $rollback_clones = array();
+    
     protected $values      = array();
     protected $meta        = null;
     
@@ -620,6 +622,28 @@ class SActiveRecord extends SObservable implements ArrayAccess
     {
         if (!isset(self::$conn)) return 0;
         return self::$conn->runtime;
+    }
+    
+    public static function begin_transaction($object = null)
+    {
+        if (!self::connection()->supports_transactions())
+            throw new Exception("{$config['adapter']} adapter does not support transactions");
+            
+        if ($object !== null) self::$rollback_clones[] = clone $object;
+        
+        return self::connection()->begin_transaction();
+    }
+    
+    public static function commit()
+    {
+        return self::connection()->commit();
+    }
+    
+    public static function rollback()
+    {
+        $return = self::connection()->rollback();
+        if (($object = array_pop(self::$rollback_clones)) !== null) return $object;
+        return $return;
     }
     
     protected function conn()

@@ -150,6 +150,21 @@ abstract class SAbstractPDOAdapter extends PDO
         return $array;
     }
     
+    public function supports_transactions()
+    {
+        return true;
+    }
+    
+    public function begin_transaction()
+    {
+        return $this->beginTransaction();
+    }
+    
+    public function rollback()
+    {
+        return $this->rollBack();
+    }
+    
     public function write_log()
     {
         $logger = SLogger::get_instance();
