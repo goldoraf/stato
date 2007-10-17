@@ -40,19 +40,24 @@
  */
 function form($object_name, $object, $options=array())
 {
-    if (!isset($options['action']))
+    $url_options = array();
+    if (isset($options['controller'])) $url_options['controller'] = $options['controller'];
+    
+    if (isset($options['action'])) 
+        $url_options['action'] = $options['action'];
+    else
     {
-        if ($object->is_new_record()) $options['action'] = 'create';
-        else $options['action'] = 'update';
+        if ($object->is_new_record()) $url_options['action'] = 'create';
+        else $url_options['action'] = 'update';
     }
     
     if (!isset($options['submit_value']))
-        $options['submit_value'] = ucfirst($options['action']);
+        $options['submit_value'] = ucfirst($url_options['action']);
     
     if (isset($options['multipart']) && $options['multipart'] === true)
-        $form = form_tag(array('action' => $options['action']), array('multipart' => true));
+        $form = form_tag($url_options, array('multipart' => true));
     else
-        $form = form_tag(array('action' => $options['action']));
+        $form = form_tag($url_options);
     
     if (!$object->is_new_record()) $form.= hidden_field($object_name, 'id', $object);
     

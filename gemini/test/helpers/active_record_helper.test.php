@@ -16,17 +16,6 @@ class MockContent extends MockRecord
     public function content_attributes() { return $this->content_attributes; }
 }
 
-if (!class_exists('SUrlRewriter', false))
-{
-    class SUrlRewriter
-    {
-        public static function url_for($options)
-        {
-            return $options['action'];
-        }
-    }
-}
-
 class RecordHelperTest extends HelperTestCase
 {
     public function setUp()
@@ -117,8 +106,8 @@ class RecordHelperTest extends HelperTestCase
             'body' => new SColumn('body', 'text'),
         );
         $this->assertDomEqual(
-            form('post', $this->post),
-            '<form method="post" action="create">
+            form('post', $this->post, array('controller' => 'posts')),
+            '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_body">Body</label>
@@ -136,8 +125,8 @@ class RecordHelperTest extends HelperTestCase
             'private' => new SColumn('private', 'boolean')
         );
         $this->assertDomEqual(
-            form('post', $this->post),
-            '<form method="post" action="create">
+            form('post', $this->post, array('controller' => 'posts')),
+            '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_private">Private</label>
@@ -158,8 +147,8 @@ class RecordHelperTest extends HelperTestCase
             'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
-            form('post', $this->post),
-            '<form method="post" action="update">
+            form('post', $this->post, array('controller' => 'posts')),
+            '<form method="post" action="/posts/update">
             <input type="hidden" name="post[id]" id="post_id" value="1" />
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
@@ -176,8 +165,8 @@ class RecordHelperTest extends HelperTestCase
             'title' => new SColumn('title', 'string'),
         );
         $this->assertDomEqual(
-            form('post', $this->post),
-            '<form method="post" action="create">
+            form('post', $this->post, array('controller' => 'posts')),
+            '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
             <div class="field-with-errors">
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" />
@@ -196,8 +185,8 @@ class RecordHelperTest extends HelperTestCase
             'written_on' => new SColumn('written_on', 'date')
         );
         $this->assertDomEqual(
-            form('post', $this->post),
-            '<form method="post" action="create">
+            form('post', $this->post, array('controller' => 'posts')),
+            '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_written_on">Written on</label>
@@ -250,8 +239,8 @@ class RecordHelperTest extends HelperTestCase
             'written_on' => new SColumn('written_on', 'datetime')
         );
         $this->assertDomEqual(
-            form('post', $this->post),
-            '<form method="post" action="create">
+            form('post', $this->post, array('controller' => 'posts')),
+            '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" /></p>
             <p><label for="post_written_on">Written on</label>
