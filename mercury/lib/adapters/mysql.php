@@ -16,42 +16,35 @@ class SMySqlAdapter extends SAbstractAdapter
     
     public function connect()
     {
-        $this->conn = @mysql_connect($this->config['host'],
-                                     $this->config['user'],
-                                     $this->config['pass']);
-        
-        mysql_select_db($this->config['dbname']);
-        
-        mysql_query("SET NAMES 'utf8'");
+        if (!isset($this->config['library']) || $this->config['library'] == 'pdo')
+            $this->conn = new SPdoMysqlLibraryWrapper();
+        elseif ($this->config['library'] == 'mysql')
+            $this->conn = new SMysqlLibraryWrapper();
+        else
+            throw new Exception($this->config['library'].' library unknown');
+            
+        $this->conn->connect($this->config['host'], 
+                             $this->config['user'],
+                             $this->config['pass'],
+                             $this->config['dbname']);
     }
     
     public function disconnect()
     {
-        mysql_close($this->conn);
-        $this->conn = null;
-    }
-    
-    public function get_error()
-    {
-        return mysql_errno($this->conn) . ": " . mysql_error($this->conn). "\n";
+        $this->conn->disconnect();
     }
 
-    public function execute($strsql, $name = null)
+    public function execute($sql, $name = null)
     {
         $start = microtime(true);
         
-        $result = @mysql_query($strsql,$this->conn);
+        $result = $this->conn->query($sql);
         
         $time = microtime(true) - $start;
-        $this->log($strsql, $time, $name);
+        $this->log($sql, $time, $name);
         $this->runtime += $time;
         
-        if (is_resource($result)) return $result;
-        
-        if (!$result)
-            throw new SInvalidStatementException('MySQL Error : '.$this->get_error().' ; SQL used : '.$strsql);
-            
-        return true;
+        return $result;
     }
     
     public function columns($table)
@@ -74,32 +67,6 @@ class SMySqlAdapter extends SAbstractAdapter
         return parent::simplified_type($sql_type);
     }
     
-    public function last_insert_id()
-    {
-        return mysql_insert_id($this->conn);
-    }
-    
-    public function affected_rows()
-    {
-        return mysql_affected_rows($this->conn);
-    }
-    
-    public function row_count($resource)
-    {
-        return @mysql_num_rows($resource);
-    }
-    
-    public function free_result($resource)
-    {
-        return @mysql_free_result($resource);
-    }
-    
-    public function fetch($resource, $associative = true)
-    {
-        if ($associative) return @mysql_fetch_assoc($resource);
-        else return @mysql_fetch_row($resource);
-    }
-    
     public function get_last_update($table)
     {
         $rs = $this->execute("SHOW TABLE STATUS LIKE '".$table."'");
@@ -117,12 +84,6 @@ class SMySqlAdapter extends SAbstractAdapter
         return $sql;
     }
     
-    public function escape_str($str)
-    {
-        // throw exception if magic_quotes ?
-        return mysql_real_escape_string($str, $this->conn);
-    }
-    
     public function quote_column_name($name)
     {
         return "`$name`";
@@ -130,7 +91,22 @@ class SMySqlAdapter extends SAbstractAdapter
     
     public function supports_transactions()
     {
-        return false;
+        return $this->conn->supports_transactions();
+    }
+    
+    public function begin_transaction()
+    {
+        return $this->conn->begin_transaction();
+    }
+    
+    public function commit()
+    {
+        return $this->conn->commit();
+    }
+    
+    public function rollback()
+    {
+        return $this->conn->rollback();
     }
     
     /**

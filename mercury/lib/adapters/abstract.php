@@ -2,11 +2,23 @@
 
 class SInvalidStatementException extends Exception {}
 
+interface SDbLibraryWrapper
+{
+    public function connect($host, $user, $pass, $dbname);
+    public function disconnect();
+    public function query($sql);
+    public function last_insert_id();
+    public function row_count($resource);
+    public function free_result($resource);
+    public function fetch($resource, $associative = true);
+    public function supports_transactions();
+    public function quote_string($str);
+}
+
 abstract class SAbstractAdapter
 {
-    private $conn = null;
-    private $log  = array();
-    
+    protected $conn = null;
+    protected $log  = array();
     protected $native_db_types = array();
     
     public $runtime = 0;
@@ -16,8 +28,20 @@ abstract class SAbstractAdapter
         'port'   => null,
         'user'   => null,
         'pass'   => null,
-        'name'   => null
+        'dbname' => null
     );
+    
+    abstract public function connect();
+    
+    abstract public function disconnect();
+    
+    abstract public function execute($sql);
+    
+    abstract public function limit($count, $offset=0);
+    
+    abstract public function columns($table);
+    
+    abstract public function get_last_update($table);
     
     public function __construct($config = array())
     {
@@ -34,7 +58,7 @@ abstract class SAbstractAdapter
     {
         $rs = $this->select($sql);
         $set = array();
-        while($row = $this->fetch($rs)) $set[] = $row;
+        while ($row = $this->fetch($rs)) $set[] = $row;
         $this->free_result($rs);
         return $set;
     }
@@ -52,8 +76,47 @@ abstract class SAbstractAdapter
     
     public function update($sql)
     {
-        if (!$this->execute($sql)) return false;
-        return $this->affected_rows();
+        return $this->execute($sql);
+    }
+    
+    public function last_insert_id()
+    {
+        return $this->conn->last_insert_id();
+    }
+    
+    public function row_count($resource)
+    {
+        return $this->conn->row_count($resource);
+    }
+    
+    public function free_result($resource)
+    {
+        return $this->conn->free_result($resource);
+    }
+    
+    public function fetch($resource, $associative = true)
+    {
+        return $this->conn->fetch($resource, $associative);
+    }
+    
+    public function supports_transactions()
+    {
+        return $this->conn->supports_transactions();
+    }
+    
+    public function begin_transaction()
+    {
+        return $this->conn->begin_transaction();
+    }
+    
+    public function commit()
+    {
+        return $this->conn->commit();
+    }
+    
+    public function rollback()
+    {
+        return $this->conn->rollback();
     }
     
     public function extract_length($sql_type)
@@ -81,23 +144,54 @@ abstract class SAbstractAdapter
             return SColumn::FLOAT;
     }
     
+    // This method should be overriden when using PDO because PDO supports natively variables
+    // binding in statements. Unfortunately, there was a bug in PDO until PHP 5.2.4 that
+    // causes problems with placeholders and escaped quotes (http://bugs.php.net/bug.php?id=42113)
+    // In order to not force users to use PHP 5.2.4+, PDO variables binding is not used.
+    public function sanitize_sql($stmt, $params = array())
+    {
+        if (!empty($params))
+        {
+            if (strpos($stmt, ':')) return $this->replace_named_bind_variables($stmt, $params);
+            elseif (strpos($stmt, '?')) return $this->replace_bind_variables($stmt, $params);
+            else return vsprintf($stmt, $params);
+        }
+        return $stmt;
+    }
+    
+    public function replace_bind_variables($stmt, $params)
+    {
+        foreach ($params as $value) $stmt = preg_replace('/\?/i', $this->quote($value), $stmt, 1);
+        return $stmt;
+    }
+    
+    public function replace_named_bind_variables($stmt, $params)
+    {
+        foreach ($params as $key => $value)
+        {
+            if (strpos($key, ':') === false) $key = ':'.$key;
+            $stmt = preg_replace('/'.$key.'/i', $this->quote($value), $stmt/*, 1*/);
+        }
+        return $stmt;
+    }
+    
     public function quote($value, $attribute_type = Null)
     {
         if ($value === Null) return "NULL";
-        if (is_object($value)) return $this->quote_string($value->__toString());
+        if (is_object($value)) return $this->conn->quote_string($value->__toString());
         switch($attribute_type)
         {
             case SColumn::DATE:
-                return $this->quote_string($value->__toString());
+                return $this->conn->quote_string($value->__toString());
                 break;
             case SColumn::DATETIME:
-                return $this->quote_string($value->__toString());
+                return $this->conn->quote_string($value->__toString());
                 break;
             case SColumn::BOOLEAN:
                 return ($value === True ? '1' : '0');
                 break;
             default:
-                return $this->quote_string($value);
+                return $this->conn->quote_string($value);
         }
     }
     
@@ -123,40 +217,11 @@ abstract class SAbstractAdapter
         return $this->log;
     }
     
-    protected function quote_string($value)
-    {
-        return "'".$this->escape_str($value)."'";
-    }
-    
     protected function log($sql, $time, $name = null)
     {
         $this->log[] = (($name === null) ? 'SQL' : $name)
                        ." (".sprintf("%.5f", $time).")\n    $sql";
     }
-    
-    abstract public function connect();
-    
-    abstract public function disconnect();
-    
-    abstract public function get_error();
-    
-    abstract public function execute($sql);
-    
-    abstract public function limit($count, $offset=0);
-    
-    abstract public function columns($table);
-    
-    abstract public function last_insert_id();
-    
-    abstract public function affected_rows();
-    
-    abstract public function row_count($resource);
-    
-    abstract public function fetch($resource, $associative = true);
-    
-    abstract public function escape_str($str);
-    
-    abstract public function get_last_update($table);
 }
 
 ?>

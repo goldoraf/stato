@@ -1,10 +1,11 @@
 <?php
 
 SActiveRecord::establish_connection(array(
-    'adapter' => 'PDOMySql',
+    'adapter' => 'MySql',
     'host'    => 'localhost',
     'user'    => 'stato',
-    'dbname'  => 'stato_model_tests'
+    'dbname'  => 'stato_model_tests',
+    'library' => 'pdo'
 ));
 
 ?>

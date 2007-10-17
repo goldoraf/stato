@@ -247,7 +247,7 @@ class SQuerySet implements Iterator, Countable
         $components[] = $this->sql_order_by();
         $components[] = $this->sql_limit();
         foreach ($components as $k => $v) if ($v === null) unset($components[$k]);
-        return $this->sanitize_sql(implode(' ', $components));
+        return $this->conn->sanitize_sql(implode(' ', $components), $this->params);
     }
     
     public function prepare_select($fields = null)
@@ -522,33 +522,6 @@ class SQuerySet implements Iterator, Countable
                 ."{$assoc_meta->table_name}.{$assoc_meta->foreign_key} = "
                 ."{$this->meta->table_name}.{$this->meta->identity_field}";
         }
-    }
-    
-    protected function sanitize_sql($stmt)
-    {
-        if (!empty($this->params))
-        {
-            if (strpos($stmt, ':')) return $this->replace_named_bind_variables($stmt, $this->params);
-            elseif (strpos($stmt, '?')) return $this->replace_bind_variables($stmt, $this->params);
-            else return vsprintf($stmt, $this->params);
-        }
-        return $stmt;
-    }
-    
-    protected function replace_bind_variables($stmt, $values)
-    {
-        foreach ($values as $value) $stmt = preg_replace('/\?/i', $this->conn->quote($value), $stmt, 1);
-        return $stmt;
-    }
-    
-    protected function replace_named_bind_variables($stmt, $values)
-    {
-        foreach ($values as $key => $value)
-        {
-            if (strpos($key, ':') === false) $key = ':'.$key;
-            $stmt = preg_replace('/'.$key.'/i', $this->conn->quote($value), $stmt/*, 1*/);
-        }
-        return $stmt;
     }
 }
 

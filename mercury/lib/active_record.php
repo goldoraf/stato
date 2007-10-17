@@ -97,7 +97,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     public function offsetGet($offset)
     {
-        return $this->values[$offset];
+        return @$this->values[$offset];
     }
     
     public function offsetSet($offset, $value)
