@@ -4,7 +4,6 @@ class SMissingTemplateException extends Exception {}
 
 class SActionView
 {
-    private $generator = null;
     private $controller  = null;
     private $template_dir = null;
     private $tmp_cache_key = null;
@@ -38,11 +37,6 @@ class SActionView
         throw new Exception('You\'re not allowed to unset template variables !');
     }
     
-    public function page()
-    {
-        return $this->generator;
-    }
-    
     public function render($template, $local_assigns = array())
     {
         if (!is_readable($template))
@@ -63,20 +57,6 @@ class SActionView
         ob_end_clean();
         
         return $str;
-    }
-    
-    public function render_update($template, $local_assigns = array())
-    {
-        if (!is_readable($template))
-            throw new SMissingTemplateException($template);
-            
-        $this->template_dir = dirname($template);
-        
-        extract($local_assigns);
-        
-        $this->generator = new SJavascriptGenerator();
-        include ($template);
-        return $this->generator->__toString();
     }
     
     public function render_partial($partial_path, $local_assigns = array())

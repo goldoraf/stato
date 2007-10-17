@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('JAVASCRIPT_DEFAULT_SOURCES'))
-    define('JAVASCRIPT_DEFAULT_SOURCES', 'prototype;effects;controls;dragdrop;lowpro;builder;slider');
-
 function image_tag($filename, $options = array())
 {
     $options['src'] = image_path($filename);
@@ -27,11 +24,6 @@ function javascript_include_tag($sources)
         $html.= '<script src="'.javascript_path($source).'" type="text/javascript"></script>'."\n";
     
     return $html;
-}
-
-function javascript_include_defaults()
-{
-    return javascript_include_tag(explode(';', JAVASCRIPT_DEFAULT_SOURCES));
 }
 
 function stylesheet_link_tag($sources, $options = array())

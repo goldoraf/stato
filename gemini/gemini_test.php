@@ -12,7 +12,7 @@ return array
     'url_rewriter',
     'helpers/tag_helper',
     'helpers/asset_tag_helper',
-    'helpers/ajax_helper',
+    'helpers/javascript_helper',
     'helpers/form_helper',
     'helpers/form_options_helper',
     'helpers/date_helper',

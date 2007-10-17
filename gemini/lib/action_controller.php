@@ -196,14 +196,6 @@ class SActionController
         $this->render_action($this->action_name(), $status, $xml);
     }
     
-    protected function render_update($local_assigns = array())
-    {
-        $template = $this->pjs_path($this->controller_path(), $this->action_name());
-        if (!file_exists($template)) throw new Exception('PJS file not found for this action');
-        $this->response->headers['Content-Type'] = 'text/javascript; charset=UTF-8';
-        $this->render_text($this->view->render_update($template, $local_assigns));
-    }
-    
     protected function render_xml($status = null)
     {
         $template = $this->template_path($this->controller_path(), $this->action_name());
@@ -273,11 +265,6 @@ class SActionController
     protected function template_path($controller_path, $action)
     {
         return STATO_APP_PATH."/views/$controller_path/$action.php";
-    }
-    
-    protected function pjs_path($controller_path, $action)
-    {
-        return STATO_APP_PATH."/views/$controller_path/$action.pjs";
     }
     
     protected function add_variables_to_assigns()

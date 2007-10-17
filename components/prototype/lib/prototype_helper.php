@@ -1,43 +1,13 @@
 <?php
 
-/**
- * Ajax helpers
- * 
- * Set of functions for working with javascript and Prototype functions, including functionality 
- * to call remote methods using Ajax.
- * 
- * @package Stato
- * @subpackage view
- */
-/**
- * Returns a javascript tag with the <var>$code</var> inside
- */
-function javascript_tag($code)
+if (!defined('JAVASCRIPT_PROTOTYPE_SOURCES'))
+    define('JAVASCRIPT_PROTOTYPE_SOURCES', 'prototype;effects;controls;dragdrop;lowpro;builder;slider');
+    
+function javascript_include_prototype()
 {
-    return '<script type="text/javascript">'.$code.'</script>';
+    return javascript_include_tag(explode(';', JAVASCRIPT_PROTOTYPE_SOURCES));
 }
-/**
- * Escape carrier returns and single and double quotes for javascript code
- */
-function escape_javascript($javascript)
-{
-    $javascript = preg_replace('/\r\n|\n|\r/', '\\n', $javascript);
-    $javascript = str_replace(array('"', "'"), array('\\\"', "\\\'"), $javascript);
-    return $javascript;
-}
-/**
- * Returns a link that will trigger a javascript function using the onclick handler
- * 
- * Example :
- * <code>link_to_function("Hello", "alert('Hello world !')");
- * Produces:
- *    <a onclick="alert('Hello world !'); return false;" href="#">Hello</a></code>
- **/
-function link_to_function($content, $function, $html_options = array())
-{
-    $options = array_merge(array('href' => '#', 'onclick' => $function.'; return false;'), $html_options);
-    return content_tag('a', $content, $options);
-}
+
 /**
  * Returns a link to a remote action whose url is defined by <var>$options['url']</var>.
  * This action is called using xmlHttpRequest and the response can be inserted into the page, 
