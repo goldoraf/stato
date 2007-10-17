@@ -85,7 +85,7 @@ class DateTest extends UnitTestCase
         $date = new SDateTime(2006, 9, 13, 20, 25, 05);
         $this->assertEqual('2006-09-13 20:25:05', $date->__toString());
         $this->assertEqual('2006-09-13 20:25:05', $date->new_offset(- 6*3600)->__toString());
-        $this->assertEqual('2006-09-13 15:25:05', $date->new_offset(- 6*3600)->to_utc()->__toString());
+        $this->assertEqual('2006-09-13 16:25:05', $date->new_offset(- 6*3600)->to_utc()->__toString());
     }
     
     public function test_alias_now()
