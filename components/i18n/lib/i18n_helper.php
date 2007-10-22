@@ -9,9 +9,9 @@
 /**
  * Returns translation corresponding to <var>$key</var>.
  */
-function __($key)
+function __($key, $args = array(null))
 {
-    return SLocale::translate($key);
+    return SLocale::translate($key, $args);
 }
 
 ?>
