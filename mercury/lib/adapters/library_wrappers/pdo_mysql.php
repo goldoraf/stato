@@ -79,7 +79,7 @@ class SPdoMysqlLibraryWrapper implements SDbLibraryWrapper
     
     public function quote_string($str)
     {
-        return "'$str'";
+        return $this->pdo->quote($str);
     }
 }
 
