@@ -37,12 +37,13 @@ class SActionView
         throw new Exception('You\'re not allowed to unset template variables !');
     }
     
-    public function render($template, $local_assigns = array())
+    public function render($template, $local_assigns = array(), $is_partial = false)
     {
         if (!is_readable($template))
             throw new SMissingTemplateException($template);
         
-        $this->template_dir = dirname($template);
+        if (!$is_partial)
+            $this->template_dir = dirname($template);
         
         $compiled = $this->compiled_template_path($template);
         
@@ -64,7 +65,7 @@ class SActionView
         list($path, $partial) = $this->partial_pieces($partial_path);
         $template = "$path/_$partial.php";
         
-        return $this->render($template, $local_assigns);
+        return $this->render($template, $local_assigns, true);
     }
     
     public function render_partial_collection($partial_path, $collection, $spacer_template = null)
@@ -79,7 +80,7 @@ class SActionView
         {
             $local_assigns[$counter_name] = $counter;
             $local_assigns[$partial] = $element;
-            $partials_collec[] = $this->render($template, $local_assigns);
+            $partials_collec[] = $this->render($template, $local_assigns, true);
             $counter++;
         }
         
@@ -87,7 +88,7 @@ class SActionView
         {
             list($spacer_path, $spacer_partial) = $this->partial_pieces($spacer_template);
             $spacer = "$spacer_path/_$spacer_partial.php";
-            return implode($this->render($spacer), $partials_collec);
+            return implode($this->render($spacer, array(), true), $partials_collec);
         }
         else return implode('', $partials_collec);
     }
