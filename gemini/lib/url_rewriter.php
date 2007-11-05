@@ -46,6 +46,11 @@ class SUrlRewriter
         return $module;
     }
     
+    public static function current_controller()
+    {
+        return self::$request->controller; 
+    }
+    
     public static function url_for($options)
     {
         if (!is_array($options)) $options = array($options);
