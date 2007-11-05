@@ -279,6 +279,14 @@ abstract class SManyAssociationManager
         return $ids;
     }
     
+    public function is_included($object)
+    {
+        foreach ($this->all() as $record)
+            if ($record == $object) return true;
+            
+        return false;
+    }
+    
     public function set_query_set($qs)
     {
         $this->qs = $qs;
