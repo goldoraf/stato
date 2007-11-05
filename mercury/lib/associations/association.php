@@ -296,6 +296,7 @@ abstract class SManyAssociationManager
     public function after_owner_save()
     {
         foreach ($this->unsaved as $record) $this->insert_record($record);
+        $this->unsaved = array();
     }
     
     public function before_owner_delete() {}
