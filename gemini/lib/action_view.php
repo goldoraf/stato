@@ -160,8 +160,8 @@ class SActionView
     private function compile($template, $compiled_path)
     {
         $content  = file_get_contents($template);
-        $compiled = preg_replace(array('/(<\?=\s)/i', '/(<\?\s)/i', '/(<\%=\s)/i', '/(<\%\s)/i'),
-                                 array('<?php echo ', '<?php '), $content);
+        $compiled = preg_replace(array('/(<\?=\s)/i', '/(<\?\s)/i', '/(<\%=\s)/i', '/(<\%\s)/i', '/(<\?=h\s)(.*);\s\?>/i'),
+                                 array('<?php echo ', '<?php ', '<?php echo ', '<?php ', '<?php echo html_escape(${2}); ?>'), $content);
         
         file_put_contents($compiled_path, $compiled);
         return $compiled_path;
