@@ -15,11 +15,10 @@ class SQuerySet implements Iterator, Countable
     public $limit    = null;
     public $distinct = false;
     
-    protected $resource = null;
-    protected $count    = 0;
-    protected $cache    = null;
-    protected $meta     = null;
-    protected $conn     = null;
+    protected $count = 0;
+    protected $cache = null;
+    protected $meta  = null;
+    protected $conn  = null;
     
     protected $pk_lookup   = array();
     protected $schema_abbr = array();
@@ -32,9 +31,8 @@ class SQuerySet implements Iterator, Countable
     
     public function __clone()
     {
-        $this->resource = null;
-        $this->count    = 0;
-        $this->cache    = null;
+        $this->count = 0;
+        $this->cache = null;
     }
     
     /**
@@ -62,19 +60,8 @@ class SQuerySet implements Iterator, Countable
 
     public function valid()
     {
-        if ($this->resource === null && is_array($this->cache)) 
-            return isset($this->cache[$this->count]);
-        elseif ($this->resource === null && $this->cache === null)
-        {
-            $this->resource = $this->conn->select($this->prepare_select());
-            $this->cache = array();
-            if (!empty($this->includes))
-            {
-                $this->fetch_all_with_assocs();
-                return !empty($this->cache);
-            }
-        }
-        return $this->fetch();
+        if ($this->cache === null) $this->fetch_all();
+        return isset($this->cache[$this->count]);
     }
     
     public function first()
@@ -86,12 +73,7 @@ class SQuerySet implements Iterator, Countable
     
     public function to_array()
     {
-        if (!is_array($this->cache))
-        {
-            $this->resource = $this->conn->select($this->prepare_select());
-            if (!empty($this->includes)) $this->fetch_all_with_assocs();
-            else { while ($this->fetch()) { } }
-        }
+        if ($this->cache === null) $this->fetch_all();
         return $this->cache;
     }
     
@@ -149,8 +131,7 @@ class SQuerySet implements Iterator, Countable
     
     public function count()
     {
-        if ($this->resource !== null) return $this->conn->row_count($this->resource);
-        elseif ($this->resource === null && is_array($this->cache)) return count($this->cache);
+        if ($this->cache !== null) return count($this->cache);
         elseif (!empty($this->includes)) return count($this->to_array());
         else
         {
@@ -294,20 +275,6 @@ class SQuerySet implements Iterator, Countable
         return $record;
     }
     
-    protected function fetch()
-    {
-        $class = $this->meta->class;
-        $row = $this->conn->fetch($this->resource);
-        if (!$row)
-        {
-            $this->conn->free_result($this->resource);
-            $this->resource = null;
-            return false;
-        }
-        $this->cache[] = $this->instanciate_record($row);
-        return true;
-    }
-    
     protected function filter_or_exclude($args, $exclude = false)
     {
         $numargs = count($args);
@@ -392,6 +359,21 @@ class SQuerySet implements Iterator, Countable
         return $this->meta->inheritance_field.' = \''.strtolower($this->meta->class).'\'';
     }
     
+    protected function fetch_all()
+    {   
+        if (!empty($this->includes))
+        {
+            $this->fetch_all_with_assocs();
+            return;
+        }
+        
+        $class = $this->meta->class;
+        $rows  = $this->conn->select_all($this->prepare_select());
+        $this->cache = array();
+        foreach ($rows as $row)
+            $this->cache[] = $this->instanciate_record($row);
+    }
+    
     protected function fetch_all_with_assocs()
     {
         $pk = $this->meta->table_name.'_'.$this->meta->identity_field;
@@ -407,7 +389,9 @@ class SQuerySet implements Iterator, Countable
             if ($assoc_meta->type == 'SHasMany' || $assoc_meta->type == 'SManyToMany') $many_assocs[] = $k;
         }
         
-        while($row = $this->conn->fetch($this->resource))
+        $resource = $this->conn->select($this->prepare_select());
+        
+        while($row = $this->conn->fetch($resource))
         {
             $id = $row[$pk];
             if (!isset($records[$id]))
@@ -439,14 +423,13 @@ class SQuerySet implements Iterator, Countable
             foreach ($many_assocs as $k)
             {
                 if (isset($records_many_assocs[$id][$k]))
-                    $records[$id]->$k->set_query_set(new SFilledQuerySet($this->meta->attributes[$k]->meta, array_values($records_many_assocs[$id][$k])));
+                    $records[$id]->$k->populate(new SFilledQuerySet($this->meta->attributes[$k]->meta, array_values($records_many_assocs[$id][$k])));
                 else
-                    $records[$id]->$k->set_query_set(new SFilledQuerySet($this->meta->attributes[$k]->meta, array()));
+                    $records[$id]->$k->populate(new SFilledQuerySet($this->meta->attributes[$k]->meta, array()));
             }
         }
                 
-        $this->conn->free_result($this->resource);
-        $this->resource = null;
+        $this->conn->free_result($resource);
         $this->cache = $records_in_order;
     }
     

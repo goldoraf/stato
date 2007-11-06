@@ -200,7 +200,7 @@ abstract class SManyAssociationManager
 {
     protected $owner   = null;
     protected $meta    = null;
-    protected $qs      = null;
+    protected $all_qs  = null;
     protected $unsaved = array();
     
     public function __construct($owner, $meta)
@@ -209,25 +209,29 @@ abstract class SManyAssociationManager
         $this->meta  = $meta;
     }
     
+    // We can't serialize PDO instances
+    public function __sleep()
+    {
+        $this->all_qs = null;
+    }
+    
     public function __call($method, $args)
     {
-        if ($this->qs !== null) 
-            return call_user_func_array(array($this->qs, $method), $args);
-        else
-            return call_user_func_array(array($this->get_query_set(), $method), $args);
+        return call_user_func_array(array($this->get_query_set(), $method), $args);
     }
     
     public function all()
     {
         if ($this->owner->is_new_record()) return $this->unsaved;
-        if ($this->qs !== null) return $this->qs;
-        return $this->get_query_set();
+        if ($this->all_qs === null) $this->all_qs = $this->get_query_set();
+        $this->all_qs->rewind();
+        return $this->all_qs;
     }
     
     public function count()
     {
         if ($this->owner->is_new_record()) return count($this->unsaved);
-        return $this->__call('count', array());
+        return $this->all()->count();
     }
     
     public function create($attributes=array())
@@ -287,14 +291,14 @@ abstract class SManyAssociationManager
         return false;
     }
     
-    public function set_query_set($qs)
+    public function populate($qs)
     {
-        $this->qs = $qs;
+        $this->all_qs = $qs;
     }
     
     public function is_loaded()
     {
-        return ($this->qs !== null);
+        return ($this->all_qs !== null);
     }
     
     abstract public function clear();
