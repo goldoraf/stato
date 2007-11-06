@@ -29,6 +29,7 @@ class SMapper
     public static function reset_meta_information($class)
     {
         unset(self::$cache[$class]);
+        SActiveRecord::connection()->reset_columns_cache();
     }
 }
 

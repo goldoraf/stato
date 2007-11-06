@@ -179,6 +179,7 @@ class MigrationTest extends StatoTestCase
         
         SActiveRecord::connection()->change_column('people', 'age', 'string');
         $this->assertNothingThrown();
+        SActiveRecord::connection()->reset_columns_cache();
         $new_columns = SActiveRecord::connection()->columns('people');
         $this->assertEqual('string', $new_columns['age']->type);
     }

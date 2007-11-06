@@ -19,6 +19,7 @@ abstract class SAbstractAdapter
 {
     protected $conn = null;
     protected $log  = array();
+    protected $columns_cache   = array();
     protected $native_db_types = array();
     
     public $runtime = 0;
@@ -39,7 +40,7 @@ abstract class SAbstractAdapter
     
     abstract public function limit($count, $offset=0);
     
-    abstract public function columns($table);
+    abstract public function query_columns($table);
     
     abstract public function get_last_update($table);
     
@@ -77,6 +78,19 @@ abstract class SAbstractAdapter
     public function update($sql)
     {
         return $this->execute($sql);
+    }
+    
+    public function columns($table)
+    {
+        if (!isset($this->columns_cache[$table]))
+            $this->columns_cache[$table] = $this->query_columns($table);
+            
+        return $this->columns_cache[$table];
+    }
+    
+    public function reset_columns_cache()
+    {
+        $this->columns_cache = array();
     }
     
     public function last_insert_id()

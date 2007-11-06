@@ -47,7 +47,7 @@ class SMySqlAdapter extends SAbstractAdapter
         return $result;
     }
     
-    public function columns($table)
+    public function query_columns($table)
     {
         $rs = $this->execute("SHOW COLUMNS FROM ".$table);
         $fields = array();
