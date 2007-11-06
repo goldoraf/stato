@@ -33,7 +33,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
      */
     public $validations    = array();
     
-    public $record_timestamps = False;
+    public $record_timestamps = false;
     
     public static $configurations    = null;
     public static $table_name_prefix = null;
@@ -43,8 +43,9 @@ class SActiveRecord extends SObservable implements ArrayAccess
     protected static $conn = null;
     protected static $rollback_clones = array();
     
-    protected $values      = array();
-    protected $meta        = null;
+    protected $values     = array();
+    protected $meta       = null;
+    protected $new_record = true;
     
     public function __construct($values = null)
     {
@@ -182,12 +183,18 @@ class SActiveRecord extends SObservable implements ArrayAccess
         return $this->save();
     }
     
+    public function set_as_loaded()
+    {
+        $this->new_record = false;
+    }
+    
     public function is_new_record()
     {
-        $id = $this->read_id();
-        if ($id !== null)
-            return !$this->conn()->select_one("SELECT 1 FROM {$this->meta->table_name} 
-                                             WHERE {$this->meta->identity_field}='$id' LIMIT 1");
+        if (!$this->new_record) return false;
+        
+        if ($this->new_record && ($id = $this->read_id()) !== null)
+            return !$this->conn()->select_one("SELECT 1 FROM {$this->meta->table_name}" 
+                                              ." WHERE {$this->meta->identity_field}='$id' LIMIT 1");
         return true;
     }
     
@@ -532,6 +539,7 @@ class SActiveRecord extends SObservable implements ArrayAccess
         $sql = 'INSERT INTO '.$this->meta->table_name.' '.
                $this->prepare_sql_set();
         $this->id = $this->conn()->insert($sql);
+        $this->new_record = false;
         $this->set_state('after_create');
     }
     

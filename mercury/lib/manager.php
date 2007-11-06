@@ -21,7 +21,7 @@ class SManager
     
     public function build($attributes = null)
     {
-        return $this->get_query_set()->instanciate_record($attributes);
+        return $this->get_query_set()->instanciate_record($attributes, null, true);
     }
     
     public function create($attributes = null)

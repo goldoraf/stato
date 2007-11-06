@@ -249,7 +249,7 @@ class SQuerySet implements Iterator, Countable
         return implode(' ', array($select, $fields, "FROM {$this->meta->table_name}", $this->sql_clause()));
     }
     
-    public function instanciate_record($row, $meta = null)
+    public function instanciate_record($row, $meta = null, $new_record = false)
     {
         if ($meta === null) $meta = $this->meta;
         
@@ -262,6 +262,7 @@ class SQuerySet implements Iterator, Countable
             $class = $meta->class;
         
         $record = new $class($row);
+        if (!$new_record) $record->set_as_loaded();
         
         if (count($meta->decorators) != 0)
         {
