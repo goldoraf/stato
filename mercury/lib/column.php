@@ -71,7 +71,7 @@ class SColumn
     public function to_sql()
     {
         $db = SActiveRecord::connection();
-        $sql = $db->quote_column_name($this->name).' '.$db->type_to_sql($this->type, $this->limit);
+        $sql = $db->quote_column_name($this->name).' '.$db->type_to_sql($this->type, array('limit' => $this->limit));
         $sql = $db->add_column_options($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
         if ($this->type === self::PK) $sql.= ' PRIMARY KEY';
         return $sql;
