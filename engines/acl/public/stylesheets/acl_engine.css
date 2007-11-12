@@ -1,0 +1,21 @@
+#role-permissions-table td {
+  text-align: left;
+  vertical-align: top;
+}
+
+#role-permissions-table ul { 
+  padding-left: 5px;
+  list-style-type: none; 
+}
+#role-permissions-table thead ul li { 
+  display: inline; 
+}
+
+#role-users-list ul li {
+  display: inline;
+}
+
+#role-permissions-table td, #role-permissions-table th {
+  text-align: left;
+  vertical-align: top;
+}
