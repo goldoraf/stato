@@ -16,8 +16,9 @@ class SCsvWriter
     (
         'separator' => ';',
         'delimiter' => '"',
-        'encoding'  => 'UTF-8',
-        'convert_encoding' => true
+        'encode_to'  => 'UTF-8',
+        'detectable_encodings' => "UTF-8, ISO-8859-1, ISO-8859-15",
+        'convert_encoding' => false
     );
     
     public function __construct($resource, $config = array())
@@ -45,7 +46,10 @@ class SCsvWriter
     private function convert_encoding($value)
     {
         if (!$this->config['convert_encoding']) return $value;
-        else return mb_convert_encoding($value, $this->config['encoding'], "UTF-8");
+        
+        $from_encoding = mb_detect_encoding($value, $this->config['detectable_encodings'], true);
+        if ($from_encoding == $this->config['encode_to']) return $value;
+        return mb_convert_encoding($value, $this->config['encode_to'], $from_encoding);
     }
 }
 
@@ -60,8 +64,9 @@ class SCsvIterator implements Iterator
         'length'    => 4096,
         'separator' => ';',
         'delimiter' => '"',
-        'encoding'  => 'ASCII',
-        'convert_encoding' => true,
+        'encode_to'  => 'UTF-8',
+        'detectable_encodings' => "UTF-8, ISO-8859-1, ISO-8859-15",
+        'convert_encoding' => false,
         'has_fields_in_first_line' => true
     );
     
@@ -143,7 +148,10 @@ class SCsvIterator implements Iterator
     private function convert_encoding($value)
     {
         if (!$this->config['convert_encoding']) return $value;
-        else return mb_convert_encoding($value, "UTF-8", $this->config['encoding']);
+        
+        $from_encoding = mb_detect_encoding($value, $this->config['detectable_encodings'], true);
+        if ($from_encoding == $this->config['encode_to']) return $value;
+        return mb_convert_encoding($value, $this->config['encode_to'], $from_encoding);
     }
 }
 
