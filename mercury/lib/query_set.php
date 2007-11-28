@@ -120,7 +120,7 @@ class SQuerySet implements Iterator, Countable
             throw new Exception('in_bulk() must be provided with a list of IDs');
         if (count($ids) == 0) return array();
         
-        $clone = call_user_func_array(array($this, 'filter'), $this->meta->identity_field.' IN ('.join(',', $ids).')');
+        $clone = call_user_func_array(array($this, 'filter'), array($this->meta->identity_field.' IN ('.join(',', $ids).')'));
         $clone->limit = null;
         $clone->offset = null;
         
