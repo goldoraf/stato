@@ -199,7 +199,7 @@ function in_place_editor($field_id, $options = array())
     if (isset($options['load_text_url'])) $js_options['loadTextURL'] = "'".url_for($options['load_text_url'])."'";
     if (isset($options['options'])) $js_options['ajaxOptions'] = $options['options'];
     if (isset($options['script'])) $js_options['evalScripts'] = $options['script'];
-    if (isset($options['with'])) $js_options['callback'] = "function(form) { return ".$options['with']." }";
+    if (isset($options['with'])) $js_options['callback'] = "function(form, value) { return '".$options['with']."='+escape(value) }";
     
     if (!empty($js_options)) $js.= ', '.options_for_js($js_options);
     $js.= ')';
