@@ -513,14 +513,14 @@ class SValuesQuerySet extends SQuerySet
 {
     public $fields = array();
     
-    public function prepare_select()
+    public function prepare_select($fields = null)
     {
         if (empty($this->fields)) $fields = '*';
         else $fields = implode(', ', $this->fields);
         return parent::prepare_select($fields);
     }
     
-    public function instanciate_record($row)
+    public function instanciate_record($row, $meta = null, $new_record = false)
     {
         if (count($this->fields) == 1) return $row[$this->fields[0]];
         return $row;
