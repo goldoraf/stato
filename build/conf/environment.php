@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Europe/Paris');
+
 // Choose components you're going to use
 // $config->components = array('mailer', 'webservice');
 
