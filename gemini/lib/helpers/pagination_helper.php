@@ -18,16 +18,11 @@
  */
 function pagination_links($paginator, $options = array(), $html_options = array())
 {
+    if (!isset($options['params']))
+        $options['params'] = SUrlRewriter::current_params();
+    
     $p = new SPaginationHelper($paginator, $options, $html_options);
     return $p->links();
-}
-
-/**
- * Deprecated alias for pagination_links().
- */
-function pager($paginator, $options = array(), $html_options = array())
-{
-    return pagination_links($paginator, $options, $html_options);
 }
 
 /**
@@ -35,13 +30,13 @@ function pager($paginator, $options = array(), $html_options = array())
  */
 class SPaginationHelper
 {
-    protected $paginator   = null;
+    protected $paginator    = null;
     protected $param_name   = 'page';
     protected $window_size  = 2;
     protected $show_anchors = true;
-    protected $params      = array();
+    protected $params       = array();
     protected $html_options = array();
-    protected $link_to_current_page = array();
+    protected $link_to_current_page = false;
     
     public function __construct($paginator, $options = array(), $html_options = array())
     {
@@ -68,6 +63,8 @@ class SPaginationHelper
         $last  = $page_count;
         
         $html = '';
+        
+        if (count($window_pages) <= 1 && !$this->link_to_current_page) return;
         
         if ($this->show_anchors && ($wp_first = $window_pages[0]) != $first)
         {
