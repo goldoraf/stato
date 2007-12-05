@@ -193,7 +193,7 @@ class SActionController
     
     protected function render($status = null)
     {
-        $this->render_action($this->action_name(), $status, $xml);
+        $this->render_action($this->action_name(), $status);
     }
     
     protected function render_xml($status = null)
