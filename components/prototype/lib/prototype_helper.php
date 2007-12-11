@@ -207,10 +207,18 @@ function in_place_editor($field_id, $options = array())
     return javascript_tag($js);
 }
 
+function text_field_tag_with_auto_complete($name, $tag_options = array(), $completion_options = array())
+{
+    $html = auto_complete_css()
+    .text_field_tag($name, null, $tag_options)
+    .content_tag('div', '', array('id' => "${name}_auto_complete", 'class' => "auto_complete"))
+    .auto_complete_field("${name}", array('url' => array('action' => "auto_complete_for_${name}")));
+    
+    return $html;
+}
+
 function text_field_with_auto_complete($object_name, $method, $object, $tag_options = array(), $completion_options = array())
 {
-    $tag_options['autocomplete'] = "off";
-    
     $html = auto_complete_css()
     .text_field($object_name, $method, $object, $tag_options)
     .content_tag('div', '', array('id' => "${object_name}_${method}_auto_complete", 'class' => "auto_complete"))
@@ -230,6 +238,17 @@ function auto_complete_field($id, $options = array())
     $js.= ', '.options_for_js($js_options).')';
     
     return javascript_tag($js);
+}
+
+function auto_complete_result($collection, $method)
+{
+    if (count($collection) == 0) return;
+    
+    $html = '';
+    foreach ($collection as $object)
+        $html.= content_tag('li', $object->$method);
+        
+    return content_tag('ul', $html);
 }
 
 function sortable_element($id, $options = array())
