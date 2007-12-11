@@ -179,7 +179,7 @@ class SQuerySet implements Iterator, Countable
     {
         $args = func_get_args();
         $clone = clone $this;
-        $clone->order_by = array_merge($this->order_by, $args);
+        $clone->order_by = $args;
         return $clone;
     }
     
