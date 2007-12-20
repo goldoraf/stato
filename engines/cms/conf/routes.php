@@ -4,8 +4,6 @@ $map = new SRouteSet();
 $map->connect('admin/:controller/:action/:id', array('subdirectory' => 'admin', 'controller' => 'pages'));
 $map->connect('api', array('controller' => 'api', 'action' => 'xmlrpc'));
 $map->connect('ajax_api/:action/:id', array('controller' => 'ajax_api'));
-$map->connect('tef/centres', array('controller' => 'pages', 'action' => 'centres_tef'));
-$map->connect('examens/centres', array('controller' => 'pages', 'action' => 'centres_exam'));
 $map->login('login', array('controller' => 'login', 'action' => 'index'));
 $map->logout('logout', array('controller' => 'login', 'action' => 'logout'));
 $map->auth('authenticate', array('controller' => 'login', 'action' => 'authenticate'));
