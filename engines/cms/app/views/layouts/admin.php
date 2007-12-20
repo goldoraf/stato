@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
-<title>Administration du site FDA</title>
+<title>Administration du site : <?= config_value('site_name'); ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?= javascript_include_tag(array('ext-1.1.1/adapter/ext/ext-base.js', 'ext-1.1.1/ext-all-debug.js', 'application')); ?>
 <script type="text/javascript">
@@ -31,7 +31,6 @@
                     <li id="nav-first-link"><?= link_to('Actualités', array('controller' => 'admin/posts')); ?></li>
                     <li><?= link_to('Pages', array('controller' => 'admin/pages')); ?></li>
                     <li><?= link_to('Fichiers', array('controller' => 'admin/files')); ?></li>
-                    <li><?= link_to('Centres', array('controller' => 'admin/centres_exam')); ?></li>
                     <li id="nav-last-link"><?= link_to('Utilisateurs', array('controller' => 'admin/users')); ?></li>
                 </ul>
             </div>
@@ -42,7 +41,7 @@
         </div>
         
         <div id="footer">
-            CCIP - DRI/E
+            Fueled by <a href="http://www.stato-framework.org">Stato</a>
         </div>
     </div>  
 </body>

@@ -8,6 +8,8 @@ class Configuration
     public static function initialize()
     {
         self::setting('site_name', 'string', 'Mon nouveau site');
+        self::setting('site_title', 'string', 'Bienvenue sur mon nouveau site');
+        self::setting('site_description', 'text', 'site vraiment très intéressant');
         self::setting('limit_post_rss', 'int', 10);
         self::setting('limit_post_home_page', 'int', 5);
         self::setting('limit_post_news_page', 'int', 10);

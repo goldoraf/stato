@@ -1,5 +1,5 @@
-Nom   : <?= $request->name."\n"; ?>
-Email : <?= $request->email."\n"; ?>
-Sujet : <?= $request->subject."\n\n"; ?>
+Nom   : <?= $message->name."\n"; ?>
+Email : <?= $message->email."\n"; ?>
+Sujet : <?= $message->subject."\n\n"; ?>
 
-<?= $request->body; ?>
+<?= $message->body; ?>

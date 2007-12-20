@@ -39,36 +39,18 @@ class PagesController extends ApplicationController
     
     public function contact()
     {
-        if (!$this->request->is_post()) $this->request_for_info = new Request();
+        if (!$this->request->is_post()) $this->message = new Message();
         else
         {
-            $this->request_for_info = new Request($this->params['request']);
-            if ($this->request_for_info->save())
+            $this->message = new Message($this->params['message']);
+            if ($this->message->save())
             {
                 $n = new Notifier();
-                $n->deliver_request_for_information($this->request_for_info);
+                $n->deliver_request_for_contact($this->message);
                 $this->render_action('contact_ok');
                 return;
             }
         }
-    }
-    
-    public function centres_tef()
-    {
-        $this->pays = CentreTef::$objects->distinct('pays')->values('pays')->order_by('pays');
-        $this->tef_root_page = Page::$objects->get_or_404("location = 'tef'");
-        if ($this->request->is_post())
-            $this->centres 
-                = CentreTef::$objects->filter('pays = ?', array($this->params['pays']))->order_by('ville');
-    }
-    
-    public function centres_exam()
-    {
-        $this->pays = CentreExam::$objects->distinct('pays')->values('pays')->order_by('pays');
-        $this->exams_root_page = Page::$objects->get_or_404("location = 'examens'");
-        if ($this->request->is_post())
-            $this->centres 
-                = CentreExam::$objects->filter('pays = ?', array($this->params['pays']))->order_by('ville');
     }
 }
 

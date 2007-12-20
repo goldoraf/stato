@@ -1,6 +1,6 @@
 <?php
 
-class Request extends SActiveRecord
+class Message extends SActiveRecord
 {
     public static $objects;
     
