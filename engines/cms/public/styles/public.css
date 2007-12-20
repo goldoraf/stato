@@ -78,8 +78,6 @@ input, select, textarea {
 	text-align: center;
 }
 #wrapper {
-	background-image: url(../images/bg_tranche.gif);
-	background-repeat: repeat-y;
     position: relative;
 	margin: 0 auto 0 auto;
 	background-color: #fff;
@@ -101,7 +99,6 @@ input, select, textarea {
 	clear: both;
 	text-align: center;
 	font-weight: bold;
-	background: transparent url(../images/bg_bottom.gif) no-repeat bottom;
 }
 #main-content {
 	min-height: 350px;
@@ -113,7 +110,6 @@ input, select, textarea {
 	height: 0;
 }
 #root-menu {
-	background: #935439 url(../images/bg_nav.gif) repeat-x;
 	position: relative;
 	width: 100%;
 	font-size: 11px;
@@ -153,16 +149,6 @@ input, select, textarea {
 }
 
 /* --------- HOME PAGE ---------------- */
-#intro {
-    background: #E08D3A url(../images/terre.gif) no-repeat;
-    color: #fff;
-    padding: 10px 0 0 190px;
-    height: 80px;
-    line-height: 1.7em;
-}
-#drie {
-    font-weight: bold;
-}
 #column-g {
     float: left;
     width: 55%;
@@ -175,33 +161,6 @@ input, select, textarea {
 #column-d {
     float: left; 
     width: 45%;
-}
-#produits {
-    background: #339999 url(../images/terre2.gif) no-repeat;
-    color: #fff;
-    border: none;
-}
-#produits ul {
-    list-style-type: none;
-    padding: 0 0 10px;
-}
-#produits li {
-     background: transparent url(../images/bullet_orange_bg_blue.gif) no-repeat 0 7px;
-     padding: 2px 0 2px .7em;
-}
-#produits a {
-    font-weight: 600;
-    text-decoration: underline;
-    color: #fff;
-}
-#pc img {
-    float: left;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-}
-#etef img {
-    float: left;
-    margin-right: 10px;
 }
 #actus {
     padding: 15px;
@@ -288,70 +247,4 @@ a.ppt-type { background-image: url(../images/page_white_powerpoint.png); }
 a.external-link {
     padding: 5px 0 5px 20px;
     background: transparent url(../images/world_link.gif) no-repeat 0 5px;
-}
-
-/* --------- CENTRES ---------------- */
-table.centre {
-    margin-bottom: 30px;
-}
-table.centre th {
-    vertical-align: top;
-    padding: 0 20px;
-    font-weight: normal;
-}
-th.adresse { background: transparent url(../images/building.png) no-repeat 0 0; }
-th.tel { background: transparent url(../images/telephone.png) no-repeat 0 0; }
-th.fax { background: transparent url(../images/printer.png) no-repeat 0 0; }
-th.site { background: transparent url(../images/world_link.png) no-repeat 0 0; }
-th.email { background: transparent url(../images/email.png) no-repeat 0 0; }
-
-/* -------- Bandeau CCIP ----------- */
-a.bandeau_haut:link,a.bandeau_haut:visited,a.bandeau_haut:active{
-	text-decoration:none;
-	font-size:10px;
-	font-weight:bold;
-	color:#30568B;
-	margin-left:8px;
-	padding-left:15px;
-	background-image:url('../images/puce_haut2.gif');
-	background-repeat : no-repeat;
-	background-position : left;
-}
-a.bandeau_haut:hover{
-	text-decoration:underline overline;
-	font-size:10px;
-	font-weight:bold;
-	color:#30568B;
-	background-color:#B5C6EF;
-	margin-left:8px;
-	padding-left:15px;
-	background-image:url('../images/puce_haut2.gif');
-	background-repeat : no-repeat;
-	background-position : left;
-}
-div.bandeau_flash{
-	text-align:center;
-	padding: 0;
-}
-div.menu_haut{
-	height:50px;
-	text-align:center;
-}
-input.recherche{
-	font-family:verdana, sans-serif;
-	font-size:10px;
-	font-weight:bold;
-	color:#003184;
-	border:1px #003184 solid;
-	background-color:#FFFFFF;
-	margin-left:5px;
-	width:90px;
-	
-}
-input.submit_recherche{
-	font-family:verdana, sans-serif;
-	font-size:11px;
-	font-weight:bold;
-	color:#003184;
-	background-color:#FFFFFF;
 }

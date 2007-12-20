@@ -1,9 +1,6 @@
 body {
 	font-size: 80%;
 }
-#produits li {
-    position: relative; /* sinon les puces n'apparaissent pas */
-}
 #secondary-nav li {
     position: relative;
 }
