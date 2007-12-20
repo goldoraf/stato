@@ -1,0 +1,23 @@
+body {
+    background: white;
+    font-size: 12pt;
+}
+a:link, a:visited {
+    color: black;
+}
+a.file, a.external-link {
+    padding: 0;
+    background: transparent;
+}
+#header, #footer, #intro, #secondary-nav, #actus {
+	display: none;
+}	
+#container {
+	width: auto; 
+	margin: 0 5%;
+	padding: 0; 
+	border: 0;
+	float: none !important;
+	color: black; 
+	background: transparent;
+}

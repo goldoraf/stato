@@ -1,0 +1,256 @@
+<html><head><title>ext-lang-nl.js</title><link rel="stylesheet" type="text/css" href="../resources/style.css" media="screen"/></head><body><h1>ext-lang-nl.js</h1><pre class="highlighted"><code><i>/*
+ * Dutch Translations
+ * by Bas van Oostveen (04 April 2007)
+ */</i>
+<i>// holder</i>
+<i>/** Ext Core translations */</i>
+Ext.UpdateManager.defaults.indicatorText = <em>'&lt;div class=&quot;loading-indicator&quot;&gt;Bezig met laden...&lt;/div&gt;'</em>;
+
+<i>/* Ext single string translations */</i>
+<b>if</b>(Ext.View){
+    Ext.View.prototype.emptyText = &quot;&quot;;
+}
+
+<b>if</b>(Ext.grid.Grid){
+    Ext.grid.Grid.prototype.ddText = &quot;{0} geselecteerde rij(en)&quot;;
+}
+
+<b>if</b>(Ext.TabPanelItem){
+    Ext.TabPanelItem.prototype.closeText = &quot;Sluit dit tabblad&quot;;
+}
+
+<b>if</b>(Ext.form.Field){
+    Ext.form.Field.prototype.invalidText = &quot;De waarde <b>in</b> dit veld is onjuist&quot;;
+}
+
+<b>if</b>(Ext.LoadMask){
+    Ext.LoadMask.prototype.msg = &quot;Bezig met laden...&quot;;
+}
+
+<i>/* Javascript month and days translations */</i>
+Date.monthNames = [
+   &quot;Januari&quot;,
+   &quot;Februari&quot;,
+   &quot;Maart&quot;,
+   &quot;April&quot;,
+   &quot;Mei&quot;,
+   &quot;Juni&quot;,
+   &quot;Juli&quot;,
+   &quot;Augustus&quot;,
+   &quot;September&quot;,
+   &quot;Oktober&quot;,
+   &quot;November&quot;,
+   &quot;December&quot;
+];
+
+Date.dayNames = [
+   &quot;Zondag&quot;,
+   &quot;Maandag&quot;,
+   &quot;Dinsdag&quot;,
+   &quot;Woensdag&quot;,
+   &quot;Donderdag&quot;,
+   &quot;Vrijdag&quot;,
+   &quot;Zaterdag&quot;
+];
+
+<i>/* Ext components translations */</i>
+<b>if</b>(Ext.MessageBox){
+    Ext.MessageBox.buttonText = {
+       ok     : &quot;OK&quot;,
+       cancel : &quot;Annuleren&quot;,
+       yes    : &quot;Ja&quot;,
+       no     : &quot;Nee&quot;
+    };
+}
+
+<b>if</b>(Ext.util.Format){
+    Ext.util.Format.date = <b>function</b>(v, format){
+       <b>if</b>(!v) <b>return</b> &quot;&quot;;
+       <b>if</b>(!(v instanceof Date)) v = <b>new</b> Date(Date.parse(v));
+       <b>return</b> v.dateFormat(format || &quot;d-m-y&quot;);
+    };
+}
+
+<b>if</b>(Ext.DatePicker){
+    Ext.apply(Ext.DatePicker.prototype, {
+       todayText         : &quot;Vandaag&quot;,
+       minText           : &quot;Deze datum is eerder dan de minimum datum&quot;,
+       maxText           : &quot;Deze datum is later dan de maximum datum&quot;,
+       disabledDaysText  : &quot;&quot;,
+       disabledDatesText : &quot;&quot;,
+       monthNames	 : Date.monthNames,
+       dayNames		 : Date.dayNames,
+       nextText          : <em>'Volgende Maand (Control+Rechts)'</em>,
+       prevText          : <em>'Vorige Maand (Control+Links)'</em>,
+       monthYearText     : <em>'Kies een maand (Control+Omhoog/Beneden volgend/vorige jaar)'</em>,
+       todayTip          : &quot;{0} (Spatie)&quot;,
+       format            : &quot;d-m-y&quot;,
+       okText		 : &quot;&amp;#160;OK&amp;#160;&quot;,
+       cancelText	 : &quot;Annuleren&quot;,
+       startDay          : 1
+    });
+}
+
+<b>if</b>(Ext.PagingToolbar){
+    Ext.apply(Ext.PagingToolbar.prototype, {
+       beforePageText : &quot;Pagina&quot;,
+       afterPageText  : &quot;van {0}&quot;,
+       firstText      : &quot;Eerste Pagina&quot;,
+       prevText       : &quot;Vorige Pagina&quot;,
+       nextText       : &quot;Volgende Pagina&quot;,
+       lastText       : &quot;Laatste Pagina&quot;,
+       refreshText    : &quot;Ververs&quot;,
+       displayMsg     : &quot;Getoond {0} - {1} van {2}&quot;,
+       emptyMsg       : <em>'Geen gegeven om weer te geven'</em>
+    });
+}
+
+<b>if</b>(Ext.form.TextField){
+    Ext.apply(Ext.form.TextField.prototype, {
+       minLengthText : &quot;De minimale lengte voor dit veld is {0}&quot;,
+       maxLengthText : &quot;De maximale lengte voor dit veld is {0}&quot;,
+       blankText     : &quot;Dit veld is verplicht&quot;,
+       regexText     : &quot;&quot;,
+       emptyText     : null
+    });
+}
+
+<b>if</b>(Ext.form.NumberField){
+    Ext.apply(Ext.form.NumberField.prototype, {
+       minText : &quot;De minimale waarde voor dit veld is {0}&quot;,
+       maxText : &quot;De maximale waarde voor dit veld is {0}&quot;,
+       nanText : &quot;{0} is geen geldig getal&quot;
+    });
+}
+
+<b>if</b>(Ext.form.DateField){
+    Ext.apply(Ext.form.DateField.prototype, {
+       disabledDaysText  : &quot;Uitgeschakeld&quot;,
+       disabledDatesText : &quot;Uitgeschakeld&quot;,
+       minText           : &quot;De datum <b>in</b> dit veld moet na {0} liggen&quot;,
+       maxText           : &quot;De datum <b>in</b> dit veld moet voor {0} liggen&quot;,
+       invalidText       : &quot;{0} is geen geldige datum - formaat voor datum is {1}&quot;,
+       format            : &quot;d/m/y&quot;
+    });
+}
+
+<b>if</b>(Ext.form.ComboBox){
+    Ext.apply(Ext.form.ComboBox.prototype, {
+       loadingText       : &quot;Bezig met laden...&quot;,
+       valueNotFoundText : undefined
+    });
+}
+
+<b>if</b>(Ext.form.VTypes){
+    Ext.apply(Ext.form.VTypes, {
+       emailText    : <em>'Dit veld moet een e-mail adres zijn <b>in</b> het formaat &quot;gebruiker@domein.nl&quot;'</em>,
+       urlText      : <em>'Dit veld moet een URL zijn <b>in</b> het formaat &quot;http:/'</em>+<em>'/www.domein.nl&quot;'</em>,
+       alphaText    : <em>'Dit veld mag alleen letters en _ bevatten'</em>,
+       alphanumText : <em>'Dit veld mag alleen letters, cijfers en _ bevatten'</em>
+    });
+}
+
+<b>if</b>(Ext.form.HtmlEditor){
+   Ext.apply(Ext.form.HtmlEditor.prototype, {
+	createLinkText : <em>'Vul hier het Internet adres voor de link <b>in</b>:'</em>,
+	buttonTips : {
+            bold : {
+                title: <em>'Vet (Ctrl+B)'</em>,
+                text: <em>'Maak de geselecteerde tekst vet gedrukt.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            italic : {
+                title: <em>'Cursief (Ctrl+I)'</em>,
+                text: <em>'Maak de geselecteerde tekst cursief.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            underline : {
+                title: <em>'Onderstrepen (Ctrl+U)'</em>,
+                text: <em>'Onderstreep de geselecteerde tekst.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            increasefontsize : {
+                title: <em>'Tekst Vergroten'</em>,
+                text: <em>'Vergroot het lettertype.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            decreasefontsize : {
+                title: <em>'Tekst Verkleinen'</em>,
+                text: <em>'Verklein het lettertype.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            backcolor : {
+                title: <em>'Tekst Achtergrond Kleur'</em>,
+                text: <em>'Verander de achtergrond kleur van de geselecteerde tekst.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            forecolor : {
+                title: <em>'Lettertype Kleur'</em>,
+                text: <em>'Verander de kleur van de geselecteerde tekst.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            justifyleft : {
+                title: <em>'Tekst Links Uitlijnen'</em>,
+                text: <em>'Lijn de tekst links uit.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            justifycenter : {
+                title: <em>'Tekst Centreren'</em>,
+                text: <em>'Centreer de tekst <b>in</b> de editor.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            justifyright : {
+                title: <em>'Tekst Richts Uitlijnen'</em>,
+                text: <em>'Lijn de tekst rechts uit.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            insertunorderedlist : {
+                title: <em>'Punten Lijst'</em>,
+                text: <em>'Begin een ongenummerde lijst.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            insertorderedlist : {
+                title: <em>'Genummerde Lijst'</em>,
+                text: <em>'Begin een genummerde lijst.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            createlink : {
+                title: <em>'Hyperlink'</em>,
+                text: <em>'Maak van de geselecteerde tekst een hyperlink.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            },
+            sourceedit : {
+                title: <em>'Bron Aanpassen'</em>,
+                text: <em>'Schakel modus over naar bron aanpassen.'</em>,
+                cls: <em>'x-html-editor-tip'</em>
+            }
+        }
+    });
+}
+
+<b>if</b>(Ext.grid.GridView){
+    Ext.apply(Ext.grid.GridView.prototype, {
+       sortAscText  : &quot;Sorteer Oplopend&quot;,
+       sortDescText : &quot;Sorteer Aflopend&quot;,
+       lockText     : &quot;Kolom Vastzetten&quot;,
+       unlockText   : &quot;Kolom Vrijgeven&quot;,
+       columnsText  : &quot;Kolommen&quot;
+    });
+}
+
+<b>if</b>(Ext.grid.PropertyColumnModel){
+    Ext.apply(Ext.grid.PropertyColumnModel.prototype, {
+       nameText   : &quot;Naam&quot;,
+       valueText  : &quot;Waarde&quot;,
+       dateFormat : &quot;Y-m-j&quot;
+    });
+}
+
+<b>if</b>(Ext.SplitLayoutRegion){
+    Ext.apply(Ext.SplitLayoutRegion.prototype, {
+       splitTip            : &quot;Sleep om grootte aan te passen.&quot;,
+       collapsibleSplitTip : &quot;Sleep om grootte aan te passen. Dubbel klikken om te verbergen.&quot;
+    });
+}
+</code></pre><hr><div style="font-size:10px;text-align:center;color:gray;">Ext - Copyright &copy; 2006-2007 Ext JS, LLC<br />All rights reserved.</div>
+    </body></html>
