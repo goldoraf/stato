@@ -6,17 +6,17 @@ $config = array
     (
         'adapter' => 'MySql',
         'host'    => 'localhost',
-        'user'    => 'root',
-        'pass'    => 'gemini65',
-        'dbname'  => 'fda'
+        'user'    => '',
+        'pass'    => '',
+        'dbname'  => ''
     ),
     'production' => array
     (
         'adapter' => 'MySql',
         'host'    => 'localhost',
-        'user'    => 'sql-fda',
-        'pass'    => 'CestPasFaux',
-        'dbname'  => 'fda'
+        'user'    => '',
+        'pass'    => '',
+        'dbname'  => ''
     ),
     'test' => array
     (
