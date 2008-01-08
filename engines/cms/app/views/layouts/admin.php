@@ -10,7 +10,7 @@
         window.setTimeout("$('#notice').fadeOut('slow')", 4000);
     });*/
 </script>
-<link rel="stylesheet" type="text/css" media="screen" href="/js/ext-1.1.1/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="<?= compute_public_path('ext-1.1.1/resources/css/ext-all.css', 'js'); ?>" />
 <?= stylesheet_link_tag('admin'); ?>
 </head>
 <body>

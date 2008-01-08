@@ -7,3 +7,5 @@
     <?= $this->render_partial('form'); ?>
     <?= submit_tag('Enregister la page'); ?> ou <?= link_to('Annuler', array('action' => 'index')); ?>
 <?= end_form_tag(); ?>
+
+<?= $this->render_partial('form_dialogs'); ?>
