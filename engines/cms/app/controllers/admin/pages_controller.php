@@ -7,6 +7,17 @@ class PagesController extends AdminBaseController
         
     }
     
+    public function test_extjs2()
+    {
+        $this->layout = 'test_extjs2';
+    }
+    
+    public function details()
+    {
+        $this->page = Page::$objects->get($this->params['id']);
+        $this->render_json(array('success' => true, 'data' => $this->page->to_array()));
+    }
+    
     public function info()
     {
         $this->page = Page::$objects->get($this->params['id']);

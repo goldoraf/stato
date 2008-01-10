@@ -1,52 +1,3 @@
-// reference local blank image
-//Ext.BLANK_IMAGE_URL = '../extjs/resources/images/default/s.gif';
- 
-// create namespace
-Ext.namespace('statoCms');
- 
-// create application
-statoCms.app = function() {
-    // do NOT access DOM from here; elements don't exist yet
- 
-    // private variables
- 
-    // private functions
- 
-    // public space
-    return {
-        // public properties, e.g. strings to translate
-        //btn1Text: 'Button 1',
- 
-        // public methods
-        createTree: function(divId, url) {
-            // shorthand
-            var Tree = Ext.tree;
-            
-            var tree = new Tree.TreePanel(divId, {
-                animate:true,
-                lines:false,
-                loader: new Tree.TreeLoader({dataUrl:url}),
-                enableDD:true,
-                containerScroll: true
-            });
-        
-            // set the root node
-            var root = new Tree.AsyncTreeNode({
-                text: 'Racine du site',
-                draggable:false,
-                id:'source'
-            });
-            tree.setRootNode(root);
-            
-            // render the tree
-            tree.render();
-            root.expand();
-            
-            return tree;
-        }
-    };
-}();
-
 // Create user extensions namespace (Ext.ux)
 Ext.namespace('Ext.ux');
  
@@ -122,7 +73,7 @@ Ext.extend(Ext.ux.CustomHtmlEditor, Ext.form.HtmlEditor, {
 
         function btn(id, toggle, handler){
             return {
-                id : id,
+                itemId : id,
                 cls : 'x-btn-icon x-edit-'+id,
                 enableToggle:toggle !== false,
                 scope: editor,
@@ -133,7 +84,10 @@ Ext.extend(Ext.ux.CustomHtmlEditor, Ext.form.HtmlEditor, {
             };
         }
 
-        var tb = new Ext.Toolbar(this.wrap.dom.firstChild);
+        // build the toolbar
+        var tb = new Ext.Toolbar({
+            renderTo:this.wrap.dom.firstChild
+        });
 
         tb.el.on('click', function(e){
             e.preventDefault();
@@ -377,7 +331,6 @@ Ext.extend(Ext.ux.CustomHtmlEditor, Ext.form.HtmlEditor, {
      */
     getDocMarkup : function(){
         return '<html><head><style type="text/css">body{border:0;margin:0;padding:3px;height:98%;cursor:text;}</style>'
-        + '<link rel="stylesheet" type="text/css" media="screen" href="/styles/editor.css" />'
         + '</head><body></body></html>';
     },
     
@@ -449,33 +402,37 @@ Ext.extend(Ext.ux.CustomHtmlEditor, Ext.form.HtmlEditor, {
     /**
      * Overriden method
      */
-    createLink : function(){
+    createLink : function(values){
+        var selText = this.getSelectedText();
+        if (!selText) {
+            this.linkDialog.hide();
+            return;
+        }
         var attributes = [];
-        var values = this.linkDialog.form.getValues();
         for (i in values) {
             if (values[i] != '') {
                 attributes.push(i+'="'+values[i]+'"');
             }
         }
-        this.insertAtCursor('<a ' + attributes.join(' ') + '>' + this.getSelectedText() + '</a>');
-        this.linkDialog.hide();
+        this.insertAtCursor('<a ' + attributes.join(' ') + '>' + selText + '</a>');
+        this.linkDialog.destroy();
     },
     
     openLinkDialog : function(){
-        if (!this.linkDialog) {
-            this.createLinkDialog();
-        }
-        this.linkDialog.form.reset();
+        this.linkDialog = new InsertLinkWindow();
+        
         var selElt = this.getSelectedElement();
         if (selElt.tagName.toLowerCase() == 'a') {
-            var values = {};
             for (i in this.linkAttributes) {
                 if (selElt.hasAttribute(this.linkAttributes[i])) {
-                    values[this.linkAttributes[i]] = selElt.getAttribute(this.linkAttributes[i]);
+                    // ugly, but it works...
+                    Ext.getCmp('link-'+this.linkAttributes[i]).setValue(selElt.getAttribute(this.linkAttributes[i]));
                 }
             }
-            this.linkDialog.form.setValues(values);
         }
+        this.linkDialog.on('linkselect', function(values){
+            this.createLink(values);
+        }.createDelegate(this));
         this.linkDialog.show();
     },
     
@@ -536,102 +493,12 @@ Ext.extend(Ext.ux.CustomHtmlEditor, Ext.form.HtmlEditor, {
         //this.imageDialog.addButton('Cancel', this.imageDialog.hide, this.imageDialog);
         this.imageDialog.addButton('Submit', this.imageDialog.hide, this.imageDialog).disable();
         
-        var fileTree = statoCms.app.createTree('image-file-tree', statoCms.BASE_URI+'/files/nodes');
+        var fileTree = statoCms.app.createTree('image-file-tree', 'http://fda/admin/files/nodes');
         fileTree.on('click', function(node, e){this.dump(node.attributes)
             if (node.attributes.cls == 'img-type' || confirm('Ce fichier ne semble pas être une image. Etes-vous sûr(e) de vouloir continuer ?')) {
                 this.relayCmd('insertimage', '/documents/'+node.attributes.path);
                 this.imageDialog.hide();
             }
-        }.createDelegate(this));
-    },
-    
-    createLinkDialog : function() {
-        this.linkDialog = new Ext.LayoutDialog("link-dlg", {
-            modal:true,
-            width:500,
-            height:300,
-            shadow:true,
-            minWidth:300,
-            minHeight:300,
-            title:'Insert link',
-            north: {
-                split:true,
-                initialSize: 100
-            },
-            center: {
-                autoScroll:true,
-                tabPosition: 'top',
-                closeOnTab: false,
-                alwaysShowTabs: true
-            }
-        });
-        this.linkDialog.addKeyListener(27, this.linkDialog.hide, this.linkDialog);
-        //this.linkDialog.addButton('Close', this.linkDialog.hide, this.linkDialog);
-        this.linkDialog.addButton('Submit', this.createLink, this);
-        
-        var layout = this.linkDialog.getLayout();
-        layout.beginUpdate();
-        layout.add('north', new Ext.ContentPanel('createlink-form', {title: 'West'}));
-        layout.add('center', new Ext.ContentPanel('createlink-pages-tab', {title: 'Pages'}));
-        layout.add('center', new Ext.ContentPanel('createlink-files-tab', {title: 'Files'}));
-        layout.endUpdate();
-    
-        this.linkDialog.show();
-        
-        this.linkDialog.urlField = new Ext.form.TextField({
-        	fieldLabel: 'URL',
-        	name: 'href',
-        	width:190
-        });
-        this.linkDialog.titleField = new Ext.form.TextField({
-        	fieldLabel: 'Title',
-        	name: 'title',
-        	width:190
-        });
-        this.linkDialog.clsField = new Ext.form.ComboBox({
-            fieldLabel: 'Class',
-            hiddenName: 'class',
-            store: new Ext.data.SimpleStore({
-                fields: ['class', 'class_name'],
-                data : this.linkStyleChoices
-            }),
-            displayField:'class_name',
-            valueField:'class',
-            typeAhead: true,
-            mode: 'local',
-            triggerAction: 'all',
-            emptyText:'Select a style...',
-            selectOnFocus:true,
-            //editable:false,
-            width:190
-        });
-
-        this.linkDialog.form = new Ext.form.Form({
-        	labelAlign: 'left',
-        	labelWidth: 75,
-        	buttonAlign: 'right'
-        });
-        this.linkDialog.form.container(
-            {}, 
-            this.linkDialog.urlField, 
-            this.linkDialog.titleField,
-            this.linkDialog.clsField
-        );
-        this.linkDialog.form.render('createlink-form');
-        
-        var pageTree = statoCms.app.createTree('createlink-pages-tab', statoCms.BASE_URI+'/pages/nodes');
-        pageTree.on('click', function(node, e){
-            this.linkDialog.urlField.setValue('/'+node.attributes.path);
-        }.createDelegate(this));
-        
-        var fileTree = statoCms.app.createTree('createlink-files-tab', statoCms.BASE_URI+'/files/nodes');
-        // Users shouldn't be able to select a folder, but only leaves (files)
-        fileTree.on('beforeclick', function(node, e){
-            return node.leaf ? true : false;
-        });
-        fileTree.on('click', function(node, e){
-            this.linkDialog.urlField.setValue('/documents/'+node.attributes.path);
-            this.linkDialog.clsField.setValue('file '+node.attributes.cls);
         }.createDelegate(this));
     },
     
@@ -681,4 +548,122 @@ Ext.extend(Ext.ux.CustomHtmlEditor, Ext.form.HtmlEditor, {
         }
         return selElt;
     }
+});
+
+InsertLinkWindow = function() {
+    this.linkStyleChoices = [
+        ['', 'None'],
+        ['file doc-type', 'Word document'],
+        ['file img-type', 'Image'],
+        ['file pdf-type', 'PDF']
+    ],
+    
+    this.form = new Ext.form.FormPanel({
+        id:'link-form',
+        region:'north',
+        labelAlign: 'left',
+    	labelWidth: 75,
+    	autoHeight:true,
+    	split: true,
+    	buttonAlign: 'right',
+        defaultType: 'textfield',
+        defaults:{bodyStyle:'padding:10px'},
+        items: [{
+            fieldLabel: 'URL',
+            name: 'href',
+            id: 'link-href',
+            width:190
+        },{
+            fieldLabel: 'Title',
+            name: 'title',
+            id: 'link-title',
+            width:190
+        }, new Ext.form.ComboBox({
+            fieldLabel: 'Class',
+            hiddenName: 'class',
+            id: 'link-class',
+            store: new Ext.data.SimpleStore({
+                fields: ['class', 'class_name'],
+                data : this.linkStyleChoices
+            }),
+            displayField:'class_name',
+            valueField:'class',
+            typeAhead: true,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText:'Select a style...',
+            selectOnFocus:true,
+            //editable:false,
+            width:190
+        })]
+    });
+    
+    this.pageTree = new Ext.tree.TreePanel({
+        id:'page-tree',
+        title:'Pages',
+        rootVisible:true,
+        lines:false,
+        autoScroll:true,
+        loader: new Ext.tree.TreeLoader({dataUrl:StatoCms.BASE_URI+'/pages/nodes'}),
+        root: new Ext.tree.AsyncTreeNode({
+                text: 'Racine du site',
+                draggable:false,
+                id:'source'
+            })
+    });
+    this.pageTree.on('click', function(node, e){
+        this.form.getForm().findField('href').setValue('/'+node.attributes.path);
+    }.createDelegate(this));
+    
+    this.fileTree = new Ext.tree.TreePanel({
+        id:'file-tree',
+        title:'Files',
+        rootVisible:true,
+        lines:false,
+        autoScroll:true,
+        loader: new Ext.tree.TreeLoader({dataUrl:StatoCms.BASE_URI+'/files/nodes'}),
+        root: new Ext.tree.AsyncTreeNode({
+                text: 'Racine du site',
+                draggable:false,
+                id:'source'
+            })
+    });
+    // Users shouldn't be able to select a folder, but only leaves (files)
+    this.fileTree.on('beforeclick', function(node, e){
+        return node.leaf ? true : false;
+    });
+    this.fileTree.on('click', function(node, e){
+        this.form.getForm().findField('href').setValue('/documents/'+node.attributes.path);
+        this.form.getForm().findField('class').setValue('file '+node.attributes.cls);
+    }.createDelegate(this));
+    
+    this.tabs = new Ext.TabPanel({
+        region: 'center',
+        margins:'3 3 3 0', 
+        activeTab: 0,
+        defaults:{autoScroll:true},
+        items:[this.pageTree, this.fileTree]
+    });
+    
+    InsertLinkWindow.superclass.constructor.call(this, {
+        title: 'Insert Link',
+        closable:true,
+        width:500,
+        height:300,
+        //border:false,
+        plain:true,
+        layout: 'border',
+        items: [this.form, this.tabs],
+        buttons: [{
+            text:'Submit',
+            handler: function(){
+                this.fireEvent('linkselect', this.form.getForm().getValues());
+            },
+            scope: this
+        }]
+    });
+};
+
+Ext.extend(InsertLinkWindow, Ext.Window, {
+    
 });

@@ -4,6 +4,7 @@
 <title>Administration du site : <?= config_value('site_name'); ?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?= javascript_include_tag(array('ext-1.1.1/adapter/ext/ext-base.js', 'ext-1.1.1/ext-all-debug.js', 'application')); ?>
+<?= javascript_tag("statoCms.BASE_URI = '/d3/admin';"); ?>
 <script type="text/javascript">
     /*$(document).ready(function() {
         $('#notice').fadeIn('slow');
