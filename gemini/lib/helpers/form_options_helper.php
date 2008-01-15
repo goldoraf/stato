@@ -44,6 +44,30 @@ function collection_select($object_name, $method, $object, $collection, $value_p
 }
 
 /**
+ * Returns a group of radiobuttons for the provided object and method. 
+ */
+function radio_button_group($object_name, $method, $object, $choices, $options = array(), $html_options = array())
+{
+    list($name, $selected, $html_options) = default_options($object_name, $method, $object, $html_options);
+    $str = '';
+    $i = 1;
+    foreach ($choices as $lib => $value)
+    {
+        $id = "{$object_name}_{$method}_{$i}";
+        if (is_int($lib)) $lib = $value; // non-associative array
+        if (isset($options['escape_label']) && $options['escape_label'] === true)
+            $lib = html_escape($lib);
+        
+        $str.= '<label for="'.$id.'">'
+        .radio_button_tag($name, $value, $value == $selected, array_merge($options, array('id' => $id)))
+        .$lib."</label>\n";
+        
+        $i++;
+    }
+    return $str;
+}
+
+/**
  * Accepts an array and returns a string of option tags.
  * 
  * Examples :  

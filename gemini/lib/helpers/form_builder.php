@@ -83,6 +83,11 @@ class SFormBuilder
                                  $value_prop, $text_prop, $options, array_merge($this->options, $html_options));
     }
     
+    public function radio_button_group($method, $choices, $options = array(), $html_options = array())
+    {
+        return radio_button_group($this->object_name, $method, $this->object, $choices, $options, array_merge($this->options, $html_options));
+    }
+    
     public function date_select($method, $options = array())
     {
         return date_select($this->object_name, $method, $this->object, array_merge($this->options, $options));
