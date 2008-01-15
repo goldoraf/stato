@@ -145,7 +145,8 @@ function error_message_on($method, $object, $prepend_text='', $append_text='', $
  * Returns a string with a div containing all the error messages for the <var>$object</var> 
  * whose form elements are prefixed by <var>$object_name</var>. 
  * This div can be tailored by the following options:
- *  - header_tag - Used for the header of the error div (default: h2)
+ *  - header_tag - Tag used for the header of the error div (default: h2)
+ *  - header_text - Text used for the header of the error div (default: "Please correct the following errors :") 
  *  - id - The id of the error div (default: form-errors)
  *  - class - The class of the error div (default: form-errors)
  */
@@ -165,10 +166,10 @@ function error_message_for($object_name, $object, $options=array())
     if (!isset($options['class'])) $options['class'] = 'form-errors';
     
     $list = '';
-    foreach($errors as $field => $error)
-        $list.= '<li>'.link_to_function($error, "Field.focus('{$object_name}_{$field}')").'</li>';
+    foreach($errors as $field => $error) $list.= "<li>$error</li>";
         
     $header = SValidation::ERR_VALID_FORM;
+    if (isset($options['header_text'])) $header = $options['header_text'];
     if (SDependencies::is_loaded_component('i18n')) $header = __($header);
         
     return content_tag('div', 
