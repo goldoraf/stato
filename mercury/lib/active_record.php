@@ -262,9 +262,11 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     protected function read_attribute($name)
     {
-        if (!$this->attr_exists($name)) return;
         if (!isset($this->values[$name]))
+        {
+            if (!$this->attr_exists($name)) return null;
             $this->values[$name] = $this->meta->attributes[$name]->default_value($this);
+        }
         if (in_array($name, $this->attr_serialized) && is_string($this->values[$name]))
             return unserialize($this->values[$name]);
         else
@@ -273,8 +275,8 @@ class SActiveRecord extends SObservable implements ArrayAccess
     
     protected function write_attribute($name, $value)
     {
-        if (!$this->attr_exists($name)) return;
-        $this->values[$name] = $this->meta->attributes[$name]->typecast($this, $value);
+        if (!$this->attr_exists($name)) $this->values[$name] = $value;
+        else $this->values[$name] = $this->meta->attributes[$name]->typecast($this, $value);
     }
     
     protected function before_create() {}
