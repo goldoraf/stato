@@ -3,7 +3,6 @@
 <head>
 <title>CRUD</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<?= javascript_include_defaults(); ?>
 <style>
     body
     {

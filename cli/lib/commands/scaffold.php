@@ -3,11 +3,10 @@
 class ScaffoldCommand extends SCommand
 {
     protected $allowed_params  = array('model_name' => true, 'controller_name' => false);
-    protected $allowed_options = array('ajax' => false, 'dry' => false);
+    protected $allowed_options = array('dry' => false);
     
     private $assigns  = array();
     private $scaffold = null;
-    private $ajax     = false;
     private $dry      = false;
     private $sub_dir  = '';
     
@@ -15,12 +14,9 @@ class ScaffoldCommand extends SCommand
     {
         $this->scaffold = $this->params['model_name'];
         
-        if (isset($this->options['ajax'])) $this->ajax = true;
-        if (isset($this->options['dry']) && !isset($this->options['ajax'])) $this->dry = true;
+        if (isset($this->options['dry'])) $this->dry = true;
         
-        if ($this->ajax)
-            $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding_ajax';
-        elseif ($this->dry)
+        if ($this->dry)
             $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding_dry';
         else
             $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding';
@@ -72,20 +68,10 @@ class ScaffoldCommand extends SCommand
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/_objects_list.php", $this->assigns));
         }
         
-        if ($this->ajax)
-            $scaffold_layout_path = "views/layouts/scaffold_ajax.php";
-        else
-            $scaffold_layout_path = "views/layouts/scaffold.php";
+        $scaffold_layout_path = "views/layouts/scaffold.php";
         
         $this->create_file($scaffold_layout_path, STATO_APP_PATH,
             file_get_contents("{$scaffold_templates_path}/views/layout.php"));
-            
-        if ($this->ajax)
-        {
-            $scaffold_helper_path = "helpers/{$this->sub_dir}scaffold_ajax_helper.php";
-            $this->create_file($scaffold_helper_path, STATO_APP_PATH,
-                file_get_contents("{$scaffold_templates_path}/helper.php"));
-        }
     }
 }
 
