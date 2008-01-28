@@ -309,16 +309,17 @@ class SActiveRecord extends SObservable implements ArrayAccess
      * {
      *     public function validate()
      *     {
-     *         $this->validate_presence_of('username', 'email', 'password');
+     *         $this->validate_presence_of(array('username', 'email', 'password'));
      *     }     
      * }
      * </code>                        
      */
-    protected function validate_presence_of()
+    protected function validate_presence_of($attr_names, $options=array())
     {
-        $attr_names = func_get_args();
+        if (!is_array($attr_names)) $attr_names = array($attr_names);
+        if (!is_array($options)) $options = array('message' => $options);
         foreach ($attr_names as $attr)
-            SValidation::validate_presence($this, $attr);
+            SValidation::validate_presence($this, $attr, $options);
     }
     
     /**
