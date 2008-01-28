@@ -103,9 +103,14 @@ class SFormBuilder
         return time_select($this->object_name, $method, $this->object, array_merge($this->options, $options));
     }
     
-    public function error_message_for($options = array())
+    public function error_message($options = array())
     {
         return error_message_for($this->object_name, $this->object, array_merge($this->options, $options));
+    }
+    
+    public function error_message_on($method, $options = array())
+    {
+        return error_message_on($method, $this->object, array_merge($this->options, $options));
     }
     
     public function input($method, $options = array())
