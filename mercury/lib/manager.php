@@ -11,6 +11,14 @@ class SManager
     
     public function __call($method, $args)
     {
+        if (preg_match('/^(get|all)_by_([_a-zA-Z]\w*)$/', $method, $matches))
+        {
+            $method = ($matches[1] == 'get') ? 'get' : 'filter';
+            $attributes = explode('_and_', $matches[2]);
+            $values = $args; $args = array();
+            foreach ($attributes as $attr) $args[] = "$attr = ?";
+            $args[] = $values;
+        }
         return call_user_func_array(array($this->get_query_set(), $method), $args);
     }
     
