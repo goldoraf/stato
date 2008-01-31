@@ -35,17 +35,19 @@ class SDispatcher
             
             SRoutes::initialize($map);
             
-            $request  = new SRequest();
-            $response = new SResponse();
+            $request = SRoutes::recognize(new SRequest());
             
     		if (file_exists($path = STATO_APP_PATH.'/controllers/application_controller.php')) require_once($path);
     		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
+            
+            if (!isset($request->params['controller']))
+                throw new SDispatchException('No controller specified in this request !');
     		
-    		SActionController::factory(SRoutes::recognize($request), $response)->out();
+    		SActionController::instanciate($request->params['controller'])->process($request, new SResponse())->out();
         }
         catch (Exception $e)
         {
-            SActionController::process_with_exception($request, $response, $e)->out();
+            SActionController::process_with_exception($request, new SResponse(), $e)->out();
         }
 	}
 }

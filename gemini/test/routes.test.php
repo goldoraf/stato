@@ -113,6 +113,24 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'posts', 'category'=>'php')));
     }
     
+    function test_simple_resources_rewrites()
+    {
+        $map = new SRouteSet();
+        $map->connect('users/:username', array('resource' => 'users'));
+        $map->connect('posts/:category', array('resource' => 'posts', 'category'=>'all'));
+        $map->connect('api/:resource/:id');
+        $this->set_map($map);
+        
+        $this->assertEqual(array('resource' => 'users', 'username' => 'raphael'),
+            $this->rec('users/raphael'));
+        $this->assertEqual(array('resource' => 'posts', 'category' => 'all'),
+            $this->rec('posts'));
+        $this->assertEqual(array('resource' => 'posts', 'category'=>'php'),
+            $this->rec('posts/php'));
+        $this->assertEqual(array('resource' => 'comments', 'id'=>'1234'),
+            $this->rec('api/comments/1234'));
+    }
+    
     function test_date_based()
     {
         $map = new SRouteSet();

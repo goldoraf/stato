@@ -9,14 +9,6 @@
 class SRequest
 {
     /**
-     * Returns the requested controller name
-     */
-    public $controller = null;
-    /**
-     * Returns the requested action name
-     */
-    public $action = null;
-    /**
      * Holds both GET and POST parameters in a single array. Uploaded files are held 
      * in an instance of SUpload class     
      */
@@ -29,6 +21,11 @@ class SRequest
     public function __construct()
     {
         if ($this->is_post()) $this->parse_post_parameters();
+    }
+    
+    public function inject_params($params)
+    {
+        $this->params = array_merge($this->params, $params);
     }
     
     /**

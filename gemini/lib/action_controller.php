@@ -91,9 +91,14 @@ class SActionController
     public static $template_class = 'SActionView';
     public static $exception_notifier = null;
     
-    public static function factory($request, $response)
+    public static function instanciate($req_controller)
     {
-        return self::instanciate_controller($request->controller)->process($request, $response);
+        $class_name = self::controller_class($req_controller);
+        if (!file_exists($path = self::controller_file($req_controller)))
+    		throw new SUnknownControllerException(SInflection::camelize($req_controller).'Controller not found !');
+    		
+    	require_once($path);
+		return new $class_name();
     }
     
     public static function process_with_exception($request, $response, $exception)
@@ -167,8 +172,8 @@ class SActionController
     
     public function action_name()
     {
-        if (empty($this->request->action)) return 'index';
-        return $this->request->action;
+        if (!isset($this->request->params['action'])) return 'index';
+        return $this->request->params['action'];
     }
     
     public function url_for($options = array())
@@ -651,7 +656,7 @@ class SActionController
         {
             $notifier = new $class();
             $notifier->notify($exception, $this->request, $this->session,
-                              self::controller_class($this->request->controller),
+                              self::controller_class($this->request->params['controller']),
                               $this->action_name());
         }
         
@@ -667,7 +672,7 @@ class SActionController
         $rescue_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue/';
         $this->add_variables_to_assigns();
         $this->assigns['exception'] = $exception;
-        $this->assigns['controller_name'] = self::controller_class($this->request->controller);
+        $this->assigns['controller_name'] = self::controller_class($this->request->params['controller']);
         $this->assigns['action_name'] = $this->action_name();
         $this->assigns['layout_content'] 
             = $this->view->render($rescue_path.$this->template_file_for_local_rescue($exception).'.php');
@@ -743,16 +748,6 @@ class SActionController
     {
         $view_class = self::$template_class;
         $this->view = new $view_class($this);
-    }
-    
-    private static function instanciate_controller($req_controller)
-    {
-        $class_name = self::controller_class($req_controller);
-        if (!file_exists($path = self::controller_file($req_controller)))
-    		throw new SUnknownControllerException(SInflection::camelize($req_controller).'Controller not found !');
-    		
-    	require_once($path);
-		return new $class_name();
     }
     
     private static function controller_class($req_controller)

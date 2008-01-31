@@ -36,19 +36,19 @@ class SUrlRewriter
     
     public static function is_current_controller($controller_name)
     {
-        return $controller_name == self::$request->controller;
+        return $controller_name == self::$request->params['controller'];
     }
     
     public static function current_module()
     {
-        if (strpos(self::$request->controller, '/') === false) return null;
-        list($module, $controller) = explode('/', self::$request->controller);
+        if (strpos(self::$request->params['controller'], '/') === false) return null;
+        list($module, $controller) = explode('/', self::$request->params['controller']);
         return $module;
     }
     
     public static function current_controller()
     {
-        return self::$request->controller; 
+        return self::$request->params['controller']; 
     }
     
     public static function url_for($options)
@@ -69,7 +69,7 @@ class SUrlRewriter
         }
         
         if (!isset($options['action']))     $options['action'] = 'index';
-        if (!isset($options['controller'])) $options['controller'] = self::$request->controller;
+        if (!isset($options['controller'])) $options['controller'] = self::$request->params['controller'];
         
         return self::rewrite($options);
     }

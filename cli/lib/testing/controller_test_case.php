@@ -17,7 +17,7 @@ class ControllerTestCase extends StatoTestCase
     protected function process($controller, $action = 'show', $params = array())
     {
         $request = new MockRequest();
-        $request->action = $action;
+        $params['action'] = $action;
         $request->params = $params;
         $c = new $controller();
         return $c->process($request, new MockResponse());
@@ -74,7 +74,7 @@ class ControllerTestCase extends StatoTestCase
     
     private function setup_and_process($action, $params = array())
     {
-        $this->request->action = $action;
+        $params['action'] = $action;
         $this->request->params = $params;
         $this->request->relative_url_root = '/';
         

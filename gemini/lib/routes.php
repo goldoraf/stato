@@ -184,7 +184,6 @@ class SRoute
         list($defaults, $conditions) = $this->initialize_hashes($options);
         $this->defaults = $defaults;
         $this->configure_components($defaults, $conditions);
-        $this->add_default_requirements();
     }
     
     public function generate($options)
@@ -294,11 +293,6 @@ class SRoute
             if (array_key_exists($comp->key(), $conditions))
                 $comp->condition = $conditions[$comp->key()];
         }
-    }
-    
-    protected function add_default_requirements()
-    {
-        //if (!in_array('action', $this->path_keys)) $this->known['action'] = 'index';
     }
 }
 
@@ -428,12 +422,7 @@ class SRoutes
         if ($options === null)
             throw new SRoutingException('Recognition failed for '.$request->request_uri());
         
-        $request->controller = $options['controller'];
-        $request->action     = $options['action'];
-        $request->params     = array_merge($options, $request->params);
-        
-        if (empty($request->controller))
-            throw new SRoutingException('No controller specified in this request !');
+        $request->inject_params($options);
             
         return $request;
     }

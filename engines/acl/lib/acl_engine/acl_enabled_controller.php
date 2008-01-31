@@ -44,12 +44,12 @@ class AclEnabledController extends SActionController
     {
         $this->current_user = (isset($this->session['user'])) ? $this->session['user'] : false;
         
-        $required_permission = $this->request->controller.'/'.$this->action_name();
-        $controller = $this->request->controller;
+        $controller = $this->request->params['controller'];
         $action = $this->action_name();
+        $required_permission = "$controller/$action";
         
         // EVERYONE should be able to get to the root.
-        if (empty($this->request->controller) && empty($this->request->action))
+        if (!isset($this->request->params['controller']) && isset($this->request->params['action']))
             return true;
         
         if ($this->current_user)
