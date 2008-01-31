@@ -30,8 +30,8 @@ class RoutesTest extends UnitTestCase
             $this->rec('posts/view'));
         $this->assertEqual(array('controller'=>'posts'),
             $this->rec('posts'));
-        $this->assertEqual(array('controller'=>'users', 'action'=>'show', 'group'=>'admin', 'pays'=>'france'),
-            $this->rec('users/show?group=admin&pays=france'));
+        $this->assertEqual(array('controller'=>'users', 'action'=>'show'),
+            $this->rec('users/show'));
             
         $this->assertEqual(array('posts/view/45', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'view', 'id'=>45)));
@@ -59,8 +59,8 @@ class RoutesTest extends UnitTestCase
             $this->rec('posts'));
         $this->assertEqual(array('controller'=>'blog'),
             $this->rec(''));
-        $this->assertEqual(array('controller'=>'users', 'action'=>'show', 'group'=>'admin', 'pays'=>'france'),
-            $this->rec('users/show?group=admin&pays=france'));
+        $this->assertEqual(array('controller'=>'users', 'action'=>'show'),
+            $this->rec('users/show'));
             
         $this->assertEqual(array('posts/view/45', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'view', 'id'=>45)));
@@ -215,18 +215,6 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php')));
         $this->assertEqual(array('downloads/pdf/my_book', array()),
             $this->gen(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book')));
-    }
-    
-    function test_trailing_slash()
-    {
-        $map = new SRouteSet();
-        $map->connect(':controller/:action/:id');
-        $this->set_map($map);
-        
-        $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
-            $this->rec('posts/view/45/'));
-        $this->assertEqual(array('controller'=>'posts', 'action'=>'new'),
-            $this->rec('posts/new/'));
     }
 }
 

@@ -339,18 +339,10 @@ class SRouteSet
         return $route->generate($options);
     }
     
-    public function recognize_path($url)
+    public function recognize_path($path)
     {
-        if (strpos($url, '?') !== false)
-            list($path, $query_string) = explode('?', $url);
-        else
-            list($path, $query_string) = array($url, '');
-            
         $options = array();
         $recognized = false;
-        
-        if (substr($path, -1) == '/') $path = substr($path, 0, -1);
-        
         foreach($this->routes as $route)
         {
             if (preg_match($route->regex, $path, $matches))
@@ -368,15 +360,11 @@ class SRouteSet
                     $options['controller'] = $route->subdir.'/'.$options['controller'];
                 
                 $recognized = true;
-                
                 break;
             }
         }
-        
         if (!$recognized) return null;
-        
-        parse_str($query_string, $params);
-        return array_merge($params, $options);
+        return $options;
     }
     
     public function draw()
@@ -401,6 +389,11 @@ class SRouteSet
             }
         }
     }
+    
+    private function extract_format($path)
+    {
+        return strrchr($path, '.');
+    }
 }
 
 class SRoutes
@@ -417,11 +410,30 @@ class SRoutes
   
     public static function recognize($request)
     {
-        $options = self::$map->recognize_path($request->request_uri());
+        $url = $request->request_uri();
+        
+        if (strpos($url, '?') !== false)
+            list($path, $query_string) = explode('?', $url);
+        else
+            list($path, $query_string) = array($url, '');
+            
+        // Skip trailing slash
+        if (substr($path, -1) == '/') $path = substr($path, 0, -1);
+        
+        $extension = strrchr($path, '.');
+        if ($extension !== false)
+        {
+            $request->set_format_by_extension(substr($extension, 1));
+            $path = substr($path, 0, - strlen($extension));
+        }
+            
+        $options = self::$map->recognize_path($path);
         
         if ($options === null)
-            throw new SRoutingException('Recognition failed for '.$request->request_uri());
+            throw new SRoutingException("Recognition failed for $url");
         
+        parse_str($query_string, $params);
+        $options = array_merge($params, $options);
         $request->inject_params($options);
             
         return $request;

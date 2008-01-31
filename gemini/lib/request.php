@@ -1,10 +1,11 @@
 <?php
 
+class SUnknownHttpMethod extends Exception {}
 /**
  * Request class
  * 
  * @package Stato
- * @subpackage controller
+ * @subpackage gemini
  */
 class SRequest
 {
@@ -14,9 +15,12 @@ class SRequest
      */
     public $params = array();
     
-    private $relative_url_root = null;
-    private $request_uri       = null;
-    private $host              = null;
+    private static $accepted_http_methods = array('get', 'post', 'put', 'delete', 'head', 'options');
+    
+    private $relative_url_root;
+    private $request_uri;
+    private $accepts;
+    private $format;
     
     public function __construct()
     {
@@ -33,7 +37,7 @@ class SRequest
      */
     public function is_post()
     {
-        return $this->method() == 'POST';
+        return $this->method() == 'post';
     }
     
     /**
@@ -41,7 +45,31 @@ class SRequest
      */
     public function is_get()
     {
-        return $this->method() == 'GET';
+        return $this->method() == 'get';
+    }
+    
+    /**
+     * Is this a HEAD request ?
+     */
+    public function is_head()
+    {
+        return $this->method() == 'head';
+    }
+    
+    /**
+     * Is this a PUT request ?
+     */
+    public function is_put()
+    {
+        return $this->method() == 'put';
+    }
+    
+    /**
+     * Is this a DELETE request ?
+     */
+    public function is_delete()
+    {
+        return $this->method() == 'delete';
     }
     
     /**
@@ -71,15 +99,64 @@ class SRequest
     }
     
     /**
-     * Returns the HTTP request method
+     * Returns the HTTP request method as a lowercase string
      */
     public function method()
     {
-        return $_SERVER['REQUEST_METHOD'];
+        $method = ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($this->params['_method']))
+                ? $this->params['_method']
+                : strtolower($_SERVER['REQUEST_METHOD']);
+        
+        if (!in_array($method, self::$accepted_http_methods))
+            throw new SUnknownHttpMethod($method);
+        
+        return $method;
     }
     
     /**
-     * Returns the host for this request
+     * Returns the accepted MIME types for the request
+     */
+    public function accepts()
+    {
+        if (!isset($this->accepts))
+        {
+            if (isset($_SERVER['HTTP_ACCEPT']) && !empty($_SERVER['HTTP_ACCEPT']))
+                $this->accepts = SMimeType::parse($_SERVER['HTTP_ACCEPT']);
+            else
+                return array('all');
+        }
+        return $this->accepts;
+    }
+    
+    /**
+     * Returns the MIME type for the format used in the request.
+     * If there is no format available, the first of the accept types will be used.
+     */
+    public function format()
+    {
+        if (!isset($this->format))
+            $this->format = array_shift($this->accepts());
+        return $this->format;
+    }
+    
+    /**
+     * Sets the format manually ; can be useful to force custom formats
+     */
+    public function set_format($format)
+    {
+        $this->format = $format;
+    }
+    
+    /**
+     * Sets the format by string extension ; used by routing
+     */
+    public function set_format_by_extension($extension)
+    {
+        $this->format = SMimeType::lookup_by_extension($extension);
+    }
+    
+    /**
+     * Returns the host for the request
      */
     public function host()
     {
@@ -87,7 +164,7 @@ class SRequest
     }
     
     /**
-     * Returns the port number of this request
+     * Returns the port number of the request
      */
     public function port()
     {
@@ -111,7 +188,7 @@ class SRequest
     }
     
     /**
-     * Returns the standard port number for this request's protocol
+     * Returns the standard port number for the request's protocol
      */
     public function standard_port()
     {
@@ -119,7 +196,7 @@ class SRequest
     }
     
     /**
-     * Returns a port suffix like ":8080" if the port number of this request is not the default HTTP port 80 or HTTPS port 443
+     * Returns a port suffix like ":8080" if the port number of the request is not the default HTTP port 80 or HTTPS port 443
      */
     public function port_string()
     {
@@ -127,7 +204,7 @@ class SRequest
     }
     
     /**
-     * Returns a host:port string for this request
+     * Returns a host:port string for the request
      */
     public function host_with_port()
     {
