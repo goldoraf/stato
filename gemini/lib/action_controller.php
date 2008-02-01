@@ -32,7 +32,7 @@ class SHttp404 extends Exception {}
  * @package Stato
  * @subpackage controller
  */
-class SActionController
+class SActionController implements SIDispatchable
 {   
     /**
      * Holds the request object that's primarily used to get variables set by the 
@@ -91,33 +91,28 @@ class SActionController
     public static $template_class = 'SActionView';
     public static $exception_notifier = null;
     
-    public static function instanciate($req_controller)
+    public static function instanciate($name)
     {
-        $class_name = self::controller_class($req_controller);
-        if (!file_exists($path = self::controller_file($req_controller)))
-    		throw new SUnknownControllerException(SInflection::camelize($req_controller).'Controller not found !');
+        if (file_exists($path = STATO_APP_PATH.'/controllers/application_controller.php')) require_once($path);
+        
+        $class_name = self::controller_class($name);
+        if (!file_exists($path = self::controller_file($name)))
+    		throw new SUnknownControllerException("$class_name not found !");
     		
     	require_once($path);
 		return new $class_name();
     }
     
-    public static function process_with_exception($request, $response, $exception)
-    {
-        $controller = new SActionController();
-        return $controller->process($request, $response, 'rescue_action', $exception);
-    }
-    
-    public function process($request, $response, $method = 'perform_action', $arguments = null)
+    public function dispatch(SRequest $request)
     {
         $this->request  = $request;
-        $this->response = $response;
+        $this->response = new SResponse();
         $this->params   =& $this->request->params;
         $this->assigns  =& $this->response->assigns;
         $this->session  = new SPhpSession();
         $this->flash    = new SFlash($this->session);
         
-        if ($arguments != null) $this->$method($arguments);
-        else $this->$method();
+        $this->perform_action();
         
         return $this->response;
     }
@@ -518,14 +513,6 @@ class SActionController
             SActiveRecord::connection()->write_log();
     }
     
-    protected function rescue_action($exception)
-    {
-        if ($this->is_performed()) $this->erase_results();
-        $this->log_error($exception);
-        if (self::$consider_all_requests_local) $this->rescue_action_locally($exception);
-        else $this->rescue_action_in_public($exception);
-    }
-    
     private function perform_action()
     {
         $action = $this->action_name();
@@ -648,82 +635,6 @@ class SActionController
         // IE6 fix on opening downloaded files
         /*if ($this->response->headers['Cache-Control'] == 'no-cache')
             $this->response->headers['Cache-Control'] = 'private';*/
-    }
-    
-    private function rescue_action_in_public($exception)
-    {
-        if (($class = self::$exception_notifier) !== null)
-        {
-            $notifier = new $class();
-            $notifier->notify($exception, $this->request, $this->session,
-                              self::controller_class($this->request->params['controller']),
-                              $this->action_name());
-        }
-        
-        $status = $this->response_code_for_rescue($exception);
-        if (in_array(get_class($exception), array('SHttp404', 'SRoutingException', 
-            'SUnknownControllerException', 'SUnknownActionException')))
-            $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/404.html'), $status);
-        else $this->render_text(file_get_contents(STATO_APP_ROOT_PATH.'/public/500.html'), $status);
-    }
-    
-    private function rescue_action_locally($exception)
-    {
-        $rescue_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue/';
-        $this->add_variables_to_assigns();
-        $this->assigns['exception'] = $exception;
-        $this->assigns['controller_name'] = self::controller_class($this->request->params['controller']);
-        $this->assigns['action_name'] = $this->action_name();
-        $this->assigns['layout_content'] 
-            = $this->view->render($rescue_path.$this->template_file_for_local_rescue($exception).'.php');
-        
-        $this->render_file($rescue_path.'layout.php', $this->response_code_for_rescue($exception));
-    }
-    
-    private function template_file_for_local_rescue($exception)
-    {
-        switch (get_class($exception))
-        {
-            case 'SRoutingException':
-                return 'routing_error';
-            case 'SMissingTemplateException':
-                return 'template_missing';
-            case 'SUnknownControllerException':
-                return 'unknown_controller';
-            case 'SUnknownActionException':
-                return 'unknown_action';
-            default:
-                return 'diagnostics';
-        }
-    }
-    
-    private function response_code_for_rescue($exception)
-    {
-        if (in_array(get_class($exception), array('SRoutingException', 
-            'SUnknownControllerException', 'SUnknownActionException')))
-            return '404 Page Not Found';
-        else
-            return '500 Internal Error';
-    }
-    
-    private function log_error($exception)
-    {
-        $this->logger->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
-        .implode("\n    ", $this->clean_backtrace($exception))."\n");
-    }
-    
-    private function clean_backtrace($exception)
-    {
-        foreach ($exception->getTrace() as $t)
-        {
-            $str = '';
-            if (isset($t['file']) && isset($t['line'])) $str.= $t['file'].':'.$t['line'];
-            else $str.= 'undefined';
-            if (isset($t['class'])) $str.= ' in \''.$t['class'].$t['type'].$t['function'].'\'';
-            else $str.= ' in \''.$t['function'].'\'';
-            $trace [] = $str;
-        }
-        return $trace;
     }
     
     private function page_cache_path($path)

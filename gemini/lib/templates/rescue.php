@@ -37,6 +37,20 @@
   </style>
   </head>
   <body>
-        <?= $this->layout_content; ?>
+        <h1><?= get_class($exception); ?></h1>
+        <pre><?= $exception->getMessage(); ?></pre>
+        <p><?= "Exception occured at : ".$exception->getFile()." : ".$exception->getLine(); ?></p>
+        <table>
+            <caption>Stack trace</caption>
+            <tr><th>#</th><th>File</th><th>Line</th><th>Function</th></tr>
+            <? foreach ($exception->getTrace() as $num => $trace) : ?>
+                <tr>
+                    <td><?= $num + 1; ?></td>
+                    <td><?= (isset($trace['file'])) ? $trace['file'] : ''; ?></td>
+                    <td><?= (isset($trace['line'])) ? $trace['line'] : ''; ?></td>
+                    <td><?= (isset($trace['class'])) ? $trace['class'].$trace['type'].$trace['function'] : $trace['function']; ?></td>
+                </tr>
+            <? endforeach; ?>
+        </table>
   </body>
 </html>

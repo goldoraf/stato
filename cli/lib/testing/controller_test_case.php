@@ -14,25 +14,17 @@ class ControllerTestCase extends StatoTestCase
     const MISSING  = '404 Page Not Found';
     const REDIRECT = '302 Found';
     
-    protected function process($controller, $action = 'show', $params = array())
-    {
-        $request = new MockRequest();
-        $params['action'] = $action;
-        $request->params = $params;
-        $c = new $controller();
-        return $c->process($request, new MockResponse());
-    }
-    
     protected function get($action, $params = array())
     {
         $this->ensure_setup_ok();
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $this->setup_and_process($action, $params);
     }
     
     protected function post($action, $params = array())
     {
         $this->ensure_setup_ok();
-        $this->request->method = 'POST';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $this->setup_and_process($action, $params);
     }
     
@@ -74,14 +66,15 @@ class ControllerTestCase extends StatoTestCase
     
     private function setup_and_process($action, $params = array())
     {
+        $this->request = new SRequest();
         $params['action'] = $action;
-        $this->request->params = $params;
-        $this->request->relative_url_root = '/';
+        $this->request->inject_params($params);
+        //$this->request->relative_url_root = '/';
         
         try {
-            $this->controller->process($this->request, $this->response);
+            $this->response = $this->controller->dispatch($this->request);
         } catch (Exception $e) {
-            SActionController::process_with_exception($this->request, $this->response, $e);
+            
         }
         
         $this->assigns = $this->response->assigns;
@@ -91,8 +84,8 @@ class ControllerTestCase extends StatoTestCase
     
     private function ensure_setup_ok()
     {
-        if ($this->controller === null || $this->request === null || $this->response === null)
-            throw new Exception('Controller, mock request or mock response was not correctly setup');
+        if ($this->controller === null)
+            throw new Exception('Controller was not correctly setup');
     }
 }
 

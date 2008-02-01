@@ -120,8 +120,18 @@ class AroundController extends TestController
     }
 }
 
-class FiltersTest extends ControllerTestCase
+class FiltersTest extends StatoTestCase
 {
+    protected function process($controller, $action = 'show', $params = array())
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $request = new SRequest();
+        $params['action'] = $action;
+        $request->inject_params($params);
+        $c = new $controller();
+        return $c->dispatch($request);
+    }
+    
     public function test_basic()
     {
         $this->assertEqual('ran action', $this->process('BasicController')->body);
