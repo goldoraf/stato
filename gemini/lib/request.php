@@ -152,7 +152,7 @@ class SRequest
      */
     public function set_format_by_extension($extension)
     {
-        $this->format = SMimeType::lookup_by_extension($extension);
+        $this->format = SMimeType::lookup_by_extension($extension)->name;
     }
     
     /**

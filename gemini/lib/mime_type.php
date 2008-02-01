@@ -34,12 +34,12 @@ class SMimeType
     
     public static function lookup($string)
     {
-        return @self::$lookup[$string]->name;   
+        return @self::$lookup[$string];   
     }
     
     public static function lookup_by_extension($string)
     {
-        return @self::$names_lookup[$string]->name;   
+        return @self::$names_lookup[$string];   
     }
     
     public static function parse($accept_header)
@@ -72,8 +72,8 @@ class SMimeType
         $types = array();
         foreach ($accept_list as $item)
         {
-            $name = self::lookup($item->name);
-            if ($name && !in_array($name, $types)) $types[] = $name;
+            $type = self::lookup($item->name);
+            if ($type && !in_array($type->name, $types)) $types[] = $type->name;
         }
         return $types;
     }

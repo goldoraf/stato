@@ -1,10 +1,14 @@
 <?php
 
+require('lib/error_handling.php');
+require('lib/dispatcher.php');
 require('lib/action_controller.php');
 require('lib/action_view.php');
+require('lib/resource.php');
+require('lib/responder.php');
+require('lib/serializers.php');
 require('lib/presenter.php');
 require('lib/caching.php');
-require('lib/dispatcher.php');
 require('lib/flash.php');
 require('lib/request.php');
 require('lib/response.php');
