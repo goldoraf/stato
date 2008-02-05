@@ -55,6 +55,12 @@ class SLogger
         return (fwrite($this->fp, $line) !== false);
     }
     
+    public function log_error($exception)
+    {
+        return $this->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
+        .implode("\n    ", $this->clean_backtrace($exception))."\n");
+    }
+    
     public function fatal($message)
     {
         return $this->log($message, self::FATAL);
@@ -138,6 +144,20 @@ class SLogger
     private function flush()
     {
         return fflush($this->fp);
+    }
+    
+    private function clean_backtrace($exception)
+    {
+        foreach ($exception->getTrace() as $t)
+        {
+            $str = '';
+            if (isset($t['file']) && isset($t['line'])) $str.= $t['file'].':'.$t['line'];
+            else $str.= 'undefined';
+            if (isset($t['class'])) $str.= ' in \''.$t['class'].$t['type'].$t['function'].'\'';
+            else $str.= ' in \''.$t['function'].'\'';
+            $trace [] = $str;
+        }
+        return $trace;
     }
 }
 

@@ -34,6 +34,8 @@ class SDispatcher
         }
         catch (Exception $e)
         {
+            SLogger::get_instance()->log_error($e);
+            
             if (SActionController::$consider_all_requests_local)
                 $response = SRescue::locally($request, $e);
             else

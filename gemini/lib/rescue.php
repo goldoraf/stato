@@ -44,7 +44,6 @@ class SRescue
                               self::controller_class($this->request->params['controller']),
                               $this->action_name());
         }*/
-        self::log_error($exception);
         $status = self::status_for_rescue($exception);
         $body = null;
         if ($request->format() == 'html')
@@ -58,7 +57,6 @@ class SRescue
     
     public static function locally($request, $exception)
     {
-        self::log_error($exception);
         $status = self::status_for_rescue($exception);
         if ($request->format() == 'html')
         {
@@ -83,26 +81,6 @@ class SRescue
         $response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $response->body = $body;
         return $response;
-    }
-    
-    private static function log_error($exception)
-    {
-        SLogger::get_instance()->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
-        .implode("\n    ", self::clean_backtrace($exception))."\n");
-    }
-    
-    private static function clean_backtrace($exception)
-    {
-        foreach ($exception->getTrace() as $t)
-        {
-            $str = '';
-            if (isset($t['file']) && isset($t['line'])) $str.= $t['file'].':'.$t['line'];
-            else $str.= 'undefined';
-            if (isset($t['class'])) $str.= ' in \''.$t['class'].$t['type'].$t['function'].'\'';
-            else $str.= ' in \''.$t['function'].'\'';
-            $trace [] = $str;
-        }
-        return $trace;
     }
 }
 
