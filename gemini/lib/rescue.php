@@ -32,7 +32,7 @@ class SRescue
         'SRoutingException' => 404, 
         'SUnknownControllerException' => 404,
         'SUnknownActionException' => 404,
-        'SActiveRecordDoesNotExist' => 404,
+        'SRecordNotFound' => 404,
     );
     
     public static function in_public($request, $exception)

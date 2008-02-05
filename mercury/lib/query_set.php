@@ -1,6 +1,6 @@
 <?php
 
-class SActiveRecordDoesNotExist extends Exception {}
+class SRecordNotFound extends Exception {}
 class SAssertionError extends Exception {}
 
 class SQuerySet implements Iterator, Countable
