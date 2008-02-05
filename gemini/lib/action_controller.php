@@ -78,7 +78,7 @@ class SActionController implements SIDispatchable
     private $performed_render   = false;
     private $performed_redirect = false;
     
-    const DEFAULT_RENDER_STATUS_CODE = '200 OK';
+    const DEFAULT_RENDER_STATUS_CODE = 200;
     
     public static $session_handler = 'default';
     public static $fragment_cache_store = 'file';
@@ -253,7 +253,7 @@ class SActionController implements SIDispatchable
             throw new SDoubleRenderException('Can only render or redirect once per action');
         
         $this->performed_render = true;
-        $this->response->headers['Status'] = (!empty($status)) ? $status : self::DEFAULT_RENDER_STATUS_CODE;
+        $this->response->status = (!empty($status)) ? $status : self::DEFAULT_RENDER_STATUS_CODE;
         $this->response->body = $str;
     }
     
@@ -346,7 +346,7 @@ class SActionController implements SIDispatchable
     {
         $this->performed_redirect = false;
         $this->response->redirected_to = null;
-        $this->response->headers['Status'] = self::DEFAULT_RENDER_STATUS_CODE;
+        $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
         unset($this->response->headers['location']);
     }
     

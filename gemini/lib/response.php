@@ -3,6 +3,7 @@
 class SResponse
 {
     public $body         = null;
+    public $status       = null;
     public $assigns      = array();
     public $headers      = array();
     public $redirected_to = null;
@@ -10,47 +11,59 @@ class SResponse
     private static $default_headers = array('Cache-Control' => 'no_cache');
     
     public static $status_code_text = array(
-        100 => 'CONTINUE',
-        101 => 'SWITCHING PROTOCOLS',
-        200 => 'OK',
-        201 => 'CREATED',
-        202 => 'ACCEPTED',
-        203 => 'NON-AUTHORITATIVE INFORMATION',
-        204 => 'NO CONTENT',
-        205 => 'RESET CONTENT',
-        206 => 'PARTIAL CONTENT',
-        300 => 'MULTIPLE CHOICES',
-        301 => 'MOVED PERMANENTLY',
-        302 => 'FOUND',
-        303 => 'SEE OTHER',
-        304 => 'NOT MODIFIED',
-        305 => 'USE PROXY',
-        306 => 'RESERVED',
-        307 => 'TEMPORARY REDIRECT',
-        400 => 'BAD REQUEST',
-        401 => 'UNAUTHORIZED',
-        402 => 'PAYMENT REQUIRED',
-        403 => 'FORBIDDEN',
-        404 => 'NOT FOUND',
-        405 => 'METHOD NOT ALLOWED',
-        406 => 'NOT ACCEPTABLE',
-        407 => 'PROXY AUTHENTICATION REQUIRED',
-        408 => 'REQUEST TIMEOUT',
-        409 => 'CONFLICT',
-        410 => 'GONE',
-        411 => 'LENGTH REQUIRED',
-        412 => 'PRECONDITION FAILED',
-        413 => 'REQUEST ENTITY TOO LARGE',
-        414 => 'REQUEST-URI TOO LONG',
-        415 => 'UNSUPPORTED MEDIA TYPE',
-        416 => 'REQUESTED RANGE NOT SATISFIABLE',
-        417 => 'EXPECTATION FAILED',
-        500 => 'INTERNAL SERVER ERROR',
-        501 => 'NOT IMPLEMENTED',
-        502 => 'BAD GATEWAY',
-        503 => 'SERVICE UNAVAILABLE',
-        504 => 'GATEWAY TIMEOUT',
-        505 => 'HTTP VERSION NOT SUPPORTED',
+        100 => "Continue",
+        101 => "Switching Protocols",
+        102 => "Processing",
+        
+        200 => "OK",
+        201 => "Created",
+        202 => "Accepted",
+        203 => "Non-Authoritative Information",
+        204 => "No Content",
+        205 => "Reset Content",
+        206 => "Partial Content",
+        207 => "Multi-Status",
+        226 => "IM Used",
+        
+        300 => "Multiple Choices",
+        301 => "Moved Permanently",
+        302 => "Found",
+        303 => "See Other",
+        304 => "Not Modified",
+        305 => "Use Proxy",
+        307 => "Temporary Redirect",
+        
+        400 => "Bad Request",
+        401 => "Unauthorized",
+        402 => "Payment Required",
+        403 => "Forbidden",
+        404 => "Not Found",
+        405 => "Method Not Allowed",
+        406 => "Not Acceptable",
+        407 => "Proxy Authentication Required",
+        408 => "Request Timeout",
+        409 => "Conflict",
+        410 => "Gone",
+        411 => "Length Required",
+        412 => "Precondition Failed",
+        413 => "Request Entity Too Large",
+        414 => "Request-URI Too Long",
+        415 => "Unsupported Media Type",
+        416 => "Requested Range Not Satisfiable",
+        417 => "Expectation Failed",
+        422 => "Unprocessable Entity",
+        423 => "Locked",
+        424 => "Failed Dependency",
+        426 => "Upgrade Required",
+        
+        500 => "Internal Server Error",
+        501 => "Not Implemented",
+        502 => "Bad Gateway",
+        503 => "Service Unavailable",
+        504 => "Gateway Timeout",
+        505 => "HTTP Version Not Supported",
+        507 => "Insufficient Storage",
+        510 => "Not Extended"
     );
     
     public function __construct()
@@ -60,8 +73,8 @@ class SResponse
     
     public function redirect($url, $permanently = false)
     {
-        if ($this->headers['Status'] != '301 Moved Permanently')
-            $this->headers['Status'] = '302 Found';
+        if ($permanently) $this->status = 301;
+        else $this->status = 302;
             
         $this->headers['location'] = $url;
         $this->body = "<html><body>You are being <a href=\"{$url}\">redirected</a>.</body></html>";
@@ -69,6 +82,8 @@ class SResponse
     
     public function send_headers()
     {
+        if (!isset($this->headers['Status']) && isset(self::$status_code_text[$this->status]))
+            $this->headers['Status'] = $this->status.' '.self::$status_code_text[$this->status];
         foreach($this->headers as $key => $value) header($key.': '.$value);
     }
     

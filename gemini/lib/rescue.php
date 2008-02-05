@@ -26,7 +26,16 @@ set_error_handler('error_handler');
 
 class SRescue
 {
-    public static function in_public($exception)
+    private static $default_rescue_status = array
+    (
+        'SHttp404' => 404, 
+        'SRoutingException' => 404, 
+        'SUnknownControllerException' => 404,
+        'SUnknownActionException' => 404,
+        'SActiveRecordDoesNotExist' => 404,
+    );
+    
+    public static function in_public($request, $exception)
     {
         /*if (($class = self::$exception_notifier) !== null)
         {
@@ -36,31 +45,41 @@ class SRescue
                               $this->action_name());
         }*/
         self::log_error($exception);
-        list($status, $html) = self::params_for_rescue($exception);
-        return self::response(file_get_contents(STATO_APP_ROOT_PATH."/public/$html"), $status);
+        $status = self::status_for_rescue($exception);
+        $body = null;
+        if ($request->format() == 'html')
+        {
+            $path = STATO_APP_ROOT_PATH."/public/{$status}.html";
+            if (file_exists($path))
+                $body = file_get_contents($path);
+        }
+        return self::response($body, $status);
     }
     
-    public static function locally($exception)
+    public static function locally($request, $exception)
     {
         self::log_error($exception);
-        list($status, ) = self::params_for_rescue($exception);
-        $template_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue.php';
-        $view = new SActionView();
-        return self::response($view->render($template_path, array('exception' => $exception)), $status);
+        $status = self::status_for_rescue($exception);
+        if ($request->format() == 'html')
+        {
+            $template_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue.php';
+            $view = new SActionView();
+            return self::response($view->render($template_path, array('exception' => $exception)), $status);
+        }
     }
     
-    private static function params_for_rescue($exception)
+    private static function status_for_rescue($exception)
     {
-        if (in_array(get_class($exception), self::$exceptions_404))
-            return array('404 Page Not Found', '404.html');
+        if (array_key_exists(get_class($exception), self::$default_rescue_status))
+            return self::$default_rescue_status[get_class($exception)];
         else
-            return array('500 Internal Error', '500.html');
+            return 500;
     }
     
     private static function response($body, $status)
     {
         $response = new SResponse();
-        $response->headers['Status'] = $status;
+        $response->status = $status;
         $response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $response->body = $body;
         return $response;
@@ -69,7 +88,7 @@ class SRescue
     private static function log_error($exception)
     {
         SLogger::get_instance()->fatal(get_class($exception)." (".$exception->getMessage().")\n    "
-        .implode("\n    ", $this->clean_backtrace($exception))."\n");
+        .implode("\n    ", self::clean_backtrace($exception))."\n");
     }
     
     private static function clean_backtrace($exception)
