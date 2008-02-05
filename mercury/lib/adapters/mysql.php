@@ -4,14 +4,15 @@ class SMySqlAdapter extends SAbstractAdapter
 {
     public $native_db_types = array
     (
-        SColumn::PK       => 'int(11) DEFAULT NULL auto_increment',
-        SColumn::STRING   => array('name' => 'varchar', 'limit' => 255),
-        SColumn::TEXT     => array('name' => 'text'),
-        SColumn::FLOAT    => array('name' => 'float'),
-        SColumn::DATETIME => array('name' => 'datetime'),
-        SColumn::DATE     => array('name' => 'date'),
-        SColumn::INTEGER  => array('name' => 'int', 'limit' => 11),
-        SColumn::BOOLEAN  => array('name' => 'tinyint', 'limit' => 1)
+        SColumn::PK        => 'int(11) DEFAULT NULL auto_increment',
+        SColumn::STRING    => array('name' => 'varchar', 'limit' => 255),
+        SColumn::TEXT      => array('name' => 'text'),
+        SColumn::FLOAT     => array('name' => 'float'),
+        SColumn::DATETIME  => array('name' => 'datetime'),
+        SColumn::DATE      => array('name' => 'date'),
+        SColumn::TIMESTAMP => array('name' => 'timestamp'),
+        SColumn::INTEGER   => array('name' => 'int', 'limit' => 11),
+        SColumn::BOOLEAN   => array('name' => 'tinyint', 'limit' => 1)
     );
     
     public function connect()

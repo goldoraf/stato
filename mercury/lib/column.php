@@ -2,14 +2,15 @@
 
 class SColumn
 {
-    const PK       = 'primary_key';
-    const INTEGER  = 'integer';
-    const STRING   = 'string';
-    const BOOLEAN  = 'boolean';
-    const DATE     = 'date';
-    const DATETIME = 'datetime';
-    const FLOAT    = 'float';
-    const TEXT     = 'text';
+    const PK        = 'primary_key';
+    const INTEGER   = 'integer';
+    const STRING    = 'string';
+    const BOOLEAN   = 'boolean';
+    const DATE      = 'date';
+    const DATETIME  = 'datetime';
+    const TIMESTAMP = 'timestamp';
+    const FLOAT     = 'float';
+    const TEXT      = 'text';
     
     public $name    = null;
     public $type    = null;
