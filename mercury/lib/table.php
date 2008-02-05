@@ -2,13 +2,16 @@
 
 class STable
 {
-    private $columns  = array();
-    private $has_pk   = false;
+    private $columns;
+    
+    public function __construct($columns = array())
+    {
+        $this->columns = $columns;
+    }
     
     public function add_primary_key($name, $type = SColumn::PK, $options = array())
     {
         $this->add_column($name, $type, $options);
-        $this->has_pk = true;
     }
     
     public function add_column($name, $type, $options = array())
@@ -27,7 +30,6 @@ class STable
     
     public function to_sql()
     {
-        //if (!$this->has_pk) $this->add_primary_key('id');
         $cols = array();
         foreach($this->columns as $column) $cols[] = $column->to_sql();
         return implode(', ', $cols);
