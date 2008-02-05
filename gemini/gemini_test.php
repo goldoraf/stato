@@ -12,6 +12,7 @@ return array
     'url_rewriter',
     'mime_type',
     'request',
+    'rescue',
     'helpers/tag_helper',
     'helpers/asset_tag_helper',
     'helpers/javascript_helper',

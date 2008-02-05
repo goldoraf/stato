@@ -1,7 +1,5 @@
 <?php
 
-define('STATO_APP_ROOT_PATH', 'dummy');
-
 require(STATO_CORE_PATH.'/common/lib/initializer.php');
 
 define('ST_DIR', STATO_CORE_PATH.'/vendor/simpletest');
