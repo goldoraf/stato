@@ -1,6 +1,6 @@
 <?php
 
-require('lib/error_handling.php');
+require('lib/rescue.php');
 require('lib/dispatcher.php');
 require('lib/action_controller.php');
 require('lib/action_view.php');
