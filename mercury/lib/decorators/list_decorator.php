@@ -96,7 +96,7 @@ class SListDecorator extends SActiveRecordDecorator
             return $this->manager->get(
                 $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) - 1)
             );
-        } catch (SActiveRecordDoesNotExist $e) {
+        } catch (SRecordNotFound $e) {
             return null;
         }
     }
@@ -108,7 +108,7 @@ class SListDecorator extends SActiveRecordDecorator
             return $this->manager->get(
                 $this->scope_condition()." AND {$this->column} = ".($this->record->__get($this->column) + 1)
             );
-        } catch (SActiveRecordDoesNotExist $e) {
+        } catch (SRecordNotFound $e) {
             return null;
         }
     }

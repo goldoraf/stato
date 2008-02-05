@@ -174,7 +174,7 @@ class ActiveRecordTest extends ActiveTestCase
         $product->delete();
         try { $p = Product::$objects->get($product->id); }
         catch (Exception $e) { }
-        $this->assertEqual('SActiveRecordDoesNotExist', get_class($e));
+        $this->assertEqual('SRecordNotFound', get_class($e));
     }
     
     public function test_save_with_timestamps()

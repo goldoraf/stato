@@ -109,7 +109,7 @@ class SQuerySet implements Iterator, Countable
         }
         $clone = call_user_func_array(array($this, 'filter'), $args);
         $set = $clone->to_array();
-        if (($count = count($set)) < 1) throw new SActiveRecordDoesNotExist();
+        if (($count = count($set)) < 1) throw new SRecordNotFound();
         elseif ($count == 1) return $set[0];
         else throw new SAssertionError();
     }

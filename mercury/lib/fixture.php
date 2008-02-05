@@ -45,7 +45,7 @@ class SFixture
             foreach($this->values as $obj => $values)
             {
                 try { $instances[$obj] = $qs->get($values['id']); }
-                catch (SActiveRecordDoesNotExist $e) {}
+                catch (SRecordNotFound $e) {}
             }
             return $instances;
         }

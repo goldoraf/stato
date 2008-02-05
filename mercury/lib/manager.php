@@ -65,7 +65,7 @@ class SManager
         try { 
             return $this->get_by_attributes($attributes);
         }
-        catch (SActiveRecordDoesNotExist $e) { 
+        catch (SRecordNotFound $e) { 
             return $this->build($attributes);
         }
     }
@@ -75,7 +75,7 @@ class SManager
         try { 
             return $this->get_by_attributes($attributes);
         }
-        catch (SActiveRecordDoesNotExist $e) { 
+        catch (SRecordNotFound $e) { 
             return $this->create($attributes);
         }
     }

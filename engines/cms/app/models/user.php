@@ -21,7 +21,7 @@ class User extends SActiveRecord
         try {
             return self::$objects->get('login = :login', 'password = :password', 
                                         array(':login' => $login, ':password' => $password));                      
-        } catch (SActiveRecordDoesNotExist $e) {
+        } catch (SRecordNotFound $e) {
             return false;
         }
     }

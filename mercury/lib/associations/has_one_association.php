@@ -85,7 +85,7 @@ class SHasOneManager extends SAssociationManager
             $qs = new SQuerySet($this->meta);
             return $qs->get("{$this->meta->foreign_key} = '{$this->owner->id}'");
         }
-        catch (SActiveRecordDoesNotExist $e)
+        catch (SRecordNotFound $e)
         {
             return null;
         }

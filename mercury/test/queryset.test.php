@@ -27,7 +27,7 @@ class QuerySetTest extends ActiveTestCase
         Employe::$objects->create(array('firstname' => 'John', 'lastname' => 'Ryan'));
         $this->expectException('SAssertionError');
         $emp = Employe::$objects->get("firstname = 'John'");
-        $this->expectException('SActiveRecordDoesNotExist');
+        $this->expectException('SRecordNotFound');
         $emp = Employe::$objects->get(999);
     }
     

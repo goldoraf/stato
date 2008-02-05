@@ -46,7 +46,7 @@ class AclEngine
             $user = User::$objects->get('login = ?', 'verified = 1', 'deleted = 0', array($login));
             return User::$objects->get('login = ?', 'salted_password = ?', 'verified = 1', 'deleted = 0',
                     array($login, self::salted_password($user->salt, self::hashed($password))));
-        } catch (SActiveRecordDoesNotExist $e) {
+        } catch (SRecordNotFound $e) {
             return false;
         }
     }
@@ -57,7 +57,7 @@ class AclEngine
             $user = User::$objects->get('id = ?', 'security_token = ?', array($user_id, $token));
             if ($user->is_token_expired()) return false;
             return $user;
-        } catch (SActiveRecordDoesNotExist $e) {
+        } catch (SRecordNotFound $e) {
             return false;
         }
     }
