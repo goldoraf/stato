@@ -2,10 +2,12 @@
 
 class STable
 {
+    private $name;
     private $columns;
     
-    public function __construct($columns = array())
+    public function __construct($name = null, $columns = array())
     {
+        $this->name = $name;
         $this->columns = $columns;
     }
     
