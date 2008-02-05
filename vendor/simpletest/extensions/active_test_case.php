@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('STATO_FIXTURES_DIR'))
-    define('STATO_FIXTURES_DIR', STATO_APP_ROOT_PATH.'/test/fixtures');
-
 class ActiveTestCase extends StatoTestCase
 {
     public $models = array();

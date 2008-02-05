@@ -1,6 +1,6 @@
 <?php
 
-if (!class_exists('SUrlRewriter', false))
+/*if (!class_exists('SUrlRewriter', false))
 {
     class SUrlRewriter
     {
@@ -9,11 +9,11 @@ if (!class_exists('SUrlRewriter', false))
             return 'http://www.example.com';
         }
     }
-}
+}*/
 
 class FormTagHelperTest extends HelperTestCase
 {
-    public function test_form_tag()
+    /*public function test_form_tag()
     {
         $this->assertDomEqual(
             form_tag('http://www.example.com').end_form_tag(),
@@ -23,7 +23,7 @@ class FormTagHelperTest extends HelperTestCase
             form_tag('http://www.example.com', array('multipart' => true)).end_form_tag(),
             '<form action="http://www.example.com" enctype="multipart/form-data" method="post"></form>'
         );
-    }
+    }*/
     
     public function test_checkbox_tag()
     {

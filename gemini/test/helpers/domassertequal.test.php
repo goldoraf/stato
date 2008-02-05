@@ -52,7 +52,7 @@ class DomAssertEqualTest extends UnitTestCase
         ));
     }
     
-    function assert_dom_equal($first, $second)
+    function assertDomEqual($first, $second)
     {
         $expectation = new DomEqualExpectation($first);
         return $expectation->test($second);
