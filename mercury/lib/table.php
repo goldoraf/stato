@@ -30,11 +30,21 @@ class STable
         $this->columns[$name] = $column;
     }
     
+    public function name()
+    {
+        return $this->name;
+    }
+    
     public function to_sql()
     {
         $cols = array();
         foreach($this->columns as $column) $cols[] = $column->to_sql();
         return implode(', ', $cols);
+    }
+    
+    public function create($options = null)
+    {
+        SActiveRecord::connection()->create_table($this->name, $this, $options);
     }
 }
 
