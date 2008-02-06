@@ -44,7 +44,7 @@ class GenerateCommand extends SCommand
         $this->create_file($migration_path, STATO_APP_ROOT_PATH,
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/cli/lib/templates/migration.php",
+                    STATO_CORE_PATH."/gemini/lib/templates/migration.php",
                     array('table_name' => $table_name, 'class_name' => $migration_class)
                 )
             )
@@ -136,7 +136,7 @@ class GenerateCommand extends SCommand
         $this->create_file($migration_path, STATO_APP_ROOT_PATH,
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/cli/lib/templates/empty_migration.php",
+                    STATO_CORE_PATH."/gemini/lib/templates/empty_migration.php",
                     array('class_name' => $migration_class)
                 )
             )
@@ -164,7 +164,7 @@ class GenerateCommand extends SCommand
         $this->create_file($path, STATO_APP_PATH,
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/cli/lib/templates/webservice.php",
+                    STATO_CORE_PATH."/gemini/lib/templates/webservice.php",
                     array('api_class_name' => $api_class_name, 'service_class_name' => $service_class_name)
                 )
             )
@@ -175,7 +175,7 @@ class GenerateCommand extends SCommand
     {
         $views_dir = $this->params['name'];
         
-        $templates_path = STATO_CORE_PATH.'/cli/lib/templates/web_services_test';
+        $templates_path = STATO_CORE_PATH.'/gemini/lib/templates/web_services_test';
         
         if (strpos($views_dir, '/') !== false)
             list($subdir, $views_dir) = explode('/', $views_dir);

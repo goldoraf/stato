@@ -17,9 +17,9 @@ class ScaffoldCommand extends SCommand
         if (isset($this->options['dry'])) $this->dry = true;
         
         if ($this->dry)
-            $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding_dry';
+            $scaffold_templates_path = STATO_CORE_PATH.'/gemini/lib/templates/scaffolding_dry';
         else
-            $scaffold_templates_path = STATO_CORE_PATH.'/cli/lib/templates/scaffolding';
+            $scaffold_templates_path = STATO_CORE_PATH.'/gemini/lib/templates/scaffolding';
         
         if (strpos($this->scaffold, '/') !== false)
         {
