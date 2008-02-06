@@ -461,7 +461,7 @@ class SNamedRoutes
         $routes_path = STATO_APP_ROOT_PATH.'/conf/routes.php';
         
         if (!file_exists($file_path) || filemtime($file_path) < filemtime($routes_path))
-            file_put_contents($file_path, SCodeGenerator::generate_file(implode("\n", self::$helpers)));
+            file_put_contents($file_path, "<?php\n\n".implode("\n", self::$helpers)."\n?>\n");
             
         require($file_path);
     }
