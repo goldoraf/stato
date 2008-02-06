@@ -2,6 +2,16 @@
 
 require_once(STATO_CORE_PATH.'/gemini/gemini.php');
 
+class SpecialMockRequest extends SRequest
+{
+    public $raw_post_data;
+    
+    public function raw_post_data()
+    {
+        return $this->raw_post_data;
+    }
+}
+
 class User extends SWebServiceStruct
 {
     public function __construct()
@@ -134,11 +144,14 @@ class XmlRpcInvocationTest extends StatoTestCase
     private function do_method_call($method, $params = array())
     {
         $xml_rpc_request = new SXmlRpcRequest($method, $params);
-        $request = new MockRequest();
-        $request->params = array('action' => 'xmlrpc');
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $request = new SpecialMockRequest();
+        $request->inject_params(array('action' => 'xmlrpc'));
         $request->raw_post_data = $xml_rpc_request->to_xml();
+        $tmp = new STempfile();
+        SLogger::initialize($tmp->path());
         $c = new ApiController();
-        return SXmlRpcClient::decode_response($c->process($request, new MockResponse())->body);
+        return SXmlRpcClient::decode_response($c->dispatch($request)->body);
     }
 }
 

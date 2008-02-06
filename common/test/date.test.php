@@ -1,9 +1,12 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/common/common.php');
-
 class DateTest extends UnitTestCase
 {
+    public function setup()
+    {
+        date_default_timezone_set('Europe/Paris');
+    }
+    
     public function test_date()
     {
         $d = new SDate(2006, 4, 15);
@@ -85,7 +88,7 @@ class DateTest extends UnitTestCase
         $date = new SDateTime(2006, 9, 13, 20, 25, 05);
         $this->assertEqual('2006-09-13 20:25:05', $date->__toString());
         $this->assertEqual('2006-09-13 20:25:05', $date->new_offset(- 6*3600)->__toString());
-        $this->assertEqual('2006-09-13 16:25:05', $date->new_offset(- 6*3600)->to_utc()->__toString());
+        $this->assertEqual('2006-09-13 14:25:05', $date->new_offset(- 6*3600)->to_local()->__toString());
     }
     
     public function test_alias_now()

@@ -481,7 +481,7 @@ class SActionController implements SIDispatchable
         }
         catch (Exception $e) {
             $raw_response = $server->write_fault('Internal server error', 500);
-            $this->log_error($e);
+            $this->logger->log_error($e);
         }
         
         $this->send_data($raw_response, array('type' => 'text/xml', 'disposition' => 'inline'));

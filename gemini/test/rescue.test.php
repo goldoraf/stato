@@ -1,6 +1,6 @@
 <?php
 
-define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/build');
+define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/gemini/lib/templates/createapp');
 
 class UnkownError extends Exception {}
 
