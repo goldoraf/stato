@@ -32,9 +32,9 @@ class CreateAppCommand extends SCommand
         foreach (array('fixtures', 'functional', 'mocks', 'unit') as $dir)
             $this->create_dir("test/$dir", $project_path);
         
-        $this->copy(STATO_CORE_PATH.'/build/conf', 'conf', $project_path);
-        $this->copy(STATO_CORE_PATH.'/build/public', 'public', $project_path);
-        $this->copy(STATO_CORE_PATH.'/build/scripts', 'scripts', $project_path);
+        $this->copy(STATO_CORE_PATH.'/gemini/lib/templates/createapp/conf', 'conf', $project_path);
+        $this->copy(STATO_CORE_PATH.'/gemini/lib/templates/createapp/public', 'public', $project_path);
+        $this->copy(STATO_CORE_PATH.'/gemini/lib/templates/createapp/scripts', 'scripts', $project_path);
         
         foreach (array('development', 'test', 'production') as $log)
             $this->create_file("log/$log.log", $project_path);
@@ -58,7 +58,7 @@ class CreateAppCommand extends SCommand
         
         $this->create_file("conf/boot.php", $project_path,
             SCodeGenerator::generate_file(
-                SCodeGenerator::render_template(STATO_CORE_PATH.'/cli/lib/templates/boot.php',
+                SCodeGenerator::render_template(STATO_CORE_PATH.'/gemini/lib/templates/createapp/boot.php',
                     array('project_core_path' => $project_core_path))
             )
         );
