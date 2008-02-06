@@ -8,20 +8,23 @@ abstract class SCommand
     protected $allowed_options = array();
     protected $allowed_params  = array();
     
-    public static function load($command_name, $args = null)
+    public static function find_and_execute()
     {
-        if ($args === null)
-        {
-            $args = $_SERVER['argv'];
-            array_shift($args);
-        }
-        
-        $command_file = STATO_CORE_PATH."/cli/lib/commands/$command_name.php";
-
-        if (!file_exists($command_file))
+        $args = $_SERVER['argv'];
+        array_shift($args); // skip file name
+        $command_name = array_shift($args);
+        return self::load($command_name, $args)->execute();
+    }
+    
+    public static function load($command_name, $args)
+    {
+        if (file_exists($command_file = STATO_CORE_PATH."/gemini/script/$command_name.php"))
+            require $command_file;
+        elseif (file_exists($command_file = STATO_CORE_PATH."/mercury/script/$command_name.php"))
+            require $command_file;
+        else
             throw new SConsoleException("$command_name command does not exist");
-            
-        require($command_file);
+
         $command_class = SInflection::camelize($command_name).'Command';
         return new $command_class($args);
     }

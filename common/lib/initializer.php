@@ -9,7 +9,6 @@ class SInitializer
         $config = new SConfiguration();
         
         require_once(STATO_CORE_PATH.'/common/common.php');
-        require_once(STATO_CORE_PATH.'/cli/cli.php');
         require_once(STATO_CORE_PATH.'/gemini/gemini.php');
         require_once(STATO_CORE_PATH.'/mercury/mercury.php');
         
