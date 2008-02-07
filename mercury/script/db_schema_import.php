@@ -1,7 +1,5 @@
 <?php
 
-require STATO_CORE_PATH.'/mercury/lib/db_schema.php';
-
 class DbSchemaImportCommand extends SCommand
 {
     public function execute()
