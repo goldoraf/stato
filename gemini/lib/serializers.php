@@ -7,40 +7,68 @@ interface SISerializable
 
 abstract class SAbstractSerializer
 {
-    public function serialize($variable)
-    {
-        if (is_object($variable) && method_exists($variable, 'serializable_form'))
-            $variable = $variable->serializable_form();
-            
-        return $this->handle($variable);
-    }
-    
-    abstract protected function handle($array);
+    abstract public function serialize($data);
 }
 
 class SJsonSerializer extends SAbstractSerializer
 {
-    protected function handle($array)
+    public function serialize($data)
     {
-        return json_encode($array);
+        if (is_object($data) && get_class($data) == 'SQuerySet')
+            return $this->serialize_queryset($data);
+        
+        if (is_object($data) && method_exists($data, 'serializable_form'))
+            $data = $data->serializable_form();    
+        
+        return json_encode($data);
+    }
+    
+    private function serialize_queryset($qs)
+    {
+        $records = array();
+        foreach ($qs as $record) $records[] = $this->serialize($record);
+        return '['.implode(',', $records).']';
     }
 }
 
 class SXmlSerializer extends SAbstractSerializer
 {
-    protected function handle($array)
+    public function serialize($data)
     {
+        if (is_object($data))
+        {
+            if (get_class($data) == 'SQuerySet')
+                $start_element = SInflection::underscore(get_class($data->first()));
+            else
+                $start_element = SInflection::underscore(get_class($data));
+        }
+        else $start_element = 'result';
+        
         $dom = new DOMDocument('1.0', 'utf-8');
-        $root = $dom->createElement('result');
+        $dom->preserveWhiteSpace = false;
+        $root = $dom->createElement($start_element);
         $dom->appendChild($root);
-        $this->recurse_node($array, $dom, $root);
+        $this->recurse_node($data, $dom, $root);
+        $dom->formatOutput = true;
         return $dom->saveXML();
     }
     
     private function recurse_node($data, $dom, $parent)
     {
+        if (!is_array($data) && !is_object($data))
+        {
+            $node = $dom->createTextNode((string) $data);
+            $parent->appendChild($node);
+            return;
+        }
+        
+        if (is_object($data) && method_exists($data, 'serializable_form'))
+            $data = $data->serializable_form();
+        
         foreach ($data as $key => $value)
         {
+            if (is_numeric($key)) $key = 'value';
+            
             if (is_array($value))
             {
                 $node = $dom->createElement($key);
@@ -49,8 +77,9 @@ class SXmlSerializer extends SAbstractSerializer
             }
             elseif (is_object($value))
             {
-                $node = $dom->createElement($key, 'Object: '.get_class($value));
+                $node = $dom->createElement(SInflection::underscore(get_class($value)));
                 $parent->appendChild($node);
+                $this->recurse_node($value, $dom, $node);
             }
             else
             {
