@@ -5,7 +5,6 @@ require('lib/dispatcher.php');
 require('lib/action_controller.php');
 require('lib/action_view.php');
 require('lib/resource.php');
-require('lib/responder.php');
 require('lib/serializers.php');
 require('lib/presenter.php');
 require('lib/caching.php');
