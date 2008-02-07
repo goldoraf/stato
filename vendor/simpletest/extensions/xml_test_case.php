@@ -64,15 +64,10 @@ class DomEqualExpectation extends EqualExpectation {
     {
         $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
-        if ($this->_hasXmlDeclaration($xml)) $doc->loadXML($xml);
-        else $doc->loadXML('<root>'.$xml.'</root>');
+        if (preg_match('/^<\?xml version="1.0"(.*)\?>(.*)$/sm', $xml, $matches))
+            $xml = $matches[2];
+        $doc->loadXML('<root>'.$xml.'</root>');
         return $doc;
-    }
-    
-    function _hasXmlDeclaration($xml)
-    {
-        if (preg_match('/<\?xml version="1.0"\?>/', $xml) == 1) return true;
-        return false;
     }
 }
 
