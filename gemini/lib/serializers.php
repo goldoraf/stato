@@ -1,32 +1,18 @@
 <?php
 
+interface SISerializable
+{
+    public function serializable_form($options = array());
+}
+
 abstract class SAbstractSerializer
 {
     public function serialize($variable)
     {
-        if (is_object($variable))
-        {
-            $ref = new ReflectionObject($variable);
-            switch ($ref->getParentClass()->getName())
-            {
-                case 'SActiveRecord':
-                    return $this->serialize_active_record($variable);
-                    break;
-                case 'SQuerySet':
-                    return $this->serialize_queryset($variable);
-                    break;
-            }
-        }
-    }
-    
-    public function serialize_active_record($record)
-    {
-        return $this->handle($record->to_array());
-    }
-    
-    public function serialize_queryset($queryset)
-    {
-        
+        if (is_object($variable) && method_exists($variable, 'serializable_form'))
+            $variable = $variable->serializable_form();
+            
+        return $this->handle($variable);
     }
     
     abstract protected function handle($array);
