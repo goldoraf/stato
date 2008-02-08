@@ -183,6 +183,12 @@ class SActionController implements SIDispatchable
         return SUrlRewriter::rewrite($options);
     }
     
+    public function process_to_log($request)
+    {
+        return array($this->controller_class_name(),
+                     (!isset($request->params['action'])) ? 'index' : $request->params['action']);
+    }
+    
     /**
      * Overwrite to perform initializations prior to action call
      */
@@ -487,32 +493,6 @@ class SActionController implements SIDispatchable
         $this->send_data($raw_response, array('type' => 'text/xml', 'disposition' => 'inline'));
     }
     
-    protected function log_processing()
-    {
-        $log = "\nProcessing ".$this->controller_class_name().'::'.$this->action_name()
-            .'() for '.$this->request->remote_ip().' at '
-            .SDateTime::today()->__toString().' ['.$this->request->method().']';
-        if (($sess_id = $this->session->id()) != '') $log.= "\n    Session ID: ".$sess_id;
-        $log.= "\n    Parameters: ".serialize($this->params);
-        $this->logger->info($log);
-    }
-    
-    protected function log_benchmarking()
-    {
-        $runtime = microtime(true) - STATO_TIME_START;
-        $info = 'Completed in '.sprintf("%.5f", $runtime).' seconds';
-        if (class_exists('SActiveRecord', false))
-        {
-            $db_runtime = SActiveRecord::connection_benchmark();
-            $db_percentage = ($db_runtime * 100) / $runtime;
-            $info.= ' | DB: '.sprintf("%.5f", $db_runtime).' ('.sprintf("%d", $db_percentage).' %)';
-        }
-        $this->logger->info($info);
-        
-        if (class_exists('SActiveRecord', false) && SActiveRecord::$log_sql === true)
-            SActiveRecord::connection()->write_log();
-    }
-    
     private function perform_action()
     {
         $action = $this->action_name();
@@ -523,8 +503,6 @@ class SActionController implements SIDispatchable
         $this->require_dependencies();
         
         $this->session->start();
-        
-        $this->log_processing();
         
         if (!empty($this->cached_actions))
             $this->around_filters[] = new SActionCacheFilter($this->cached_actions);
@@ -545,8 +523,6 @@ class SActionController implements SIDispatchable
         
         if (in_array($this->action_name(), $this->cached_pages) && self::$perform_caching && $this->is_caching_allowed())
             $this->cache_page($this->response->body, array('action' => $this->action_name(), 'params' => $this->params));
-        
-        $this->log_benchmarking();
     }
     
     private function action_exists($action)

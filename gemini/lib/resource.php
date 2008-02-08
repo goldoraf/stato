@@ -36,6 +36,11 @@ class SResource
         return $this->responds($result);
     }
     
+    public function process_to_log($request)
+    {
+        return array(get_class($this), $request->method());
+    }
+    
     protected function responds($data, $status = 200)
     {
         $serializer = $this->instantiate_serializer();
