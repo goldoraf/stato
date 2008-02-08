@@ -7,6 +7,13 @@ interface SISerializable
     public function serializable_form($options = array());
 }
 
+class SerializableError
+{
+    public $error_message;
+    public $status_code;
+    public $errors;
+}
+
 abstract class SAbstractSerializer
 {
     abstract public function serialize($data);
@@ -19,6 +26,22 @@ abstract class SAbstractSerializer
         
         return new $serializer_class();
     }
+    
+    public static function serialize_exception($format, $exception)
+    {
+        try {
+            $serializer = self::instantiate($format);
+        } catch (SUnkownFormat $e) {
+            return null;
+        }
+        
+        $error = new SerializableError();
+        $error->error_message = $exception->getMessage();
+        if (method_exists($exception, 'getErrors'))
+            $error->errors = $exception->getErrors();
+            
+        return $serializer->serialize($error);
+    }
 }
 
 class SJsonSerializer extends SAbstractSerializer
@@ -29,7 +52,7 @@ class SJsonSerializer extends SAbstractSerializer
             return $this->serialize_queryset($data);
         
         if (is_object($data) && method_exists($data, 'serializable_form'))
-            $data = $data->serializable_form();    
+            $data = $data->serializable_form();
         
         return json_encode($data);
     }

@@ -31,20 +31,25 @@ class SRescue
         $status = self::status_for_rescue($exception);
         
         if ($request->format() == 'html')
-        {
-            if (!SActionController::$consider_all_requests_local)
-                $body = self::in_public($request, $status, $exception);
-            else
-                $body = self::locally($request, $status, $exception);
-        }
+            $body = self::html_body_response($request, $status, $exception);
+        else
+            $body = SAbstractSerializer::serialize_exception($request->format(), $exception);
         
         $response->status = $status;
         $response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $response->body = $body;
         return $response;
-    }   
+    }
     
-    public static function in_public($request, $status, $exception)
+    public static function html_body_response($request, $status, $exception)
+    {
+        if (!SActionController::$consider_all_requests_local)
+            return self::html_body_in_public($request, $status, $exception);
+        
+        return self::html_body_locally($request, $status, $exception);
+    }
+    
+    public static function html_body_in_public($request, $status, $exception)
     {
         $body = '';
         $path = STATO_APP_ROOT_PATH."/public/{$status}.html";
@@ -54,7 +59,7 @@ class SRescue
         return $body;
     }
     
-    public static function locally($request, $status, $exception)
+    public static function html_body_locally($request, $status, $exception)
     {
         $template_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue.php';
         $view = new SActionView();
