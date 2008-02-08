@@ -12,7 +12,7 @@ class SResource
     protected $mimetype;
     protected $accepted_formats = array('xml', 'json');
     
-    public static function instanciate($name)
+    public static function instantiate($name)
     {
         $class_name = SInflection::camelize($name).'Resource';
         $file_path = STATO_APP_PATH."/resources/{$name}_resource.php";

@@ -91,7 +91,7 @@ class SActionController implements SIDispatchable
     public static $template_class = 'SActionView';
     public static $exception_notifier = null;
     
-    public static function instanciate($name)
+    public static function instantiate($name)
     {
         if (file_exists($path = STATO_APP_PATH.'/controllers/application_controller.php')) require_once($path);
         

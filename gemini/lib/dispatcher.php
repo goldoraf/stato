@@ -4,7 +4,7 @@ define('STATO_APP_PATH', STATO_APP_ROOT_PATH.'/app');
 
 interface SIDispatchable
 {
-    public static function instanciate($name);
+    public static function instantiate($name);
     
     public function dispatch(SRequest $request, SResponse $response);
     
@@ -37,9 +37,9 @@ class SDispatcher
     		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
             
             if (isset($this->request->params['resource']) && !isset($this->request->params['controller']))
-                $dispatchable = SResource::instanciate($this->request->params['resource']);
+                $dispatchable = SResource::instantiate($this->request->params['resource']);
             elseif (isset($this->request->params['controller']) && !isset($this->request->params['resource']))
-                $dispatchable = SActionController::instanciate($this->request->params['controller']);
+                $dispatchable = SActionController::instantiate($this->request->params['controller']);
             else
                 throw new SDispatchException('No dispatchable class identified !');
             
