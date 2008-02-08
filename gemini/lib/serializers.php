@@ -1,5 +1,7 @@
 <?php
 
+class SUnkownFormat extends Exception {}
+
 interface SISerializable
 {
     public function serializable_form($options = array());
@@ -13,7 +15,7 @@ abstract class SAbstractSerializer
     {
         $serializer_class = "S{$format}Serializer";
         if (!class_exists($serializer_class, false))
-            throw new Exception();
+            throw new SUnkownFormat($format);
         
         return new $serializer_class();
     }
