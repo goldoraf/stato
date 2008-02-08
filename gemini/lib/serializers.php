@@ -8,6 +8,15 @@ interface SISerializable
 abstract class SAbstractSerializer
 {
     abstract public function serialize($data);
+    
+    public static function instantiate($format)
+    {
+        $serializer_class = "S{$format}Serializer";
+        if (!class_exists($serializer_class, false))
+            throw new Exception();
+        
+        return new $serializer_class();
+    }
 }
 
 class SJsonSerializer extends SAbstractSerializer

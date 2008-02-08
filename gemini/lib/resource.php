@@ -45,22 +45,13 @@ class SResource
     
     protected function responds($data, $status = 200)
     {
-        $serializer = $this->instantiate_serializer();
+        $serializer = SAbstractSerializer::instantiate($this->format);
         
         $this->response->headers['Status'] = $status;
         $this->response->headers['Content-Type'] = (string) $this->mimetype;
         $this->response->body = $serializer->serialize($data);
         
         return $this->response;
-    }
-    
-    protected function instantiate_serializer()
-    {
-        $serializer_class = "S{$this->format}Serializer";
-        if (!class_exists($serializer_class, false))
-            throw new Exception();
-        
-        return new $serializer_class();
     }
 }
 
