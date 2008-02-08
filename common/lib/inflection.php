@@ -74,6 +74,11 @@ class SInflection
             preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $camel_cased_word)));
     }
     
+    public static function dasherize($underscore_word)
+    {
+        return preg_replace('/_/', '-', $underscore_word);
+    }
+    
     public static function camelize($underscore_word)
     {
         return preg_replace('/(^|_)(.)/e', "strtoupper('\\2')", $underscore_word);

@@ -24,6 +24,11 @@ class InflectionTest extends UnitTestCase
         $this->assertEqual('SMyTestController', SInflection::camelize('s_my_test_controller'));
     }
     
+    function test_dasherize()
+    {
+        $this->assertEqual('hello-world', SInflection::dasherize('hello_world'));
+    }
+    
     function test_wikify()
     {
         $this->assertEqual('hello_world', SInflection::wikify('Hello World'));
