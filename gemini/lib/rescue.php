@@ -28,6 +28,11 @@ class SRescue
     {
         self::notify($request, $exception);
         
+        // Let the exception alter the response if it wants.
+        // For example, SHttpMethodNotAllowed sets the Allow header.
+        if (method_exists($exception, 'handle_response'))
+            $exception->handle_response($response);
+        
         $status = self::status_for_rescue($exception);
         
         if ($request->format() == 'html')
@@ -36,7 +41,8 @@ class SRescue
             $body = SAbstractSerializer::serialize_exception($request->format(), $exception);
         
         $response->status = $status;
-        $response->headers['Content-Type'] = 'text/html; charset=utf-8';
+        $response->headers['Content-Type']
+            = (string) SMimeType::lookup($request->format()); // et l'encoding UTF-8 ?
         $response->body = $body;
         return $response;
     }
