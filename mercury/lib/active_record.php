@@ -14,7 +14,7 @@ class SAssociationTypeMismatch extends Exception { }
  * @package Stato
  * @subpackage model
  */
-class SActiveRecord extends SObservable implements ArrayAccess, SISerializable
+class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable*/
 {
     public $errors          = array();
     public $attr_protected  = array();
@@ -181,6 +181,12 @@ class SActiveRecord extends SObservable implements ArrayAccess, SISerializable
         $this->conn()->update($sql);
         
         $this->set_state('after_delete');
+    }
+    
+    public function reload()
+    {
+        $qs = new SValuesQuerySet($this->meta);
+        $this->values = $qs->get($this->id);
     }
     
     public function update_attributes($values)

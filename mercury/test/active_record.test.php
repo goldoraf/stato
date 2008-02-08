@@ -177,6 +177,16 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertEqual('SRecordNotFound', get_class($e));
     }
     
+    public function test_reload()
+    {
+        $product = new Product();
+        $product->name = 'CD';
+        $product->save();
+        $product->name = 'CD-R';
+        $product->reload();
+        $this->assertEqual('CD', $product->name);
+    }
+    
     public function test_save_with_timestamps()
     {
         $created_date = new SDateTime(2005,12,01,20,30,00);
