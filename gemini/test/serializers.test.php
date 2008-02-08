@@ -37,7 +37,7 @@ class SerializersTestCase extends XmlTestCase
     public function test_active_record_to_xml()
     {
         $s = new SXmlSerializer();
-        $this->assertDomEqual('<mock_active_record><id>1234</id><name>raphael</name></mock_active_record>',
+        $this->assertDomEqual('<mock-active-record><id>1234</id><name>raphael</name></mock-active-record>',
                               $s->serialize(new MockActiveRecord));
     }
     

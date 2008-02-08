@@ -16,7 +16,7 @@ class SerializableError
 
 abstract class SAbstractSerializer
 {
-    abstract public function serialize($data);
+    abstract public function serialize($data, $options = array());
     
     public static function instantiate($format)
     {
@@ -46,10 +46,10 @@ abstract class SAbstractSerializer
 
 class SJsonSerializer extends SAbstractSerializer
 {
-    public function serialize($data)
+    public function serialize($data, $options = array())
     {
         if (is_object($data) && get_class($data) == 'SQuerySet')
-            return $this->serialize_queryset($data);
+            return $this->serialize_queryset($data, $options);
         
         if (is_object($data) && method_exists($data, 'serializable_form'))
             $data = $data->serializable_form();
@@ -57,17 +57,17 @@ class SJsonSerializer extends SAbstractSerializer
         return json_encode($data);
     }
     
-    private function serialize_queryset($qs)
+    private function serialize_queryset($qs, $options)
     {
         $records = array();
-        foreach ($qs as $record) $records[] = $this->serialize($record);
+        foreach ($qs as $record) $records[] = $this->serialize($record, $options);
         return '['.implode(',', $records).']';
     }
 }
 
 class SXmlSerializer extends SAbstractSerializer
 {
-    public function serialize($data)
+    public function serialize($data, $options = array())
     {
         if (is_object($data))
         {
@@ -78,16 +78,19 @@ class SXmlSerializer extends SAbstractSerializer
         }
         else $start_element = 'result';
         
+        if (!isset($options['dasherize']) || $options['dasherize'] = true)
+            $start_element = SInflection::dasherize($start_element);
+        
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->preserveWhiteSpace = false;
         $root = $dom->createElement($start_element);
         $dom->appendChild($root);
-        $this->recurse_node($data, $dom, $root);
+        $this->recurse_node($data, $dom, $root, $options);
         $dom->formatOutput = true;
         return $dom->saveXML();
     }
     
-    private function recurse_node($data, $dom, $parent)
+    private function recurse_node($data, $dom, $parent, $options)
     {
         if (!is_array($data) && !is_object($data))
         {
@@ -102,18 +105,16 @@ class SXmlSerializer extends SAbstractSerializer
         foreach ($data as $key => $value)
         {
             if (is_numeric($key)) $key = 'value';
+            if (is_object($value)) $key = SInflection::underscore(get_class($value));
             
-            if (is_array($value))
+            if (!isset($options['dasherize']) || $options['dasherize'] = true)
+                $key = SInflection::dasherize($key);
+            
+            if (is_array($value) || is_object($value))
             {
                 $node = $dom->createElement($key);
                 $parent->appendChild($node);
-                $this->recurse_node($value, $dom, $node);
-            }
-            elseif (is_object($value))
-            {
-                $node = $dom->createElement(SInflection::underscore(get_class($value)));
-                $parent->appendChild($node);
-                $this->recurse_node($value, $dom, $node);
+                $this->recurse_node($value, $dom, $node, $options);
             }
             else
             {
