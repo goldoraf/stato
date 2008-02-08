@@ -24,8 +24,9 @@ class SRescue
         'SRecordNotFound' => 404,
     );
     
-    public static function in_public($request, $exception)
+    public static function response($request, $exception)
     {
+        $status = self::status_for_rescue($exception);
         /*if (($class = self::$exception_notifier) !== null)
         {
             $notifier = new $class();
@@ -33,26 +34,31 @@ class SRescue
                               self::controller_class($this->request->params['controller']),
                               $this->action_name());
         }*/
-        $status = self::status_for_rescue($exception);
-        $body = null;
         if ($request->format() == 'html')
         {
-            $path = STATO_APP_ROOT_PATH."/public/{$status}.html";
-            if (file_exists($path))
-                $body = file_get_contents($path);
+            if (!SActionController::$consider_all_requests_local)
+                $body = self::in_public($request, $status, $exception);
+            else
+                $body = self::locally($request, $status, $exception);
         }
-        return self::response($body, $status);
+        return self::get_response($body, $status);
+    }   
+    
+    public static function in_public($request, $status, $exception)
+    {
+        $body = '';
+        $path = STATO_APP_ROOT_PATH."/public/{$status}.html";
+        if (file_exists($path))
+            $body = file_get_contents($path);
+        
+        return $body;
     }
     
-    public static function locally($request, $exception)
+    public static function locally($request, $status, $exception)
     {
-        $status = self::status_for_rescue($exception);
-        if ($request->format() == 'html')
-        {
-            $template_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue.php';
-            $view = new SActionView();
-            return self::response($view->render($template_path, array('exception' => $exception)), $status);
-        }
+        $template_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue.php';
+        $view = new SActionView();
+        return $view->render($template_path, array('exception' => $exception));
     }
     
     private static function status_for_rescue($exception)
@@ -63,7 +69,7 @@ class SRescue
             return 500;
     }
     
-    private static function response($body, $status)
+    private static function get_response($body, $status)
     {
         $response = new SResponse();
         $response->status = $status;

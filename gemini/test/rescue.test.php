@@ -11,13 +11,14 @@ class RescueTest extends UnitTestCase
     public function setup()
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
+        SActionController::$consider_all_requests_local = false;
         $this->request = new SRequest();
     }
     
     public function test_404_in_public()
     {
         $this->request->set_format('html');
-        $response = SRescue::in_public($this->request, new SRoutingException());
+        $response = SRescue::response($this->request, new SRoutingException());
         $this->assertEqual(404, $response->status);
         $this->assertWantedPattern('|404 Page not found|', $response->body);
     }
@@ -25,7 +26,7 @@ class RescueTest extends UnitTestCase
     public function test_500_in_public()
     {
         $this->request->set_format('html');
-        $response = SRescue::in_public($this->request, new UnkownError());
+        $response = SRescue::response($this->request, new UnkownError());
         $this->assertEqual(500, $response->status);
         $this->assertWantedPattern('|500 Internal Error|', $response->body);
     }

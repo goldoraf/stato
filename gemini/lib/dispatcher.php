@@ -46,11 +46,7 @@ class SDispatcher
         catch (Exception $e)
         {
             $this->logger->log_error($e);
-            
-            if (SActionController::$consider_all_requests_local)
-                $response = SRescue::locally($request, $e);
-            else
-                $response = SRescue::in_public($request, $e);
+            $response = SRescue::response($request, $e);
         }
         
         $response->out();
