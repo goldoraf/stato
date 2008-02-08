@@ -6,6 +6,7 @@ class SHttpMethodNotImplemented extends Exception {}
 class SResource
 {
     protected $request;
+    protected $response;
     protected $params;
     protected $format;
     protected $mimetype;
@@ -21,9 +22,10 @@ class SResource
         return new $class_name();
     }
     
-    public function dispatch(SRequest $request)
+    public function dispatch(SRequest $request, SResponse $response)
     {
         $this->request  = $request;
+        $this->response = $response;
         $this->params   =& $this->request->params;
         $this->format   = $this->request->format();
         $this->mimetype = SMimeType::lookup($this->format);
@@ -45,12 +47,11 @@ class SResource
     {
         $serializer = $this->instantiate_serializer();
         
-        $response = new SResponse();
-        $response->headers['Status'] = $status;
-        $response->headers['Content-Type'] = (string) $this->mimetype;
-        $response->body = $serializer->serialize($data);
+        $this->response->headers['Status'] = $status;
+        $this->response->headers['Content-Type'] = (string) $this->mimetype;
+        $this->response->body = $serializer->serialize($data);
         
-        return $response;
+        return $this->response;
     }
     
     protected function instantiate_serializer()

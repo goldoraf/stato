@@ -24,16 +24,12 @@ class SRescue
         'SRecordNotFound' => 404,
     );
     
-    public static function response($request, $exception)
+    public static function response($request, $response, $exception)
     {
+        self::notify($request, $exception);
+        
         $status = self::status_for_rescue($exception);
-        /*if (($class = self::$exception_notifier) !== null)
-        {
-            $notifier = new $class();
-            $notifier->notify($exception, $this->request, $this->session,
-                              self::controller_class($this->request->params['controller']),
-                              $this->action_name());
-        }*/
+        
         if ($request->format() == 'html')
         {
             if (!SActionController::$consider_all_requests_local)
@@ -41,7 +37,11 @@ class SRescue
             else
                 $body = self::locally($request, $status, $exception);
         }
-        return self::get_response($body, $status);
+        
+        $response->status = $status;
+        $response->headers['Content-Type'] = 'text/html; charset=utf-8';
+        $response->body = $body;
+        return $response;
     }   
     
     public static function in_public($request, $status, $exception)
@@ -61,21 +61,23 @@ class SRescue
         return $view->render($template_path, array('exception' => $exception));
     }
     
+    public static function notify($request, $exception)
+    {
+        /*if (($class = self::$exception_notifier) !== null)
+        {
+            $notifier = new $class();
+            $notifier->notify($exception, $this->request, $this->session,
+                              self::controller_class($this->request->params['controller']),
+                              $this->action_name());
+        }*/
+    }
+    
     private static function status_for_rescue($exception)
     {
         if (array_key_exists(get_class($exception), self::$default_rescue_status))
             return self::$default_rescue_status[get_class($exception)];
         else
             return 500;
-    }
-    
-    private static function get_response($body, $status)
-    {
-        $response = new SResponse();
-        $response->status = $status;
-        $response->headers['Content-Type'] = 'text/html; charset=utf-8';
-        $response->body = $body;
-        return $response;
     }
 }
 

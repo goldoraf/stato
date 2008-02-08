@@ -129,7 +129,7 @@ class FiltersTest extends StatoTestCase
         $params['action'] = $action;
         $request->inject_params($params);
         $c = new $controller();
-        return $c->dispatch($request);
+        return $c->dispatch($request, new SResponse());
     }
     
     public function test_basic()

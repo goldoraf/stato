@@ -103,10 +103,10 @@ class SActionController implements SIDispatchable
 		return new $class_name();
     }
     
-    public function dispatch(SRequest $request)
+    public function dispatch(SRequest $request, SResponse $response)
     {
         $this->request  = $request;
-        $this->response = new SResponse();
+        $this->response = $response;
         $this->params   =& $this->request->params;
         $this->assigns  =& $this->response->assigns;
         $this->session  = new SPhpSession();

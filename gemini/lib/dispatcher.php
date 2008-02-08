@@ -6,7 +6,7 @@ interface SIDispatchable
 {
     public static function instanciate($name);
     
-    public function dispatch(SRequest $request);
+    public function dispatch(SRequest $request, SResponse $response);
     
     public function process_to_log($request);
 }
@@ -15,10 +15,14 @@ class SDispatchException extends Exception {}
 
 class SDispatcher
 {	
-	protected $logger;
+	protected $request;
+    protected $logger;
+    protected $response;
     
     public function __construct()
     {
+        $this->request = new SRequest();
+        $this->response = new SResponse();
         $this->logger = SLogger::get_instance();
     }
     
@@ -28,41 +32,41 @@ class SDispatcher
     	{
             $map = include(STATO_APP_ROOT_PATH.'/conf/routes.php');
             SRoutes::initialize($map);
-            $request = SRoutes::recognize(new SRequest());
+            $this->request = SRoutes::recognize($this->request);
             
     		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
             
-            if (isset($request->params['resource']) && !isset($request->params['controller']))
-                $dispatchable = SResource::instanciate($request->params['resource']);
-            elseif (isset($request->params['controller']) && !isset($request->params['resource']))
-                $dispatchable = SActionController::instanciate($request->params['controller']);
+            if (isset($this->request->params['resource']) && !isset($this->request->params['controller']))
+                $dispatchable = SResource::instanciate($this->request->params['resource']);
+            elseif (isset($this->request->params['controller']) && !isset($this->request->params['resource']))
+                $dispatchable = SActionController::instanciate($this->request->params['controller']);
             else
                 throw new SDispatchException('No dispatchable class identified !');
             
-            $this->log_processing($dispatchable->process_to_log($request), $request);
+            $this->log_processing($dispatchable->process_to_log($this->request));
     		
-    		$response = $dispatchable->dispatch($request);
+    		$this->response = $dispatchable->dispatch($this->request, $this->response);
         }
         catch (Exception $e)
         {
             $this->logger->log_error($e);
-            $response = SRescue::response($request, $e);
+            $this->response = SRescue::response($this->request, $this->response, $e);
         }
         
-        $response->out();
+        $this->response->out();
         
         $this->log_benchmarking();
 	}
     
-    protected function log_processing($process, $request)
+    protected function log_processing($process)
     {
         if (is_array($process)) $process = $process[0].'::'.$process[1];
         
-        $log = "\nProcessing {$process}() for ".$request->remote_ip().' at '
-            .SDateTime::today()->__toString().' ['.strtoupper($request->method()).']';
+        $log = "\nProcessing {$process}() for ".$this->request->remote_ip().' at '
+            .SDateTime::today()->__toString().' ['.strtoupper($this->request->method()).']';
         
         //if (($sess_id = session_id()) != '') $log.= "\n    Session ID: ".$sess_id;
-        $log.= "\n    Parameters: ".serialize($request->params);
+        $log.= "\n    Parameters: ".serialize($this->request->params);
         
         $this->logger->info($log);
     }
