@@ -1,6 +1,6 @@
 <?php
 
-class TagHelperTest extends HelperTestCase
+class TagHelperTest extends StatoTestCase
 {   
     public function test_tags()
     {

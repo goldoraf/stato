@@ -1,30 +1,7 @@
 <?php
 
-/*if (!class_exists('SUrlRewriter', false))
+class FormTagHelperTest extends StatoTestCase
 {
-    class SUrlRewriter
-    {
-        public static function url_for($options)
-        {
-            return 'http://www.example.com';
-        }
-    }
-}*/
-
-class FormTagHelperTest extends HelperTestCase
-{
-    /*public function test_form_tag()
-    {
-        $this->assertDomEqual(
-            form_tag('http://www.example.com').end_form_tag(),
-            '<form action="http://www.example.com" method="post"></form>'
-        );
-        $this->assertDomEqual(
-            form_tag('http://www.example.com', array('multipart' => true)).end_form_tag(),
-            '<form action="http://www.example.com" enctype="multipart/form-data" method="post"></form>'
-        );
-    }*/
-    
     public function test_checkbox_tag()
     {
         $this->assertDomEqual(

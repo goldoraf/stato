@@ -23,6 +23,4 @@ class MockRecord
     }
 }
 
-class HelperTestCase extends XmlTestCase {}
-
 ?>

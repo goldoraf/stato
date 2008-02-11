@@ -151,7 +151,7 @@ class XmlRpcInvocationTest extends StatoTestCase
         $tmp = new STempfile();
         SLogger::initialize($tmp->path());
         $c = new ApiController();
-        return SXmlRpcClient::decode_response($c->dispatch($request)->body);
+        return SXmlRpcClient::decode_response($c->dispatch($request, new SResponse())->body);
     }
 }
 

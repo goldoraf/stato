@@ -16,7 +16,7 @@ class MockContent extends MockRecord
     public function content_attributes() { return $this->content_attributes; }
 }
 
-class RecordHelperTest extends HelperTestCase
+class RecordHelperTest extends StatoTestCase
 {
     public function setUp()
     {

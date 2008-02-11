@@ -5,7 +5,7 @@ class MockPost extends MockRecord
     protected $attributes = array('title', 'author', 'body', 'private', 'written_on');
 }
 
-class FormHelperTest extends HelperTestCase
+class FormHelperTest extends StatoTestCase
 {
     public function setUp()
     {

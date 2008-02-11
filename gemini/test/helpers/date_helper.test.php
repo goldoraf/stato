@@ -5,7 +5,7 @@ class MockArticle extends MockRecord
     protected $attributes = array('written_on');
 }
 
-class DateHelperTest extends HelperTestCase
+class DateHelperTest extends StatoTestCase
 {
     public function test_select_day()
     {

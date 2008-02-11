@@ -1,6 +1,6 @@
 <?php
 
-class AjaxHelperTest extends HelperTestCase
+class AjaxHelperTest extends StatoTestCase
 {
     public function test_ajax()
     {

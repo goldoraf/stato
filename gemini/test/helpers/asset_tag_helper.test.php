@@ -1,6 +1,6 @@
 <?php
 
-class AssetTagHelperTest extends HelperTestCase
+class AssetTagHelperTest extends StatoTestCase
 {   
     private $tmp_script_name = null;
     

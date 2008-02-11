@@ -1,6 +1,6 @@
 <?php
 
-class NumberHelperTest extends HelperTestCase
+class NumberHelperTest extends StatoTestCase
 {   
     public function test_number_with_delimiter()
     {

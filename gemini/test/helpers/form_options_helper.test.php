@@ -10,7 +10,7 @@ class MockUser extends MockRecord
     protected $attributes = array('name', 'service', 'role');
 }
 
-class FormOptionsTest extends HelperTestCase
+class FormOptionsTest extends StatoTestCase
 {
     public function test_options_for_select()
     {

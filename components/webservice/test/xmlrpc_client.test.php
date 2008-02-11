@@ -1,6 +1,6 @@
 <?php
 
-class XmlRpcClientTest extends XmlTestCase
+class XmlRpcClientTest extends StatoTestCase
 {
     public function test_request_to_xml()
     {

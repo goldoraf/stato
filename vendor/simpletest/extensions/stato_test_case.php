@@ -7,6 +7,11 @@ class StatoTestCase extends UnitTestCase
         return $this->assertTrue(true);
     }
     
+    function assertDomEqual($first, $second, $message = "%s")
+    {
+        return $this->assertExpectation(new DomEqualExpectation($first), $second, $message);
+    }
+    
     public function __call($method, $args)
     {
         $method = SInflection::camelize($method);

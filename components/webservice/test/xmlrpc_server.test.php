@@ -1,6 +1,6 @@
 <?php
 
-class XmlRpcServerTest extends XmlTestCase
+class XmlRpcServerTest extends StatoTestCase
 {
     public function test_basic_request_parsing()
     {

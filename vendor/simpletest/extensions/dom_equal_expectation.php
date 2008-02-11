@@ -71,12 +71,4 @@ class DomEqualExpectation extends EqualExpectation {
     }
 }
 
-class XmlTestCase extends UnitTestCase
-{
-    function assertDomEqual($first, $second, $message = "%s")
-    {
-        return $this->assertExpectation(new DomEqualExpectation($first), $second, $message);
-    }
-}
-
 ?>
