@@ -48,20 +48,30 @@ class SJsonSerializer extends SAbstractSerializer
 {
     public function serialize($data, $options = array())
     {
-        if (is_object($data) && get_class($data) == 'SQuerySet')
-            return $this->serialize_queryset($data, $options);
-        
-        if (is_object($data) && method_exists($data, 'serializable_form'))
-            $data = $data->serializable_form();
-        
+        if (is_object($data)) return $this->serialize_object($data, $options);
         return json_encode($data);
     }
     
-    private function serialize_queryset($qs, $options)
+    private function serialize_object($object, $options)
     {
-        $records = array();
-        foreach ($qs as $record) $records[] = $this->serialize($record, $options);
-        return '['.implode(',', $records).']';
+        if ($this->implements_iterator($object))
+            return $this->serialize_iterator($object, $options);
+        if (method_exists($object, 'serializable_form'))
+            $object = $object->serializable_form();  
+        return json_encode($object);
+    }
+    
+    private function serialize_iterator($iterator, $options)
+    {
+        $values = array();
+        foreach ($iterator as $value) $values[] = $this->serialize($value, $options);
+        return '['.implode(',', $values).']';
+    }
+    
+    private function implements_iterator($object)
+    {
+        $ref = new ReflectionObject($object);
+        return $ref->implementsInterface('Iterator');
     }
 }
 

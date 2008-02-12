@@ -77,6 +77,11 @@ class SQuerySet implements Iterator, Countable
         return $this->cache;
     }
     
+    public function serializable_form()
+    {
+        return $this->to_array();   
+    }
+    
     public function get()
     {
         $numargs = func_num_args();
