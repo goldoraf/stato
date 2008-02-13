@@ -1,0 +1,323 @@
+<?xml version="1.0"?>
+<xliff version="1.0">
+  <file orginal="global" source-language="en_US" datatype="plaintext">
+    <body>
+        <!-- ACL messages -->
+        
+        <!-- UserController messages -->
+        <trans-unit id="1">
+          <source>You need to log in.</source>
+          <target>Authentification obligatoire.</target>
+        </trans-unit>
+        <trans-unit id="2">
+          <source>Permission warning: You are not authorized for the action '%s'.</source>
+          <target>Vous n'êtes pas autorisé pour l'action '%s'.</target>
+        </trans-unit>
+        <trans-unit id="3">
+          <source>Login successful</source>
+          <target>Authentification réussie</target>
+        </trans-unit>
+        <trans-unit id="4">
+          <source>Login unsuccessful</source>
+          <target>Echec de l'authentification</target>
+        </trans-unit>
+        <trans-unit id="5">
+          <source>Signup successful !</source>
+          <target>Inscription réussie !</target>
+        </trans-unit>
+        <trans-unit id="6">
+          <source> Please check your registered email account to verify your account registration and continue with the login.</source>
+          <target> Un email vous a été envoyé afin de poursuivre le processus d'inscription.</target>
+        </trans-unit>
+        <trans-unit id="7">
+          <source>Error creating account. Please retry.</source>
+          <target>Votre compte n'a pu être créé. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="8">
+          <source>Error creating account: confirmation email not sent</source>
+          <target>Le mail de confirmation de la création de votre compte n'a pu être envoyé</target>
+        </trans-unit>
+        <trans-unit id="9">
+          <source> Please log in.</source>
+          <target> Vous pouvez maintenant vous connecter.</target>
+        </trans-unit>
+        <trans-unit id="10">
+          <source> Account verified! Please log in.</source>
+          <target> Votre compte est vérifié ! Vous pouvez maintenant vous connecter.</target>
+        </trans-unit>
+        <trans-unit id="11">
+          <source>You are currently logged in. You may change your password now.</source>
+          <target>Vous êtes déjà connecté. Vous pouvez changer votre mot de passe maintenant.</target>
+        </trans-unit>
+        <trans-unit id="12">
+          <source>Please enter a valid email address.</source>
+          <target>Merci d'entrer une adresse email valide.</target>
+        </trans-unit>
+        <trans-unit id="13">
+          <source>We could not find a user with this email address.</source>
+          <target>Aucun utilisateur n'est associé à cette adresse email.</target>
+        </trans-unit>
+        <trans-unit id="14">
+          <source>Instructions on resetting your password have been emailed to %s.</source>
+          <target>Des instructions pour réinitialiser votre mot de passe ont été envoyées à %s.</target>
+        </trans-unit>
+        <trans-unit id="15">
+          <source>Your password could not be emailed to %s.</source>
+          <target>Votre mot de passe n'a pu être envoyé à %s.</target>
+        </trans-unit>
+        <trans-unit id="16">
+          <source>User details updated.</source>
+          <target>Profil mis à jour.</target>
+        </trans-unit>
+        <trans-unit id="17">
+          <source>Details could not be updated! Please retry.</source>
+          <target>Votre profil n'a pu être mis à jour. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="18">
+          <source>Error updating user details. Please try again later.</source>
+          <target>Votre profil n'a pu être mis à jour. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="19">
+          <source>Updated password emailed to %s.</source>
+          <target>Le nouveau mot de passe a été envoyé par email à %s.</target>
+        </trans-unit>
+        <trans-unit id="20">
+          <source>There was a problem saving the password. Please retry.</source>
+          <target>Votre mot de passe n'a pu être changé. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="21">
+          <source>Password could not be changed at this time. Please retry.</source>
+          <target>Votre mot de passe n'a pu être changé. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="22">
+          <source>The account has been scheduled for deletion. It will be removed in %s days.</source>
+          <target>Votre compte sera supprimé dans %s jours.</target>
+        </trans-unit>
+        <trans-unit id="23">
+          <source>The delete instructions were not sent. Please try again later.</source>
+          <target>Votre demande de suppression de compte n'a pu être programmée. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="24">
+          <source>The account for %s was successfully deleted.</source>
+          <target>Le compte de %s a été supprimé.</target>
+        </trans-unit>
+        <trans-unit id="25">
+          <source>Account restored! Please log in.</source>
+          <target>Votre compte est restauré ! Merci de vous authentifier.</target>
+        </trans-unit>
+        
+        <!-- UserController views messages -->
+        <trans-unit id="26">
+          <source>Please Login</source>
+          <target>Authentification</target>
+        </trans-unit>
+        <trans-unit id="27">
+          <source>Login</source>
+          <target>Identifiant</target>
+        </trans-unit>
+        <trans-unit id="28">
+          <source>Password</source>
+          <target>Mot de passe</target>
+        </trans-unit>
+        <trans-unit id="29">
+          <source>Register for an account</source>
+          <target>Créer votre compte</target>
+        </trans-unit>
+        <trans-unit id="30">
+          <source>Forgot my password</source>
+          <target>J'ai oublié mon mot de passe</target>
+        </trans-unit>
+        <trans-unit id="31">
+          <source>Signup</source>
+          <target>Inscription</target>
+        </trans-unit>
+        <trans-unit id="32">
+          <source>Cancel</source>
+          <target>Annuler</target>
+        </trans-unit>
+        <trans-unit id="33">
+          <source>First Name</source>
+          <target>Prénom</target>
+        </trans-unit>
+        <trans-unit id="34">
+          <source>Last Name</source>
+          <target>Nom</target>
+        </trans-unit>
+        <trans-unit id="35">
+          <source>Login ID</source>
+          <target>Identifiant</target>
+        </trans-unit>
+        <trans-unit id="36">
+          <source>Email</source>
+          <target>Courriel</target>
+        </trans-unit>
+        <trans-unit id="37">
+          <source>Password Confirmation</source>
+          <target>Confirmation du mot de passe</target>
+        </trans-unit>
+        <trans-unit id="38">
+          <source>Forgotten Password</source>
+          <target>Mot de passe oublié</target>
+        </trans-unit>
+        <trans-unit id="39">
+          <source>Enter your email address in the field below and click 'Reset Password' to have a new password emailed to you.</source>
+          <target>Entrez votre adresse email ci-dessous et cliquez sur 'Réinitialiser le mot de passe' pour recevoir un nouveau mot de passe par email.</target>
+        </trans-unit>
+        <trans-unit id="40">
+          <source>Reset Password</source>
+          <target>Réinitialiser le mot de passe</target>
+        </trans-unit>
+        <trans-unit id="41">
+          <source>Edit user</source>
+          <target>Editer le compte</target>
+        </trans-unit>
+        <trans-unit id="42">
+          <source>Change Settings</source>
+          <target>Enregistrer les modifications</target>
+        </trans-unit>
+        <trans-unit id="43">
+          <source>Change Password</source>
+          <target>Changer le mot de passe</target>
+        </trans-unit>
+        <trans-unit id="44">
+          <source>Delete Account</source>
+          <target>Supprimer le compte</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Enter your new password in the fields below and click 'Change Password'. Your new password will be sent to your email inbox.</source>
+          <target>Entrez votre nouveau mot de passe ci-dessous et cliquez sur 'Changer le mot de passe'. Votre nouveau mot de passe vous sera envoyé par email.</target>
+        </trans-unit>
+          
+        <!-- UsersController views messages -->
+        <trans-unit id="45">
+          <source>Listing users</source>
+          <target>Liste des utilisateurs</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Last Login</source>
+          <target>Dernière connection</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Created On</source>
+          <target>Date de création</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Back</source>
+          <target>Retour</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Show</source>
+          <target>Voir</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Edit</source>
+          <target>Editer</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Delete</source>
+          <target>Supprimer</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Are you sure ?</source>
+          <target>Etes vous sûr ?</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>New User</source>
+          <target>Nouvel utilisateur</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>User:</source>
+          <target>Utilisateur :</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Editing user</source>
+          <target>Edition de l'utilisateur</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Roles</source>
+          <target>Groupes</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Save Roles</source>
+          <target>Enregistrer</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>New User</source>
+          <target>Nouvel utilisateur</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Create User</source>
+          <target>Créer l'utilisateur</target>
+        </trans-unit>
+          
+        <!-- UsersController messages -->
+        <trans-unit id="45">
+          <source>User creation successful.</source>
+          <target>Utilisateur créé avec succès.</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Error creating account.</source>
+          <target>Une erreur est survenue pendant la création du compte.</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Roles updated for user '%s'.</source>
+          <target>Groupes mis à jour pour l'utilisateur '%s'.</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Roles could not be edited at this time. Please retry.</source>
+          <target>Les groupes n'ont pu être mis à jour. Veuillez réessayer ultérieurement.</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Error updating password.</source>
+          <target>Une erreur est survenue pendant le changement de mot de passe.</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>The account of '%s' has been scheduled for deletion. It will be removed in %s days.</source>
+          <target>Le compte de '%s' sera supprimé dans %s jours.</target>
+        </trans-unit>
+          
+        <!-- RolesController views messages -->
+        <trans-unit id="45">
+          <source>Name</source>
+          <target>Nom</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Description</source>
+          <target>Description</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Admin?</source>
+          <target>Administrateur ?</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Permissions</source>
+          <target>Permissions</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Users</source>
+          <target>Utilisateurs</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>New role</source>
+          <target>Nouveau groupe</target>
+        </trans-unit>
+        <trans-unit id="45">
+          <source>Create</source>
+          <target>Créer</target>
+        </trans-unit>
+        
+        
+        <!-- end of ACL messages -->
+        
+        <trans-unit id="46">
+          <source>Please correct the following errors :</source>
+          <target>Veuillez renseigner ou corriger les champs ci-dessous :</target>
+        </trans-unit>
+        <trans-unit id="47">
+          <source>%s is required.</source>
+          <target>Le champ %s est obligatoire.</target>
+        </trans-unit>
+      
+    </body>
+  </file>
+</xliff>
