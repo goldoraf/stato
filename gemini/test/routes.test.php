@@ -154,45 +154,45 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006)));
     }
     
-    /*function test_controller_in_subdir()
+    function test_modules()
     {
         $map = new SRouteSet();
-        $map->connect('process/:controller/:action/:id', array('subdirectory'=>'processing', 'controller'=>'images', 'action'=>'list'));
-        $map->connect('cms/:controller/:action/:id', array('subdirectory'=>'content', 'controller'=>'articles'));
-        $map->connect('admin/:controller/:action/:id', array('subdirectory'=>'admin'));
+        $map->connect('process/:controller/:action/:id', array('module'=>'processing', 'controller'=>'images', 'action'=>'list'));
+        $map->connect('cms/:controller/:action/:id', array('module'=>'content', 'controller'=>'articles'));
+        $map->connect('admin/:controller/:action/:id', array('module'=>'admin'));
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'admin/users', 'action'=>'edit', 'id'=>15),
+        $this->assertEqual(array('module'=>'admin', 'controller'=>'users', 'action'=>'edit', 'id'=>15),
             $this->rec('admin/users/edit/15'));
-        $this->assertEqual(array('controller'=>'content/photos', 'action'=>'edit', 'id'=>15),
+        $this->assertEqual(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15),
             $this->rec('cms/photos/edit/15'));
-        $this->assertEqual(array('controller'=>'content/articles'),
+        $this->assertEqual(array('module'=>'content', 'controller'=>'articles'),
             $this->rec('cms'));
-        $this->assertEqual(array('controller'=>'processing/images', 'action'=>'list'),
+        $this->assertEqual(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
             $this->rec('process'));
-        $this->assertEqual(array('controller'=>'processing/images', 'action'=>'list'),
+        $this->assertEqual(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
             $this->rec('process/images'));
-        $this->assertEqual(array('controller'=>'processing/images', 'action'=>'index'),
+        $this->assertEqual(array('module'=>'processing', 'controller'=>'images', 'action'=>'index'),
             $this->rec('process/images/index'));
-        $this->assertEqual(array('controller'=>'processing/pdf', 'action'=>'generate', 'id'=>15),
+        $this->assertEqual(array('module'=>'processing', 'controller'=>'pdf', 'action'=>'generate', 'id'=>15),
             $this->rec('process/pdf/generate/15'));
             
         $this->assertEqual(array('admin/users/edit/15', array()),
-            $this->gen(array('controller'=>'admin/users', 'action'=>'edit', 'id'=>15)));
+            $this->gen(array('module'=>'admin', 'controller'=>'users', 'action'=>'edit', 'id'=>15)));
         $this->assertEqual(array('cms/photos/edit/15', array()),
-            $this->gen(array('controller'=>'content/photos', 'action'=>'edit', 'id'=>15)));
+            $this->gen(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15)));
         $this->assertEqual(array('cms/articles/edit/15', array()),
-            $this->gen(array('controller'=>'content/articles', 'action'=>'edit', 'id'=>15)));
+            $this->gen(array('module'=>'content', 'controller'=>'articles', 'action'=>'edit', 'id'=>15)));
         $this->assertEqual(array('cms', array()),
-            $this->gen(array('controller'=>'content/articles')));
+            $this->gen(array('module'=>'content', 'controller'=>'articles')));
         $this->assertEqual(array('cms', array()),
-            $this->gen(array('controller'=>'content/articles', 'action'=>'index')));
+            $this->gen(array('module'=>'content', 'controller'=>'articles', 'action'=>'index')));
         $this->assertEqual(array('process', array()),
-            $this->gen(array('controller'=>'processing/images', 'action'=>'list')));
+            $this->gen(array('module'=>'processing', 'controller'=>'images', 'action'=>'list')));
         $this->assertEqual(array('process/images/index', array()),
-            $this->gen(array('controller'=>'processing/images', 'action'=>'index')));
-    }*/
+            $this->gen(array('module'=>'processing', 'controller'=>'images', 'action'=>'index')));
+    }
     
     function test_path()
     {

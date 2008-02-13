@@ -164,7 +164,6 @@ class SRoute
     public $keys       = array();
     public $defaults   = array();
     public $regex      = null;
-    public $subdir     = null;
     
     public function __construct($path, $options = array())
     {
@@ -295,11 +294,17 @@ class SRouteSet
     
     public function generate($options)
     {
-        if (!isset($this->gen_map[$options['controller']]))
+        if (!isset($this->gen_map[$options['module']]))
         {
-            $actions = $this->gen_map['*'];
+            $controllers = $this->gen_map['*'];
         }
-        else $actions = $this->gen_map[$options['controller']];
+        else $controllers = $this->gen_map[$options['module']];
+        
+        if (!isset($controllers[$options['controller']]))
+        {
+            $actions = $controllers['*'];
+        }
+        else $actions = $controllers[$options['controller']];
         
         if (!isset($options['action']) || !isset($actions[$options['action']]))
         {
@@ -342,14 +347,17 @@ class SRouteSet
         {
             $r->write_regex();
             
+            if (array_key_exists('module', $r->known)) $module = $r->known['module'];
+            else $module = '*';
+            
             if (array_key_exists('controller', $r->known))
             {
                 if (array_key_exists('action', $r->known))
-                    $this->gen_map[$r->known['controller']][$r->known['action']] = $r;
+                    $this->gen_map[$module][$r->known['controller']][$r->known['action']] = $r;
                 else
-                    $this->gen_map[$r->known['controller']]['*'] = $r;
+                    $this->gen_map[$module][$r->known['controller']]['*'] = $r;
             }
-            else $this->gen_map['*']['*'] = $r;
+            else $this->gen_map[$module]['*']['*'] = $r;
         }
     }
     
