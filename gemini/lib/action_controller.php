@@ -91,12 +91,13 @@ class SActionController implements SIDispatchable
     public static $template_class = 'SActionView';
     public static $exception_notifier = null;
     
-    public static function instantiate($name)
+    public static function instantiate($name, $module = null)
     {
-        if (file_exists($path = STATO_APP_PATH.'/controllers/application_controller.php')) require_once($path);
+        if (file_exists($path = STATO_APP_ROOT_PATH.'/app/controllers/application_controller.php'))
+            require_once($path);
         
         $class_name = self::controller_class($name);
-        if (!file_exists($path = self::controller_file($name)))
+        if (!file_exists($path = self::controller_file($name, $module)))
     		throw new SUnknownControllerException("$class_name not found !");
     		
     	require_once($path);
@@ -638,21 +639,19 @@ class SActionController implements SIDispatchable
     }
     
     private static function controller_class($req_controller)
-    {
-        if (strpos($req_controller, '/') === false) $controller_name = $req_controller; 
-    	else
-    	{
-            list($module, $controller_name) = explode('/', $req_controller);
-            if (file_exists($path = STATO_APP_PATH.'/controllers/'.$module.'/base_controller.php'))
-                require_once($path);
-        }
-    	   
-    	return SInflection::camelize($controller_name).'Controller';
+    { 
+    	return SInflection::camelize($req_controller).'Controller';
     }
     
-    private static function controller_file($req_controller)
+    private static function controller_file($req_controller, $module)
     {
-        return STATO_APP_PATH.'/controllers/'.$req_controller.'_controller.php';
+        if ($module === null)    
+            return STATO_APP_ROOT_PATH."/app/controllers/{$req_controller}_controller.php";
+        
+        if (file_exists($path = STATO_APP_ROOT_PATH."/{$module}/controllers/base_controller.php"))
+            require_once($path);
+            
+        return STATO_APP_ROOT_PATH."/{$module}/controllers/{$req_controller}_controller.php";
     }
 }
 

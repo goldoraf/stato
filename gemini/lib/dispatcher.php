@@ -4,7 +4,7 @@ define('STATO_APP_PATH', STATO_APP_ROOT_PATH.'/app');
 
 interface SIDispatchable
 {
-    public static function instantiate($name);
+    public static function instantiate($name, $module = null);
     
     public function dispatch(SRequest $request, SResponse $response);
     
@@ -15,7 +15,9 @@ class SDispatchException extends Exception {}
 
 class SDispatcher
 {	
-	protected $request;
+	public static $use_modules = false;
+    
+    protected $request;
     protected $logger;
     protected $response;
     

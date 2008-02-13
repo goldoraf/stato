@@ -41,9 +41,7 @@ class SUrlRewriter
     
     public static function current_module()
     {
-        if (strpos(self::$request->params['controller'], '/') === false) return null;
-        list($module, $controller) = explode('/', self::$request->params['controller']);
-        return $module;
+        return self::$request->params['module']; 
     }
     
     public static function current_controller()

@@ -154,7 +154,7 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006)));
     }
     
-    function test_controller_in_subdir()
+    /*function test_controller_in_subdir()
     {
         $map = new SRouteSet();
         $map->connect('process/:controller/:action/:id', array('subdirectory'=>'processing', 'controller'=>'images', 'action'=>'list'));
@@ -192,7 +192,7 @@ class RoutesTest extends UnitTestCase
             $this->gen(array('controller'=>'processing/images', 'action'=>'list')));
         $this->assertEqual(array('process/images/index', array()),
             $this->gen(array('controller'=>'processing/images', 'action'=>'index')));
-    }
+    }*/
     
     function test_path()
     {

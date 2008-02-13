@@ -103,16 +103,6 @@ class SDynamicComponent extends SComponent
 
 class SControllerComponent extends SDynamicComponent
 {
-    public $subdir = null;
-    
-    public function write_generation($url)
-    {
-        if (isset($url->params[$this->key]) && $this->subdir !== null)
-            $url->params[$this->key] = str_replace($this->subdir.'/', '', $url->params[$this->key]);
-            
-        parent::write_generation($url);
-    }
-    
     public function regex()
     {
         return '(?P<'.$this->key.'>\w*)';
@@ -255,18 +245,6 @@ class SRoute
             unset($options['requirements']);
         }
         
-        if (isset($options['subdirectory']))
-        {
-            if (!in_array('controller', $this->path_keys))
-                throw new SRoutingException('Subdirectory option must be used with a route including a ControllerComponent');
-            
-            foreach($this->components as $k => $c)
-                if ($c->key() == 'controller') $c->subdir = $options['subdirectory'];
-            
-            $this->subdir = $options['subdirectory'];
-            unset($options['subdirectory']);
-        }
-        
         foreach ($options as $k => $v)
         {
             if (in_array($k, $this->path_keys))
@@ -319,13 +297,7 @@ class SRouteSet
     {
         if (!isset($this->gen_map[$options['controller']]))
         {
-            if (strpos($options['controller'], '/'))
-            {
-                list($subdir, $contr) = explode('/', $options['controller']);
-                $actions = $this->gen_map[$subdir.'/*'];
-            }
-            else
-                $actions = $this->gen_map['*'];
+            $actions = $this->gen_map['*'];
         }
         else $actions = $this->gen_map[$options['controller']];
         
@@ -356,9 +328,6 @@ class SRouteSet
                 $options = array_merge($route->defaults, $matches);
                 $options = array_merge($route->known, $options);
                 
-                if ($route->subdir !== null)
-                    $options['controller'] = $route->subdir.'/'.$options['controller'];
-                
                 $recognized = true;
                 break;
             }
@@ -380,13 +349,7 @@ class SRouteSet
                 else
                     $this->gen_map[$r->known['controller']]['*'] = $r;
             }
-            else
-            {
-                if ($r->subdir !== null)
-                    $this->gen_map[$r->subdir.'/*']['*'] = $r;
-                else
-                    $this->gen_map['*']['*'] = $r;
-            }
+            else $this->gen_map['*']['*'] = $r;
         }
     }
     
