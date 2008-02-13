@@ -35,13 +35,17 @@ class SDispatcher
             $map = include(STATO_APP_ROOT_PATH.'/conf/routes.php');
             SRoutes::initialize($map);
             $this->request = SRoutes::recognize($this->request);
+            SUrlRewriter::initialize($this->request);
             
     		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
             
+            if (isset($this->request->params['module'])) $module = $this->request->params['module'];
+            else $module = null;
+            
             if (isset($this->request->params['resource']) && !isset($this->request->params['controller']))
-                $dispatchable = SResource::instantiate($this->request->params['resource']);
+                $dispatchable = SResource::instantiate($this->request->params['resource'], $module);
             elseif (isset($this->request->params['controller']) && !isset($this->request->params['resource']))
-                $dispatchable = SActionController::instantiate($this->request->params['controller']);
+                $dispatchable = SActionController::instantiate($this->request->params['controller'], $module);
             else
                 throw new SDispatchException('No dispatchable class identified !');
             

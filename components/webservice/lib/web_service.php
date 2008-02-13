@@ -26,7 +26,7 @@ class SWebService
         
         $this->api = new $api_class();
         
-        SDependencies::require_dependencies('models', $this->models, get_class($this));
+        SDependencies::require_models($this->models);
     }
     
     public function invoke($request)

@@ -68,6 +68,8 @@ class SUrlRewriter
         
         if (!isset($options['action']))     $options['action'] = 'index';
         if (!isset($options['controller'])) $options['controller'] = self::$request->params['controller'];
+        if (!isset($options['module']) && isset(self::$request->params['module']))
+            $options['module'] = self::$request->params['module'];
         
         return self::rewrite($options);
     }

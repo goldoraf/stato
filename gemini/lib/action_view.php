@@ -97,7 +97,7 @@ class SActionView
     {
         if (!SActionController::$perform_caching) return;
         
-        if ($key === null) $key = array('controller' => $this->controller->controller_path(),
+        if ($key === null) $key = array('controller' => $this->controller->controller_name(),
                                         'action' => $this->controller->action_name());
         
         if (($cache = $this->read_fragment($key, $lifetime)) !== false)

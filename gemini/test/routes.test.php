@@ -79,7 +79,7 @@ class RoutesTest extends UnitTestCase
         $map = new SRouteSet();
         $map->connect('', array('controller'=>'blog', 'action'=>'recent'));
         $map->connect(':controller/:action/:id');
-        $this->set_map($map);
+        $this->set_map($map);//print_r($map);die();
         
         $this->assertEqual(array('controller'=>'blog', 'action'=>'recent'),
             $this->rec(''));
@@ -159,12 +159,15 @@ class RoutesTest extends UnitTestCase
         $map = new SRouteSet();
         $map->connect('process/:controller/:action/:id', array('module'=>'processing', 'controller'=>'images', 'action'=>'list'));
         $map->connect('cms/:controller/:action/:id', array('module'=>'content', 'controller'=>'articles'));
+        $map->connect('admin/users/:action/:id', array('module'=>'admin', 'controller' => 'users_roles'));
         $map->connect('admin/:controller/:action/:id', array('module'=>'admin'));
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('module'=>'admin', 'controller'=>'users', 'action'=>'edit', 'id'=>15),
+        $this->assertEqual(array('module'=>'admin', 'controller'=>'users_roles', 'action'=>'edit', 'id'=>15),
             $this->rec('admin/users/edit/15'));
+        $this->assertEqual(array('module'=>'admin', 'controller'=>'permissions', 'action'=>'edit', 'id'=>15),
+            $this->rec('admin/permissions/edit/15'));
         $this->assertEqual(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15),
             $this->rec('cms/photos/edit/15'));
         $this->assertEqual(array('module'=>'content', 'controller'=>'articles'),
@@ -177,6 +180,8 @@ class RoutesTest extends UnitTestCase
             $this->rec('process/images/index'));
         $this->assertEqual(array('module'=>'processing', 'controller'=>'pdf', 'action'=>'generate', 'id'=>15),
             $this->rec('process/pdf/generate/15'));
+        $this->assertEqual(array('controller'=>'home', 'action'=>'about'),
+            $this->rec('home/about'));
             
         $this->assertEqual(array('admin/users/edit/15', array()),
             $this->gen(array('module'=>'admin', 'controller'=>'users', 'action'=>'edit', 'id'=>15)));

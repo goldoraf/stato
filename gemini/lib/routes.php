@@ -295,26 +295,29 @@ class SRouteSet
     public function generate($options)
     {
         if (!isset($this->gen_map[$options['module']]))
-        {
             $controllers = $this->gen_map['*'];
-        }
-        else $controllers = $this->gen_map[$options['module']];
+        else
+            $controllers = $this->gen_map[$options['module']];
         
         if (!isset($controllers[$options['controller']]))
-        {
             $actions = $controllers['*'];
-        }
-        else $actions = $controllers[$options['controller']];
+        else
+            $actions = $controllers[$options['controller']];
+          
+        if (($route = $this->search_action($options['action'], $actions)) === false)
+            $route = $this->search_action($options['action'], $controllers['*']);
         
-        if (!isset($options['action']) || !isset($actions[$options['action']]))
-        {
-            if (isset($actions['*'])) $route = $actions['*'];
-            else $route = $this->gen_map['*']['*'];
-        }
-        else $route = $actions[$options['action']];
+        if (!$route) $route = $this->gen_map['*']['*']['*'];
         
         return $route->generate($options);
     }
+    
+    private function search_action($action, $routes)
+    {
+        if (isset($routes[$action])) return $routes[$action];
+        if (isset($routes['*'])) return $routes['*'];
+        return false;
+    }   
     
     public function recognize_path($path)
     {

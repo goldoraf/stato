@@ -73,7 +73,7 @@ class SActionController implements SIDispatchable
     
     protected $web_services = array();
     
-    private $sub_directory      = null;
+    private $module = null;
     
     private $performed_render   = false;
     private $performed_redirect = false;
@@ -101,7 +101,7 @@ class SActionController implements SIDispatchable
     		throw new SUnknownControllerException("$class_name not found !");
     		
     	require_once($path);
-		return new $class_name();
+		return new $class_name($module);
     }
     
     public function dispatch(SRequest $request, SResponse $response)
@@ -118,8 +118,9 @@ class SActionController implements SIDispatchable
         return $this->response;
     }
     
-    public function __construct()
+    public function __construct($module = null)
     {
+        $this->module = $module;
         $this->initialize_template_class();
         $this->logger = SLogger::get_instance();
         $this->page_cache_dir = STATO_APP_ROOT_PATH.'/public/cache';
@@ -161,11 +162,6 @@ class SActionController implements SIDispatchable
         return get_class($this);
     }
     
-    public function controller_path()
-    {
-        return SDependencies::sub_directory(get_class($this)).$this->controller_name();
-    }
-    
     public function action_name()
     {
         if (!isset($this->request->params['action'])) return 'index';
@@ -176,7 +172,7 @@ class SActionController implements SIDispatchable
     {
         if (!isset($options['controller']))
         {
-            $options['controller'] = $this->controller_path();
+            $options['controller'] = $this->controller_name();
             if (!isset($options['action'])) $options['action'] = $this->action_name();
         }
         elseif (!isset($options['action'])) $options['action'] = 'index';  
@@ -205,7 +201,7 @@ class SActionController implements SIDispatchable
     
     protected function render_xml($status = null)
     {
-        $template = $this->template_path($this->controller_path(), $this->action_name());
+        $template = $this->template_path($this->controller_name(), $this->action_name(), $this->module);
         if (!file_exists($template)) throw new Exception('Template not found for this action');
         $this->response->headers['Content-Type'] = 'text/xml; charset=utf-8';
         $this->render_text('<?xml version="1.0" encoding="UTF-8"?'.">\n"
@@ -214,7 +210,7 @@ class SActionController implements SIDispatchable
     
     protected function render_action($action, $status = null)
     {
-        $template = $this->template_path($this->controller_path(), $action);
+        $template = $this->template_path($this->controller_name(), $action, $this->module);
         if (!file_exists($template)) throw new SMissingTemplateException('Template not found for this action');
         
         if ($this->layout) $this->render_with_layout($template, $status);
@@ -238,13 +234,14 @@ class SActionController implements SIDispatchable
         $this->render_text($this->view->render($path), $status);
     }
     
-    protected function render_partial($partial, $local_assigns = array())
+    // TO FIX
+    /*protected function render_partial($partial, $local_assigns = array())
     {
         $this->add_variables_to_assigns();
         if (strpos($partial, '/') === false) $partial = $this->controller_path().'/'.$partial;
         $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
         $this->render_text($this->view->render_partial($partial, $local_assigns));
-    }
+    }*/
     
     /**
      * Renders text without the active layout. 
@@ -269,9 +266,12 @@ class SActionController implements SIDispatchable
         $this->render_text(' ', $status);
     }
     
-    protected function template_path($controller_path, $action)
+    protected function template_path($controller, $action, $module = null)
     {
-        return STATO_APP_PATH."/views/$controller_path/$action.php";
+        if ($module !== null)
+            return STATO_APP_ROOT_PATH."/modules/$module/views/$controller/$action.php";
+    
+        return STATO_APP_PATH."/views/$controller/$action.php";
     }
     
     protected function add_variables_to_assigns()
@@ -315,7 +315,7 @@ class SActionController implements SIDispatchable
         else
         {
             throw new Exception('No HTTP_REFERER was set in the request to this action, 
-                so redirectBack() could not be called successfully');
+                so redirect_back() could not be called successfully');
         }
     }
     
@@ -543,19 +543,16 @@ class SActionController implements SIDispatchable
     
     private function require_dependencies()
     {
-        SUrlRewriter::initialize($this->request);
+        try {
+            SDependencies::require_model($this->controller_name());
+        } catch (SDependencyNotFound $e) {};
         
-        try
-        {
-            SDependencies::require_dependency('models', SInflection::singularize($this->controller_name()), get_class($this));
-            SDependencies::require_dependency('helpers', $this->controller_name().'Helper', get_class($this));
-        }
-        catch (SDependencyNotFound $e) {}
+        try {
+            SDependencies::require_helper($this->controller_name(), $this->module);
+        } catch (SDependencyNotFound $e) {};
         
-        foreach($this->helpers as $k => $helper) $this->helpers[$k] = $helper.'Helper';
-        
-        SDependencies::require_dependencies('models', $this->models, get_class($this));
-        SDependencies::require_dependencies('helpers', $this->helpers, get_class($this));
+        SDependencies::require_models($this->models);
+        SDependencies::require_helpers($this->helpers, $this->module);
         
         if (!empty($this->components))
             SDependencies::require_components($this->components);
@@ -648,10 +645,10 @@ class SActionController implements SIDispatchable
         if ($module === null)    
             return STATO_APP_ROOT_PATH."/app/controllers/{$req_controller}_controller.php";
         
-        if (file_exists($path = STATO_APP_ROOT_PATH."/{$module}/controllers/base_controller.php"))
+        if (file_exists($path = STATO_APP_ROOT_PATH."/modules/{$module}/controllers/base_controller.php"))
             require_once($path);
             
-        return STATO_APP_ROOT_PATH."/{$module}/controllers/{$req_controller}_controller.php";
+        return STATO_APP_ROOT_PATH."/modules/{$module}/controllers/{$req_controller}_controller.php";
     }
 }
 
