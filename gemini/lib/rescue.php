@@ -1,6 +1,6 @@
 <?php
 
-function error_handler($error_type, $message)
+function stato_error_handler($error_type, $message)
 {
     if ($error_type == E_USER_ERROR && preg_match('/^Missing ([a-zA-Z0-9_]*) model$/', $message))
         throw new SDependencyNotFound($message, $error_type);
@@ -11,7 +11,6 @@ function error_handler($error_type, $message)
     if ($error_type != E_NOTICE && $error_type != E_STRICT)
         throw new Exception($message, $error_type);
 }
-set_error_handler('error_handler');
 
 class SRescue
 {

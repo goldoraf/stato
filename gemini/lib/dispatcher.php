@@ -15,14 +15,14 @@ class SDispatchException extends Exception {}
 
 class SDispatcher
 {	
-	public static $use_modules = false;
-    
     protected $request;
     protected $logger;
     protected $response;
     
     public function __construct()
     {
+        set_error_handler('stato_error_handler');
+        
         $this->request = new SRequest();
         $this->response = new SResponse();
         $this->logger = SLogger::get_instance();
