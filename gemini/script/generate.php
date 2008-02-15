@@ -3,8 +3,7 @@
 class GenerateCommand extends SCommand
 {
     protected $allowed_params = array('type' => true, 'name' => true);
-    protected $allowed_types  = array('controller', 'model', 'migration', 'module', 
-                                      'webservice', 'ws_test_controller', 'mailer');
+    protected $allowed_types  = array('controller', 'resource', 'model', 'migration', 'module');
     
     public function execute()
     {
@@ -15,96 +14,76 @@ class GenerateCommand extends SCommand
         $this->$generate_method();
     }
     
-    private function generate_model()
+    private function generate_controller()
     {
-        $file_name = $this->params['name'];
+        list($path, $controller_name) = $this->path_and_name($this->params['name']);
         
-        if (strpos($file_name, '/') !== false)
-            list($subdir, $file_name) = explode('/', $file_name);
-        
-        if (empty($subdir)) $path = "models/$file_name.php";
-        else
-        {
-            $this->test_module_existence($subdir);
-            $path = "models/$subdir/$file_name.php";
-        }
-        
-        $class_name = SInflection::camelize($file_name);
+        $class_name = SInflection::camelize($controller_name).'Controller';
             
-        $content = SCodeGenerator::generate_class($class_name, '    public static $objects;', 'SActiveRecord');
+        $content = SCodeGenerator::generate_class($class_name, '', 'ApplicationController');
         
-        $this->create_file($path, STATO_APP_PATH, $content);
+        $this->create_file("{$path}/controllers/{$controller_name}_controller.php", STATO_APP_ROOT_PATH, $content);
+        $this->create_dir("{$path}/views/{$controller_name}", STATO_APP_ROOT_PATH);
+    }
+    
+    private function generate_resource()
+    {
+        list($path, $resource_name) = $this->path_and_name($this->params['name']);
         
-        $table_name = SInflection::pluralize($file_name);
-        $migration_name = 'create_'.$table_name;
-        $migration_class = SInflection::camelize($migration_name);
-        $migration_version = SMigrator::last_version(STATO_APP_ROOT_PATH.'/db/migrate') + 1;
-        $migration_path = "db/migrate/{$migration_version}_{$migration_name}.php";
+        $class_name = SInflection::camelize($resource_name).'Resource';
         
-        $this->create_file($migration_path, STATO_APP_ROOT_PATH,
+        if (!is_dir(STATO_APP_ROOT_PATH."/{$path}/resources"))
+            $this->create_dir("{$path}/resources", STATO_APP_ROOT_PATH);
+        
+        $this->create_file("{$path}/resources/{$resource_name}_resource.php", STATO_APP_ROOT_PATH, 
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/gemini/lib/templates/migration.php",
-                    array('table_name' => $table_name, 'class_name' => $migration_class)
+                    STATO_CORE_PATH."/gemini/lib/templates/resource.php",
+                    array('class_name' => $class_name)
                 )
             )
         );
     }
     
-    private function generate_controller()
+    private function generate_model()
     {
-        $views_dir = $this->params['name'];
+        list($path, $model_name) = $this->path_and_name($this->params['name']);
         
-        if (strpos($views_dir, '/') !== false)
-            list($subdir, $views_dir) = explode('/', $views_dir);
+        $class_name = SInflection::camelize($model_name);
             
-        $file_name = $views_dir.'_controller';
+        $content = SCodeGenerator::generate_class($class_name, '    public static $objects;', 'SActiveRecord');
         
-        if (!empty($subdir))
-        {
-            $this->test_module_existence($subdir);
-            $path = "controllers/$subdir/$file_name.php";
-            $views_path = "views/$subdir/$views_dir";
-        }
-        else
-        {
-            $path = "controllers/$file_name.php";
-            $views_path = "views/$views_dir";
-        }
+        $this->create_file("{$path}/models/{$model_name}.php", STATO_APP_ROOT_PATH, $content);
         
-        $class_name = SInflection::camelize($file_name);
-            
-        $content = SCodeGenerator::generate_class($class_name, '', 'ApplicationController');
+        $table_name = SInflection::pluralize($model_name);
+        $migration_name = 'create_'.$table_name;
         
-        $this->create_file($path, STATO_APP_PATH, $content);
-        $this->create_dir($views_path, STATO_APP_PATH);
+        if ($this->ask("generate a migration file ?"))
+            $this->generate_migration($migration_name, $table_name);
     }
     
-    private function generate_mailer()
+    private function generate_migration($migration_name = null, $table_name = null)
     {
-        $file_name = $this->params['name'];
+        if ($migration_name === null)
+            $migration_name = $this->params['name'];
         
-        if (strpos($file_name, '/') !== false)
-            list($subdir, $file_name) = explode('/', $file_name);
+        $migration_class = SInflection::camelize($migration_name);
+        $migration_version = SMigrator::last_version(STATO_APP_ROOT_PATH.'/db/migrate') + 1;
+        $migration_path = "db/migrate/{$migration_version}_{$migration_name}.php";
         
-        if (empty($subdir))
-        {
-            $path = "models/$file_name.php";
-            $views_path = "views/$file_name";
-        }
-        else
-        {
-            $this->test_module_existence($subdir);
-            $path = "models/$subdir/$file_name.php";
-            $views_path = "views/$subdir/$file_name";
+        if ($table_name === null) {
+            $template = STATO_CORE_PATH."/gemini/lib/templates/empty_migration.php";
+            $assigns = array('class_name' => $migration_class);
+        } else {
+            $template = STATO_CORE_PATH."/gemini/lib/templates/migration.php";
+            $assigns = array('table_name' => $table_name, 'class_name' => $migration_class);
         }
         
-        $class_name = SInflection::camelize($file_name);
-            
-        $content = SCodeGenerator::generate_class($class_name, '', 'SMailer');
-        
-        $this->create_file($path, STATO_APP_PATH, $content);
-        $this->create_dir($views_path, STATO_APP_PATH);
+        $this->create_file($migration_path, STATO_APP_ROOT_PATH,
+            SCodeGenerator::generate_file(
+                SCodeGenerator::render_template($template, $assigns)
+            )
+        );
     }
     
     private function generate_module()
@@ -114,101 +93,32 @@ class GenerateCommand extends SCommand
         if ($this->module_exists($module_name))
             die("Module $module_name already exists.\n");
             
-        $this->create_dir("controllers/$module_name", STATO_APP_PATH);
-        $this->create_dir("models/$module_name", STATO_APP_PATH);
-        $this->create_dir("views/$module_name", STATO_APP_PATH);
-        $this->create_dir("helpers/$module_name", STATO_APP_PATH);
-        $this->create_dir("apis/$module_name", STATO_APP_PATH);
-        $this->create_dir("i18n/$module_name", STATO_APP_PATH);
+        if (!is_dir(STATO_APP_ROOT_PATH.'/modules'))
+            $this->create_dir('modules', STATO_APP_ROOT_PATH);
+            
+        $this->create_dir("modules/$module_name", STATO_APP_ROOT_PATH);
+        $this->create_dir("modules/$module_name/controllers", STATO_APP_ROOT_PATH);
+        $this->create_dir("modules/$module_name/models", STATO_APP_ROOT_PATH);
+        $this->create_dir("modules/$module_name/views", STATO_APP_ROOT_PATH);
+        $this->create_dir("modules/$module_name/helpers", STATO_APP_ROOT_PATH);
         
-        $this->create_file("controllers/$module_name/base_controller.php", STATO_APP_PATH,
+        $this->create_file("modules/$module_name/controllers/base_controller.php", STATO_APP_ROOT_PATH,
             SCodeGenerator::generate_class(SInflection::camelize($module_name).'BaseController', '', 'ApplicationController'));
     }
     
-    private function generate_migration()
+    private function path_and_name($name)
     {
-        $migration_name = $this->params['name'];
+        if (strpos($name, '::') !== false)
+            list($module, $name) = explode('::', $name);
         
-        $migration_class = SInflection::camelize($migration_name);
-        $migration_version = SMigrator::last_version(STATO_APP_ROOT_PATH.'/db/migrate') + 1;
-        $migration_path = "db/migrate/{$migration_version}_{$migration_name}.php";
-        
-        $this->create_file($migration_path, STATO_APP_ROOT_PATH,
-            SCodeGenerator::generate_file(
-                SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/gemini/lib/templates/empty_migration.php",
-                    array('class_name' => $migration_class)
-                )
-            )
-        );
-    }
-    
-    private function generate_webservice()
-    {
-        $file_name = $this->params['name'];
-        
-        if (strpos($file_name, '/') !== false)
-            list($subdir, $file_name) = explode('/', $file_name);
-        
-        if (empty($subdir)) $path = "apis/$file_name.php";
+        if (empty($module)) $path = 'app';
         else
         {
-            $this->test_module_existence($subdir);
-            $path = "apis/$subdir/$file_name.php";
+            $this->test_module_existence($module);
+            $path = "modules/$module";
         }
         
-        $service_cc_name = SInflection::camelize($file_name);
-        $api_class_name = $service_cc_name.'API';
-        $service_class_name = $service_cc_name.'Service';
-        
-        $this->create_file($path, STATO_APP_PATH,
-            SCodeGenerator::generate_file(
-                SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/gemini/lib/templates/webservice.php",
-                    array('api_class_name' => $api_class_name, 'service_class_name' => $service_class_name)
-                )
-            )
-        );
-    }
-    
-    private function generate_ws_test_controller()
-    {
-        $views_dir = $this->params['name'];
-        
-        $templates_path = STATO_CORE_PATH.'/gemini/lib/templates/web_services_test';
-        
-        if (strpos($views_dir, '/') !== false)
-            list($subdir, $views_dir) = explode('/', $views_dir);
-            
-        $file_name = $views_dir.'_controller';
-        
-        if (!empty($subdir))
-        {
-            $this->test_module_existence($subdir);
-            $controller_path = "controllers/$subdir/$file_name.php";
-            $views_path = "views/$subdir/$views_dir";
-        }
-        else
-        {
-            $controller_path = "controllers/$file_name.php";
-            $views_path = "views/$views_dir";
-        }
-        
-        $this->create_file($controller_path, STATO_APP_PATH,
-            SCodeGenerator::generate_file(
-                SCodeGenerator::render_template("{$templates_path}/controller.php",
-                    array('controller_class_name' => SInflection::camelize($file_name)))
-            )
-        );
-        
-        $this->create_dir($views_path, STATO_APP_PATH);
-        
-        foreach (array('index', 'invoke', 'set_params') as $view_name)
-            $this->create_file("$views_path/$view_name.php", STATO_APP_PATH,
-                file_get_contents("{$templates_path}/views/{$view_name}.php"));
-                
-        $this->create_file("views/layouts/test_ws.php", STATO_APP_PATH,
-            file_get_contents("{$templates_path}/views/layout.php"));
+        return array($path, $name);
     }
 }
 

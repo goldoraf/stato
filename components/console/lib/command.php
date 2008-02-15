@@ -57,9 +57,7 @@ abstract class SCommand
                 $this->announce("identical $path");
             else
             {
-                $this->announce("overwrite $path ? (y/n)");
-                $answer = fgetc(STDIN);
-                if ($answer == 'n')
+                if (!$this->ask("overwrite $path ?"))
                     $this->announce("skip $path");
                 else
                 {
@@ -81,23 +79,30 @@ abstract class SCommand
         SDir::copy($source_path, $base_path.'/'.$path);
     }
     
-    protected function test_module_existence($subdir)
+    protected function test_module_existence($module)
     {
-        if (!$this->module_exists($subdir))
-            throw new SConsoleException("Module $subdir does not exist");
+        if (!$this->module_exists($module))
+            throw new SConsoleException("Module $module does not exist");
     }
     
-    protected function module_exists($subdir)
+    protected function module_exists($module)
     {
-        return (file_exists(STATO_APP_PATH."/controllers/$subdir")
-             && file_exists(STATO_APP_PATH."/models/$subdir")
-             && file_exists(STATO_APP_PATH."/views/$subdir")
-             && file_exists(STATO_APP_PATH."/helpers/$subdir"));
+        return (file_exists(STATO_APP_ROOT_PATH."/modules/$module/controllers")
+             && file_exists(STATO_APP_ROOT_PATH."/modules/$module/models")
+             && file_exists(STATO_APP_ROOT_PATH."/modules/$module/views")
+             && file_exists(STATO_APP_ROOT_PATH."/modules/$module/helpers"));
     }
     
     protected function announce($message)
     {
         echo "    $message\n";
+    }
+    
+    protected function ask($message)
+    {
+        echo "    $message (y/n) ";
+        $answer = trim(fgets(STDIN, 1024));
+        return $answer == 'y';
     }
 }
 
