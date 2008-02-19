@@ -382,23 +382,8 @@ class SRoutes
         if ($use_named_routes) SNamedRoutes::install();
     }
   
-    public static function recognize($url)
+    public static function recognize($path)
     {
-        if (strpos($url, '?') !== false)
-            list($path, ) = explode('?', $url);
-        else
-            $path = $url;
-            
-        // Skip trailing slash
-        if (substr($path, -1) == '/') $path = substr($path, 0, -1);
-        
-        $extension = strrchr($path, '.');
-        if ($extension !== false)
-        {
-            $request->set_format_by_extension(substr($extension, 1));
-            $path = substr($path, 0, - strlen($extension));
-        }
-            
         $options = self::$map->recognize_path($path);
         
         if ($options === null)

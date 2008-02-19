@@ -148,7 +148,7 @@ class SRequest
     }
     
     /**
-     * Sets the format by string extension ; used by routing
+     * Sets the format by string extension
      */
     public function set_format_by_extension($extension)
     {
@@ -227,6 +227,28 @@ class SRequest
         if (!isset($this->request_uri))
             $this->request_uri = substr($_SERVER['REQUEST_URI'], strlen($this->relative_url_root()));
         return $this->request_uri;
+    }
+    
+    /**
+     * Return the request URI minus file extension and querystring (for use with routing)
+     * If a file extension is present, sets the format too
+     */
+    public function request_path()
+    {
+        $path = $this->request_uri();
+        if (strpos($path, '?') !== false) list($path, ) = explode('?', $path);
+        
+        // Skip trailing slash
+        if (substr($path, -1) == '/') $path = substr($path, 0, -1);
+        
+        $extension = strrchr($path, '.');
+        if ($extension !== false)
+        {
+            $this->set_format_by_extension(substr($extension, 1));
+            $path = substr($path, 0, - strlen($extension));
+        }
+        
+        return $path;
     }
     
     /**
