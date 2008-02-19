@@ -382,14 +382,12 @@ class SRoutes
         if ($use_named_routes) SNamedRoutes::install();
     }
   
-    public static function recognize($request)
+    public static function recognize($url)
     {
-        $url = $request->request_uri();
-        
         if (strpos($url, '?') !== false)
-            list($path, $query_string) = explode('?', $url);
+            list($path, ) = explode('?', $url);
         else
-            list($path, $query_string) = array($url, '');
+            $path = $url;
             
         // Skip trailing slash
         if (substr($path, -1) == '/') $path = substr($path, 0, -1);
@@ -405,12 +403,8 @@ class SRoutes
         
         if ($options === null)
             throw new SRoutingException("Recognition failed for $url");
-        
-        parse_str($query_string, $params);
-        $options = array_merge($params, $options);
-        $request->inject_params($options);
             
-        return $request;
+        return $options;
     }
     
     public static function generate($options)

@@ -34,7 +34,7 @@ class SDispatcher
     	{
             $map = include(STATO_APP_ROOT_PATH.'/conf/routes.php');
             SRoutes::initialize($map);
-            $this->request = SRoutes::recognize($this->request);
+            $this->request->inject_params(SRoutes::recognize($this->request->request_uri()));
             SUrlRewriter::initialize($this->request);
             
     		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);

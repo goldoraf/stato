@@ -24,7 +24,7 @@ class SRequest
     
     public function __construct()
     {
-        if ($this->is_post()) $this->parse_post_parameters();
+        $this->parse_request_parameters();
     }
     
     public function inject_params($params)
@@ -239,39 +239,51 @@ class SRequest
         return $this->relative_url_root;
     }
     
-    private function parse_post_parameters()
+    private function parse_request_parameters()
     {
-        $keys  = array_keys($_POST);
-        $count = sizeof($keys);
-        for ($i = 0; $i < $count; $i++) $this->params[$keys[$i]] = $_POST[$keys[$i]];
-        
-		$keys  = array_keys($_FILES);
-        $count = sizeof($keys);
-        for ($i = 0; $i < $count; $i++)
-		{
-        	if (is_array($_FILES[$keys[$i]]['name']))
-        	{
-                $subkeys = array_keys($_FILES[$keys[$i]]['name']);
-                foreach($subkeys as $subkey)
-                {
-                    if ($_FILES[$keys[$i]]['error'][$subkey] != UPLOAD_ERR_NO_FILE)
-                	{
-                        $flags = array('name', 'type', 'tmp_name', 'error', 'size');
-                        foreach($flags as $flag) $file[$flag] = $_FILES[$keys[$i]][$flag][$subkey];
-                        $this->params[$keys[$i]][$subkey] = new SUpload($file);
-                    }
-                    else $this->params[$keys[$i]][$subkey] = False;
-                }
+        $this->params += $_GET;
+        if ($this->is_put())
+            parse_str($this->raw_post_data(), $this->params);
+        elseif ($this->is_post()) {
+            $this->params += $_POST;
+            $this->extract_uploaded_files();
+        }   
+    }
+    
+    private function extract_uploaded_files()
+    {
+        foreach ($_FILES as $key => $value) {
+        	if (is_array($value['name'])) {
+                foreach ($value['name'] as $k => $v)
+                    if ($value['error'][$k] === UPLOAD_ERR_OK)
+                        $this->params[$key][$k] = new SUploadedFile($value['tmp_name'][$k], $v, $value['type'][$k]);
             }
-            else
-            {
-                if ($_FILES[$keys[$i]]['error'] != UPLOAD_ERR_NO_FILE)
-                    $this->params[$keys[$i]] = new SUpload($_FILES[$keys[$i]]);
-                else
-                    $this->params[$keys[$i]] = False;
-            }
+            elseif ($value['error'] === UPLOAD_ERR_OK)
+                $this->params[$key] = new SUploadedFile($value['tmp_name'], $value['name'], $value['type']);
         }
 	}
+}
+
+class SUploadedFile
+{
+    public $original_filename;
+    public $content_type;
+    
+    private $temp_filename;
+    
+    public function __construct($temp_filename, $orig_filename, $content_type)
+    {
+        $this->temp_filename = $temp_filename;
+        $this->original_filename = $orig_filename;
+        $this->content_type = $content_type;
+    }
+    
+    public function save_as($path, $chmod = null)
+    {
+        $mv_success = @move_uploaded_file($this->temp_filename, $path);
+        if ($chmod === null) return $mv_success;
+        return ($mv_success && @chmod($path, $chmod));
+    }
 }
 
 ?>

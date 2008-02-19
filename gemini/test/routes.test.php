@@ -79,7 +79,7 @@ class RoutesTest extends UnitTestCase
         $map = new SRouteSet();
         $map->connect('', array('controller'=>'blog', 'action'=>'recent'));
         $map->connect(':controller/:action/:id');
-        $this->set_map($map);//print_r($map);die();
+        $this->set_map($map);
         
         $this->assertEqual(array('controller'=>'blog', 'action'=>'recent'),
             $this->rec(''));
