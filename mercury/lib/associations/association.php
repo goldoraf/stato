@@ -220,6 +220,11 @@ abstract class SManyAssociationManager
         return call_user_func_array(array($this->get_query_set(), $method), $args);
     }
     
+    public function target()
+    {
+        return $this->all();   
+    }
+    
     public function all()
     {
         if ($this->owner->is_new_record()) return $this->unsaved;
