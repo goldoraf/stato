@@ -2,19 +2,14 @@
 
 class SUnknownResourceException extends Exception {}
 class SHttpMethodNotImplemented extends Exception {}
-class SUnknownAuthenticationMethod extends Exception {}
 
 class SResource
 {
-    const HTTP_BASIC = 1;
-    
     protected $request;
     protected $response;
     protected $params;
     protected $format;
     protected $mimetype;
-    protected $authentication;
-    protected $authentication_callback;
     protected $accepted_formats = array('xml', 'json');
     
     public static function instantiate($name, $module = null)
@@ -37,9 +32,6 @@ class SResource
         $this->format   = $this->request->format();
         $this->mimetype = SMimeType::lookup($this->format);
         
-        if ($this->authentication !== null && !$this->authenticate()) 
-            return $this->response;
-        
         $method = $this->request->method();
         if (!method_exists($this, $method))
             throw new SHttpMethodNotImplemented(strtoupper($method));
@@ -51,19 +43,6 @@ class SResource
     public function process_to_log($request)
     {
         return array(get_class($this), $request->method());
-    }
-    
-    public function authenticate()
-    {
-        switch ($this->authentication)
-        {
-            case self::HTTP_BASIC:
-                require STATO_CORE_PATH.'/components/http_authentication/lib/basic_http_authentication.php';
-                return SBasicHttpAuthentication::authenticate($this->request, $this->response, $this->authentication_callback);
-                break;
-            default:
-                throw new SUnknownAuthenticationMethod("{$this->authentication} auth method unknown");
-        }
     }
     
     protected function responds($data, $status = 200)
