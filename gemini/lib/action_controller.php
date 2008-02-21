@@ -32,7 +32,7 @@ class SHttp404 extends Exception {}
  * @package Stato
  * @subpackage controller
  */
-class SActionController implements SIDispatchable
+class SActionController implements SIDispatchable, SIFilterable
 {   
     /**
      * Holds the request object that's primarily used to get variables set by the 
@@ -264,6 +264,12 @@ class SActionController implements SIDispatchable
     public function render_nothing($status = null)
     {
         $this->render_text(' ', $status);
+    }
+    
+    public function call_filter($method, $state)
+    {
+        $skip_prop = 'skip_'.$state.'_filters';
+        if (!in_array($method, $this->$skip_prop)) return $this->$method();
     }
     
     protected function template_path($controller, $action, $module = null)
@@ -508,7 +514,7 @@ class SActionController implements SIDispatchable
         if (!empty($this->cached_actions))
             $this->around_filters[] = new SActionCacheFilter($this->cached_actions);
         
-        $before_result = $this->process_filters('before');
+        $before_result = SFilters::process($this, 'before', $this->action_name(), $this->before_filters);
         foreach($this->around_filters as $filter) $filter->before($this);
         
         if ($before_result !== false && !$this->is_performed())
@@ -518,7 +524,7 @@ class SActionController implements SIDispatchable
         }
         
         foreach($this->around_filters as $filter) $filter->after($this);
-        $this->process_filters('after');
+        SFilters::process($this, 'after', $this->action_name(), $this->after_filters);
         
         $this->session->store();
         
@@ -556,37 +562,6 @@ class SActionController implements SIDispatchable
         
         if (!empty($this->components))
             SDependencies::require_components($this->components);
-    }
-    
-    private function process_filters($state)
-    {
-        $prop = $state.'_filters';
-        foreach ($this->$prop as $filter)
-        {
-            if (is_array($filter))
-            {
-                $method = $filter[0];
-                
-                if (isset($filter['only']) && !is_array($filter['only']))
-                    $filter['only'] = array($filter['only']);
-                if (isset($filter['except']) && !is_array($filter['except']))
-                    $filter['except'] = array($filter['except']);
-                
-                if ((isset($filter['only']) && in_array($this->action_name(), $filter['only']))
-                    || (isset($filter['except']) && !in_array($this->action_name(), $filter['except']))
-                    || (!isset($filter['only']) && !isset($filter['except'])))
-                    $result = $this->call_filter($method, $state);
-            }
-            else $result = $this->call_filter($filter, $state);
-            
-            if (@$result === false) return false;
-        }
-    }
-    
-    private function call_filter($method, $state)
-    {
-        $skip_prop = 'skip_'.$state.'_filters';
-        if (!in_array($method, $this->$skip_prop)) return $this->$method();
     }
     
     private function is_performed()
