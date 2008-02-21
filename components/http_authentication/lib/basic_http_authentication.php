@@ -2,15 +2,20 @@
 
 class SBasicHttpAuthentication
 {
+    public static function authenticate_or_request($request, $response, $login_callback, $realm = 'Application')
+    {
+        return self::authenticate($request, $response, $login_callback, $realm)
+            || self::authentication_request($response, $realm);
+    }
+    
     public static function authenticate($request, $response, $login_callback, $realm = 'Application')
     {
         list($login, $pwd) = self::login_and_password($request);
-        if (!$login || !$pwd || !call_user_func_array($login_callback, array($login, $pwd)))
-            return self::authentication_request($response, $realm);
-        return true;
+        if (!$login || !$pwd) return false;
+        return call_user_func_array($login_callback, array($login, $pwd));
     }
     
-    private static function authentication_request($response, $realm)
+    public static function authentication_request($response, $realm)
     {
         $response->status = 401;
         $response->headers["WWW-Authenticate"] = 'Basic realm="'.$realm.'"';
