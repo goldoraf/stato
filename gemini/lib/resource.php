@@ -3,14 +3,17 @@
 class SUnknownResourceException extends Exception {}
 class SHttpMethodNotImplemented extends Exception {}
 
-class SResource
+class SResource implements SIDispatchable, SIFilterable
 {
     protected $request;
     protected $response;
     protected $params;
     protected $format;
     protected $mimetype;
+    protected $performed = false;
     protected $accepted_formats = array('xml', 'json');
+    protected $before_filters   = array();
+    protected $after_filters    = array();
     
     public static function instantiate($name, $module = null)
     {
@@ -36,13 +39,25 @@ class SResource
         if (!method_exists($this, $method))
             throw new SHttpMethodNotImplemented(strtoupper($method));
         
-        $result = $this->$method();
-        return $this->responds($result);
+        $before_result = SFilters::process($this, 'before', $method, $this->before_filters);
+        if ($before_result !== false && !$this->performed)
+        {
+            $result = $this->$method();
+            if (!$this->performed) $this->responds($result);
+        }
+        SFilters::process($this, 'after', $method, $this->after_filters);
+        
+        return $this->response;
     }
     
     public function process_to_log($request)
     {
         return array(get_class($this), $request->method());
+    }
+    
+    public function call_filter($method, $state)
+    {
+        return $this->$method();
     }
     
     protected function responds($data, $status = 200)
@@ -53,7 +68,7 @@ class SResource
         $this->response->headers['Content-Type'] = (string) $this->mimetype;
         $this->response->body = $serializer->serialize($data);
         
-        return $this->response;
+        $this->performed = true;
     }
     
     private static function resource_file($req_resource, $module)
