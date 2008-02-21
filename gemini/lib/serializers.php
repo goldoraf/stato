@@ -56,9 +56,23 @@ class SJsonSerializer extends SAbstractSerializer
     {
         if ($this->implements_iterator($object))
             return $this->serialize_iterator($object, $options);
+        
+        return $this->recurse_on_object($object, $options);
+    }
+    
+    private function recurse_on_object($object, $options)
+    {
         if (method_exists($object, 'serializable_form'))
-            $object = $object->serializable_form();  
-        return json_encode($object);
+            $object = $object->serializable_form();
+            
+        $parts = array();
+        foreach ($object as $key => $value)
+        {
+            if (is_object($value)) $value = $this->serialize_object($value, $options);
+            else $value = json_encode($value);
+            $parts[] = "\"$key\":$value";
+        }
+        return '{'.implode(',', $parts).'}';
     }
     
     private function serialize_iterator($iterator, $options)
@@ -82,7 +96,7 @@ class SXmlSerializer extends SAbstractSerializer
         if (is_object($data))
         {
             if (get_class($data) == 'SQuerySet')
-                $start_element = SInflection::underscore(get_class($data->first()));
+                $start_element = SInflection::pluralize(SInflection::underscore(get_class($data->first())));
             else
                 $start_element = SInflection::underscore(get_class($data));
         }
@@ -114,8 +128,8 @@ class SXmlSerializer extends SAbstractSerializer
         
         foreach ($data as $key => $value)
         {
-            if (is_numeric($key)) $key = 'value';
-            if (is_object($value)) $key = SInflection::underscore(get_class($value));
+            if (is_numeric($key) && is_object($value)) $key = SInflection::underscore(get_class($value));
+            elseif (is_numeric($key)) $key = 'value';
             
             if (!isset($options['dasherize']) || $options['dasherize'] = true)
                 $key = SInflection::dasherize($key);

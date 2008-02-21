@@ -88,12 +88,26 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     
     public function serializable_form($options = array())
     {
+        $defaults = array('include' => array(), 'exclude' => array());
+        $options = array_merge($defaults, $options);
+        if (!is_array($options['include']))
+            $options['include'] = array($options['include']);
+        if (!is_array($options['exclude']))
+            $options['exclude'] = array($options['exclude']);
+        
         $obj = new stdClass;
         foreach ($this->meta->attributes as $name => $column)
         {
-            if (array_key_exists($name, $this->meta->relationships)) continue;
-            if (in_array($name, $this->attr_protected)) continue;
-            $obj->$name = (string) $this->$name;
+            if (!array_key_exists($name, $this->meta->relationships)
+                && !in_array($name, $this->attr_protected)
+                && !in_array($name, $options['exclude'])
+                && !preg_match('/(_id|_count)$/', $name))
+                $obj->$name = (string) $this->$name;
+        }
+        foreach ($this->meta->relationships as $name => $assoc)
+        {
+            if (in_array($name, $options['include']))
+                $obj->$name = $this->$name->target();
         }
         return $obj;
     }
