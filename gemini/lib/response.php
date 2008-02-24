@@ -84,7 +84,8 @@ class SResponse
     {
         if (!isset($this->headers['Status']) && isset(self::$status_code_text[$this->status]))
             $this->headers['Status'] = $this->status.' '.self::$status_code_text[$this->status];
-        foreach($this->headers as $key => $value) header($key.': '.$value);
+        header('HTTP/1.x '.$this->headers['Status']);
+		foreach($this->headers as $key => $value) header($key.': '.$value);
     }
     
     public function out()
