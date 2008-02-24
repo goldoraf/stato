@@ -71,6 +71,11 @@ class SResource implements SIDispatchable, SIFilterable
         $this->responds($object, $status);
     }
     
+    protected function responds_nothing($status = 200)
+    {
+        $this->responds_text(' ', $status);
+    }
+    
     protected function responds_text($text, $status = 200)
     {
         $this->response->headers['Status'] = $status;
