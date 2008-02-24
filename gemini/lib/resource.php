@@ -63,10 +63,14 @@ class SResource implements SIDispatchable, SIFilterable
     protected function responds($data, $status = 200)
     {
         $serializer = SAbstractSerializer::instantiate($this->format);
-        
+        $this->responds_text($serializer->serialize($data), $status);
+    }
+    
+    protected function responds_text($text, $status = 200)
+    {
         $this->response->headers['Status'] = $status;
         $this->response->headers['Content-Type'] = (string) $this->mimetype;
-        $this->response->body = $serializer->serialize($data);
+        $this->response->body = $text;
         
         $this->performed = true;
     }
