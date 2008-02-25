@@ -60,6 +60,16 @@ class SResource implements SIDispatchable, SIFilterable
         return $this->$method();
     }
     
+    protected function add_before_filter($filter, $options = array())
+    {
+        $this->before_filters[$filter] = $options;
+    }
+    
+    protected function add_after_filter($filter, $options = array())
+    {
+        $this->after_filters[$filter] = $options;
+    }
+    
     protected function responds($data, $status = 200)
     {
         $serializer = SAbstractSerializer::instantiate($this->format);

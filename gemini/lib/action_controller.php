@@ -101,7 +101,9 @@ class SActionController implements SIDispatchable, SIFilterable
     		throw new SUnknownControllerException("$class_name not found !");
     		
     	require_once($path);
-		return new $class_name($module);
+		$controller = new $class_name();
+        $controller->set_module($module);
+        return $controller;
     }
     
     public function dispatch(SRequest $request, SResponse $response)
@@ -118,9 +120,8 @@ class SActionController implements SIDispatchable, SIFilterable
         return $this->response;
     }
     
-    public function __construct($module = null)
+    public function __construct()
     {
-        $this->module = $module;
         $this->initialize_template_class();
         $this->logger = SLogger::get_instance();
         $this->page_cache_dir = STATO_APP_ROOT_PATH.'/public/cache';
@@ -166,6 +167,11 @@ class SActionController implements SIDispatchable, SIFilterable
     {
         if (!isset($this->request->params['action'])) return 'index';
         return $this->request->params['action'];
+    }
+    
+    public function set_module($module)
+    {
+        $this->module = $module;   
     }
     
     public function url_for($options = array())
@@ -270,6 +276,16 @@ class SActionController implements SIDispatchable, SIFilterable
     {
         $skip_prop = 'skip_'.$state.'_filters';
         if (!in_array($method, $this->$skip_prop)) return $this->$method();
+    }
+    
+    protected function add_before_filter($filter, $options = array())
+    {
+        $this->before_filters[$filter] = $options;
+    }
+    
+    protected function add_after_filter($filter, $options = array())
+    {
+        $this->after_filters[$filter] = $options;
     }
     
     protected function template_path($controller, $action, $module = null)

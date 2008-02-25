@@ -9,8 +9,8 @@ class TestController extends SActionController
 
 class BasicController extends TestController
 {
-    public $before_filters = array('ensure_login');
-    public $after_filters  = array('clean_up');
+    protected $before_filters = array('ensure_login' => array());
+    protected $after_filters  = array('clean_up' => array());
     
     public function show()
     {
@@ -58,28 +58,48 @@ class ConditionalFilterController extends TestController
 
 class ExceptConditionController extends ConditionalFilterController
 {
-    public $before_filters = array(array('ensure_login', 'except' => 'show_without_filter'));
+    public function __construct()
+    {
+        $this->add_before_filter('ensure_login', array('except' => 'show_without_filter'));
+        parent::__construct();
+    }
 }
 
 class ExceptConditionArrayController extends ConditionalFilterController
 {
-    public $before_filters = array(array('ensure_login', 'except' => array('another_action', 'show_without_filter')));
+    public function __construct()
+    {
+        $this->add_before_filter('ensure_login', array('except' => array('another_action', 'show_without_filter')));
+        parent::__construct();
+    }
 }
 
 class OnlyConditionController extends ConditionalFilterController
 {
-    public $before_filters = array(array('ensure_login', 'only' => 'show'));
+    public function __construct()
+    {
+        $this->add_before_filter('ensure_login', array('only' => 'show'));
+        parent::__construct();
+    }
 }
 
 class OnlyConditionArrayController extends ConditionalFilterController
 {
-    public $before_filters = array(array('ensure_login', 'only' => array('another_action', 'show')));
+    public function __construct()
+    {
+        $this->add_before_filter('ensure_login', array('only' => array('another_action', 'show')));
+        parent::__construct();
+    }
 }
 
 class BeforeAndAfterConditionController extends ConditionalFilterController
 {
-    public $before_filters = array(array('ensure_login', 'only' => 'show'));
-    public $after_filters = array(array('clean_up', 'only' => 'show'));
+    public function __construct()
+    {
+        $this->add_before_filter('ensure_login', array('only' => 'show'));
+        $this->add_after_filter('clean_up', array('only' => 'show'));
+        parent::__construct();
+    }
 }
 
 class SkippingController extends BasicController

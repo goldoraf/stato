@@ -21,6 +21,7 @@ class SRescue
         'SUnknownControllerException' => 404,
         'SUnknownActionException' => 404,
         'SRecordNotFound' => 404,
+        'SHttpMethodNotImplemented' => 405
     );
     
     public static function response($request, $response, $exception)
