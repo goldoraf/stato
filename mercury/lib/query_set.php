@@ -20,6 +20,7 @@ class SQuerySet implements Iterator, Countable
     protected $meta  = null;
     protected $conn  = null;
     
+    protected $custom_sql  = null;
     protected $pk_lookup   = array();
     protected $schema_abbr = array();
     
@@ -172,6 +173,12 @@ class SQuerySet implements Iterator, Countable
         return $this->filter_or_exclude(func_get_args(), true);
     }
     
+    public function by_sql($sql)
+    {
+        $this->custom_sql = $sql;
+        return $this;
+    }
+    
     public function limit($limit, $offset = 0)
     {
         $clone = clone $this;
@@ -238,6 +245,8 @@ class SQuerySet implements Iterator, Countable
     
     public function prepare_select($fields = null)
     {
+        if ($this->custom_sql !== null) return $this->custom_sql;
+        
         if ($fields === null)
         {
             if (empty($this->includes) && empty($this->joins)) $fields = '*';

@@ -161,8 +161,13 @@ class QuerySetTest extends ActiveTestCase
     {
         $companies = Company::$objects->filter("employes->lastname = 'Doe'");
         $this->assertEqual("LEFT OUTER JOIN employes ON employes.company_id = companies.id WHERE employes.lastname = 'Doe'", $companies->sql_clause());
-        if ($companies->valid()) $c = $companies->current();
-        $this->assertEqual('World Company', $c->name);
+        $this->assertEqual('World Company', $companies->first()->name);
+    }
+    
+    public function test_custom_sql()
+    {
+        $companies = Company::$objects->by_sql("SELECT companies.* FROM companies LEFT OUTER JOIN employes ON employes.company_id = companies.id WHERE employes.lastname = 'Doe'");
+        $this->assertEqual('World Company', $companies->first()->name);
     }
     
     public function test_create()
