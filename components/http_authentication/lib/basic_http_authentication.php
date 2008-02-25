@@ -4,8 +4,11 @@ class SBasicHttpAuthentication
 {
     public static function authenticate_or_request($request, $response, $login_callback, $realm = 'Application')
     {
-        return self::authenticate($request, $response, $login_callback, $realm)
-            || self::authentication_request($response, $realm);
+        $user = self::authenticate($request, $response, $login_callback, $realm);
+        if ($user === false)
+            return self::authentication_request($response, $realm);
+        else
+            return $user;
     }
     
     public static function authenticate($request, $response, $login_callback, $realm = 'Application')
