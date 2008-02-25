@@ -26,9 +26,10 @@ class SFilters
             if ((!isset($options['only']) && !isset($options['except']))
                 || (isset($options['only']) && in_array($method_to_perform, $options['only']))
                 || (isset($options['except']) && !in_array($method_to_perform, $options['except'])))
+            {
                 $result = $object->call_filter($filter, $state);
-            
-            if (@$result === false) return false;
+                if ($result === false) return false;
+            }
         }
     }
 }
