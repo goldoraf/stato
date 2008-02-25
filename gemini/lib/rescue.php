@@ -31,7 +31,7 @@ class SRescue
         // Let the exception alter the response if it wants.
         // For example, SHttpMethodNotAllowed sets the Allow header.
         if (method_exists($exception, 'handle_response'))
-            $exception->handle_response($response);
+            $response = $exception->handle_response($response);
         
         $status = self::status_for_rescue($exception);
         

@@ -1,7 +1,30 @@
 <?php
 
 class SUnknownResourceException extends Exception {}
-class SHttpMethodNotImplemented extends Exception {}
+class SHttpMethodNotImplemented extends Exception
+{
+    private $allowed_methods;
+    
+    public function __construct($resource, $requested_method)
+    {
+        $ref = new ReflectionObject($resource);
+        $this->allowed_methods = array();
+        foreach ($ref->getMethods() as $method)
+        {
+            if ($method->isPublic() && !$method->isConstructor()
+                && $method->getDeclaringClass()->getName() != 'SResource'
+                && in_array($method->getName(), SRequest::$accepted_http_methods))
+                $this->allowed_methods[] = strtoupper($method->getName());
+        }
+        parent::__construct(strtoupper($requested_method).' not implemented on this resource');
+    }
+    
+    public function handle_response($response)
+    {
+        $response->headers['Allow'] = implode(', ', $this->allowed_methods);
+        return $response;
+    }
+}
 
 class SResource implements SIDispatchable, SIFilterable
 {
@@ -37,7 +60,7 @@ class SResource implements SIDispatchable, SIFilterable
         
         $method = $this->request->method();
         if (!method_exists($this, $method))
-            throw new SHttpMethodNotImplemented(strtoupper($method));
+            throw new SHttpMethodNotImplemented($this, $method);
         
         $before_result = SFilters::process($this, 'before', $method, $this->before_filters);
         if ($before_result !== false && !$this->performed)

@@ -15,7 +15,7 @@ class SRequest
      */
     public $params = array();
     
-    private static $accepted_http_methods = array('get', 'post', 'put', 'delete', 'head', 'options');
+    public static $accepted_http_methods = array('get', 'post', 'put', 'delete', 'head', 'options');
     
     private $relative_url_root;
     private $request_uri;
