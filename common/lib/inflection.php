@@ -15,6 +15,7 @@ class SInflection
 		'/person$/'					=> 'people',     # person, salesperson
 		'/man$/'					=> 'men',        # man, woman, spokesman
 		'/child$/'					=> 'children',   # child
+		'/(alias|status)$/i'        => '\1es',
 		'/s$/'						=> 's',          # no change (compatibility)
 		'/$/'                       => 's'
     );
@@ -32,7 +33,7 @@ class SInflection
 		'/([ti])a$/'				=> '\1um',
 		'/people$/'					=> 'person',
 		'/men$/'					=> 'man',
-		'/status$/'					=> 'status',
+		'/(alias|status)es$/i'      => '\1',
 		'/children$/'				=> 'child',
 		'/news$/'					=> 'news',
 		'/s$/'						=> ''
