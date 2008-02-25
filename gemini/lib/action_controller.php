@@ -114,17 +114,14 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->assigns  =& $this->response->assigns;
         $this->session  = new SPhpSession();
         $this->flash    = new SFlash($this->session);
+        $this->logger   = SLogger::get_instance();
+        
+        $this->page_cache_dir = STATO_APP_ROOT_PATH.'/public/cache';
+        $this->initialize_template_class();
         
         $this->perform_action();
         
         return $this->response;
-    }
-    
-    public function __construct()
-    {
-        $this->initialize_template_class();
-        $this->logger = SLogger::get_instance();
-        $this->page_cache_dir = STATO_APP_ROOT_PATH.'/public/cache';
     }
     
     public function __get($name)
@@ -286,6 +283,21 @@ class SActionController implements SIDispatchable, SIFilterable
     protected function add_after_filter($filter, $options = array())
     {
         $this->after_filters[$filter] = $options;
+    }
+    
+    protected function add_around_filter($filter)
+    {
+        $this->around_filters[] = $filter;
+    }
+    
+    protected function skip_before_filter($filter)
+    {
+        $this->skip_before_filters[] = $filter;
+    }
+    
+    protected function skip_after_filter($filter)
+    {
+        $this->skip_after_filters[] = $filter;
     }
     
     protected function template_path($controller, $action, $module = null)

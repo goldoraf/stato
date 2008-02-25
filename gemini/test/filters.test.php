@@ -9,8 +9,11 @@ class TestController extends SActionController
 
 class BasicController extends TestController
 {
-    protected $before_filters = array('ensure_login' => array());
-    protected $after_filters  = array('clean_up' => array());
+    public function __construct()
+    {
+        $this->add_before_filter('ensure_login');
+        $this->add_after_filter('clean_up');
+    }
     
     public function show()
     {
@@ -61,7 +64,6 @@ class ExceptConditionController extends ConditionalFilterController
     public function __construct()
     {
         $this->add_before_filter('ensure_login', array('except' => 'show_without_filter'));
-        parent::__construct();
     }
 }
 
@@ -70,7 +72,6 @@ class ExceptConditionArrayController extends ConditionalFilterController
     public function __construct()
     {
         $this->add_before_filter('ensure_login', array('except' => array('another_action', 'show_without_filter')));
-        parent::__construct();
     }
 }
 
@@ -79,7 +80,6 @@ class OnlyConditionController extends ConditionalFilterController
     public function __construct()
     {
         $this->add_before_filter('ensure_login', array('only' => 'show'));
-        parent::__construct();
     }
 }
 
@@ -88,7 +88,6 @@ class OnlyConditionArrayController extends ConditionalFilterController
     public function __construct()
     {
         $this->add_before_filter('ensure_login', array('only' => array('another_action', 'show')));
-        parent::__construct();
     }
 }
 
@@ -98,7 +97,6 @@ class BeforeAndAfterConditionController extends ConditionalFilterController
     {
         $this->add_before_filter('ensure_login', array('only' => 'show'));
         $this->add_after_filter('clean_up', array('only' => 'show'));
-        parent::__construct();
     }
 }
 
@@ -130,8 +128,7 @@ class AroundController extends TestController
 {
     public function __construct()
     {
-        parent::__construct();
-        $this->around_filters[] = new TestAroundFilter();
+        $this->add_around_filter(new TestAroundFilter());
     }
     
     public function show()
