@@ -4,7 +4,7 @@ class AdminBaseController extends ApplicationController
 {
     protected $layout = 'admin';
     protected $helpers = array('/cms', 'files', 'pages');
-    protected $before_filters = array('load_settings', 'authenticate');
+    protected $before_filters = array('load_settings' => array(), 'authenticate'  => array());
     
     protected function authenticate()
     {

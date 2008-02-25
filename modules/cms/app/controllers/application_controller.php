@@ -2,7 +2,7 @@
 
 class ApplicationController extends SActionController
 {
-    protected $before_filters = array('load_settings');
+    protected $before_filters = array('load_settings' => array());
     
     protected function load_settings()
     {
