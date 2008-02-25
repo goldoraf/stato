@@ -76,7 +76,12 @@ class SResource implements SIDispatchable, SIFilterable
         $this->responds_text(' ', $status);
     }
     
-    protected function responds_error($err_object, $status = 400)
+    protected function responds_error($status = 400)
+    {
+        $this->responds_nothing($status);
+    }
+    
+    protected function responds_detailed_error($err_object, $status = 400)
     {
         $this->responds($err_object, $status);
     }
