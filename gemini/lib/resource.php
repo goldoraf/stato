@@ -104,6 +104,11 @@ class SResource implements SIDispatchable, SIFilterable
         $this->responds($object, $status);
     }
     
+    protected function responds_deleted($status = 204)
+    {
+        $this->responds_nothing($status);   
+    }
+    
     protected function responds_nothing($status = 200)
     {
         $this->responds_text(' ', $status);
