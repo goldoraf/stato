@@ -1,5 +1,33 @@
 <?php
 
+/**
+ * Basic HTTP Authentication
+ *
+ * NB : the $login_callback method will receive the login and the password provided as arguments.
+ * It must return false if the user is not found or the user object.
+ *
+ * Example :
+ * class ExampleController extends ApplicationController
+ * {
+ *  public function __construct()
+ *  {
+ *      $this->add_before_filter('authenticate');
+ *  }
+ *
+ *  public function index()
+ *  {
+ *      $this->render_text('Hello world with authentication !');
+ *  }
+ *
+ *  private function authenticate()
+ *  {
+ *      $this->user =  SBasicHttpAuthentication::authenticate_or_request(
+ *          $this->request, $this->response, array('User', 'authenticate'), 'My app'
+ *      );
+ *      if (!$this->user) return false;
+ *  }
+ * }
+ */
 class SBasicHttpAuthentication
 {
     public static function authenticate_or_request($request, $response, $login_callback, $realm = 'Application')
