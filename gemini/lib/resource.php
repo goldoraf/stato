@@ -90,17 +90,21 @@ class SResource implements SIDispatchable, SIFilterable
     
     protected function perform()
     {
+        $this->initialize();
+        
         $method = $this->request->method();
         if (!method_exists($this, $method))
             throw new SHttpMethodNotImplemented($this, $method);
         
-        $before_result = SFilters::process($this, 'before', $method, $this->before_filters);
+        $before_result = $this->before_filters->process($this, $method, 'before');
+        $this->around_filters->process($this, $method, 'before');
         if ($before_result !== false && !$this->performed)
         {
             $result = $this->$method();
             if (!$this->performed) $this->responds($result);
         }
-        SFilters::process($this, 'after', $method, $this->after_filters);
+        $this->around_filters->process($this, $method, 'after');
+        $this->after_filters->process($this, $method, 'after');
     }
     
     protected function responds($data, $status = 200)
