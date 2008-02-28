@@ -4,10 +4,11 @@ class AclEnabledController extends SActionController
 {
     public function __construct()
     {
+        parent::__construct();
         if (AclEngine::config('use_permission_system'))
-            $this->add_before_filters('authorize_action');
+            $this->before_filters->append('authorize_action');
         else
-            $this->add_before_filters('login_required');
+            $this->before_filters->append('login_required');
             
         $this->helpers[] = '/acl';
     }

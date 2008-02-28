@@ -50,6 +50,13 @@ class SResource implements SIDispatchable, SIFilterable
         return new $class_name();
     }
     
+    public function __construct()
+    {
+        $this->before_filters = new SFilterChain();
+        $this->after_filters  = new SFilterChain();
+        $this->around_filters = new SFilterChain();
+    }
+    
     public function dispatch(SRequest $request, SResponse $response)
     {
         $this->request  = $request;
@@ -58,6 +65,31 @@ class SResource implements SIDispatchable, SIFilterable
         $this->format   = $this->request->format();
         $this->mimetype = SMimeType::lookup($this->format);
         
+        $this->perform(); 
+            
+        return $this->response;
+    }
+    
+    public function process_to_log($request)
+    {
+        return array(get_class($this), $request->method());
+    }
+    
+    public function call_filter($method)
+    {
+        return $this->$method();
+    }
+    
+    /**
+     * Overwrite to perform initializations prior to action call
+     */
+    protected function initialize()
+    {
+    
+    }
+    
+    protected function perform()
+    {
         $method = $this->request->method();
         if (!method_exists($this, $method))
             throw new SHttpMethodNotImplemented($this, $method);
@@ -69,28 +101,6 @@ class SResource implements SIDispatchable, SIFilterable
             if (!$this->performed) $this->responds($result);
         }
         SFilters::process($this, 'after', $method, $this->after_filters);
-        
-        return $this->response;
-    }
-    
-    public function process_to_log($request)
-    {
-        return array(get_class($this), $request->method());
-    }
-    
-    public function call_filter($method, $state)
-    {
-        return $this->$method();
-    }
-    
-    protected function add_before_filter($filter, $options = array())
-    {
-        $this->before_filters[$filter] = $options;
-    }
-    
-    protected function add_after_filter($filter, $options = array())
-    {
-        $this->after_filters[$filter] = $options;
     }
     
     protected function responds($data, $status = 200)

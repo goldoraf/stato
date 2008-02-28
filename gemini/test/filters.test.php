@@ -9,10 +9,10 @@ class TestController extends SActionController
 
 class BasicController extends TestController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_before_filter('ensure_login');
-        $this->add_after_filter('clean_up');
+        $this->before_filters->append('ensure_login');
+        $this->after_filters->append('clean_up');
     }
     
     public function show()
@@ -61,53 +61,75 @@ class ConditionalFilterController extends TestController
 
 class ExceptConditionController extends ConditionalFilterController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_before_filter('ensure_login', array('except' => 'show_without_filter'));
+        $this->before_filters->append('ensure_login', array('except' => 'show_without_filter'));
     }
 }
 
 class ExceptConditionArrayController extends ConditionalFilterController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_before_filter('ensure_login', array('except' => array('another_action', 'show_without_filter')));
+        $this->before_filters->append('ensure_login', array('except' => array('another_action', 'show_without_filter')));
     }
 }
 
 class OnlyConditionController extends ConditionalFilterController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_before_filter('ensure_login', array('only' => 'show'));
+        $this->before_filters->append('ensure_login', array('only' => 'show'));
     }
 }
 
 class OnlyConditionArrayController extends ConditionalFilterController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_before_filter('ensure_login', array('only' => array('another_action', 'show')));
+        $this->before_filters->append('ensure_login', array('only' => array('another_action', 'show')));
     }
 }
 
 class BeforeAndAfterConditionController extends ConditionalFilterController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_before_filter('ensure_login', array('only' => 'show'));
-        $this->add_after_filter('clean_up', array('only' => 'show'));
+        $this->before_filters->append('ensure_login', array('only' => 'show'));
+        $this->after_filters->append('clean_up', array('only' => 'show'));
     }
 }
 
-class SkippingController extends BasicController
+class BasicSkippingController extends BasicController
 {
-    public $skip_before_filters = array('ensure_login');
-    public $skip_after_filters = array('clean_up');
+    public function initialize()
+    {
+        parent::initialize();
+        $this->before_filters->skip('ensure_login');
+        $this->after_filters->skip('clean_up');
+    }
     
     public function home_page()
     {
         $this->render_text('ran action');
+    }
+}
+
+class SkippingWithExceptController extends ConditionalFilterController
+{
+    public function initialize()
+    {
+        $this->before_filters->append('ensure_login');
+        $this->before_filters->skip('ensure_login', array('except' => 'another_action'));
+    }
+}
+
+class SkippingWithOnlyController extends ConditionalFilterController
+{
+    public function initialize()
+    {
+        $this->before_filters->append('ensure_login');
+        $this->before_filters->skip('ensure_login', array('only' => 'show'));
     }
 }
 
@@ -126,9 +148,9 @@ class TestAroundFilter implements SAroundFilter
 
 class AroundController extends TestController
 {
-    public function __construct()
+    public function initialize()
     {
-        $this->add_around_filter(new TestAroundFilter());
+        $this->around_filters->append(new TestAroundFilter());
     }
     
     public function show()
@@ -192,10 +214,22 @@ class FiltersTest extends StatoTestCase
         $this->assertTrue(!isset($this->process('BeforeAndAfterConditionController', 'show_without_filter')->assigns['ran_after_filter']));
     }
     
-    public function test_skipping()
+    public function test_basic_skipping()
     {
-        $this->assertTrue(!isset($this->process('SkippingController', 'home_page')->assigns['ran_before_filter']));
-        $this->assertTrue(!isset($this->process('SkippingController', 'home_page')->assigns['ran_after_filter']));
+        $this->assertTrue(!isset($this->process('BasicSkippingController', 'home_page')->assigns['ran_before_filter']));
+        $this->assertTrue(!isset($this->process('BasicSkippingController', 'home_page')->assigns['ran_after_filter']));
+    }
+    
+    public function test_skipping_with_except()
+    {
+        $this->assertEqual('ensure_login', $this->process('SkippingWithExceptController', 'another_action')->assigns['ran_before_filter']);
+        $this->assertTrue(!isset($this->process('SkippingWithExceptController', 'show')->assigns['ran_before_filter']));
+    }
+    
+    public function test_skipping_with_only()
+    {
+        $this->assertEqual('ensure_login', $this->process('SkippingWithOnlyController', 'another_action')->assigns['ran_before_filter']);
+        $this->assertTrue(!isset($this->process('SkippingWithOnlyController', 'show')->assigns['ran_before_filter']));
     }
     
     public function test_around()

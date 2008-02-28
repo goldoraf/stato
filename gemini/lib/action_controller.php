@@ -64,12 +64,9 @@ class SActionController implements SIDispatchable, SIFilterable
     protected $page_cache_dir = null;
     protected $page_cache_ext = '.html';
     
-    protected $before_filters = array();
-    protected $after_filters  = array();
+    protected $before_filters;
+    protected $after_filters;
     protected $around_filters = array();
-    
-    protected $skip_before_filters = array();
-    protected $skip_after_filters  = array();
     
     protected $web_services = array();
     
@@ -122,6 +119,13 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->perform_action();
         
         return $this->response;
+    }
+    
+    public function __construct()
+    {
+        $this->before_filters = new SFilterChain();
+        $this->after_filters  = new SFilterChain();
+        $this->around_filters = new SFilterChain();
     }
     
     public function __get($name)
@@ -269,35 +273,9 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->render_text(' ', $status);
     }
     
-    public function call_filter($method, $state)
+    public function call_filter($method)
     {
-        $skip_prop = 'skip_'.$state.'_filters';
-        if (!in_array($method, $this->$skip_prop)) return $this->$method();
-    }
-    
-    protected function add_before_filter($filter, $options = array())
-    {
-        $this->before_filters[$filter] = $options;
-    }
-    
-    protected function add_after_filter($filter, $options = array())
-    {
-        $this->after_filters[$filter] = $options;
-    }
-    
-    protected function add_around_filter($filter)
-    {
-        $this->around_filters[] = $filter;
-    }
-    
-    protected function skip_before_filter($filter)
-    {
-        $this->skip_before_filters[] = $filter;
-    }
-    
-    protected function skip_after_filter($filter)
-    {
-        $this->skip_after_filters[] = $filter;
+        return $this->$method();
     }
     
     protected function template_path($controller, $action, $module = null)
@@ -540,10 +518,10 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->session->start();
         
         if (!empty($this->cached_actions))
-            $this->around_filters[] = new SActionCacheFilter($this->cached_actions);
+            $this->around_filters->append(new SActionCacheFilter($this->cached_actions));
         
-        $before_result = SFilters::process($this, 'before', $this->action_name(), $this->before_filters);
-        foreach($this->around_filters as $filter) $filter->before($this);
+        $before_result = $this->before_filters->process($this, $this->action_name(), 'before');
+        $this->around_filters->process($this, $this->action_name(), 'before');
         
         if ($before_result !== false && !$this->is_performed())
         {
@@ -551,8 +529,8 @@ class SActionController implements SIDispatchable, SIFilterable
             if (!$this->is_performed()) $this->render();
         }
         
-        foreach($this->around_filters as $filter) $filter->after($this);
-        SFilters::process($this, 'after', $this->action_name(), $this->after_filters);
+        $this->around_filters->process($this, $this->action_name(), 'after');
+        $this->after_filters->process($this, $this->action_name(), 'after');
         
         $this->session->store();
         
