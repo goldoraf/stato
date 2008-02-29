@@ -264,12 +264,14 @@ class SRequest
     private function parse_request_parameters()
     {
         $this->params += $_GET;
-        if ($this->is_put())
-            parse_str($this->raw_post_data(), $this->params);
-        elseif ($this->is_post()) {
+        if ($this->is_put()) {
+            $put_params = array();
+            parse_str($this->raw_post_data(), $put_params);
+            $this->params += $put_params;
+        } elseif ($this->is_post()) {
             $this->params += $_POST;
             $this->extract_uploaded_files();
-        }   
+        }
     }
     
     private function extract_uploaded_files()
