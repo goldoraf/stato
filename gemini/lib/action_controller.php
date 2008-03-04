@@ -177,14 +177,7 @@ class SActionController implements SIDispatchable, SIFilterable
     
     public function url_for($options = array())
     {
-        if (!isset($options['controller']))
-        {
-            $options['controller'] = $this->controller_name();
-            if (!isset($options['action'])) $options['action'] = $this->action_name();
-        }
-        elseif (!isset($options['action'])) $options['action'] = 'index';  
-        
-        return SUrlRewriter::rewrite($options);
+        return SUrlRewriter::url_for($options);
     }
     
     public function process_to_log($request)
