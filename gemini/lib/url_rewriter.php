@@ -51,7 +51,8 @@ class SUrlRewriter
     
     public static function url_for($options)
     {
-        if (!is_array($options)) $options = array($options);
+        if (!is_array($options)) 
+            return self::rewrite_url($options, array());
         
         foreach ($options as $k => $v)
         {
@@ -71,11 +72,6 @@ class SUrlRewriter
         if (!isset($options['module']) && isset(self::$request->params['module']))
             $options['module'] = self::$request->params['module'];
         
-        return self::rewrite($options);
-    }
-    
-    public static function rewrite($options = array())
-    {
         return self::rewrite_url(self::rewrite_path($options), $options);
     }
     

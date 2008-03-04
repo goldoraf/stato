@@ -37,7 +37,7 @@ class ControllerTestCase extends StatoTestCase
     {
         return $this->assertTrue(
             $this->response->headers['Status'] == self::REDIRECT
-            && $this->response->headers['location'] == SUrlRewriter::rewrite($params),
+            && $this->response->headers['location'] == SUrlRewriter::url_for($params),
             $message
         );
     }
