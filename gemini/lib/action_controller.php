@@ -241,14 +241,23 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->render_text($this->view->render($path), $status);
     }
     
-    // TO FIX
-    /*protected function render_partial($partial, $local_assigns = array())
+    protected function render_partial($partial, $local_assigns = array())
     {
+        if (strpos($partial, '/') === false)
+            $partial = $this->controller_name()."/_{$partial}.php";
+        else {
+            list($sub_path, $partial) = explode('/', $partial);
+            $partial = "{$sub_path}/_{$partial}.php";
+        }
+        if ($this->module !== null)
+            $path = STATO_APP_ROOT_PATH."/modules/{$this->module}/views/";
+        else
+            $path = STATO_APP_ROOT_PATH."/app/views/";
+        
         $this->add_variables_to_assigns();
-        if (strpos($partial, '/') === false) $partial = $this->controller_path().'/'.$partial;
         $this->response->headers['Content-Type'] = 'text/html; charset=utf-8';
-        $this->render_text($this->view->render_partial($partial, $local_assigns));
-    }*/
+        $this->render_text($this->view->render($path.$partial, $local_assigns), $status);
+    }
     
     /**
      * Renders text without the active layout. 

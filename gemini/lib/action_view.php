@@ -192,7 +192,7 @@ class SActionView
         {
             $partial = substr(strrchr($partial_path, '/'), 1);
             $sub_path = substr($partial_path, 0, - (strlen($partial) + 1));
-            return array(STATO_APP_PATH."/views/$sub_path", $partial);
+            return array(dirname($this->template_dir)."/$sub_path", $partial);
         }
     }
 }
