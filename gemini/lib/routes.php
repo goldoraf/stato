@@ -294,6 +294,8 @@ class SRouteSet
     
     public function generate($options)
     {
+        if ($options['module'] === false) unset($options['module']);
+        
         if (!isset($this->gen_map[$options['module']]))
             $controllers = $this->gen_map['*'];
         else
