@@ -66,11 +66,9 @@ class SActionController implements SIDispatchable, SIFilterable
     
     protected $before_filters;
     protected $after_filters;
-    protected $around_filters = array();
+    protected $around_filters;
     
-    protected $web_services = array();
-    
-    private $module = null;
+    protected $module = null;
     
     private $performed_render   = false;
     private $performed_redirect = false;
@@ -473,39 +471,6 @@ class SActionController implements SIDispatchable, SIFilterable
         
         $paginator = new SPaginator($query_set, $per_page, $current_page, $param);
         return array($paginator, $paginator->current_page());
-    }
-    
-    protected function add_web_service($name, $instance)
-    {
-        $this->web_services[$name] = $instance;
-    }
-    
-    protected function invoke_web_service($protocol)
-    {
-        if (!in_array($protocol, array('xmlrpc')))
-            throw new SUnknownProtocolException($protocol);
-            
-        $class = 'S'.$protocol.'Server';
-        $server = new $class();
-        
-        try {
-            $ws_request = $server->parse_request($this->request->raw_post_data());
-        
-            if (!array_key_exists($ws_request->service, $this->web_services))
-                throw new SUnknownServiceException();
-            
-            $return_value = $this->web_services[$ws_request->service]->invoke($ws_request);
-            $raw_response = $server->write_response($return_value);
-        }
-        catch (SWebServiceFault $fault) {
-            $raw_response = $server->write_fault($fault->getMessage(), $fault->getCode());
-        }
-        catch (Exception $e) {
-            $raw_response = $server->write_fault('Internal server error', 500);
-            $this->logger->log_error($e);
-        }
-        
-        $this->send_data($raw_response, array('type' => 'text/xml', 'disposition' => 'inline'));
     }
     
     private function perform_action()

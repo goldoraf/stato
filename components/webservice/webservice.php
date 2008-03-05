@@ -1,6 +1,7 @@
 <?php
 
 require('lib/request.php');
+require('lib/invocator.php');
 require('lib/api.php');
 require('lib/struct.php');
 require('lib/web_service.php');
