@@ -79,13 +79,17 @@ class SUrlRewriter
     {
         $url = '';
         
-        if (SActionController::$use_relative_urls === false && (!isset($options['only_path']) || $options['only_path'] == false))
+        if (!preg_match('#^\w+://.*#', $path))
         {
-            $url.= isset($options['protocol']) ? $options['protocol'] : self::$request->protocol();
-            $url.= isset($options['host']) ? $options['host'] : self::$request->host_with_port();
+            if (SActionController::$use_relative_urls === false && (!isset($options['only_path']) || $options['only_path'] == false))
+            {
+                $url.= isset($options['protocol']) ? $options['protocol'] : self::$request->protocol();
+                $url.= isset($options['host']) ? $options['host'] : self::$request->host_with_port();
+            }
+            if ((!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false) 
+            && !preg_match('#^'.self::$request->relative_url_root().'.*#', $path))
+                $url.= self::$request->relative_url_root();
         }
-        if (!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false)
-            $url.= self::$request->relative_url_root();
         
         $url.= $path;
         if (isset($options['action_suffix'])) $url.= '/'.$options['action_suffix'];
@@ -97,7 +101,7 @@ class SUrlRewriter
     
     private static function rewrite_path($options)
     {
-        foreach(self::$reserved_options as $opt) unset($options[$opt]);
+        foreach (self::$reserved_options as $opt) unset($options[$opt]);
         
         if (isset($options['params']))
         {
