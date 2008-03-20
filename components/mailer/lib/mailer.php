@@ -114,10 +114,11 @@ class SMailer
     
     protected function template_path($template)
     {
-        return STATO_APP_PATH.'/views/'
-        .SDependencies::sub_directory(get_class($this))
-        .SInflection::underscore(get_class($this))
-        ."/$template.php";
+        $ref = new ReflectionObject($this);
+        $base_path = dirname(dirname($ref->getFilename()));
+        return $base_path.'/views/'
+               .SInflection::underscore(get_class($this))
+               ."/$template.php";
     }
 }
 
