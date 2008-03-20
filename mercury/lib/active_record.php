@@ -215,6 +215,16 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return $this->save();
     }
     
+    /**
+     * Initializes the <var>$attribute</var> to zero if null, adds one and saves the record.
+     */
+    public function increment($attribute)
+    {
+        if ($this->$attribute === null) $this->$attribute = 0;
+        $this->$attribute += 1;
+        return $this->save();
+    }
+    
     public function set_as_loaded()
     {
         $this->new_record = false;
