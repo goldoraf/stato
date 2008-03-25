@@ -59,7 +59,7 @@ function radio_button_group($object_name, $method, $object, $choices, $options =
             $lib = html_escape($lib);
         
         $str.= '<label for="'.$id.'">'
-        .radio_button_tag($name, $value, $value == $selected, array_merge($options, array('id' => $id)))
+        .radio_button_tag($name, $value, $value == $selected, array_merge($html_options, array('id' => $id)))
         .$lib."</label>\n";
         
         $i++;
