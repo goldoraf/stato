@@ -216,7 +216,9 @@ class SRequest
      */
     public function raw_post_data()
     {
-        return file_get_contents('php://input');
+        $data = file_get_contents('php://input');
+        if (strlen(trim($data)) > 0) return $data;
+        return false;
     }
     
     /**
@@ -264,9 +266,9 @@ class SRequest
     private function parse_request_parameters()
     {
         $this->params += $_GET;
-        if ($this->is_put()) {
+        if ($this->is_put() && ($data = $this->raw_post_data()) !== false) {
             $put_params = array();
-            parse_str($this->raw_post_data(), $put_params);
+            parse_str($data, $put_params);
             $this->params += $put_params;
         } elseif ($this->is_post()) {
             $this->params += $_POST;
