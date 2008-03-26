@@ -1,8 +1,5 @@
 <?php
 
-define('XML_HTMLSAX3', STATO_CORE_PATH.'/vendor/safehtml/classes/');
-require_once(XML_HTMLSAX3.'safehtml.php');
-
 /**
  * Text helpers
  * 
@@ -52,25 +49,14 @@ function pluralize($count, $singular, $plural = null)
 }
 
 /**
- * Sanitize the given HTML using safeHTML library. It is better than PHP function 
- * strip_tags(), who does not modify any attributes on the tags that you allow.
- *
- * The parser strips down all potentially dangerous content within HTML:
- *
- *  * opening tag without its closing tag 
- *  * closing tag without its opening tag 
- *  * any of these tags: “base”, “basefont”, “head”, “html”, “body”, “applet”, “object”,
- *    “iframe”, “frame”, “frameset”, “script”, “layer”, “ilayer”, “embed”, “bgsound”,
- *    “link”, “meta”, “style”, “title”, “blink”, “xml” etc.
- *  * any of these attributes: on*, data*, dynsrc
- *  * javascript:/vbscript:/about: etc. protocols
- *  * expression/behavior etc. in styles
- *  * any other active content
+ * Sanitize the given HTML using strip_tags()
+ * 
+ * Caution : strip_tags() does not modify any attributes on the tags that you allow,
+ * so it is not as secure as a special library like htmlPurifier. 
  */
 function sanitize($html)
 {
-    $safehtml = new safehtml();
-    return $safehtml->parse($html);
+    return strip_tags($html);
 }
 
 /**
