@@ -1,6 +1,6 @@
 <?php
 
-class RoutesTest extends UnitTestCase
+class RoutesTest extends PHPUnit_Framework_TestCase
 {
     function set_map($map)
     {
@@ -24,24 +24,24 @@ class RoutesTest extends UnitTestCase
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
+        $this->assertEquals(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
             $this->rec('posts/view/45'));
-        $this->assertEqual(array('controller'=>'posts', 'action'=>'view'),
+        $this->assertEquals(array('controller'=>'posts', 'action'=>'view'),
             $this->rec('posts/view'));
-        $this->assertEqual(array('controller'=>'posts'),
+        $this->assertEquals(array('controller'=>'posts'),
             $this->rec('posts'));
-        $this->assertEqual(array('controller'=>'users', 'action'=>'show'),
+        $this->assertEquals(array('controller'=>'users', 'action'=>'show'),
             $this->rec('users/show'));
             
-        $this->assertEqual(array('posts/view/45', array()),
+        $this->assertEquals(array('posts/view/45', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'view', 'id'=>45)));
-        $this->assertEqual(array('posts/list', array()),
+        $this->assertEquals(array('posts/list', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'list')));
-        $this->assertEqual(array('posts', array()),
+        $this->assertEquals(array('posts', array()),
             $this->gen(array('controller'=>'posts')));
-        $this->assertEqual(array('posts', array()),
+        $this->assertEquals(array('posts', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'index')));
-        $this->assertEqual(array('users/show', array('group'=>'admin', 'pays'=>'france')),
+        $this->assertEquals(array('users/show', array('group'=>'admin', 'pays'=>'france')),
             $this->gen(array('controller'=>'users', 'action'=>'show', 'group'=>'admin', 'pays'=>'france')));
     }
     
@@ -51,26 +51,26 @@ class RoutesTest extends UnitTestCase
         $map->connect(':controller/:action/:id', array('controller'=>'blog'));
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
+        $this->assertEquals(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
             $this->rec('posts/view/45'));
-        $this->assertEqual(array('controller'=>'posts', 'action'=>'view'),
+        $this->assertEquals(array('controller'=>'posts', 'action'=>'view'),
             $this->rec('posts/view'));
-        $this->assertEqual(array('controller'=>'posts'),
+        $this->assertEquals(array('controller'=>'posts'),
             $this->rec('posts'));
-        $this->assertEqual(array('controller'=>'blog'),
+        $this->assertEquals(array('controller'=>'blog'),
             $this->rec(''));
-        $this->assertEqual(array('controller'=>'users', 'action'=>'show'),
+        $this->assertEquals(array('controller'=>'users', 'action'=>'show'),
             $this->rec('users/show'));
             
-        $this->assertEqual(array('posts/view/45', array()),
+        $this->assertEquals(array('posts/view/45', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'view', 'id'=>45)));
-        $this->assertEqual(array('posts/list', array()),
+        $this->assertEquals(array('posts/list', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'list')));
-        $this->assertEqual(array('users', array()),
+        $this->assertEquals(array('users', array()),
             $this->gen(array('controller'=>'users')));
-        $this->assertEqual(array('', array()),
+        $this->assertEquals(array('', array()),
             $this->gen(array('controller'=>'blog')));
-        $this->assertEqual(array('blog/recent', array()),
+        $this->assertEquals(array('blog/recent', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'recent')));
     }
     
@@ -81,10 +81,10 @@ class RoutesTest extends UnitTestCase
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'blog', 'action'=>'recent'),
+        $this->assertEquals(array('controller'=>'blog', 'action'=>'recent'),
             $this->rec(''));
             
-        $this->assertEqual(array('', array()),
+        $this->assertEquals(array('', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'recent')));
     }
     
@@ -96,20 +96,20 @@ class RoutesTest extends UnitTestCase
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'other', 'action'=>'list'),
+        $this->assertEquals(array('controller'=>'other', 'action'=>'list'),
             $this->rec('test/list'));
-        $this->assertEqual(array('controller'=>'blog', 'action'=>'posts', 'category'=>'all'),
+        $this->assertEquals(array('controller'=>'blog', 'action'=>'posts', 'category'=>'all'),
             $this->rec('posts'));
-        $this->assertEqual(array('controller'=>'blog', 'action'=>'posts', 'category'=>'php'),
+        $this->assertEquals(array('controller'=>'blog', 'action'=>'posts', 'category'=>'php'),
             $this->rec('posts/php'));
             
-        $this->assertEqual(array('test/list', array()),
+        $this->assertEquals(array('test/list', array()),
             $this->gen(array('controller'=>'other', 'action'=>'list')));
-        $this->assertEqual(array('test', array()),
+        $this->assertEquals(array('test', array()),
             $this->gen(array('controller'=>'other', 'action'=>'index')));
-        $this->assertEqual(array('posts', array()),
+        $this->assertEquals(array('posts', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'posts')));
-        $this->assertEqual(array('posts/php', array()),
+        $this->assertEquals(array('posts/php', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'posts', 'category'=>'php')));
     }
     
@@ -121,13 +121,13 @@ class RoutesTest extends UnitTestCase
         $map->connect('api/:resource/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('resource' => 'users', 'username' => 'raphael'),
+        $this->assertEquals(array('resource' => 'users', 'username' => 'raphael'),
             $this->rec('users/raphael'));
-        $this->assertEqual(array('resource' => 'posts', 'category' => 'all'),
+        $this->assertEquals(array('resource' => 'posts', 'category' => 'all'),
             $this->rec('posts'));
-        $this->assertEqual(array('resource' => 'posts', 'category'=>'php'),
+        $this->assertEquals(array('resource' => 'posts', 'category'=>'php'),
             $this->rec('posts/php'));
-        $this->assertEqual(array('resource' => 'comments', 'id'=>'1234'),
+        $this->assertEquals(array('resource' => 'comments', 'id'=>'1234'),
             $this->rec('api/comments/1234'));
     }
     
@@ -139,18 +139,18 @@ class RoutesTest extends UnitTestCase
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>14),
+        $this->assertEquals(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>14),
             $this->rec('archives/2006/02/14'));
-        $this->assertEqual(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>null),
+        $this->assertEquals(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>null),
             $this->rec('archives/2006/02'));
-        $this->assertEqual(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>null, 'day'=>null),
+        $this->assertEquals(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>null, 'day'=>null),
             $this->rec('archives/2006'));
             
-        $this->assertEqual(array('archives/2006/02/14', array()),
+        $this->assertEquals(array('archives/2006/02/14', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>'02', 'day'=>14)));
-        $this->assertEqual(array('archives/2006/02', array()),
+        $this->assertEquals(array('archives/2006/02', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>'02')));
-        $this->assertEqual(array('archives/2006', array()),
+        $this->assertEquals(array('archives/2006', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006)));
     }
     
@@ -164,38 +164,38 @@ class RoutesTest extends UnitTestCase
         $map->connect(':controller/:action/:id');
         $this->set_map($map);
         
-        $this->assertEqual(array('module'=>'admin', 'controller'=>'users_roles', 'action'=>'edit', 'id'=>15),
+        $this->assertEquals(array('module'=>'admin', 'controller'=>'users_roles', 'action'=>'edit', 'id'=>15),
             $this->rec('admin/users/edit/15'));
-        $this->assertEqual(array('module'=>'admin', 'controller'=>'permissions', 'action'=>'edit', 'id'=>15),
+        $this->assertEquals(array('module'=>'admin', 'controller'=>'permissions', 'action'=>'edit', 'id'=>15),
             $this->rec('admin/permissions/edit/15'));
-        $this->assertEqual(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15),
+        $this->assertEquals(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15),
             $this->rec('cms/photos/edit/15'));
-        $this->assertEqual(array('module'=>'content', 'controller'=>'articles'),
+        $this->assertEquals(array('module'=>'content', 'controller'=>'articles'),
             $this->rec('cms'));
-        $this->assertEqual(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
+        $this->assertEquals(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
             $this->rec('process'));
-        $this->assertEqual(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
+        $this->assertEquals(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
             $this->rec('process/images'));
-        $this->assertEqual(array('module'=>'processing', 'controller'=>'images', 'action'=>'index'),
+        $this->assertEquals(array('module'=>'processing', 'controller'=>'images', 'action'=>'index'),
             $this->rec('process/images/index'));
-        $this->assertEqual(array('module'=>'processing', 'controller'=>'pdf', 'action'=>'generate', 'id'=>15),
+        $this->assertEquals(array('module'=>'processing', 'controller'=>'pdf', 'action'=>'generate', 'id'=>15),
             $this->rec('process/pdf/generate/15'));
-        $this->assertEqual(array('controller'=>'home', 'action'=>'about'),
+        $this->assertEquals(array('controller'=>'home', 'action'=>'about'),
             $this->rec('home/about'));
             
-        $this->assertEqual(array('admin/users/edit/15', array()),
+        $this->assertEquals(array('admin/users/edit/15', array()),
             $this->gen(array('module'=>'admin', 'controller'=>'users', 'action'=>'edit', 'id'=>15)));
-        $this->assertEqual(array('cms/photos/edit/15', array()),
+        $this->assertEquals(array('cms/photos/edit/15', array()),
             $this->gen(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15)));
-        $this->assertEqual(array('cms/articles/edit/15', array()),
+        $this->assertEquals(array('cms/articles/edit/15', array()),
             $this->gen(array('module'=>'content', 'controller'=>'articles', 'action'=>'edit', 'id'=>15)));
-        $this->assertEqual(array('cms', array()),
+        $this->assertEquals(array('cms', array()),
             $this->gen(array('module'=>'content', 'controller'=>'articles')));
-        $this->assertEqual(array('cms', array()),
+        $this->assertEquals(array('cms', array()),
             $this->gen(array('module'=>'content', 'controller'=>'articles', 'action'=>'index')));
-        $this->assertEqual(array('process', array()),
+        $this->assertEquals(array('process', array()),
             $this->gen(array('module'=>'processing', 'controller'=>'images', 'action'=>'list')));
-        $this->assertEqual(array('process/images/index', array()),
+        $this->assertEquals(array('process/images/index', array()),
             $this->gen(array('module'=>'processing', 'controller'=>'images', 'action'=>'index')));
     }
     
@@ -207,18 +207,18 @@ class RoutesTest extends UnitTestCase
         $map->connect('*path', array('controller' => 'pages', 'action' => 'view'));
         $this->set_map($map);
         
-        $this->assertEqual(array('controller'=>'articles', 'action'=>'edit', 'id'=>15),
+        $this->assertEquals(array('controller'=>'articles', 'action'=>'edit', 'id'=>15),
             $this->rec('articles/edit/15'));
-        $this->assertEqual(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php'),
+        $this->assertEquals(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php'),
             $this->rec('products/web/cms/php'));
-        $this->assertEqual(array('controller'=>'pages', 'action'=>'view', 'path'=>''),
+        $this->assertEquals(array('controller'=>'pages', 'action'=>'view', 'path'=>''),
             $this->rec(''));
-        $this->assertEqual(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'),
+        $this->assertEquals(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'),
             $this->rec('downloads/pdf/my_book'));
             
-        $this->assertEqual(array('products/web/cms/php', array()),
+        $this->assertEquals(array('products/web/cms/php', array()),
             $this->gen(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php')));
-        $this->assertEqual(array('downloads/pdf/my_book', array()),
+        $this->assertEquals(array('downloads/pdf/my_book', array()),
             $this->gen(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book')));
     }
 }

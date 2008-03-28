@@ -1,6 +1,6 @@
 <?php
 
-class RequestTest extends UnitTestCase
+class RequestTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {
@@ -11,7 +11,7 @@ class RequestTest extends UnitTestCase
     public function test_accept_format()
     {
         $_SERVER['HTTP_ACCEPT'] = 'text/javascript';
-        $this->assertEqual('js', $this->request->format());
+        $this->assertEquals('js', $this->request->format());
     }
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-class UrlRewriterTest extends UnitTestCase
+class UrlRewriterTest extends PHPUnit_Framework_TestCase
 {
     function setUp()
     {
@@ -13,20 +13,20 @@ class UrlRewriterTest extends UnitTestCase
     
     function test_basic()
     {
-        $this->assertEqual('http://test.host/foo/bar',
+        $this->assertEquals('http://test.host/foo/bar',
             SUrlRewriter::url_for(array('controller' => 'foo', 'action' => 'bar')));
-        $this->assertEqual('/foo/bar',
+        $this->assertEquals('/foo/bar',
             SUrlRewriter::url_for(array('controller' => 'foo', 'action' => 'bar', 'only_path' => true)));
-        $this->assertEqual('foo/bar',
+        $this->assertEquals('foo/bar',
             SUrlRewriter::url_for(array('controller' => 'foo', 'action' => 'bar', 'only_path' => true, 'skip_relative_url_root' => true)));
             
         SActionController::$use_relative_urls = true;
             
-        $this->assertEqual('/foo/bar',
+        $this->assertEquals('/foo/bar',
             SUrlRewriter::url_for(array('controller' => 'foo', 'action' => 'bar')));
-        $this->assertEqual('/foo/bar',
+        $this->assertEquals('/foo/bar',
             SUrlRewriter::url_for(array('controller' => 'foo', 'action' => 'bar', 'only_path' => true)));
-        $this->assertEqual('foo/bar',
+        $this->assertEquals('foo/bar',
             SUrlRewriter::url_for(array('controller' => 'foo', 'action' => 'bar', 'only_path' => true, 'skip_relative_url_root' => true)));
     }
 }

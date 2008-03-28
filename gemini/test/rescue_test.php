@@ -4,7 +4,7 @@ define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/gemini/lib/templates/createapp')
 
 class UnkownError extends Exception {}
 
-class RescueTest extends UnitTestCase
+class RescueTest extends PHPUnit_Framework_TestCase
 {
     private $request;
     
@@ -19,16 +19,16 @@ class RescueTest extends UnitTestCase
     {
         $this->request->set_format('html');
         $response = SRescue::response($this->request, new SResponse(), new SRoutingException());
-        $this->assertEqual(404, $response->status);
-        $this->assertWantedPattern('|404 Page not found|', $response->body);
+        $this->assertEquals(404, $response->status);
+        $this->assertRegExp('|404 Page not found|', $response->body);
     }
     
     public function test_500_in_public()
     {
         $this->request->set_format('html');
         $response = SRescue::response($this->request, new SResponse(), new UnkownError());
-        $this->assertEqual(500, $response->status);
-        $this->assertWantedPattern('|500 Internal Error|', $response->body);
+        $this->assertEquals(500, $response->status);
+        $this->assertRegExp('|500 Internal Error|', $response->body);
     }
 }
 

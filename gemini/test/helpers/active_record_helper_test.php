@@ -1,7 +1,7 @@
 <?php
 
-require_once(STATO_CORE_PATH.'/mercury/lib/column.php');
-require_once(STATO_CORE_PATH.'/mercury/lib/validation.php');
+require_once STATO_CORE_PATH.'/mercury/lib/column.php';
+require_once STATO_CORE_PATH.'/mercury/lib/validation.php';
 
 class MockContent extends MockRecord
 {
@@ -16,7 +16,7 @@ class MockContent extends MockRecord
     public function content_attributes() { return $this->content_attributes; }
 }
 
-class RecordHelperTest extends StatoTestCase
+class ActiveRecordHelperTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
@@ -33,7 +33,7 @@ class RecordHelperTest extends StatoTestCase
         (
             'title' => new SColumn('title', 'string'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             input('post', 'title', $this->post),
             '<input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" />'
         );
@@ -46,7 +46,7 @@ class RecordHelperTest extends StatoTestCase
         (
             'title' => new SColumn('title', 'string'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             input('post', 'title', $this->post),
             '<div class="field-with-errors">
             <input type="text" name="post[title]" value="PHP for ever" id="post_title" size="30" />
@@ -61,7 +61,7 @@ class RecordHelperTest extends StatoTestCase
         (
             'title' => new SColumn('title', 'string'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             error_message_for('post', $this->post),
             '<div id="form-errors" class="form-errors">
             <h2>Please correct the following errors :</h2>
@@ -70,7 +70,7 @@ class RecordHelperTest extends StatoTestCase
             </ul>
             </div>'
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             error_message_for('post', $this->post, array('id' => 'bad-errors', 'header_tag' => 'h5')),
             '<div id="bad-errors" class="form-errors">
             <h5>Please correct the following errors :</h5>
@@ -88,24 +88,24 @@ class RecordHelperTest extends StatoTestCase
         (
             'title' => new SColumn('title', 'string'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             error_message_on('title', $this->post),
             '<div class="form-error">can\'t be empty</div>'
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             error_message_on('title', $this->post, 'Title ', ' you stupid !', 'mistake'),
             '<div class="mistake">Title can\'t be empty you stupid !</div>'
         );
     }
     
-    public function test_form_with_strings()
+    /*public function test_form_with_strings()
     {
         $this->post->content_attributes = array
         (
             'title' => new SColumn('title', 'string'),
             'body' => new SColumn('body', 'text'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             form('post', $this->post, array('controller' => 'posts')),
             '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
@@ -124,7 +124,7 @@ class RecordHelperTest extends StatoTestCase
             'title' => new SColumn('title', 'string'),
             'private' => new SColumn('private', 'boolean')
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             form('post', $this->post, array('controller' => 'posts')),
             '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
@@ -146,7 +146,7 @@ class RecordHelperTest extends StatoTestCase
         (
             'title' => new SColumn('title', 'string'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             form('post', $this->post, array('controller' => 'posts')),
             '<form method="post" action="/posts/update">
             <input type="hidden" name="post[id]" id="post_id" value="1" />
@@ -164,7 +164,7 @@ class RecordHelperTest extends StatoTestCase
         (
             'title' => new SColumn('title', 'string'),
         );
-        $this->assertDomEqual(
+        $this->assertXmlStringEqualsXmlString(
             form('post', $this->post, array('controller' => 'posts')),
             '<form method="post" action="/posts/create">
             <p><label for="post_title">Title</label>
@@ -175,7 +175,7 @@ class RecordHelperTest extends StatoTestCase
             <input type="submit" name="commit" value="Create" />
             </form>'
         );
-    }
+    }*/
 }
 
 ?>

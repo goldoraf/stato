@@ -93,6 +93,11 @@ class SXmlSerializer extends SAbstractSerializer
 {
     public function serialize($data, $options = array())
     {
+        $defaults = array('dasherize' => true, /*'skip_instruct' => false,*/
+                          'indent' => true);
+        
+        $options = array_merge($defaults, $options);
+        
         if (is_object($data))
         {
             if (get_class($data) == 'SQuerySet')
@@ -102,11 +107,12 @@ class SXmlSerializer extends SAbstractSerializer
         }
         else $start_element = 'result';
         
-        if (!isset($options['dasherize']) || $options['dasherize'] = true)
+        if ($options['dasherize'] == true)
             $start_element = SInflection::dasherize($start_element);
         
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->preserveWhiteSpace = false;
+        if ($defaults['indent'] === true) $dom->formatOutput = true;
         $root = $dom->createElement($start_element);
         $dom->appendChild($root);
         $this->recurse_node($data, $dom, $root, $options);
