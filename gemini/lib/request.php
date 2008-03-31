@@ -294,8 +294,7 @@ class SUploadedFile
 {
     public $original_filename;
     public $content_type;
-    
-    private $temp_filename;
+    public $temp_filename;
     
     public function __construct($temp_filename, $orig_filename, $content_type)
     {
