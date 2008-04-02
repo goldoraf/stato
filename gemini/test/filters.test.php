@@ -159,7 +159,7 @@ class AroundController extends TestController
     }
 }
 
-class FiltersTest extends PHPUnit_Framework_TestCase
+class FiltersTest extends StatoTestCase
 {
     protected function process($controller, $action = 'show', $params = array())
     {
@@ -173,43 +173,43 @@ class FiltersTest extends PHPUnit_Framework_TestCase
     
     public function test_basic()
     {
-        $this->assertEquals('ran action', $this->process('BasicController')->body);
-        $this->assertEquals('ensure_login', $this->process('BasicController')->assigns['ran_before_filter']);
-        $this->assertEquals('clean_up', $this->process('BasicController')->assigns['ran_after_filter']);
+        $this->assertEqual('ran action', $this->process('BasicController')->body);
+        $this->assertEqual('ensure_login', $this->process('BasicController')->assigns['ran_before_filter']);
+        $this->assertEqual('clean_up', $this->process('BasicController')->assigns['ran_after_filter']);
     }
     
     public function test_except_condition()
     {
-        $this->assertEquals('ensure_login', $this->process('ExceptConditionController')->assigns['ran_before_filter']);
-        $this->assertEquals('ensure_login', $this->process('ExceptConditionController', 'another_action')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('ExceptConditionController')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('ExceptConditionController', 'another_action')->assigns['ran_before_filter']);
         $this->assertTrue(!isset($this->process('ExceptConditionController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_except_condition_array()
     {
-        $this->assertEquals('ensure_login', $this->process('ExceptConditionArrayController')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('ExceptConditionArrayController')->assigns['ran_before_filter']);
         $this->assertTrue(!isset($this->process('ExceptConditionArrayController', 'another_action')->assigns['ran_before_filter']));
         $this->assertTrue(!isset($this->process('ExceptConditionArrayController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_only_condition()
     {
-        $this->assertEquals('ensure_login', $this->process('OnlyConditionController')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('OnlyConditionController')->assigns['ran_before_filter']);
         $this->assertTrue(!isset($this->process('OnlyConditionController', 'another_action')->assigns['ran_before_filter']));
         $this->assertTrue(!isset($this->process('OnlyConditionController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_only_condition_array()
     {
-        $this->assertEquals('ensure_login', $this->process('OnlyConditionArrayController')->assigns['ran_before_filter']);
-        $this->assertEquals('ensure_login', $this->process('OnlyConditionArrayController', 'another_action')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('OnlyConditionArrayController')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('OnlyConditionArrayController', 'another_action')->assigns['ran_before_filter']);
         $this->assertTrue(!isset($this->process('OnlyConditionArrayController', 'show_without_filter')->assigns['ran_before_filter']));
     }
     
     public function test_before_and_after_condition()
     {
-        $this->assertEquals('ensure_login', $this->process('BeforeAndAfterConditionController')->assigns['ran_before_filter']);
-        $this->assertEquals('clean_up', $this->process('BeforeAndAfterConditionController')->assigns['ran_after_filter']);
+        $this->assertEqual('ensure_login', $this->process('BeforeAndAfterConditionController')->assigns['ran_before_filter']);
+        $this->assertEqual('clean_up', $this->process('BeforeAndAfterConditionController')->assigns['ran_after_filter']);
         $this->assertTrue(!isset($this->process('BeforeAndAfterConditionController', 'another_action')->assigns['ran_before_filter']));
         $this->assertTrue(!isset($this->process('BeforeAndAfterConditionController', 'show_without_filter')->assigns['ran_after_filter']));
     }
@@ -222,13 +222,13 @@ class FiltersTest extends PHPUnit_Framework_TestCase
     
     public function test_skipping_with_except()
     {
-        $this->assertEquals('ensure_login', $this->process('SkippingWithExceptController', 'another_action')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('SkippingWithExceptController', 'another_action')->assigns['ran_before_filter']);
         $this->assertTrue(!isset($this->process('SkippingWithExceptController', 'show')->assigns['ran_before_filter']));
     }
     
     public function test_skipping_with_only()
     {
-        $this->assertEquals('ensure_login', $this->process('SkippingWithOnlyController', 'another_action')->assigns['ran_before_filter']);
+        $this->assertEqual('ensure_login', $this->process('SkippingWithOnlyController', 'another_action')->assigns['ran_before_filter']);
         $this->assertTrue(!isset($this->process('SkippingWithOnlyController', 'show')->assigns['ran_before_filter']));
     }
     
