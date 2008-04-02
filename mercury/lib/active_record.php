@@ -70,20 +70,33 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     
     public function __toString()
     {
-        $str = '';
-        foreach($this->values as $key => $value)
-        {
-            if ($value === True) $value = 'True';
-            if ($value === False) $value = 'False';
-            if ($value === Null) $value = 'Null';
-            $str.= "$key = $value\n";
-        }
-        return '['.get_class($this)."]\n".$str;
+        return $this->id;
+    }
+    
+    /**
+     * DEPRECATED : use __toString() instead
+     */
+    public function __repr()
+    {
+        return $this->__toString();
     }
     
     public function to_array()
     {
         return $this->values;
+    }
+    
+    public function dump()
+    {
+        $str = '';
+        foreach($this->values as $key => $value)
+        {
+            if ($value === true)  $value = 'True';
+            if ($value === false) $value = 'False';
+            if ($value === null)  $value = 'Null';
+            $str.= "$key = $value\n";
+        }
+        return '['.get_class($this)."]\n".$str;
     }
     
     public function serializable_form($options = array())
@@ -110,11 +123,6 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
                 $obj->$name = $this->$name->target();
         }
         return $obj;
-    }
-    
-    public function __repr()
-    {
-        return $this->id;
     }
     
     public function offsetExists($offset)
