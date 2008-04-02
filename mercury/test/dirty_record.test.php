@@ -66,6 +66,16 @@ class DirtyRecordTest extends ActiveTestCase
         $this->assertEqual(array('Frameworks : A new hope...', 'My second post'), $post->title_change());
         $this->assertEqual('Frameworks : A new hope...', $post->title_was());
     }
+    
+    public function test_date_attribute_changes()
+    {
+        $post = DirtyPost::$objects->get(1);
+        $this->assertFalse($post->has_changed());
+        $post->created_on = new SDateTime(2005,12,1,20,30);
+        $this->assertFalse($post->has_changed());
+        $post->created_on = new SDateTime(2006,12,1,20,30);
+        $this->assertTrue($post->has_changed());
+    }
 }
 
 ?>

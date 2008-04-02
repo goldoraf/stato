@@ -427,13 +427,16 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
      */
     protected function write_attribute($name, $value)
     {
+        if ($this->attr_exists($name)) 
+            $value = $this->meta->attributes[$name]->typecast($this, $value);
+            
         if (!array_key_exists($name, $this->changed_values))
         {
             $old = $this->read_attribute($name);
             if ($old != $value) $this->changed_values[$name] = $old;
         }
-        if (!$this->attr_exists($name)) $this->values[$name] = $value;
-        else $this->values[$name] = $this->meta->attributes[$name]->typecast($this, $value);
+        
+        $this->values[$name] = $value;
     }
     
     protected function before_create() {}
