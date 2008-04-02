@@ -164,16 +164,31 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return $obj;
     }
     
+    /**
+     * Do any attributes have unsaved changes?
+     */
     public function has_changed()
     {
         return count($this->changed_values) != 0;
     }
     
+    /**
+     * Returns an array of attributes with unsaved changes.
+     * <code>$person->changed();   // -> false
+     * $person->name = 'john';
+     * $person->changed();   // -> array('name')</code>             
+     */
     public function changed()
     {
         return array_keys($this->changed_values);
     }
     
+    /**
+     * Returns an array of changed attributes, with both original and new values.
+     * <code>$person->changes();   // -> array()
+     * $person->name = 'john';
+     * $person->changes();   // -> array('name' => array('bob', 'john'))</code>             
+     */
     public function changes()
     {
         $changes = array();
@@ -182,25 +197,49 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return $changes;
     }
     
+    /**
+     * Does <var>$name</var> attribute have unsaved change?
+     */
     public function has_attribute_changed($name)
     {
         return in_array($name, $this->changed());
     }
     
+    /**
+     * Returns both original and new values of a changed attribute.
+     */
     public function attribute_change($name)
     {
         if (!$this->has_attribute_changed($name)) return null;
         return array($this->changed_values[$name], $this->values[$name]);
     }
     
+    /**
+     * Returns original value of a changed attribute.
+     */
     public function attribute_old_value($name)
     {
         return ($this->has_attribute_changed($name)) ? $this->changed_values[$name] : $this->values[$name];
     }
     
     /**
+     * Sets all attributes at once. Used by <var>SQuerySet</var> class to instantiate records.
+     */
+    public function set_attributes($values=array())
+    {
+        foreach($values as $key => $value)
+        {
+            if (!is_object($value) && $value !== null && !is_bool($value)) $value = stripslashes($value);
+            if (!$this->attr_exists($key)) $this->values[$key] = $value;
+            else $this->values[$key] = $this->meta->attributes[$key]->typecast($this, $value);
+        }
+    }
+    
+    /**
      * Sets all attributes at once by passing in an array with keys matching the
-     * attribute names.
+     * attribute names. Handles multiparameters attributes (such as dates, which are
+     * generally provided as an array when a form is submitted). Attributes defined in
+     * <var>$attr_protected</var> property are not affected by this mass-assignment.     
      */
     public function populate($values=array())
     {
@@ -365,6 +404,10 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return get_class($this);
     }
     
+    /**
+     * Returns the typecast value of the attribute identified by <var>$name</var> 
+     * (for example, "2007-12-12" in a data column is cast to a <var>SDate</var> object).
+     */
     protected function read_attribute($name)
     {
         if (!isset($this->values[$name]))
@@ -378,6 +421,10 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
             return $this->values[$name];
     }
     
+    /**
+     * Updates the attribute identified by <var>$name</var> with the specified <var>$value</var>
+     * after it has been typecast.     
+     */
     protected function write_attribute($name, $value)
     {
         if (!array_key_exists($name, $this->changed_values))
