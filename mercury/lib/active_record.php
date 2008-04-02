@@ -5,14 +5,14 @@ class SAdapterNotFound extends Exception { }
 class SAssociationTypeMismatch extends Exception { }
 
 /**
- * ORM class
+ * ORM base class
  * 
  * <var>SActiveRecord</var> objects don't specify their attributes directly, 
  * but rather infer them from the table definition with which they're linked. 
  * Any change in the schema of the table is though instantly reflected in the objects.  
  * 
  * @package Stato
- * @subpackage model
+ * @subpackage mercury
  */
 class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable*/
 {
@@ -43,7 +43,9 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     protected static $conn = null;
     protected static $rollback_clones = array();
     
-    protected $values     = array();
+    protected $values         = array();
+    protected $changed_values = array();
+    
     protected $meta       = null;
     protected $new_record = true;
     
@@ -68,9 +70,46 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         else return $this->write_attribute($name, $value);
     }
     
+    public function __call($method, $args)
+    {
+        if (preg_match('/^([_a-zA-Z]\w*)_(has_changed|change|was)$/', $method, $matches))
+        {
+            $attr_name = $matches[1];
+            switch ($matches[2])
+            {
+                case 'has_changed':
+                    return $this->has_attribute_changed($attr_name);
+                case 'change':
+                    return $this->attribute_change($attr_name);
+                case 'was':
+                    return $this->attribute_old_value($attr_name);
+            }
+        }
+    }
+    
     public function __toString()
     {
         return $this->id;
+    }
+    
+    public function offsetExists($offset)
+    {
+        return (isset($this->values[$offset]));
+    }
+    
+    public function offsetGet($offset)
+    {
+        return @$this->values[$offset];
+    }
+    
+    public function offsetSet($offset, $value)
+    {
+        $this->values[$offset] = $value;
+    }
+    
+    public function offsetUnset($offset)
+    {
+        $this->values[$offset] = null;
     }
     
     /**
@@ -125,24 +164,38 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return $obj;
     }
     
-    public function offsetExists($offset)
+    public function has_changed()
     {
-        return (isset($this->values[$offset]));
+        return count($this->changed_values) != 0;
     }
     
-    public function offsetGet($offset)
+    public function changed()
     {
-        return @$this->values[$offset];
+        return array_keys($this->changed_values);
     }
     
-    public function offsetSet($offset, $value)
+    public function changes()
     {
-        $this->values[$offset] = $value;
+        $changes = array();
+        foreach ($this->changed_values as $k => $v)
+            $changes[$k] = array($v, $this->values[$k]);
+        return $changes;
     }
     
-    public function offsetUnset($offset)
+    public function has_attribute_changed($name)
     {
-        $this->values[$offset] = null;
+        return in_array($name, $this->changed());
+    }
+    
+    public function attribute_change($name)
+    {
+        if (!$this->has_attribute_changed($name)) return null;
+        return array($this->changed_values[$name], $this->values[$name]);
+    }
+    
+    public function attribute_old_value($name)
+    {
+        return ($this->has_attribute_changed($name)) ? $this->changed_values[$name] : $this->values[$name];
     }
     
     /**
@@ -186,6 +239,8 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
             $this->$k->after_owner_save();
         
         $this->set_state('after_save');
+        
+        $this->changed_values = array();
         
         return true;
     }
@@ -325,6 +380,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     
     protected function write_attribute($name, $value)
     {
+        if (!array_key_exists($name, $this->changed_values))
+        {
+            $old = $this->read_attribute($name);
+            if ($old != $value) $this->changed_values[$name] = $old;
+        }
         if (!$this->attr_exists($name)) $this->values[$name] = $value;
         else $this->values[$name] = $this->meta->attributes[$name]->typecast($this, $value);
     }

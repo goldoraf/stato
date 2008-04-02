@@ -21,7 +21,7 @@ class Bill extends SActiveRecord
     }
 }
 
-// For boolean et timestamps attributes tests
+// For boolean and timestamps attributes tests
 class Post extends SActiveRecord
 {
     public static $objects;
@@ -32,6 +32,12 @@ class Post extends SActiveRecord
 class BooleanFalseByDefaultPost extends SActiveRecord
 {
     public static $objects;
+}
+
+class DirtyPost extends SActiveRecord
+{
+    public static $objects;
+    public static $table_name = 'posts';
 }
 
 class Employe extends SActiveRecord

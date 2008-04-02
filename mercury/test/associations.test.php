@@ -335,8 +335,6 @@ class SHasOneTest extends ActiveTestCase
         $client->save();
         $this->assertFalse($client->is_new_record());
         $this->assertEqual($contract, $client->contract->target());
-        $client2 = Client::$objects->get($client->id);
-        $this->assertEqual($contract, $client2->contract->target());
     }
     
     public function test_create()
