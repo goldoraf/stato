@@ -6,7 +6,7 @@
  * Provides a set of functions for filtering, formatting and transforming strings.
  * 
  * @package Stato
- * @subpackage view
+ * @subpackage gemini
  */
 /**
  * Convert special characters to HTML entities
@@ -23,8 +23,8 @@ function html_escape($html)
  */
 function truncate($text, $length = 30, $truncate_string = '...')
 {
-    if (utf8_strlen($text) > $length)
-        return utf8_substr_replace($text, $truncate_string, $length - utf8_strlen($truncate_string));
+    if (strlen(utf8_decode($text)) > $length)
+        return utf8_encode(substr_replace(utf8_decode($text), $truncate_string, $length - strlen(utf8_decode($truncate_string))));
     else
         return $text;
 }
