@@ -3,6 +3,14 @@
 class SRecordNotFound extends Exception {}
 class SAssertionError extends Exception {}
 
+/**
+ * ORM query class
+ * 
+ * <var>SQuerySet</var> objects represents lazy database lookups for a set of objects.
+ * 
+ * @package Stato
+ * @subpackage mercury
+ */
 class SQuerySet implements Iterator, Countable
 {
     public $filters  = array();
@@ -37,34 +45,49 @@ class SQuerySet implements Iterator, Countable
     }
     
     /**
-     * Iterator methods
-     **/
+     * Iterator method
+     */
     public function current()
     {
         return $this->cache[$this->count];
     }
-
+    
+    /**
+     * Iterator method
+     */
     public function key()
     {
         return $this->count;
     }
 
+    /**
+     * Iterator method
+     */
     public function next()
     {
         $this->count++;
     }
 
+    /**
+     * Iterator method
+     */
     public function rewind()
     {
         $this->count = 0;
     }
 
+    /**
+     * Iterator method
+     */
     public function valid()
     {
         if ($this->cache === null) $this->fetch_all();
         return isset($this->cache[$this->count]);
     }
     
+    /**
+     * Retrieves the first item of the result set.
+     */
     public function first()
     {
         $this->rewind();
@@ -72,17 +95,26 @@ class SQuerySet implements Iterator, Countable
         else return null;
     }
     
+    /**
+     * Retrieves the result set as an array.
+     */
     public function to_array()
     {
         if ($this->cache === null) $this->fetch_all();
         return $this->cache;
     }
     
+    /**
+     * Alias of <var>to_array()</var>.
+     */
     public function serializable_form()
     {
         return $this->to_array();   
     }
     
+    /**
+     * Performs a SELECT and returns a single object matching the given arguments.
+     */
     public function get()
     {
         $numargs = func_num_args();
@@ -120,6 +152,9 @@ class SQuerySet implements Iterator, Countable
         else throw new SAssertionError();
     }
     
+    /**
+     * Returns an array mapping each of the given IDs to the object with that ID.
+     */
     public function in_bulk($ids)
     {
         if (!is_array($ids))
@@ -135,24 +170,41 @@ class SQuerySet implements Iterator, Countable
         return $set;
     }
     
+    /**
+     * Performs a SELECT COUNT() and returns the number of records as an integer.
+     * 
+     * If the queryset is already cached, if returns the length of the cached result set.          
+     */
     public function count()
     {
         if ($this->cache !== null) return count($this->cache);
-        elseif (!empty($this->includes)) return count($this->to_array());
-        else
-        {
-            $clone = clone $this;
-            $clone->order_by = array();
-            $clone->includes = array();
-            $clone->offset   = null;
-            $clone->limit    = null;
+        if (!empty($this->includes)) return count($this->to_array());
+        
+        $clone = clone $this;
+        $clone->order_by = array();
+        $clone->includes = array();
+        
+        $offset = $clone->offset;
+        $limit  = $clone->limit;
+        
+        $clone->offset = null;
+        $clone->limit  = null;
+        
+        $rs = $this->conn->select($clone->prepare_select('COUNT(*)'));
+        $row = $this->conn->fetch($rs, false);
+        $count = $row[0];
+        
+        if ($offset !== null)
+            $count = max(0, $count - $offset);
+        if ($limit !== null)
+            $count = min($limit, $count);
             
-            $rs = $this->conn->select($clone->prepare_select('COUNT(*)'));
-            $row = $this->conn->fetch($rs, false);
-            return $row[0];
-        }
+        return $count;
     }
     
+    /**
+     * Deletes the records in the current queryset.       
+     */
     public function delete()
     {
         $clone = clone $this;
@@ -163,22 +215,34 @@ class SQuerySet implements Iterator, Countable
         return;
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance with the args ANDed to the existing set.   
+     */
     public function filter()
     {
         return $this->filter_or_exclude(func_get_args());
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance with the NOT(args) ANDed to the existing set.   
+     */
     public function exclude()
     {
         return $this->filter_or_exclude(func_get_args(), true);
     }
     
+    /**
+     * Allows the user to provide a custom SQL condition.   
+     */
     public function by_sql($sql)
     {
         $this->custom_sql = $sql;
         return $this;
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance with a limited result set.   
+     */
     public function limit($limit, $offset = 0)
     {
         $clone = clone $this;
@@ -187,6 +251,9 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance with the ordering changed.   
+     */
     public function order_by()
     {
         $args = func_get_args();
@@ -195,6 +262,9 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
+    /**
+     * Allows the user to provide a custom SQL join.   
+     */
     public function join($sql)
     {
         $clone = clone $this;
@@ -202,6 +272,9 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance which will use a SELECT DISTINCT query.   
+     */
     public function distinct()
     {
         $clone = clone $this;
@@ -209,6 +282,9 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance which will use joins to retrieve associated objects.   
+     */
     public function includes()
     {
         $args = func_get_args();
@@ -217,6 +293,9 @@ class SQuerySet implements Iterator, Countable
         return $clone;
     }
     
+    /**
+     * Returns a new <var>SValuesQuerySet</var> instance which will return values intead of objects.   
+     */
     public function values()
     {
         $args = func_get_args();
@@ -232,6 +311,9 @@ class SQuerySet implements Iterator, Countable
         return $v;
     }
     
+    /**
+     * Returns the generated SQL condition.
+     */
     public function sql_clause()
     {
         $components = array();
@@ -243,6 +325,9 @@ class SQuerySet implements Iterator, Countable
         return $this->conn->sanitize_sql(implode(' ', $components), $this->params);
     }
     
+    /**
+     * Returns the generated SQL query.
+     */
     public function prepare_select($fields = null)
     {
         if ($this->custom_sql !== null) return $this->custom_sql;
@@ -263,6 +348,9 @@ class SQuerySet implements Iterator, Countable
         return implode(' ', array($select, $fields, "FROM {$this->meta->table_name}", $this->sql_clause()));
     }
     
+    /**
+     * Instantiates records and deals with the single table inheritance model.
+     */
     public function instanciate_record($row, $meta = null, $new_record = false)
     {
         if ($meta === null) $meta = $this->meta;
@@ -453,7 +541,6 @@ class SQuerySet implements Iterator, Countable
         $this->cache = $records_in_order;
     }
     
-    // n'instancie pas les records dont ttes les values sont NULL !!!
     protected function extract_record($table_name, $row)
     {
         $record = array();

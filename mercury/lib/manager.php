@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * ORM manager class
+ * 
+ * An instance of the <var>SManager</var> class is assigned to the static 
+ * <var>$objects</var> property of an autoloaded model class. <var>SManager</var> 
+ * instances manage table-level operations and act as "root" querysets that 
+ * describes all objects in the model's table.
+ * 
+ * @package Stato
+ * @subpackage mercury
+ */
 class SManager
 {
     protected $meta = null;
@@ -22,16 +33,25 @@ class SManager
         return call_user_func_array(array($this->get_query_set(), $method), $args);
     }
     
+    /**
+     * Returns a new <var>SQuerySet</var> instance describing all objects in the model's table.   
+     */
     public function all()
     {
         return $this->get_query_set();
     }
     
+    /**
+     * Instantiates and populates a new record.
+     */
     public function build($attributes = null)
     {
         return $this->get_query_set()->instanciate_record($attributes, null, true);
     }
     
+    /**
+     * Instantiates, populates and saves a new record.
+     */
     public function create($attributes = null)
     {
         $object = $this->build($attributes);
@@ -39,6 +59,9 @@ class SManager
         return $object;
     }
     
+    /**
+     * Retrieves and updates attributes of a record.
+     */
     public function update($id, $attributes)
     {
         $object = $this->get_query_set()->get($id);
@@ -46,11 +69,17 @@ class SManager
         return $object;
     }
     
+    /**
+     * Updates all records described by the given SQL <var>$condition</var>.
+     */
     public function update_all($set, $condition)
     {
         SActiveRecord::connection()->execute("UPDATE {$this->meta->table_name} SET {$set} WHERE {$condition}");
     }
     
+    /**
+     * Retrieves a single record or throws a <var>SHttp404</var> exception if it is not found.
+     */
     public function get_or_404()
     {
         $args = func_get_args();
@@ -60,6 +89,9 @@ class SManager
         }
     }
     
+    /**
+     * Retrieves a single record or instantiates a new record if it is not found.
+     */
     public function get_or_build($attributes)
     {
         try { 
@@ -70,6 +102,9 @@ class SManager
         }
     }
     
+    /**
+     * Retrieves a single record or instantiates and saves a new record if it is not found.
+     */
     public function get_or_create($attributes)
     {
         try { 
