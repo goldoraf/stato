@@ -3,6 +3,7 @@
 class SAdapterNotSpecified extends Exception { }
 class SAdapterNotFound extends Exception { }
 class SAssociationTypeMismatch extends Exception { }
+class SRecordNotSaved extends Exception { }
 
 /**
  * ORM base class
@@ -260,6 +261,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         if (!empty($multi_params_attributes)) $this->assign_multiparams_attributes($multi_params_attributes);
     }
     
+    /**
+     * If the record does not exist yet in the database, creates a new record with
+     * values matching those of the object attributes. If the record does exist, updates
+     * its values.               
+     */
     public function save()
     {
         if (!$this->is_valid()) return false;
@@ -284,6 +290,21 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return true;
     }
     
+    /**
+     * Attempts to save the record and throws a <var>SRecordNotSaved</var> exception
+     * if it couldn't happen.                
+     */
+    public function must_save()
+    {
+        if (!$this->save())
+            throw new SRecordNotSaved();
+            
+        return true;
+    }
+    
+    /**
+     * Deletes the record in the database.               
+     */
     public function delete()
     {
         $this->set_state('before_delete');
@@ -299,18 +320,28 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         $this->set_state('after_delete');
     }
     
+    /**
+     * Reloads the attributes of the object from the database.              
+     */
     public function reload()
     {
         $qs = new SValuesQuerySet($this->meta);
         $this->values = $qs->get($this->id);
     }
     
+    /**
+     * Updates all the attributes of the object from the <var>$values</var> array 
+     * and saves the record.                    
+     */
     public function update_attributes($values)
     {
         $this->populate($values);
         return $this->save();
     }
     
+    /**
+     * Updates a single attribute of the object and saves the record.                    
+     */
     public function update_attribute($name, $value)
     {
         $this->$name = $value;
@@ -327,11 +358,18 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return $this->save();
     }
     
+    /**
+     * Flags the object as been loaded from the database (<var>is_new_record()</var> 
+     * will return false). Used by the <var>SQuerySet</var> class when instantiating records.     
+     */
     public function set_as_loaded()
     {
         $this->new_record = false;
     }
     
+    /**
+     * Returns true if a record for the object doesn't exist yet in the database.
+     */
     public function is_new_record()
     {
         if (!$this->new_record) return false;
@@ -342,6 +380,10 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return true;
     }
     
+    /**
+     * Calls <var>validate()</var> and <var>validate_on_create()</var> or 
+     * <var>validate_on_update()</var> and returns true if no errors were added otherwise false. 
+     */
     public function is_valid()
     {
         $this->errors = array();
