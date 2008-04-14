@@ -8,7 +8,7 @@ class ScaffoldCommand extends SCommand
     private $assigns  = array();
     private $scaffold = null;
     private $dry      = false;
-    private $sub_dir  = '';
+    private $module   = '';
     
     public function execute()
     {
@@ -23,10 +23,11 @@ class ScaffoldCommand extends SCommand
         
         if (strpos($this->scaffold, '/') !== false)
         {
-            list($this->sub_dir, $this->scaffold) = explode('/', $this->scaffold);
-            $this->test_module_existence($sub_dir);
-            $this->sub_dir.= '/';
+            list($this->module, $this->scaffold) = explode('/', $this->scaffold);
+            $this->test_module_existence($this->module);
+            $base_path = "modules/{$this->module}";
         }
+        else $base_path = 'app';
         
         if (!isset($this->params['controller_name']))
             $this->params['controller_name'] = SInflection::pluralize($this->scaffold);
@@ -42,29 +43,29 @@ class ScaffoldCommand extends SCommand
             'plural_hm_name' => SInflection::humanize(SInflection::pluralize($this->scaffold))
         );
         
-        $controller_path = "controllers/{$this->sub_dir}".$this->params['controller_name'].'_controller.php';
-        $this->create_file($controller_path, STATO_APP_PATH,
+        $controller_path = "$base_path/controllers/".$this->params['controller_name'].'_controller.php';
+        $this->create_file($controller_path, STATO_APP_ROOT_PATH,
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template("{$scaffold_templates_path}/controller.php", $this->assigns)
             )
         );
         
-        $views_dir = "views/{$this->sub_dir}".$this->params['controller_name'];
-        $this->create_dir($views_dir, STATO_APP_PATH);
+        $views_dir = "$base_path/views/".$this->params['controller_name'];
+        $this->create_dir($views_dir, STATO_APP_ROOT_PATH);
         
         foreach (array('index', 'view', 'create', 'update') as $view_name)
         {
-            $this->create_file("$views_dir/$view_name.php", STATO_APP_PATH,
+            $this->create_file("$views_dir/$view_name.php", STATO_APP_ROOT_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/{$view_name}.php", $this->assigns));
         }
         
         if (!$this->dry && !$this->ajax)
-            $this->create_file("$views_dir/_form.php", STATO_APP_PATH,
+            $this->create_file("$views_dir/_form.php", STATO_APP_ROOT_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/_form.php", $this->assigns));
         
         if ($this->ajax)
         {
-            $this->create_file("$views_dir/_objects_list.php", STATO_APP_PATH,
+            $this->create_file("$views_dir/_objects_list.php", STATO_APP_ROOT_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/_objects_list.php", $this->assigns));
         }
         
