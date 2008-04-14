@@ -359,6 +359,16 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     }
     
     /**
+     * Initializes the <var>$attribute</var> to zero if null, substracts one and saves the record.
+     */
+    public function decrement($attribute)
+    {
+        if ($this->$attribute === null) $this->$attribute = 0;
+        $this->$attribute -= 1;
+        return $this->save();
+    }
+    
+    /**
      * Flags the object as been loaded from the database (<var>is_new_record()</var> 
      * will return false). Used by the <var>SQuerySet</var> class when instantiating records.     
      */
