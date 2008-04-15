@@ -59,15 +59,9 @@ class ScaffoldCommand extends SCommand
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/{$view_name}.php", $this->assigns));
         }
         
-        if (!$this->dry && !$this->ajax)
+        if (!$this->dry)
             $this->create_file("$views_dir/_form.php", STATO_APP_ROOT_PATH,
                 SCodeGenerator::render_template("{$scaffold_templates_path}/views/_form.php", $this->assigns));
-        
-        if ($this->ajax)
-        {
-            $this->create_file("$views_dir/_objects_list.php", STATO_APP_ROOT_PATH,
-                SCodeGenerator::render_template("{$scaffold_templates_path}/views/_objects_list.php", $this->assigns));
-        }
         
         $scaffold_layout_path = "views/layouts/scaffold.php";
         
