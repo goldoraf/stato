@@ -49,7 +49,7 @@ class SMimeType
         $list = explode(',', $accept_header);
         foreach ($list as $l)
         {
-            list($string, $q) = preg_split('/;\s*q=/', $l);
+            @list($string, $q) = preg_split('/;\s*q=/', $l);
             $item = new SAcceptItem($index++, $string, $q);
             $inserted = false;
             foreach ($accept_list as $k => $i)
