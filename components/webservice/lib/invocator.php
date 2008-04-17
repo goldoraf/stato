@@ -42,7 +42,7 @@ class SWebServiceInvocator
             $this->logger->log_error($e);
         }
         
-        return $raw_reponse;
+        return $raw_response;
     }
 }
 
