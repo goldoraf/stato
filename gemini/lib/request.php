@@ -135,7 +135,10 @@ class SRequest
     public function format()
     {
         if (!isset($this->format))
-            $this->format = array_shift($this->accepts());
+        {
+            $accepts = $this->accepts();
+            $this->format = array_shift($accepts);
+        }
         return $this->format;
     }
     
