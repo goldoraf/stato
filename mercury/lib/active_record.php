@@ -220,7 +220,7 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
      */
     public function attribute_old_value($name)
     {
-        return ($this->has_attribute_changed($name)) ? $this->changed_values[$name] : $this->values[$name];
+        return ($this->has_attribute_changed($name)) ? $this->changed_values[$name] : @$this->values[$name];
     }
     
     /**
