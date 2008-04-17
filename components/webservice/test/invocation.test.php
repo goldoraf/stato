@@ -102,14 +102,18 @@ class ApiController extends SActionController
     protected function log_benchmarking() {}
     protected function rescue_action($exception) { throw $exception; }
     
+    private $invocator;
+ 
     protected function initialize()
     {
-        $this->add_web_service('user', new UserService());
+        $this->invocator = new SWebServiceInvocator($this->request);
+        $this->invocator->add_web_service('user', new UserService());
     }
     
     public function xmlrpc()
     {
-        $this->invoke_web_service('xmlrpc');
+        $response = $this->invocator->invoke('xmlrpc');
+        $this->send_data($response, array('type' => 'text/xml', 'disposition' => 'inline'));
     }
 }
 

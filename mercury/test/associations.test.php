@@ -277,7 +277,8 @@ class SHasOneTest extends ActiveTestCase
     {
         $client = Client::$objects->get(1);
         $contract = Contract::$objects->get(1);
-        $this->assertCopy($contract, $client->contract->target());
+        $client_contract = $client->contract->target();
+        $this->assertCopy($contract, $client_contract);
         $this->assertEqual($contract->code, $client->contract->code);
     }
     

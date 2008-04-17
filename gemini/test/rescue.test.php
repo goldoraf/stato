@@ -20,7 +20,7 @@ class RescueTest extends UnitTestCase
         $this->request->set_format('html');
         $response = SRescue::response($this->request, new SResponse(), new SRoutingException());
         $this->assertEqual(404, $response->status);
-        $this->assertWantedPattern('|404 Page not found|', $response->body);
+        $this->assertPattern('|404 Page not found|', $response->body);
     }
     
     public function test_500_in_public()
@@ -28,7 +28,7 @@ class RescueTest extends UnitTestCase
         $this->request->set_format('html');
         $response = SRescue::response($this->request, new SResponse(), new UnkownError());
         $this->assertEqual(500, $response->status);
-        $this->assertWantedPattern('|500 Internal Error|', $response->body);
+        $this->assertPattern('|500 Internal Error|', $response->body);
     }
 }
 

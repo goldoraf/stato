@@ -7,7 +7,7 @@ class ProductWithExclude extends SActiveRecord
     public static $objects;
     public static $table_name = 'products';
     
-    public function serializable_form()
+    public function serializable_form($options = array())
     {
         return parent::serializable_form(array('exclude' => 'price'));
     }
@@ -19,7 +19,7 @@ class ProfileWithInclude extends SActiveRecord
     public static $table_name = 'profiles';
     public static $relationships = array('employe' => 'belongs_to');
     
-    public function serializable_form()
+    public function serializable_form($options = array())
     {
         return parent::serializable_form(array('include' => 'employe'));
     }
@@ -31,7 +31,7 @@ class CompanyWithInclude extends SActiveRecord
     public static $table_name = 'companies';
     public static $relationships = array('employes' => array('assoc_type' => 'has_many', 'foreign_key' => 'company_id'));
     
-    public function serializable_form()
+    public function serializable_form($options = array())
     {
         return parent::serializable_form(array('include' => 'employes'));
     }
