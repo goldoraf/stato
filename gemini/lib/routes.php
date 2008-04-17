@@ -306,8 +306,13 @@ class SRouteSet
         else
             $actions = $controllers[$options['controller']];
           
-        if (($route = $this->search_action($options['action'], $actions)) === false)
-            $route = $this->search_action($options['action'], $controllers['*']);
+        $route = false;
+        
+        if (isset($options['action']))
+        {
+            if (($route = $this->search_action($options['action'], $actions)) === false)
+                $route = $this->search_action($options['action'], $controllers['*']);
+        }
         
         if (!$route) $route = $this->gen_map['*']['*']['*'];
         
