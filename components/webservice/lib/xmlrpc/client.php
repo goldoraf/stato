@@ -32,7 +32,7 @@ class SXmlRpcClient
             $method = implode('.', $this->namespaces).".$method";
             $this->namespaces = array();
         }
-        return $this->decode_response($this->send_request($method, $args));
+        return self::decode_response($this->send_request($method, $args));
     }
     
     public function set_http_credentials($username, $password)
@@ -40,7 +40,26 @@ class SXmlRpcClient
         $this->credentials = "$username:$password";
     }
     
-    public function decode_response($xml_string)
+    public function send_request($method, $args)
+    {
+        $request = new SXmlRpcRequest($method, $args);
+        
+        $headers = array
+        (
+            "Content-Type: text/xml",
+            "User-Agent: {$this->user_agent}",
+            "Content-length: ".$request->length()
+        );
+        $client = new SHttpClient($this->uri, $headers, $this->credentials);
+        $response = $client->post($request->to_xml());
+        
+        if ($response->code != 200)
+            throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
+        
+        return $response->body;
+    }
+    
+    public static function decode_response($xml_string)
     {
         try { $xml = new SimpleXMLElement($xml_string); }
         catch (Exception $e) { throw new SXmlRpcClientException('Failed to parse response'); }
@@ -66,25 +85,6 @@ class SXmlRpcClient
             throw new SXmlRpcClientException('Invalid response : no <value> tag');
             
         return SXmlRpcValue::typecast($xml->params->param->value->asXml())->to_php();
-    }
-    
-    public function send_request($method, $args)
-    {
-        $request = new SXmlRpcRequest($method, $args);
-        
-        $headers = array
-        (
-            "Content-Type: text/xml",
-            "User-Agent: {$this->user_agent}",
-            "Content-length: ".$request->length()
-        );
-        $client = new SHttpClient($this->uri, $headers, $this->credentials);
-        $response = $client->post($request->to_xml());
-        
-        if ($response->code != 200)
-            throw new SXmlRpcRequestFailedException("Request failed with code {$response->code}");
-        
-        return $response->body;
     }
 }
 
