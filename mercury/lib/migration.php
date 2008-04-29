@@ -35,6 +35,13 @@ abstract class SMigration
         echo "=> $name: $message\n";
     }
     
+    public function ask($message)
+    {
+        $this->announce("$message (y/n)");
+        $answer = trim(fgets(STDIN, 1024));
+        return $answer == 'y';
+    }
+    
     public function __call($method, $args)
     {
         return call_user_func_array(array(SActiveRecord::connection(), $method), $args);
