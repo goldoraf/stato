@@ -75,6 +75,7 @@ class SFixture
             $i = 1;
             foreach($csv as $data)
             {
+                foreach ($data as $k => $v) if ($v == 'NULL') $data[$k] = null;
                 $this->values[strtolower($this->class_name).'_'.$i] = $data;
                 $i++;
             }
