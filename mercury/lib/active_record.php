@@ -753,7 +753,8 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         $this->set_state('before_create');
         $sql = 'INSERT INTO '.$this->meta->table_name.' '.
                $this->prepare_sql_set();
-        $this->id = $this->conn()->insert($sql);
+        $id = $this->conn()->insert($sql);
+        if ($this->read_id() === null) $this->id = $id;
         $this->new_record = false;
         $this->set_state('after_create');
     }
