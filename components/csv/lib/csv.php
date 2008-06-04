@@ -136,12 +136,12 @@ class SCsvIterator implements Iterator
     
     private function fetch_assoc()
     {
-        if (count($this->fields) != count($this->data))
-            throw new Exception("Wrong field count at line {$this->line}");
-        
         $row = array();
         foreach ($this->fields as $key => $value) 
-            $row[$value] = $this->convert_encoding($this->data[$key]);
+            if (isset($this->data[$key]))
+                $row[$value] = $this->convert_encoding($this->data[$key]);
+            else
+                $row[$value] = null;
         return $row;
     }
     
