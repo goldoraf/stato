@@ -55,6 +55,8 @@ class DateTest extends UnitTestCase
     {
         $this->assertEqual(new SDate(1969, 7, 21),
                            SDate::parse('1969-07-21'));
+        $this->assertEqual(new SDate(1969, 7, 21),
+                           SDate::parse('19690721'));
         $this->assertEqual(new SDateTime(1969, 7, 21, 20, 35, 05),
                            SDateTime::parse('19690721T20:35:05'));
         $this->assertEqual(new SDateTime(1969, 7, 21, 20, 35, 05),

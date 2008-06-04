@@ -11,7 +11,8 @@ class SDate
     private static $regex = array
     (
         'fr'  => '/^(?P<day>\d{1,2})\/(?P<month>\d{1,2})\/(?P<year>\d{4})$/',
-        'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$/'
+        'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$/',
+        'db'  => '/^(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})$/'
     );
     
     public function __construct($year, $month, $day)
