@@ -39,6 +39,19 @@ class SMySqlAdapter extends SAbstractAdapter
     {
         $start = microtime(true);
         
+        $result = $this->conn->execute($sql);
+        
+        $time = microtime(true) - $start;
+        $this->log($sql, $time, $name);
+        $this->runtime += $time;
+        
+        return $result;
+    }
+    
+    public function query($sql, $name = null)
+    {
+        $start = microtime(true);
+        
         $result = $this->conn->query($sql);
         
         $time = microtime(true) - $start;
@@ -50,7 +63,7 @@ class SMySqlAdapter extends SAbstractAdapter
     
     public function query_columns($table)
     {
-        $rs = $this->execute("SHOW COLUMNS FROM ".$table);
+        $rs = $this->query("SHOW COLUMNS FROM ".$table);
         $fields = array();
         while($row = $this->fetch($rs))
             $fields[$row['Field']] = new SColumn($row['Field'], 
@@ -70,7 +83,7 @@ class SMySqlAdapter extends SAbstractAdapter
     
     public function get_last_update($table)
     {
-        $rs = $this->execute("SHOW TABLE STATUS LIKE '".$table."'");
+        $rs = $this->query("SHOW TABLE STATUS LIKE '".$table."'");
         $status = $this->fetch($rs);
         return $status['Update_time'];
     }
@@ -116,7 +129,7 @@ class SMySqlAdapter extends SAbstractAdapter
     public function tables()
     {
         $tables = array();
-        $rs = $this->execute('SHOW TABLES');
+        $rs = $this->query('SHOW TABLES');
         while ($row = $this->fetch($rs, false)) $tables[] = $row[0];
         return $tables;
     }

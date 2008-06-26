@@ -31,10 +31,17 @@ class SMysqlLibraryWrapper implements SDbLibraryWrapper
         if (!$result)
             throw new SInvalidStatementException('MySQL Error : '.$this->get_error().' ; SQL used : '.$sql);
             
-        if (strpos($sql, 'UPDATE') === 0 || strpos($sql, 'DELETE') === 0)
-            return mysql_affected_rows($this->conn);
-            
         return true;
+    }
+    
+    public function execute($sql)
+    {
+        $result = @mysql_query($sql, $this->conn);
+        
+        if (!$result)
+            throw new SInvalidStatementException('MySQL Error : '.$this->get_error().' ; SQL used : '.$sql);
+            
+        return mysql_affected_rows($this->conn);
     }
     
     public function last_insert_id()

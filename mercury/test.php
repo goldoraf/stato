@@ -10,7 +10,7 @@ require STATO_CORE_PATH.'/components/console/console.php';
 require STATO_CORE_PATH.'/mercury/mercury.php';
 require STATO_CORE_PATH.'/components/test/test.php';
 
-define('STATO_TESTING_ADAPTER', 'mysql');
+define('STATO_TESTING_ADAPTER', 'pdo_mysql');
 define('STATO_FIXTURES_DIR', STATO_CORE_PATH.'/mercury/test/fixtures');
 require_once STATO_FIXTURES_DIR.'/models.php';
 

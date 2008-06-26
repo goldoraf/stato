@@ -26,10 +26,17 @@ class SPdoMysqlLibraryWrapper implements SDbLibraryWrapper
     public function query($sql)
     {
         try {
-            if (strpos($sql, 'SELECT') === 0 || strpos($sql, 'SHOW') === 0)
-                return $this->pdo->query($sql); // returns a PDO statement
-            else
-                return $this->pdo->exec($sql); // returns affected rows
+            return $this->pdo->query($sql); // returns a PDO statement
+        } 
+        catch (PDOException $e) {
+            throw new SInvalidStatementException($e->getMessage()."\nSQL used : $sql");
+        }
+    }
+    
+    public function execute($sql)
+    {
+        try {
+            return $this->pdo->exec($sql); // returns affected rows
         } 
         catch (PDOException $e) {
             throw new SInvalidStatementException($e->getMessage()."\nSQL used : $sql");

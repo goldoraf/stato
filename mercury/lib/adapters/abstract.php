@@ -37,6 +37,8 @@ abstract class SAbstractAdapter
     abstract public function disconnect();
 
     abstract public function execute($sql);
+    
+    abstract public function query($sql);
 
     abstract public function limit($count, $offset=0);
 
@@ -52,7 +54,7 @@ abstract class SAbstractAdapter
 
     public function select($sql)
     {
-        return $this->execute($sql);
+        return $this->query($sql);
     }
 
     public function select_all($sql)
