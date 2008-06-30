@@ -11,7 +11,7 @@ class ActiveTestCase extends StatoTestCase
     
     public function __construct()
     {
-        parent::UnitTestCase();
+        parent::__construct();
         $this->recreate_database();
         $this->loaded_fixtures = SFixture::create_fixtures(STATO_FIXTURES_DIR, $this->fixtures);
         foreach ($this->models as $class) 
