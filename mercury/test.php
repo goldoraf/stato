@@ -19,8 +19,13 @@ if (!file_exists(STATO_CORE_PATH.'/mercury/test/connections/'.STATO_TESTING_ADAP
 
 require_once STATO_CORE_PATH.'/mercury/test/connections/'.STATO_TESTING_ADAPTER.'.php';
 
+$start = microtime(true);
+
 $test = new StatoGroupTest('Mercury tests');
 $test->addTestFolder(STATO_CORE_PATH.'/mercury/test');
 $test->run(new TextReporter());
+
+$time = microtime(true) - $start;
+echo "Completed in $time seconds\n";
 
 ?>
