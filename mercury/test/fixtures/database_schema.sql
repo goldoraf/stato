@@ -1,5 +1,3 @@
-# Database : test_framework
-
 CREATE TABLE `bills` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `product` varchar(255) default NULL,
@@ -32,7 +30,6 @@ CREATE TABLE `companies` (
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `employes` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `company_id` int(11) default NULL,
@@ -43,7 +40,6 @@ CREATE TABLE `employes` (
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `products` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(50) default NULL,
@@ -52,7 +48,6 @@ CREATE TABLE `products` (
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `profiles` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `employe_id` int(11) default NULL,
@@ -60,26 +55,22 @@ CREATE TABLE `profiles` (
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `developers` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `developers_projects` (
   `developer_id` int(11) NOT NULL default '0',
   `project_id` int(11) NOT NULL default '0'
 ) TYPE=MyISAM ;
-
 
 CREATE TABLE `projects` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
-
 
 CREATE TABLE `contracts` (
   `id` int(10) unsigned NOT NULL auto_increment,
@@ -89,13 +80,11 @@ CREATE TABLE `contracts` (
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `clients` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;
-
 
 CREATE TABLE `topics` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -105,13 +94,11 @@ CREATE TABLE `topics` (
 PRIMARY KEY ( `id` )
 ) TYPE=MyISAM ;
 
-
 CREATE TABLE `forums` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
 `name` VARCHAR( 50 ) default NULL,
 PRIMARY KEY ( `id` )
 ) TYPE=MyISAM ;
-
 
 CREATE TABLE `articles` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -119,7 +106,6 @@ CREATE TABLE `articles` (
 `text` TEXT default NULL,
 PRIMARY KEY ( `id` )
 ) TYPE = MYISAM ;
-
 
 CREATE TABLE `comments` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -129,13 +115,11 @@ CREATE TABLE `comments` (
 PRIMARY KEY ( `id` )
 ) TYPE = MYISAM ;
 
-
 CREATE TABLE `categories` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
 `name` VARCHAR( 50 ) default NULL,
 PRIMARY KEY ( `id` )
 ) TYPE = MYISAM ;
-
 
 CREATE TABLE `articles_categories` (
   `article_id` int(11) NOT NULL default '0',

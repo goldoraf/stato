@@ -54,7 +54,7 @@ class ActiveTestCase extends StatoTestCase
         $db->execute("CREATE DATABASE $dbname");
         $db->execute("USE $dbname");
         $sql = file_get_contents(STATO_FIXTURES_DIR.'/database_schema.sql');
-        $requetes = explode(';', $sql);
+        $requetes = explode("\n\n", $sql);
         foreach($requetes as $req) if (trim($req) != '') $db->execute($req);
     }
 }
