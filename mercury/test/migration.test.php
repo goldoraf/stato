@@ -14,7 +14,7 @@ class MigrationTest extends StatoTestCase
 {
     public function __construct()
     {
-        parent::UnitTestCase();
+        parent::__construct();
         SMapper::add_manager_to_class('Person');
     }
     
