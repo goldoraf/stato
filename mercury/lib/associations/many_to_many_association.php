@@ -47,14 +47,13 @@ class SManyToManyManager extends SManyAssociationManager
 {
     public function before_owner_delete()
     {
-        $this->connection()->execute("DELETE FROM {$this->meta->join_table} 
-                                      WHERE {$this->meta->foreign_key} = '{$this->owner->id}'");
+        $this->clear();
     }
     
     public function clear()
     {
         $this->connection()->execute("DELETE FROM {$this->meta->join_table} 
-                                      WHERE {$this->meta->foreign_key} = '{$this->owner->id}'");
+                                      WHERE ".$this->get_sql_filter());
     }
     
     protected function insert_record($record)
@@ -69,7 +68,7 @@ class SManyToManyManager extends SManyAssociationManager
     {
         $this->connection()->execute("DELETE FROM {$this->meta->join_table} 
                                       WHERE {$this->meta->assoc_foreign_key} = '{$record->id}' 
-                                      AND {$this->meta->foreign_key} = '{$this->owner->id}'");
+                                      AND ".$this->get_sql_filter());
     }
     
     protected function get_query_set()
