@@ -59,6 +59,7 @@ class SManyToManyManager extends SManyAssociationManager
         {
             $quoted_record_ids = array();
             foreach ($this->all() as $record) $quoted_record_ids[] = $this->connection()->quote($record->id);
+            if (count($quoted_record_ids) == 0) return;
             $this->connection()->execute("DELETE FROM {$this->meta->join_table} 
                                           WHERE {$this->meta->foreign_key} = '{$this->owner->id}' 
                                           AND {$this->meta->assoc_foreign_key} IN (".implode(',', $quoted_record_ids).")");
