@@ -484,7 +484,7 @@ class SActionController implements SIDispatchable, SIFilterable
         
         $this->session->start();
         
-        if (!empty($this->cached_actions))
+        if (!empty($this->cached_actions) && self::$perform_caching)
             $this->around_filters->append(new SActionCacheFilter($this->cached_actions));
         
         $before_result = $this->before_filters->process($this, $this->action_name(), 'before');

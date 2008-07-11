@@ -227,7 +227,7 @@ class SActionCacheFilter
     private function cache_key($controller)
     {
         return $controller->view->fragment_cache_key(
-            array('controller' => $controller->controller_path(),
+            array('controller' => $controller->controller_name(),
                   'action' => $controller->action_name())
         );
     }
