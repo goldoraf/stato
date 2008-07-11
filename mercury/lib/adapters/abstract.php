@@ -199,12 +199,6 @@ abstract class SAbstractAdapter
         if (is_object($value)) return $this->conn->quote_string($value->__toString());
         switch($attribute_type)
         {
-            case SColumn::DATE:
-                return $this->conn->quote_string($value->__toString());
-                break;
-            case SColumn::DATETIME:
-                return $this->conn->quote_string($value->__toString());
-                break;
             case SColumn::BOOLEAN:
                 return ($value === True ? '1' : '0');
                 break;
