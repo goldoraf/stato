@@ -220,7 +220,7 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->add_variables_to_assigns();
         $this->assigns['layout_content'] = $this->view->render($template);
         
-        $layout = STATO_APP_PATH.'/views/layouts/'.$this->layout.'.php';
+        $layout = $this->layout_path();
         if (!file_exists($layout)) throw new Exception('Layout not found');
         $this->render_file($layout, $status);
     }
@@ -284,6 +284,16 @@ class SActionController implements SIDispatchable, SIFilterable
             return STATO_APP_ROOT_PATH."/modules/$module/views/$controller/$action.php";
     
         return STATO_APP_PATH."/views/$controller/$action.php";
+    }
+    
+    protected function layout_path()
+    {
+        if (strpos($this->layout, '/') !== false)
+        {
+            list($module, $layout) = explode('/', $this->layout);
+            return STATO_APP_ROOT_PATH."/modules/$module/views/layouts/$layout.php";
+        }
+        return STATO_APP_PATH."/views/layouts/{$this->layout}.php";
     }
     
     protected function add_variables_to_assigns()
