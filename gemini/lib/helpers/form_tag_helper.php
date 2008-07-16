@@ -8,7 +8,7 @@ function form_tag($url_options, $options=array())
         $html_options['enctype'] = "multipart/form-data";
         unset($html_options['multipart']);
     }
-    $html_options['action'] = url_for($url_options);
+    $html_options['action'] = (is_array($url_options)) ? url_for($url_options) : $url_options;
     return tag('form', $html_options, True);
 }
 
