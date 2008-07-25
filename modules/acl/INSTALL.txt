@@ -1,4 +1,4 @@
-ATTENTION : ce module d'ACL n'est pas terminé ! Ne l'utilisez pas encore dans vos applis !
+﻿ATTENTION : ce module d'ACL n'est pas terminé ! Ne l'utilisez pas encore dans vos applis !
 
 INSTALL
 -------------
@@ -17,3 +17,7 @@ AclEngine::set_config('...', '...');
  * Faire hériter les controllers à protéger de la classe AclEnabledController :
  
 class ApplicationController extends AclEnabledController {...}
+
+ * Ajouter la route suivante :
+
+$map->connect('acl/:controller/:action/:id', array('module' => 'acl', 'controller' => 'users'));
