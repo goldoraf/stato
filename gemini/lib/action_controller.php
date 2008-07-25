@@ -75,6 +75,7 @@ class SActionController implements SIDispatchable, SIFilterable
     
     const DEFAULT_RENDER_STATUS_CODE = 200;
     
+    public static $installed_modules = array();
     public static $session_handler = 'default';
     public static $fragment_cache_store = 'file';
     public static $file_store_path = '/cache/fragments';
@@ -281,8 +282,12 @@ class SActionController implements SIDispatchable, SIFilterable
     protected function template_path($controller, $action, $module = null)
     {
         if ($module !== null)
+        {
+            if (in_array($module, self::$installed_modules))
+                return STATO_CORE_PATH."/modules/$module/views/$controller/$action.php";
+                
             return STATO_APP_ROOT_PATH."/modules/$module/views/$controller/$action.php";
-    
+        }
         return STATO_APP_PATH."/views/$controller/$action.php";
     }
     
@@ -291,6 +296,9 @@ class SActionController implements SIDispatchable, SIFilterable
         if (strpos($this->layout, '/') !== false)
         {
             list($module, $layout) = explode('/', $this->layout);
+            if (in_array($module, self::$installed_modules))
+                return STATO_CORE_PATH."/modules/$module/views/layouts/$layout.php";
+            
             return STATO_APP_ROOT_PATH."/modules/$module/views/layouts/$layout.php";
         }
         return STATO_APP_PATH."/views/layouts/{$this->layout}.php";
@@ -602,11 +610,16 @@ class SActionController implements SIDispatchable, SIFilterable
     {
         if ($module === null)    
             return STATO_APP_ROOT_PATH."/app/controllers/{$req_controller}_controller.php";
-        
-        if (file_exists($path = STATO_APP_ROOT_PATH."/modules/{$module}/controllers/base_controller.php"))
-            require_once($path);
             
-        return STATO_APP_ROOT_PATH."/modules/{$module}/controllers/{$req_controller}_controller.php";
+        if (in_array($module, self::$installed_modules)) $base_path = STATO_CORE_PATH.'/modules';
+        else $base_path = STATO_APP_ROOT_PATH.'/modules';
+        
+        $base_controller_path = "{$base_path}/{$module}/controllers/base_controller.php";
+        $controller_path = "{$base_path}/{$module}/controllers/{$req_controller}_controller.php";
+        
+        if (file_exists($base_controller_path)) require_once($base_controller_path);
+            
+        return $controller_path;
     }
 }
 

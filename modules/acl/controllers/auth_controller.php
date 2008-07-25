@@ -2,7 +2,11 @@
 
 class AuthController extends ApplicationController
 {
-    protected $protected_actions = array('login', 'signup', 'forgot_password');
+    public function __construct()
+    {
+        parent::__construct();
+        $this->layout = AclEngine::config('auth_controller_layout');
+    }
     
     public function login()
     {

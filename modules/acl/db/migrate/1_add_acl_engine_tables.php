@@ -72,11 +72,11 @@ class AddAclEngineTables extends SMigration
         $r->omnipotent  = false;
         $r->save();
         
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'login'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'forgot_password'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'signup'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'confirm'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'restore_deleted'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'login'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'forgot_password'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'signup'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'confirm'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'restore_deleted'));
         $r->save();
         
         $this->announce('Creating admin role');
@@ -93,11 +93,11 @@ class AddAclEngineTables extends SMigration
         $r->omnipotent  = false;
         $r->save();
         
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'logout'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'home'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'change_password'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'edit'));
-        $r->permissions->add(Permission::$objects->find_by_controller_and_action('user', 'delete'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'logout'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'home'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'change_password'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'edit'));
+        $r->permissions->add(Permission::$objects->find_by_controller_and_action('auth', 'delete'));
         $r->save();
         
         $this->announce('Creating admin user');

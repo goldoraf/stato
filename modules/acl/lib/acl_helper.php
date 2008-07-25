@@ -1,5 +1,14 @@
 <?php
 
+if (!function_exists('__'))
+{
+    function __($str, $args = array(null))
+    {
+        array_unshift($args, $str);
+        return call_user_func_array('sprintf', $args);
+    }
+}
+
 function link_if_authorized($label, $user, $url_options=array(), $html_options=array())
 {
     $result = (array_delete('show_text', $html_options)) ? $label : '';

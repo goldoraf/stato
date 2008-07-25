@@ -1,0 +1,19 @@
+ATTENTION : ce module d'ACL n'est pas terminé ! Ne l'utilisez pas encore dans vos applis !
+
+INSTALL
+-------------
+
+ * Ajouter dans le fichier conf/environment.php :
+
+SDependencies::require_component('i18n');
+SLocale::set('fr_FR');
+
+SDependencies::use_modules(array('acl'));
+
+AclEngine::set_config('...', '...');
+AclEngine::set_config('...', '...');
+AclEngine::set_config('...', '...');
+
+ * Faire hériter les controllers à protéger de la classe AclEnabledController :
+ 
+class ApplicationController extends AclEnabledController {...}

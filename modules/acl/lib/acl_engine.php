@@ -1,44 +1,42 @@
 <?php
 
-require('acl_engine/acl_enabled_controller.php');
-require('acl_engine/acl_helper.php');
-
 class AclEngine
 {
-    private static $config = array();
+    private static $config = array
+    (
+        'use_permission_system' => true,
     
-    public static function start()
-    {
-        self::set_config('use_permission_system', true);
+        'salt' => 'your salt value',
+        'app_name' => 'Your Site',
         
-        self::set_config('salt', 'your salt value');
-        self::set_config('app_name', 'Your Site');
+        'roles_table' => 'roles',
+        'permissions_table' => 'permissions',
+        'users_table' => 'users',
         
-        self::set_config('roles_table', 'roles');
-        self::set_config('permissions_table', 'permissions');
-        self::set_config('users_table', 'users');
+        'roles_users_table' => 'roles_users',
+        'permissions_roles_table' => 'permissions_roles',
+        'permissions_users_table' => 'permissions_users',
         
-        self::set_config('roles_users_table', self::config('roles_table').'_'.self::config('users_table'));
-        self::set_config('permissions_roles_table', self::config('permissions_table').'_'.self::config('roles_table'));
-        self::set_config('permissions_users_table', self::config('permissions_table').'_'.self::config('users_table'));
+        'guest_role_name' => 'Guest',
+        'user_role_name' => 'User',
         
-        self::set_config('guest_role_name', 'Guest');
-        self::set_config('user_role_name', 'User');
+        'admin_role_name' => 'Admin',
+        'admin_login' => 'admin',
+        'admin_password' => 'testing',
+        'admin_email' => 'admin@yoursite.com',
         
-        self::set_config('admin_role_name', 'Admin');
-        self::set_config('admin_login', 'admin');
-        self::set_config('admin_password', 'testing');
-        self::set_config('admin_email', 'admin@yoursite.com');
+        'use_email_notification' => true,
+        'confirm_account' => true,
+        'security_token_life_hours' => 4,
+        'email_from' => 'support@yoursite.com',
+        'changeable_fields' => array('firstname', 'lastname', 'email', 'login'),
+        'delayed_delete' => true,
+        'delayed_delete_days' => 1,
         
-        self::set_config('use_email_notification', true);
-        self::set_config('login_page', array('controller' => 'user', 'action' => 'login'));
-        self::set_config('confirm_account', true);
-        self::set_config('security_token_life_hours', 4);
-        self::set_config('email_from', 'support@yoursite.com');
-        self::set_config('changeable_fields', array('firstname', 'lastname', 'email', 'login'));
-        self::set_config('delayed_delete', true);
-        self::set_config('delayed_delete_days', 1);
-    }
+        'login_page' => array('module' => 'acl', 'controller' => 'auth', 'action' => 'login'),
+        'auth_controller_layout' => 'acl/public',
+        'site_title' => 'Stato administration'
+    );
     
     public static function authenticate($login, $password)
     {
@@ -156,7 +154,7 @@ class AclEngine
     
     public static function set_config($key, $value)
     {
-        if (!isset(self::$config[$key])) self::$config[$key] = $value;
+        if (isset(self::$config[$key])) self::$config[$key] = $value;
     }
     
     public static function config($key)

@@ -6,8 +6,8 @@ class SDependencyNotFound extends Exception {}
 
 class SDependencies
 {
-    private static $modules = null;
     private static $loaded_components = array();
+    private static $model_possible_paths = null;
     
     public static function auto_require_model($class_name)
     {
@@ -34,23 +34,23 @@ class SDependencies
         
         require_once($complete_path);
         
-        if (self::descends_from_active_record($class_name))
-            SMapper::add_manager_to_class($class_name);
+        self::init_model($class_name);
     }
     
     public static function model_exists($class_name)
     {
         $file_name = SInflection::underscore($class_name).'.php';
-        $possible_paths = array("/app/models/$file_name");
         
-        foreach (self::modules_list() as $module)
-            $possible_paths[] = "/modules/$module/models/$file_name";
-        
-        foreach ($possible_paths as $path)
-            if (file_exists(STATO_APP_ROOT_PATH.$path))
-                return STATO_APP_ROOT_PATH.$path;
+        foreach (self::model_possible_paths() as $path)
+            if (file_exists("{$path}/{$file_name}")) return "{$path}/{$file_name}";
         
         return false;
+    }
+    
+    public static function init_model($class_name)
+    {
+        if (self::descends_from_active_record($class_name))
+            SMapper::add_manager_to_class($class_name);
     }
     
     public static function require_helpers($helpers, $module = null)
@@ -67,6 +67,20 @@ class SDependencies
             throw new SDependencyNotFound("Missing $helper helper");
         
         require_once($path);
+    }
+    
+    public static function use_modules($modules)
+    {
+        foreach ($modules as $module)
+        {
+            $module_path = STATO_CORE_PATH."/modules/{$module}";
+            if (!is_dir($module_path))
+                throw new Exception("Module $module not found");
+            
+            if (file_exists($path = "{$module_path}/init.php")) require $path;  
+        }
+          
+        SActionController::$installed_modules = $modules;
     }
     
     public static function require_components($components)
@@ -99,21 +113,32 @@ class SDependencies
         }
     }
     
-    private static function modules_list()
+    private static function model_possible_paths()
     {
-        if (self::$modules !== null) return self::$modules;
+        if (self::$model_possible_paths !== null) return self::$model_possible_paths;
         
-        self::$modules = array();
+        self::$model_possible_paths = array(STATO_APP_ROOT_PATH.'/app/models');
+        foreach (self::user_modules_list() as $module)
+            self::$model_possible_paths[] = STATO_APP_ROOT_PATH."/modules/$module/models";
+        foreach (SActionController::$installed_modules as $module)
+            self::$model_possible_paths[] = STATO_CORE_PATH."/modules/$module/models";
+            
+        return self::$model_possible_paths;
+    }
+    
+    private static function user_modules_list()
+    {
+        $modules = array();
         if (is_dir(STATO_APP_ROOT_PATH.'/modules'))
         {
             $dir = new DirectoryIterator(STATO_APP_ROOT_PATH.'/modules');
             foreach ($dir as $file)
             {
                 if ($file->isFile() || $file->isDot() || $file->getFilename() == '.svn') continue;
-                elseif ($file->isDir()) self::$modules[] = $file->getFilename();
+                elseif ($file->isDir()) $modules[] = $file->getFilename();
             }   
         }
-        return self::$modules;
+        return $modules;
     }
 }
 
