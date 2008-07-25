@@ -208,7 +208,7 @@ class SMySqlAdapter extends SAbstractAdapter
     public function remove_index($table_name, $options = array())
     {
         if (!is_array($options)) $options = array('column' => $options);
-        $this->execute("DROP INDEX ".self::index_name($table_name, $options)." ON {$table_name}");
+        $this->execute("DROP INDEX ".$this->index_name($table_name, $options)." ON {$table_name}");
     }
     
     public function index_name($table_name, $options = array())
