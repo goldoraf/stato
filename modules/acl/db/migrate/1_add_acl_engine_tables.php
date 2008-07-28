@@ -60,7 +60,7 @@ class AddAclEngineTables extends SMigration
         
         $this->create_table(AclEngine::config('permissions_users_table'), $t, 'ENGINE=InnoDB');
         
-        SDependencies::require_dependencies('models', array('user', 'role', 'permission'));
+        SDependencies::require_models(array('user', 'role', 'permission'));
         
         $this->announce('Creating permissions');
         AclEngine::synchronize_with_controllers();

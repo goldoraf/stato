@@ -5,6 +5,7 @@ class User extends SActiveRecord
     public static $objects;
     public static $relationships = array('roles' => 'many_to_many');
     public static $table_name = null;
+    public $attr_protected  = array('password');
     public $record_timestamps = true;
     public $password = null;
     public $new_password = false;
