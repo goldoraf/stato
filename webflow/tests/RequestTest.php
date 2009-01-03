@@ -26,6 +26,13 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->request->isOptions());
     }
     
+    public function testInvalidMethod()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'PATCH';
+        $this->setExpectedException('Stato_InvalidHttpMethod');
+        $this->request->getMethod();
+    }
+    
     public function testGetParam()
     {
         $_GET = array('foo' => 'bar');

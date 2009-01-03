@@ -1,6 +1,6 @@
 <?php
 
-class Stato_UnknownHttpMethod extends Exception {}
+class Stato_InvalidHttpMethod extends Exception {}
 
 /**
  * HTTP request class
@@ -182,7 +182,7 @@ class Stato_Request
         $method = strtolower($_SERVER['REQUEST_METHOD']);
         
         if (!in_array($method, self::$allowedMethods))
-            throw new Stato_UnknownHttpMethod($method);
+            throw new Stato_InvalidHttpMethod($method);
         
         return $method;
     }
