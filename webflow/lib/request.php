@@ -14,7 +14,7 @@ class Stato_Request
      * Allowed HTTP methods
      * @var array 
      */
-    private static $allowedMethods = array(
+    protected static $allowedMethods = array(
         'get', 'post', 'put', 'delete', 'head', 'options'
     );
     
@@ -22,31 +22,31 @@ class Stato_Request
      * Userland parameters
      * @var array
      */
-    private $params = array();
+    protected $params = array();
     
     /**
      * Base url
      * @var string
      */
-    private $baseUrl = null;
+    protected $baseUrl = null;
     
     /**
      * Request URI
      * @var string
      */
-    private $requestUri = null;
+    protected $requestUri = null;
     
     /**
      * Base path
      * @var string
      */
-    private $basePath = null;
+    protected $basePath = null;
     
     /**
      * Path info
      * @var string
      */
-    private $pathInfo = null;
+    protected $pathInfo = null;
     
     /**
      * Constructor
