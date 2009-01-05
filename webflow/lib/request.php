@@ -179,6 +179,8 @@ class Stato_Request
      */
     public function getMethod()
     {
+        if (!isset($_SERVER['REQUEST_METHOD'])) return null;
+        
         $method = strtolower($_SERVER['REQUEST_METHOD']);
         
         if (!in_array($method, self::$allowedMethods))
@@ -207,7 +209,8 @@ class Stato_Request
      */
     public function setRequestUri($requestUri = null)
     {
-        if ($requestUri === null) $requestUri = $_SERVER['REQUEST_URI'];
+        if ($requestUri === null && isset($_SERVER['REQUEST_URI']))
+            $requestUri = $_SERVER['REQUEST_URI'];
         $this->requestUri = $requestUri;
     }
     

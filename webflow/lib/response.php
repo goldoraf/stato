@@ -100,6 +100,16 @@ class Stato_Response
     }
     
     /**
+     * Returns response body
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+    
+    /**
      * Sets HTTP status code
      *
      * @param int $code
