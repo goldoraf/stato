@@ -2,15 +2,14 @@
 
 class Stato_ActionNotFound extends Exception {}
 class Stato_DoubleRenderError extends Exception {}
-class Stato_MissingTemplate extends Exception {}
 
 class Stato_Controller
 {
     const TEXT = 'text';
     
-    const FILE = 'file';
-    
     const TEMPLATE = 'template';
+    
+    const ACTION = 'action';
     
     const DEFAULT_RENDER_STATUS_CODE = 200;
     
@@ -20,18 +19,19 @@ class Stato_Controller
     
     protected $response;
     
+    protected $view;
+    
     protected $layout;
     
     private $performedRedirect = false;
     
     private $performedRender = false;
     
-    private $viewPaths = array();
-    
     public function __construct(Stato_Request $request, Stato_Response $response)
     {
         $this->request = $request;
         $this->response = $response;
+        $this->view = new Stato_View();
     }
     
     public function __get($name)
@@ -62,12 +62,14 @@ class Stato_Controller
             
         $this->$action();
         
+        if (!$this->isPerformed()) $this->render();
+        
         return $this->response;
     }
     
     public function addViewPath($path)
     {
-        $this->viewPaths[] = $path;
+        $this->view->addPath($path);
     }
     
     protected function render($type = null, $content = null, $options = array())
@@ -79,14 +81,17 @@ class Stato_Controller
         $options = array_merge($defaultOptions, $options);
         
         switch ($type) {
-            case self::TEXT:
-                $this->renderText($content, $options['status'], $options['layout']);
+            case null:
+                $this->renderTemplate($this->defaultTemplateName(), $options);
                 break;
-            case self::FILE:
-                $this->renderFile($content, $options['status'], $options['locals'], $options['layout']);
+            case self::ACTION:
+                $this->renderTemplate($this->defaultTemplateName($content), $options);
                 break;
             case self::TEMPLATE:
-                $this->renderTemplate($content, $options['status'], $options['locals'], $options['layout']);
+                $this->renderTemplate($content, $options);
+                break;
+            case self::TEXT:
+                $this->renderText($content, $options['status']);
                 break;
         }
     }
@@ -100,6 +105,11 @@ class Stato_Controller
     protected function isPerformed()
     {
         return $this->performedRender || $this->performedRedirect;
+    }
+    
+    protected function getControllerName()
+    {
+        return underscore(str_replace('Controller', '', get_class($this)));
     }
     
     protected function getActionName()
@@ -121,47 +131,27 @@ class Stato_Controller
         }
     }
     
-    private function renderText($text, $status = null, $layout = false)
+    private function renderTemplate($template, $options = array())
     {
-        if ($layout) {
-            $this->contentForLayout = $text;
-            $text = $this->renderFile($this->layoutPath());
-            $this->eraseRenderResults();
-        }
+        if ($options['layout'] === true) 
+            $options['layout'] = $this->layout;
+            
+        $this->view->assign($this->assigns);
+        $text = $this->view->render($template, $options);
+        return $this->renderText($text, $options['status']);
+    }
+    
+    private function renderText($text, $status = null)
+    {
         $this->performedRender = true;
         $this->response->setStatus(!empty($status) ? $status : self::DEFAULT_RENDER_STATUS_CODE);
         $this->response->setBody($text);
         return $text;
     }
     
-    private function renderFile($templatePath, $status = null, $locals = array(), $layout = false)
+    private function defaultTemplateName($actionName = null)
     {
-        if (!is_readable($templatePath))
-            throw new Stato_MissingTemplate($templatePath);
-        
-        extract($locals);
-        ob_start();
-        include ($templatePath);
-        $text = ob_get_clean();
-        return $this->renderText($text, $status, $layout);
-    }
-    
-    private function renderTemplate($template, $status = null, $locals = array(), $layout = false)
-    {
-        return $this->renderFile($this->templatePath($template), $status, $locals, $layout);
-    }
-    
-    private function templatePath($template)
-    {
-        foreach ($this->viewPaths as $path) {
-            $possiblePath = "{$path}/{$template}.php";
-            if (file_exists($possiblePath)) return $possiblePath;
-        }
-        throw new Stato_MissingTemplate($template);
-    }
-    
-    private function layoutPath()
-    {
-        return $this->templatePath("layouts/{$this->layout}");
+        if ($actionName === null) $actionName = $this->getActionName();
+        return $this->getControllerName().'/'.$actionName;
     }
 }

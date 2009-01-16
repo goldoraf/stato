@@ -21,7 +21,7 @@ class Stato_ResponseTest extends PHPUnit_Framework_TestCase
     public function testGetStatusAndHeaders()
     {
         $this->response->setHeader('Content-type', 'application/pdf');
-        $this->assertEquals('200 OK', $this->response->getStatus());
+        $this->assertEquals(200, $this->response->getStatus());
         $this->assertEquals(array('Content-type' => 'application/pdf'),
                             $this->response->getHeaders());
     }
@@ -29,11 +29,11 @@ class Stato_ResponseTest extends PHPUnit_Framework_TestCase
     public function testRedirect()
     {
         $this->response->redirect('/foo/bar');
-        $this->assertEquals('302 Found', $this->response->getStatus());
+        $this->assertEquals(302, $this->response->getStatus());
         $this->assertEquals(array('Location' => '/foo/bar'),
                             $this->response->getHeaders());
         $this->response->redirect('/foo/baz', true);
-        $this->assertEquals('301 Moved Permanently', $this->response->getStatus());
+        $this->assertEquals(301, $this->response->getStatus());
         $this->assertEquals(array('Location' => '/foo/baz'),
                             $this->response->getHeaders());
     }

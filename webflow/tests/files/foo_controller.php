@@ -9,6 +9,16 @@ class FooController extends Stato_Controller
         $this->response->setBody('hello world');
     }
     
+    public function bat()
+    {
+        
+    }
+    
+    public function baz()
+    {
+        $this->render();
+    }
+    
     public function renderSimpleText()
     {
         $this->render(self::TEXT, 'hello world');
@@ -26,18 +36,18 @@ class FooController extends Stato_Controller
     
     public function renderSimpleFile()
     {
-        $this->render(self::FILE, dirname(__FILE__).'/views/foo.php');
+        $this->render(self::TEMPLATE, dirname(__FILE__).'/views/foo.php');
     }
     
     public function renderFileWithAssigns()
     {
         $this->username = 'raphael';
-        $this->render(self::FILE, dirname(__FILE__).'/views/bar.php');
+        $this->render(self::TEMPLATE, dirname(__FILE__).'/views/bar.php');
     }
     
     public function renderMissingFile()
     {
-        $this->render(self::FILE, dirname(__FILE__).'/views/dummy.php');
+        $this->render(self::TEMPLATE, dirname(__FILE__).'/views/dummy.php');
     }
     
     public function renderSimpleTemplate()
@@ -48,5 +58,10 @@ class FooController extends Stato_Controller
     public function renderMissingTemplate()
     {
         $this->render(self::TEMPLATE, 'foo/dummy');
+    }
+    
+    public function renderSpecificAction()
+    {
+        $this->render(self::ACTION, 'baz');
     }
 }
