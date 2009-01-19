@@ -2,66 +2,111 @@
 
 class FooController extends Stato_Controller
 {
-    protected $layout = 'main';
+    public function index()
+    {
+        return 'hello world';
+    }
+    
+    public function foo()
+    {
+        return $this->render();
+    }
     
     public function bar()
     {
-        $this->response->setBody('hello world');
-    }
-    
-    public function bat()
-    {
-        
+        $this->setLayout('main');
+        return $this->render();
     }
     
     public function baz()
     {
-        $this->render();
+        return $this->render('foo', array('status' => 204));
     }
     
-    public function renderSimpleText()
+    public function respondText()
     {
-        $this->render(self::TEXT, 'hello world');
+        $this->respond('hello world');
     }
     
-    public function renderTextWithStatus()
+    public function respondTextWithStatus()
     {
-        $this->render(self::TEXT, 'hello world', array('status' => 500));
+        $this->respond('hello world', 500);
     }
     
-    public function renderTextWithLayout()
+    public function simpleRedirect()
     {
-        $this->render(self::TEXT, 'hello world', array('layout' => true));
+        $this->redirect('/posts/1234');
     }
     
-    public function renderSimpleFile()
+    public function redirectPermanently()
     {
-        $this->render(self::TEMPLATE, dirname(__FILE__).'/views/foo.php');
+        $this->redirect('/posts/1234', true);
     }
     
-    public function renderFileWithAssigns()
+    public function renderSpecificFile()
+    {
+        return $this->render(array('template' => dirname(__FILE__).'/views/foo.php'));
+    }
+    
+    public function renderSpecificFileWithAssigns()
     {
         $this->username = 'raphael';
-        $this->render(self::TEMPLATE, dirname(__FILE__).'/views/bar.php');
+        return $this->render(array('template' => dirname(__FILE__).'/views/bar.php'));
+    }
+    
+    public function renderSpecificFileWithLayout()
+    {
+        return $this->render(array('template' => dirname(__FILE__).'/views/foo.php', 'layout' => 'main'));
+    }
+    
+    public function renderSpecificFileWithAssignsAndLayout()
+    {
+        $this->username = 'raphael';
+        return $this->render(array('template' => dirname(__FILE__).'/views/bar.php', 'layout' => 'main'));
     }
     
     public function renderMissingFile()
     {
-        $this->render(self::TEMPLATE, dirname(__FILE__).'/views/dummy.php');
+        return $this->render(array('template' => dirname(__FILE__).'/views/dummy.php'));
     }
     
-    public function renderSimpleTemplate()
+    public function renderSpecificTemplate()
     {
-        $this->render(self::TEMPLATE, 'foo/bar');
+        return $this->render('foo/bar');
+    }
+    
+    public function renderSpecificTemplateWithLayout()
+    {
+        return $this->render('foo/bar', array('layout' => 'main'));
     }
     
     public function renderMissingTemplate()
     {
-        $this->render(self::TEMPLATE, 'foo/dummy');
+        return $this->render('foo/dummy');
     }
     
-    public function renderSpecificAction()
+    public function renderAction()
     {
-        $this->render(self::ACTION, 'baz');
+        return $this->render('baz');
+    }
+    
+    public function renderWithoutArguments()
+    {
+        return $this->render();
+    }
+    
+    public function partialTemplateCollection()
+    {
+        return $this->partial('_item', array('collection' => array('foo', 'bar', 'baz')));
+    }
+    
+    public function partialTemplateCollectionWithSpacer()
+    {
+        return $this->partial('_item', array('collection' => array('foo', 'bar', 'baz'), 'spacer' => '<br />'));
+    }
+    
+    public function partialTemplateCollectionWithSpacerTemplate()
+    {
+        return $this->partial('_item', array('collection' => array('foo', 'bar', 'baz'), 'spacer_template' => '_spacer'));
     }
 }

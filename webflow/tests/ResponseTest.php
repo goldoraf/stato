@@ -26,18 +26,6 @@ class Stato_ResponseTest extends PHPUnit_Framework_TestCase
                             $this->response->getHeaders());
     }
     
-    public function testRedirect()
-    {
-        $this->response->redirect('/foo/bar');
-        $this->assertEquals(302, $this->response->getStatus());
-        $this->assertEquals(array('Location' => '/foo/bar'),
-                            $this->response->getHeaders());
-        $this->response->redirect('/foo/baz', true);
-        $this->assertEquals(301, $this->response->getStatus());
-        $this->assertEquals(array('Location' => '/foo/baz'),
-                            $this->response->getHeaders());
-    }
-    
     public function testSend()
     {
         $this->response->setBody('hello world');

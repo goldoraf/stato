@@ -1,117 +1,270 @@
 <?php
 
 class Stato_ActionNotFound extends Exception {}
-class Stato_DoubleRenderError extends Exception {}
+class Stato_DoubleRespond extends Exception {}
+class Stato_MissingTemplate extends Exception {}
 
+/**
+ * Controller class
+ * 
+ * Controllers are made up of public methods or "actions" that are executed on request
+ * and then either render a template or redirect to another action.
+ * 
+ * @package Stato
+ * @subpackage webflow
+ */
 class Stato_Controller
 {
-    const TEXT = 'text';
-    
-    const TEMPLATE = 'template';
-    
-    const ACTION = 'action';
-    
-    const DEFAULT_RENDER_STATUS_CODE = 200;
-    
-    protected $assigns = array();
-    
+    /**
+     * Holds the request object that's primarily used to get GET, POST and other 
+     * environment variables
+     * @var Stato_Request
+     */
     protected $request;
     
+    /**
+     * Holds the response object that's primarily used to set additional HTTP headers
+     * and that holds the final body content that's sent back to the browser
+     * @var Stato_Response
+     */
     protected $response;
     
-    protected $view;
+    /**
+     * Default template rendering options
+     * @var array
+     */
+    protected $defaultRenderOptions = array(
+        'status' => 200, 'layout' => false, 'locals' => array()
+    );
     
-    protected $layout;
+    /**
+     * Holds the HTTP status code to send back
+     * @var integer
+     */
+    private $status = 200;
     
-    private $performedRedirect = false;
+    /**
+     * Directories that contain templates
+     * @var array
+     */
+    private $viewPaths = array();
     
-    private $performedRender = false;
+    /**
+     * Whether or not the respond method has been called
+     * @var boolean
+     */
+    private $performedRespond = false;
     
+    /**
+     * Constructor
+     * 
+     * @param Stato_Request $request
+     * @param Stato_Response $response
+     * @return void
+     */
     public function __construct(Stato_Request $request, Stato_Response $response)
     {
         $this->request = $request;
         $this->response = $response;
-        $this->view = new Stato_View();
     }
     
-    public function __get($name)
-    {
-        return $this->__isset($name) ? $this->assigns[$name] : null;
-    }
-    
-    public function __set($name, $value)
-    {
-        $this->assigns[$name] = $value;
-    }
-    
-    public function __isset($name)
-    {
-        return isset($this->assigns[$name]);
-    }
-    
-    public function __unset($name)
-    {
-        unset($this->assigns[$name]);
-    }
-    
+    /**
+     * Calls the action specified in the request object and returns a response
+     * 
+     * @return Stato_Response
+     */
     public function run()
     {
+        $this->initialize();
+        
         $action = $this->getActionName();
         if (!$this->actionExists($action))
             throw new Stato_ActionNotFound($action);
             
-        $this->$action();
+        $content = $this->$action();
         
-        if (!$this->isPerformed()) $this->render();
+        if (!$this->performedRespond) $this->respond($content);
         
         return $this->response;
     }
     
+    /**
+     * Specifies a directory as containing templates
+     * 
+     * @param string $path
+     * @return void
+     */
     public function addViewPath($path)
     {
-        $this->view->addPath($path);
+        $this->viewPaths[] = $path;
     }
     
-    protected function render($type = null, $content = null, $options = array())
+    /**
+     * Overwrite to perform initializations prior to action call
+     */
+    protected function initialize()
     {
-        if ($this->isPerformed())
-            throw new Stato_DoubleRenderError('Can only render or redirect once per action');
-            
-        $defaultOptions = array('status' => null, 'locals' => array(), 'layout' => false);
-        $options = array_merge($defaultOptions, $options);
         
-        switch ($type) {
-            case null:
-                $this->renderTemplate($this->defaultTemplateName(), $options);
-                break;
-            case self::ACTION:
-                $this->renderTemplate($this->defaultTemplateName($content), $options);
-                break;
-            case self::TEMPLATE:
-                $this->renderTemplate($content, $options);
-                break;
-            case self::TEXT:
-                $this->renderText($content, $options['status']);
-                break;
+    }
+    
+    /**
+     * Renders the specified action template
+     * 
+     * @param mixed $action
+     * @param array $options
+     * @return string
+     */
+    protected function render($action = null, $options = array())
+    {
+        if (is_array($action)) {
+            $options = array_merge($action, $options);
+            $action = null;
         }
+        $options = array_merge($this->defaultRenderOptions, $options);
+        
+        if (isset($options['status']))
+            $this->status = $options['status'];
+        
+        if (isset($options['template']))
+            $template = $options['template'];
+        else
+            $template = $this->getTemplateName($action);
+        
+        if ($options['layout'] !== false)
+            return $this->renderWithLayout($template, $options['layout'], $options['locals']);
+        
+        return $this->renderTemplate($template, $options['locals']);
     }
     
-    protected function eraseRenderResults()
+    /**
+     * Prepares for redirection to an url
+     *
+     * Sets Location header and response code.
+     *
+     * @param string $url
+     * @param boolean $permanently
+     * @return void
+     */
+    protected function redirect($url, $permanently = false)
     {
-        $this->response->setBody('');
-        $this->performedRender = false;
+        $this->response->setHeader('Location', $url);
+        $this->respond(
+            "<html><body>You are being <a href=\"{$url}\">redirected</a>.</body></html>",
+            ($permanently) ? 301 : 302
+        );
     }
     
-    protected function isPerformed()
+    /**
+     * Sets the response body and status code header
+     *
+     * @param mixed $data
+     * @param integer $status
+     * @return void
+     */
+    protected function respond($data, $status = null)
     {
-        return $this->performedRender || $this->performedRedirect;
+        if ($this->performedRespond)
+            throw new Stato_DoubleRespond();
+        
+        $this->response->setStatus(!empty($status) ? $status : $this->status);
+        $this->response->setBody($data);
+        $this->performedRespond = true;
     }
     
+    /**
+     * Renders a partial template
+     * 
+     * @param mixed $template
+     * @param array $options
+     * @return string
+     */
+    protected function partial($template, $options = array())
+    {
+        if (isset($options['collection']))
+            return $this->partialCollection($template, $options);
+            
+        $locals = (isset($options['locals'])) ? $options['locals'] : array();
+        return $this->renderTemplate($template, $locals);
+    }
+    
+    /**
+     * Sends a file over HTTP
+     * 
+     * @param string $path
+     * @param array $params
+     * @return void
+     */
+    protected function sendFile($path, $params = array())
+    {
+        if (!file_exists($path) || !is_readable($path)) 
+            throw new Exception('Cannot read file : '.$path);
+        
+        $defaults = array(
+            'type' => 'application/octet-stream',
+            'disposition' => 'attachment',
+            'stream' => true
+        );
+        $params = array_merge($defaults, $params);
+        
+        if (!isset($params['filename'])) $params['filename'] = basename($path);
+        if (!isset($params['length']))   $params['length']   = filesize($path);
+        
+        $this->setFileHeaders($params);
+        
+        /*if ($params['stream'] === true)
+        {
+            $this->response->send_headers();
+            $fp = @fopen($path, "rb");
+            fpassthru($fp);
+            return;
+        }
+        else */$this->respond(file_get_contents($path));
+    }
+    
+    /**
+     * Sends binary data over HTTP to the user as a file download
+     * 
+     * @param string $data
+     * @param array $params
+     * @return void
+     */
+    protected function sendData($data, $params = array())
+    {
+        $defaults = array(
+            'type' => 'application/octet-stream',
+            'disposition' => 'attachment',
+        );
+        $params = array_merge($defaults, $params);
+        
+        if (!isset($params['length']) && !is_resource($data)) $params['length'] = strlen($data);
+        
+        $this->setFileHeaders($params);
+        
+        /*if (is_resource($data))
+        {
+            $this->response->send_headers();
+            rewind($data);
+            fpassthru($data);
+            exit();
+        }*/
+        $this->respond($data);
+    }
+    
+    /**
+     * Converts the controller class name from something like "WeblogController" to "weblog"
+     * 
+     * @return string
+     */
     protected function getControllerName()
     {
         return underscore(str_replace('Controller', '', get_class($this)));
     }
     
+    /**
+     * Returns the requested action name (default to "index")
+     * 
+     * @return string
+     */
     protected function getActionName()
     {
         $action = $this->request->getParam('action');
@@ -119,6 +272,40 @@ class Stato_Controller
         return $action;
     }
     
+    /**
+     * Returns the template name related to the requested action
+     * 
+     * E.g: FooController::new() => foo/new
+     * 
+     * @param string $actionName
+     * @return string
+     */
+    protected function getTemplateName($actionName = null)
+    {
+        if (strpos($actionName, '/') !== false) return $actionName;
+        if ($actionName === null) $actionName = $this->getActionName();
+        return $this->getControllerName().'/'.$actionName;
+    }
+    
+    /**
+     * Sets the default layout to use
+     * 
+     * You can disable layout rendering by passing false to this method.
+     * 
+     * @param string $layout
+     * @return void
+     */
+    protected function setLayout($layout)
+    {
+        $this->defaultRenderOptions['layout'] = ($layout) ? $layout : false;
+    }
+    
+    /**
+     * Checks if a public method named after the requested action exists
+     * 
+     * @param string $action
+     * @return boolean
+     */
     protected function actionExists($action)
     {
         try {
@@ -131,27 +318,106 @@ class Stato_Controller
         }
     }
     
-    private function renderTemplate($template, $options = array())
+    /**
+     * Renders a template
+     * 
+     * @param string $template
+     * @param array $locals
+     * @return string
+     */
+    private function renderTemplate($template, $locals = array())
     {
-        if ($options['layout'] === true) 
-            $options['layout'] = $this->layout;
-            
-        $this->view->assign($this->assigns);
-        $text = $this->view->render($template, $options);
-        return $this->renderText($text, $options['status']);
+        $templatePath = $this->getTemplatePath($template);
+        
+        if (!is_readable($templatePath))
+            throw new Stato_MissingTemplate($templatePath);
+        
+        extract($locals);
+        ob_start();
+        include ($templatePath);
+        return ob_get_clean();
     }
     
-    private function renderText($text, $status = null)
+    /**
+     * Renders a template inside a layout
+     * 
+     * @param string $template
+     * @param string $layout
+     * @param array $locals
+     * @return string
+     */
+    private function renderWithLayout($template, $layout, $locals = array())
     {
-        $this->performedRender = true;
-        $this->response->setStatus(!empty($status) ? $status : self::DEFAULT_RENDER_STATUS_CODE);
-        $this->response->setBody($text);
-        return $text;
+        $layout = "layouts/{$layout}";
+        $this->contentForLayout = $this->renderTemplate($template, $locals);
+        return $this->renderTemplate($layout, $locals);
     }
     
-    private function defaultTemplateName($actionName = null)
+    /**
+     * Renders a collection of partials
+     * 
+     * @param string $template
+     * @param array $options
+     * @return string
+     */
+    private function partialCollection($template, $options)
     {
-        if ($actionName === null) $actionName = $this->getActionName();
-        return $this->getControllerName().'/'.$actionName;
+        $partials = array();
+        $elementName = basename($template, '.php');
+        $counterName = "{$elementName}_counter";
+        $counter = 1;
+        foreach($options['collection'] as $element)
+        {
+            $locals[$counterName] = $counter;
+            $locals[$elementName] = $element;
+            $partials[] = $this->renderTemplate($this->getTemplateName($template), $locals);
+            $counter++;
+        }
+        
+        if (isset($options['spacer'])) 
+            $spacer = $options['spacer'];
+        elseif (isset($options['spacer_template'])) 
+            $spacer = $this->renderTemplate($this->getTemplateName($options['spacer_template']));
+        else 
+            $spacer = '';
+
+        return implode($spacer, $partials);
+    }
+    
+    /**
+     * Returns the absolute path of a template (if found)
+     * 
+     * @param string $template
+     * @return string
+     */
+    private function getTemplatePath($template)
+    {
+        if (file_exists($template)) return $template;
+        foreach ($this->viewPaths as $path) {
+            $possiblePath = "{$path}/{$template}.php";
+            if (file_exists($possiblePath)) return $possiblePath;
+        }
+        throw new Stato_MissingTemplate($template);
+    }
+    
+    /**
+     * Sets response headers for a file sending
+     * 
+     * @param array $params
+     * @return void
+     */
+    private function setFileHeaders($params = array())
+    {
+        $disposition = $params['disposition'];
+        if (isset($params['filename'])) 
+            $disposition.= '; filename='.$params['filename'];
+        
+        $headers = array(
+            'Content-Length'      => $params['length'],
+            'Content-Type'        => $params['type'],
+            'Content-Disposition' => $disposition,
+            'Content-Transfer-Encoding' => 'binary'
+        );
+        foreach ($headers as $k => $v) $this->response->setHeader($k, $v);
     }
 }

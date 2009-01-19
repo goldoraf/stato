@@ -58,7 +58,7 @@ class Stato_Response
     public function setStatus($code)
     {
         if (!is_int($code) || ($code < 100) || ($code > 599))
-            throw new Stato_InvalidHttpStatusCode($code);
+            throw new Stato_InvalidHttpStatusCode((string) $code);
         $this->status = $code;
     }
     
@@ -92,22 +92,6 @@ class Stato_Response
     public function getHeaders()
     {
         return $this->headers;
-    }
-    
-    /**
-     * Prepares for redirection to an url
-     *
-     * Sets Location header and response code.
-     *
-     * @param string $url
-     * @param boolean $permanently
-     * @return void
-     */
-    public function redirect($url, $permanently = false)
-    {
-        $this->setStatus(($permanently) ? 301 : 302);
-        $this->setHeader('Location', $url);
-        $this->setBody("<html><body>You are being <a href=\"{$url}\">redirected</a>.</body></html>");
     }
     
     /**
