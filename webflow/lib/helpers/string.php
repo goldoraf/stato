@@ -18,6 +18,14 @@ function html_escape($html)
 }
 
 /**
+ * Escape carrier returns and single and double quotes for javascript code
+ */
+function js_escape($javascript)
+{
+    return addslashes(preg_replace('/\r\n|\n|\r/', '\\n', $javascript));
+}
+
+/**
  * If <var>$text</var> is longer than <var>$length</var>, <var>$text</var> will 
  * be truncated to the length of <var>$length</var> and the last three characters
  * will be replaced with the <var>$truncate_string</var>.

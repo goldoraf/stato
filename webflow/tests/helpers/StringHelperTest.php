@@ -6,10 +6,16 @@ require_once 'helpers/string.php';
 
 class Stato_StringHelperTest extends PHPUnit_Framework_TestCase
 {
-    public function testEscape()
+    public function testHtmlEscape()
     {
     	$this->assertEquals('&lt;a href=&quot;dummy.com&quot;&gt;test&lt;/a&gt;',
     						html_escape('<a href="dummy.com">test</a>'));	
+    }
+    
+    public function testJsEscape()
+    {
+    	$str = "It\'s just a \\\"dummy\\\" sentence\\\\n";
+    	$this->assertEquals($str, js_escape("It's just a \"dummy\" sentence\n"));
     }
     
     public function testTruncate()
