@@ -1,6 +1,44 @@
 <?php
 
 /**
+ * String helpers
+ * 
+ * Provides a set of functions for filtering, formatting and transforming strings.
+ * 
+ * @package Stato
+ * @subpackage webflow
+ */
+
+/**
+ * Convert special characters to HTML entities
+ */
+function html_escape($html)
+{
+    return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Escape carrier returns and single and double quotes for javascript code
+ */
+function js_escape($javascript)
+{
+    return addslashes(preg_replace('/\r\n|\n|\r/', '\\n', $javascript));
+}
+
+/**
+ * If <var>$text</var> is longer than <var>$length</var>, <var>$text</var> will 
+ * be truncated to the length of <var>$length</var> and the last three characters
+ * will be replaced with the <var>$truncate_string</var>.
+ */
+function truncate($text, $length = 30, $truncate_string = '...')
+{
+    if (strlen(utf8_decode($text)) > $length)
+        return utf8_encode(substr_replace(utf8_decode($text), $truncate_string, $length - strlen(utf8_decode($truncate_string))));
+    else
+        return $text;
+}
+
+/**
 * Makes an underscored, lowercase form from the <var>$camel_cased_word</var> argument.
 * 
 * Example : <code>underscore('ActionController');  // => 'action_controller'</code>          
@@ -140,4 +178,86 @@ function deaccent($string, $case=0)
         $string = str_replace(array_keys($utf8_upper_accents), array_values($utf8_upper_accents), $string);
     
     return $string;
+}
+
+/**
+ * Creates a Stato_Cycle object whose __toString() method cycles through elements of an array every time it is called.
+ * 
+ * This can be used for example, to alternate classes for table rows:
+ * <code>
+ * <? foreach ($this->items as $item) : ? >
+ *  <tr class="<?= cycle(array("even", "odd")); ? >">
+ *    <td>item</td>
+ *  </tr>
+ * <? endforeach; ? >
+ * </code>
+ * 
+ * You can use named cycles to allow nesting in loops. You can manually reset a 
+ * cycle by calling reset_cycle() and passing the name of the cycle.
+ * <code>
+ * <? foreach ($this->items as $item) : ? >
+ *  <tr class="<?= cycle(array("even", "odd"), "row_class"); ? >">
+ *    <td>
+ *    <? foreach ($item->values as $value) : ? >
+ *      <span style="<?= cycle(array("red", "green"), "colors"); ? >">value</span>
+ *    <? endforeach; ? >
+ *    <? reset_cycle("colors"); ? > 
+ *    </td>
+ *  </tr>
+ * <? endforeach; ? >
+ * </code>   
+ */
+function cycle($values, $name = 'default')
+{
+    $cycle = Stato_Cycle::get_cycle($name);
+    if ($cycle === null || $cycle->values != $values)
+        $cycle = Stato_Cycle::set_cycle($name, new Stato_Cycle($values));
+    return $cycle->__toString();
+}
+
+function reset_cycle($name = 'default')
+{
+    $cycle = Stato_Cycle::get_cycle($name);
+    if ($cycle !== null) $cycle->reset();
+}
+
+/**
+ * @ignore
+ */
+class Stato_Cycle
+{
+    public $values = array();
+    private $index = 0;
+    
+    private static $cycles = array();
+    
+    public function __construct($values)
+    {
+        $this->values = $values;
+    }
+    
+    public function __toString()
+    {
+        $value = $this->values[$this->index];
+        if ($this->index == count($this->values) - 1) $this->index = 0;
+        else $this->index++;
+        return $value;
+    }
+    
+    public function reset()
+    {
+        $this->index = 0;
+    }
+    
+    public static function set_cycle($name, $cycle)
+    {
+        self::$cycles[$name] = $cycle;
+        return $cycle;
+    }
+    
+    public static function get_cycle($name)
+    {
+        if (isset(self::$cycles[$name])) return self::$cycles[$name];
+        else return null;
+    }
 }
