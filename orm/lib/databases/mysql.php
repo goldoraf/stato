@@ -1,0 +1,101 @@
+<?php
+
+class Stato_MysqlDialect implements Stato_Dialect
+{
+    private static $columnTypes = array(
+        'bigint' => Stato_Column::INTEGER,
+        //'binary',
+        //'bit',
+        //'blob',
+        'boolean' => Stato_Column::BOOLEAN,
+        'char' => Stato_Column::STRING,
+        'date' => Stato_Column::DATE,
+        'datetime' => Stato_Column::DATETIME,
+        'decimal' => Stato_Column::FLOAT,
+        'double' => Stato_Column::FLOAT,
+        'enum' => Stato_Column::STRING,
+        'fixed' => Stato_Column::FLOAT,
+        'float' => Stato_Column::FLOAT,
+        'int' => Stato_Column::INTEGER,
+        'integer' => Stato_Column::INTEGER,
+        //'longblob',
+        'longtext' => Stato_Column::STRING,
+        //'mediumblob',
+        'mediumint' => Stato_Column::INTEGER,
+        'mediumtext' => Stato_Column::TEXT,
+        //'nchar',
+        //'nvarchar',
+        'numeric' => Stato_Column::FLOAT,
+        'set' => Stato_Column::STRING,
+        'smallint' => Stato_Column::INTEGER,
+        'text' => Stato_Column::TEXT,
+        //'time',
+        'timestamp' => Stato_Column::TIMESTAMP,
+        //'tinyblob',
+        'tinyint' => Stato_Column::INTEGER,
+        'tinytext' => Stato_Column::TEXT,
+        //'varbinary',
+        'varchar' => Stato_Column::STRING,
+        'year' => Stato_Column::STRING,
+    );
+    
+    public function getDsn(array $params)
+    {
+        $parts = array();
+        if (isset($params['unix_socket']))
+            $parts[] = "unix_socket={$params['unix_socket']}";
+        else {
+            if (!isset($params['host'])) throw new Exception('No host provided');
+            $parts[] = "host={$params['host']}";
+            if (isset($params['port'])) $parts[] = "port={$params['port']}";
+        }
+        if (!isset($params['dbname'])) throw new Exception('No db name provided');
+        $parts[] = "dbname={$params['dbname']}";
+        return 'mysql:'.implode(';', $parts);
+    }
+    
+    public function getConnection(array $params)
+    {
+        $dsn = $this->getDsn($params);
+        if (!isset($params['user'])) throw new Exception('No user provided');
+        $password = (isset($params['password'])) ? $params['password'] : null;
+        $connection = new PDO($dsn, $params['user'], $password);
+        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $connection;
+    }
+    
+    public function getTableNames(PDO $connection)
+    {
+        return $connection->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    }
+    
+    public function hasTable(PDO $connection, $tableName)
+    {
+        return in_array($tableName, $this->getTableNames($connection));
+    }
+    
+    public function reflectTable(PDO $connection, $tableName)
+    {
+        $columns = array();
+        $rs = $connection->query("SHOW COLUMNS FROM {$tableName}");
+        foreach ($rs as $row) {
+            $options = array();
+            preg_match('/^(?P<type>\w+)(\((?P<length>\d+)\))?$/', $row['Type'], $options);
+            $name = $row['Field'];
+            $type = $this->reflectColumnType($options['type']);
+            $options['nullable'] = ($row['Null'] == 'YES') ? true : false;
+            $options['primary_key'] = ($row['Key'] == 'PRI') ? true : false;
+            $options['auto_increment'] = (preg_match('/auto_increment/i', $row['Extra'])) ? true : false;
+            $options['default'] = (!empty($row['Default'])) ? $row['Default'] : null;
+            $columns[] = new Stato_Column($name, $type, $options);
+        }
+        return new Stato_Table($tableName, $columns);
+    }
+    
+    private function reflectColumnType($sqlColumn)
+    {
+        if (!isset(self::$columnTypes[$sqlColumn]))
+            throw new Stato_UnknownColumnType($sqlColumn);
+        return self::$columnTypes[$sqlColumn];
+    }
+}

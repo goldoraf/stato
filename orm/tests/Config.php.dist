@@ -1,0 +1,12 @@
+<?php
+
+return array
+(
+    'mysql' => array(
+        'host'     => 'localhost',
+        'user'     => 'stato',
+        'password' => null,
+        'dbname'   => 'stato_orm_tests',
+        'dsn'      => 'mysql:host=localhost;dbname=stato_orm_tests'
+    ),
+);
