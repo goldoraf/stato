@@ -16,6 +16,8 @@ abstract class Stato_AbstractDialectTestCase extends PHPUnit_Framework_TestCase
     
     abstract public function testGetDsn();
     
+    abstract public function testGetColumnSpecification();
+    
     public function __construct()
     {
         $config = include dirname(__FILE__) . '/../Config.php';

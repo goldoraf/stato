@@ -48,4 +48,24 @@ class Stato_MysqlDialectTest extends Stato_AbstractDialectTestCase
         $this->assertEquals('mysql:unix_socket=/tmp/mysql.sock;dbname=testdb',
             $this->getDialect()->getDsn(array('unix_socket' => '/tmp/mysql.sock', 'dbname' => 'testdb')));
     }
+    
+    public function testGetColumnSpecification()
+    {
+        $this->assertEquals('`product` varchar(255)', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('product', Stato_Column::STRING)));
+        $this->assertEquals('`product` varchar(50)', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('product', Stato_Column::STRING, array('length' => 50))));
+        $this->assertEquals('`product` varchar(50) DEFAULT \'test\'', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('product', Stato_Column::STRING, array('length' => 50, 'default' => 'test'))));
+        $this->assertEquals('`product` varchar(50) DEFAULT NULL', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('product', Stato_Column::STRING, array('length' => 50, 'default' => null))));
+        $this->assertEquals('`product` varchar(50) NOT NULL', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('product', Stato_Column::STRING, array('length' => 50, 'nullable' => false))));
+        $this->assertEquals('`flag` tinyint(1)', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('flag', Stato_Column::BOOLEAN)));
+        $this->assertEquals('`flag` tinyint(1) DEFAULT 1', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('flag', Stato_Column::BOOLEAN, array('default' => true))));
+        $this->assertEquals('`id` int(11) NOT NULL auto_increment', $this->getDialect()->getColumnSpecification(
+            new Stato_Column('id', Stato_Column::INTEGER, array('nullable' => false, 'auto_increment' => true))));
+    }
 }

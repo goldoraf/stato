@@ -34,7 +34,7 @@ class Stato_Column
         $this->type = $type;
         $this->primaryKey = $this->popOption($options, 'primary_key', false);
         $this->nullable = $this->popOption($options, 'nullable', !$this->primaryKey);
-        $this->default = $this->popOption($options, 'default', null);
+        $this->default = $this->popOption($options, 'default', false);
         $this->length = $this->popOption($options, 'length', null);
         $this->index = $this->popOption($options, 'index', false);
         $this->unique = $this->popOption($options, 'unique', false);
@@ -43,7 +43,7 @@ class Stato_Column
     
     private function popOption($options, $optionName, $optionDefault)
     {
-        if (!isset($options[$optionName])) return $optionDefault;
+        if (!array_key_exists($optionName, $options)) return $optionDefault;
         $optionValue = $options[$optionName];
         unset($options[$optionName]);
         return $optionValue;

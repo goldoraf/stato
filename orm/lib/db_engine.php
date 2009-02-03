@@ -78,4 +78,10 @@ interface Stato_Dialect
     public function hasTable(PDO $connection, $tableName);
     
     public function reflectTable(PDO $connection, $tableName);
+    
+    public function createTable(PDO $connection, Stato_Table $table);
+    
+    public function getColumnSpecification(Stato_Column $column);
+    
+    public function getDefaultValue(Stato_Column $column);
 }
