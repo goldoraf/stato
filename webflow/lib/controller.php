@@ -30,6 +30,24 @@ class Stato_Controller
     protected $response;
     
     /**
+     * Holds the chain of filters that are run before action code processing
+     * @var Stato_FilterChain
+     */
+    protected $beforeFilters;
+    
+    /**
+     * Holds the chain of filters that are run after action code processing
+     * @var Stato_FilterChain
+     */
+    protected $afterFilters;
+    
+    /**
+     * Holds the chain of filters that are run before and after action code processing
+     * @var Stato_FilterChain
+     */
+    protected $aroundFilters;
+    
+    /**
      * Default template rendering options
      * @var array
      */
@@ -66,6 +84,9 @@ class Stato_Controller
     {
         $this->request = $request;
         $this->response = $response;
+        $this->beforeFilters = new Stato_FilterChain();
+        $this->afterFilters  = new Stato_FilterChain();
+        $this->aroundFilters = new Stato_FilterChain();
     }
     
     /**
@@ -81,9 +102,16 @@ class Stato_Controller
         if (!$this->actionExists($action))
             throw new Stato_ActionNotFound($action);
             
-        $content = $this->$action();
+        $beforeResult = $this->beforeFilters->process($this, $action, 'before');
+        $this->aroundFilters->process($this, $action, 'before');
         
-        if (!$this->performedRespond) $this->respond($content);
+        if ($beforeResult !== false && !$this->performedRespond) {
+            $content = $this->$action();
+            if (!$this->performedRespond) $this->respond($content);
+        }
+        
+        $this->aroundFilters->process($this, $action, 'after');
+        $this->afterFilters->process($this, $action, 'after');
         
         return $this->response;
     }
@@ -97,6 +125,17 @@ class Stato_Controller
     public function addViewPath($path)
     {
         $this->viewPaths[] = $path;
+    }
+    
+    /**
+     * Runs a filter
+     * 
+     * @param string $method
+     * @return boolean
+     */
+    public function callFilter($method)
+    {
+        return $this->$method();
     }
     
     /**

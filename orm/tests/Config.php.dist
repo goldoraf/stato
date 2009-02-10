@@ -3,6 +3,7 @@
 return array
 (
     'mysql' => array(
+        'driver'   => 'mysql',
         'host'     => 'localhost',
         'user'     => 'stato',
         'password' => null,

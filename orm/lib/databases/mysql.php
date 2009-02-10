@@ -45,7 +45,7 @@ class Stato_MysqlDialect implements Stato_Dialect
         Stato_Column::FLOAT     => array('type' => 'float'),
         Stato_Column::DATETIME  => array('type' => 'datetime'),
         Stato_Column::DATE      => array('type' => 'date'),
-        Stato_Column::TIMESTAMP => array('type' => 'timestamp'),
+        Stato_Column::TIMESTAMP => array('type' => 'datetime'),
         Stato_Column::INTEGER   => array('type' => 'int', 'length' => 11),
         Stato_Column::BOOLEAN   => array('type' => 'tinyint', 'length' => 1)
     );
@@ -65,24 +65,9 @@ class Stato_MysqlDialect implements Stato_Dialect
         return 'mysql:'.implode(';', $parts);
     }
     
-    public function getConnection(array $params)
-    {
-        $dsn = $this->getDsn($params);
-        if (!isset($params['user'])) throw new Exception('No user provided');
-        $password = (isset($params['password'])) ? $params['password'] : null;
-        $connection = new PDO($dsn, $params['user'], $password);
-        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return $connection;
-    }
-    
     public function getTableNames(PDO $connection)
     {
         return $connection->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-    }
-    
-    public function hasTable(PDO $connection, $tableName)
-    {
-        return in_array($tableName, $this->getTableNames($connection));
     }
     
     public function reflectTable(PDO $connection, $tableName)
@@ -103,13 +88,23 @@ class Stato_MysqlDialect implements Stato_Dialect
         return new Stato_Table($tableName, $columns);
     }
     
-    public function createTable(PDO $connection, Stato_Table $table)
+    public function createTable(Stato_Table $table)
     {
         $columns = array();
         foreach ($table->columns as $column) $columns[] = $this->getColumnSpecification($column);
         if ($table->primaryKey) $columns[] = "PRIMARY KEY (`{$table->primaryKey}`)";
         $columns = implode(',', $columns);
-        $connection->exec("CREATE TABLE `{$table->name}` ({$columns})");
+        return "CREATE TABLE `{$table->name}` ({$columns})";
+    }
+    
+    public function dropTable($tableName)
+    {
+        return "DROP TABLE `{$tableName}`";
+    }
+    
+    public function addColumn($tableName, Stato_Column $column)
+    {
+        return "ALTER TABLE `{$tableName}` ADD ".$this->getColumnSpecification($column);
     }
     
     public function getColumnSpecification(Stato_Column $column)

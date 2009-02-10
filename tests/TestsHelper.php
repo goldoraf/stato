@@ -21,3 +21,6 @@ $path = array(
     get_include_path()
 );
 set_include_path(implode(PATH_SEPARATOR, $path));
+
+require_once dirname(__FILE__).'/TestEnv.php';
+require_once dirname(__FILE__).'/DatabaseTestCase.php';

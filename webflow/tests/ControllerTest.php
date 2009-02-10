@@ -5,6 +5,7 @@ require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
 require_once 'controller.php';
 require_once 'request.php';
 require_once 'response.php';
+require_once 'filters.php';
 require_once 'helpers/string.php';
 
 require_once 'files/foo_controller.php';
