@@ -6,6 +6,7 @@ require_once 'RequestTest.php';
 require_once 'ResponseTest.php';
 require_once 'ControllerTest.php';
 require_once 'FiltersTest.php';
+require_once 'RouteSetTest.php';
 require_once 'HelpersTests.php';
 
 class Stato_Webflow_AllTests
@@ -17,6 +18,7 @@ class Stato_Webflow_AllTests
         $suite->addTestSuite('Stato_ResponseTest');
         $suite->addTestSuite('Stato_ControllerTest');
         $suite->addTestSuite('Stato_FiltersTest');
+        $suite->addTestSuite('Stato_RouteSetTest');
         $suite->addTestSuite('Stato_Webflow_HelpersTests');
         return $suite;
     }
