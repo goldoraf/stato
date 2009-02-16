@@ -4,45 +4,46 @@ class Stato_RoutingError extends Exception {}
 
 class Stato_RouteSet
 {
+    private $routes;
+    
     private $recognizers;
+    
+    private $segmentSeparators;
     
     public function __construct()
     {
-        $this->recognizers = array();
+        $this->routes = array();
+        $this->segmentSeparators = array('/', '\.');
     }
     
-    public function addRoute($path, $args = array())
+    public function addRoute($path, $defaults = array(), $requirements = array())
     {
-        $requirements = array();
-        if (array_key_exists('requirements', $args)) {
-            $requirements = $args['requirements'];
-            unset($args['requirements']);
-        }
-        
         $params = array();
         $regexParts = array();
-        $segments = explode('/', $path);
+        $segments = preg_split('#'.implode('|', $this->segmentSeparators).'#', $path, -1, PREG_SPLIT_OFFSET_CAPTURE);
+        $firstOptionalSegment = 0;
         foreach ($segments as $k => $segment) {
-            if (preg_match('/^:(\w+)$/', $segment, $m)) {
+            $separator = ($segment[1] === 0) ? '' : $path[$segment[1]-1];
+            if (preg_match('/^:(\w+)$/', $segment[0], $m)) {
                 $param = $m[1];
-                $params[] = $param; // useful ?
-                if (array_key_exists($param, $args)) {
-                    $this->addRecognizer($regexParts, $args);
-                    unset($args[$param]);
-                }
+                $params[] = $param;
                 $requirement = (array_key_exists($param, $requirements)) 
                              ? $requirements[$param] : '\w+';
-                $regexParts[] = "(?P<{$param}>{$requirement})";
-                $this->addRecognizer($regexParts, $args);
+                $regexParts[] = "{$separator}(?P<{$param}>{$requirement})";
             } else {
-                $regexParts[] = $segment;
+                $regexParts[] = $separator.$segment[0];
+                $firstOptionalSegment = $k + 1;
             }
-            
-        }print_r($this->recognizers);
+        }
+        $route = new Stato_Route($regexParts, $params, $defaults);
+        $route->firstOptionalSegment = $firstOptionalSegment;
+        $this->routes[] = $route;
     }
     
     public function recognizePath($path)
     {
+        if (!isset($this->recognizers)) $this->buildRecognizers();
+        
         foreach ($this->recognizers as $regex => $defaults) {
             if (preg_match($regex, $path, $matches)) {
                 // Removes numeric keys from the matches array
@@ -56,9 +57,50 @@ class Stato_RouteSet
         throw new Stato_RoutingError("Recognition failed for $path");
     }
     
-    private function addRecognizer($regexParts, $defaults)
+    public function buildRecognizers()
     {
-        $regex = '|^'.implode('/', $regexParts).'$|';
+        $this->recognizers = array();
+        foreach ($this->routes as $route) {
+            $regexParts = array();
+            if ($route->firstOptionalSegment == 0)
+                    $this->addRecognizer($this->buildRegex($regexParts), $route->defaults);
+            foreach ($route->segments as $k => $segment) {
+                if ($k >= $route->firstOptionalSegment)
+                    $this->addRecognizer($this->buildRegex($regexParts), $route->defaults);
+                if (!empty($segment)) $regexParts[] = $segment;
+            }
+            $this->addRecognizer($this->buildRegex($regexParts), $route->defaults);
+        }
+    }
+    
+    public function setSegmentSeparators($separators)
+    {
+        $this->segmentSeparators = $separators;
+    }
+    
+    private function buildRegex($regexParts)
+    {
+        return '|^'.implode('', $regexParts).'$|';
+    }
+    
+    private function addRecognizer($regex, $defaults)
+    {
+        if (array_key_exists($regex, $this->recognizers)) return;
         $this->recognizers[$regex] = $defaults;
+    }
+}
+
+class Stato_Route
+{
+    public $segments;
+    public $params;
+    public $defaults;
+    public $firstOptionalSegment = 0;
+    
+    public function __construct($segments, $params, $defaults)
+    {
+        $this->segments = $segments;
+        $this->params = $params;
+        $this->defaults = $defaults;
     }
 }

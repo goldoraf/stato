@@ -66,7 +66,7 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
         );
     }
     
-    /*public function testEmptyPathRoute()
+    public function testEmptyPathRoute()
     {
         $set = new Stato_RouteSet();
         $set->addRoute('', array('controller' => 'home'));
@@ -87,12 +87,12 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'home'),
             $set->recognizePath('')
         );
-    }*/
+    }
     
     public function testRouteWithRequirement()
     {
         $set = new Stato_RouteSet();
-        $set->addRoute('conference/:year', array('controller' => 'confs', 'requirements' => array('year' => '\d{4}')));
+        $set->addRoute('conference/:year', array('controller' => 'confs'), array('year' => '\d{4}'));
         $this->assertEquals(
             array('controller'=>'confs', 'year' => 2009),
             $set->recognizePath('conference/2009')
@@ -101,7 +101,18 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
         try { $set->recognizePath('conference/foo'); } catch (Stato_RoutingError $e) { $recognized = false; }
         $this->assertFalse($recognized);
         $recognized = true;
-        try { $set->recognizePath('conference'); } catch (Stato_RoutingError $e) { $recognized = false; }
-        $this->assertFalse($recognized);
+        /*try { $set->recognizePath('conference'); } catch (Stato_RoutingError $e) { $recognized = false; }
+        $this->assertFalse($recognized);*/
+    }
+    
+    public function testRouteWithSubSegments()
+    {
+        $set = new Stato_RouteSet();
+        $set->setSegmentSeparators(array('/', '-'));
+        $set->addRoute('articles/:id-:slug', array('controller' => 'articles'), array('id' => '\d+', 'slug' => '[a-zA-Z_]+'));
+        $this->assertEquals(
+            array('controller'=>'articles', 'id' => 45, 'slug' => 'foo_bar'),
+            $set->recognizePath('articles/45-foo_bar')
+        );
     }
 }
