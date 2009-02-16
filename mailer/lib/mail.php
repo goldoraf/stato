@@ -34,8 +34,8 @@ class Stato_Mail
     
     public function __toString()
     {
-        return $this->getHeadersAsString($this->headers)
-        .self::$eol.$this->getBody();
+        return $this->prepareHeaders()
+        .self::$eol.self::$eol.$this->getBody();
     }
     
     public function isMultipart()
@@ -88,30 +88,6 @@ class Stato_Mail
         $this->parts[] = new Stato_MailAttachment($params);
     }
     
-    public function getBody()
-    {
-        if (!$this->isMultipart()) {
-            if (empty($this->parts)) {
-                throw new Exception('No body specified');
-            }
-            return $this->getHeadersAsString($this->parts[0]->getHeaders())
-            .self::$eol.$this->parts[0]->getContent();
-        } else {
-            $p = new Stato_MailPart(array('content_type' => 'multipart/mixed', 'content_disposition' => null,
-                                          'body' => 'This is a multi-part message in MIME format.'));
-            $body = $this->getHeadersAsString($p->getHeaders($this->boundary))
-            .self::$eol.$p->getContent();
-            
-            foreach ($this->parts as $part) {
-                $body.= $this->boundaryLine()
-                       .$this->getHeadersAsString($part->getHeaders())
-                       .self::$eol.$part->getContent();
-            }
-            $body.= $this->boundaryEnd();
-            return $body;
-        }
-    }
-    
     public function addHeader($name, $value, $encode = true)
     {
         if ($encode) $value = $this->encodeHeader($value);
@@ -121,21 +97,54 @@ class Stato_Mail
     
     public function getHeaders()
     {
-        return $this->headers;
+        if (!$this->isMultipart()) {
+            return array_merge($this->headers, $this->getFirstPart()->getHeaders());
+        } else {
+            $p = new Stato_MailPart(array('content_type' => 'multipart/mixed', 'content_disposition' => null,
+                                          'boundary' => $this->boundary, 'body' => ''));
+            return array_merge($this->headers, $p->getHeaders());
+        }
     }
     
-    public function getHeadersAsString($headers)
+    public function getBody()
     {
+        if (!$this->isMultipart()) {
+            return $this->getFirstPart()->getContent();
+        }
+        
+        $body = 'This is a multi-part message in MIME format.';
+        
+        foreach ($this->parts as $part) {
+            $body.= $this->boundaryLine()
+                   .$this->prepareHeaders($part->getHeaders())
+                   .self::$eol.self::$eol.$part->getContent();
+        }
+        $body.= $this->boundaryEnd();
+        
+        return $body;
+    }
+    
+    public function prepareHeaders($headers = null)
+    {
+        if ($headers === null) $headers = $this->getHeaders();
         $h = array();
         foreach ($headers as $k => $v)
             $h[] = "$k: ".$this->implodeHeaderValue($v);
         
-        return implode(self::$eol, $h).self::$eol;
+        return implode(self::$eol, $h);
     }
     
     public function setBoundary($boundary)
     {
         $this->boundary = $boundary;
+    }
+    
+    private function getFirstPart()
+    {
+        if (empty($this->parts)) {
+            throw new Exception('No body specified');
+        }
+        return $this->parts[0];
     }
     
     private function implodeHeaderValue($value)
@@ -175,4 +184,9 @@ class Stato_Mail
     {
         return self::$eol.'--'.$this->boundary.'--';
     }
+}
+
+interface Stato_IMailTransport
+{
+    public function send(Stato_Mail $mail);
 }

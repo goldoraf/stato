@@ -10,6 +10,8 @@ class Stato_MailPart
     
     protected $content_type = null;
     
+    protected $boundary = null;
+    
     protected $filename = null;
     
     protected $encoding = '8bit';
@@ -17,7 +19,7 @@ class Stato_MailPart
     public function __construct($params)
     {
         if (!isset($params['body']) || !isset($params['content_type']))
-            throw new Exception('Body and content-type are required parameters.');
+            throw new Exception('body and content_type are required parameters.');
         
         $ref = new ReflectionClass(get_class($this));
         foreach ($params as $k => $v)
@@ -33,15 +35,15 @@ class Stato_MailPart
         return Stato_Mime::encode($this->body, $this->encoding);
     }
     
-    public function getHeaders($boundary = null)
+    public function getHeaders()
     {
         $headers = array();
         
         $headers['Content-Type'] = $this->content_type;
-        if ($this->charset !== null && $boundary === null && !preg_match('/charset=/', $this->content_type)) 
+        if ($this->charset !== null && $this->boundary === null && !preg_match('/charset=/', $this->content_type)) 
             $headers['Content-Type'].= '; charset="'.$this->charset.'"';
-        if ($boundary !== null)
-            $headers['Content-Type'].= '; boundary="'.$boundary.'"';
+        if ($this->boundary !== null)
+            $headers['Content-Type'].= '; boundary="'.$this->boundary.'"';
             
         $headers['Content-Transfer-Encoding'] = $this->encoding;
         
