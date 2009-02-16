@@ -6,6 +6,8 @@ class Stato_RouteSet
 {
     private $routes;
     
+    private $routeSets;
+    
     private $recognizers;
     
     private $segmentSeparators;
@@ -13,7 +15,13 @@ class Stato_RouteSet
     public function __construct()
     {
         $this->routes = array();
+        $this->routeSets = array();
         $this->segmentSeparators = array('/', '\.');
+    }
+    
+    public function addRouteSet($endPointPath, Stato_RouteSet $set)
+    {
+        $this->routeSets[$endPointPath] = $set;
     }
     
     public function addRoute($path, $defaults = array(), $requirements = array())
@@ -25,11 +33,14 @@ class Stato_RouteSet
         foreach ($segments as $k => $segment) {
             $separator = ($segment[1] === 0) ? '' : $path[$segment[1]-1];
             if (preg_match('/^:(\w+)$/', $segment[0], $m)) {
-                $param = $m[1];
-                $params[] = $param;
+                $params[] = $param = $m[1];
                 $requirement = (array_key_exists($param, $requirements)) 
                              ? $requirements[$param] : '\w+';
                 $regexParts[] = "{$separator}(?P<{$param}>{$requirement})";
+            } elseif (preg_match('/^\*(\w+)$/', $segment[0], $m)) {
+                $params[] = $param = $m[1];
+                $regexParts[] = "{$separator}(?P<{$param}>[a-z0-9_/-]*)";
+                break;
             } else {
                 $regexParts[] = $separator.$segment[0];
                 $firstOptionalSegment = $k + 1;
@@ -71,6 +82,19 @@ class Stato_RouteSet
             }
             $this->addRecognizer($this->buildRegex($regexParts), $route->defaults);
         }
+        foreach ($this->routeSets as $endPointPath => $routeSet) {
+            $recognizers = $routeSet->getRecognizers();
+            foreach ($recognizers as $regex => $defaults) {
+                $newRegex = str_replace('|^', '|^'.$endPointPath, $regex);
+                $this->addRecognizer($newRegex, $defaults);
+            }
+        }
+    }
+    
+    public function getRecognizers()
+    {
+        if (!isset($this->recognizers)) $this->buildRecognizers();
+        return $this->recognizers;
     }
     
     public function setSegmentSeparators($separators)
