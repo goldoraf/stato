@@ -32,7 +32,7 @@ class Stato_MailPart
             /*&& preg_match('/format=flowed/', $this->content_type)*/)
             return $this->body;
             
-        return Stato_Mime::encode($this->body, $this->encoding);
+        return Stato_Mime::encode($this->body, $this->encoding, Stato_Mail::$lineLength, Stato_Mail::$eol);
     }
     
     public function getHeaders()

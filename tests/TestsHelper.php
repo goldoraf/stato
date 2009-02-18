@@ -23,5 +23,23 @@ $path = array(
 );
 set_include_path(implode(PATH_SEPARATOR, $path));
 
+/*
+ * Require testing tools
+ */
 require_once dirname(__FILE__).'/TestEnv.php';
 require_once dirname(__FILE__).'/DatabaseTestCase.php';
+
+/*
+ * Exclude tests dirs from code coverage
+ */
+$testsDirs = array(
+    'tests',
+    'mailer/tests',
+    'webflow/tests',
+    'orm/tests'
+);
+foreach ($testsDirs as $dir) {
+    PHPUnit_Util_Filter::addDirectoryToFilter(
+      dirname(__FILE__).'/../'.$dir, '.php'
+    );
+}
