@@ -1,6 +1,7 @@
 <?php
 
-class Stato_DbTestsConfigFileNotFound extends Exception {}
+class Stato_TestConfigNotFound extends Exception {}
+class Stato_TestsConfigFileNotFound extends Exception {}
 class Stato_DbDriverConfigNotFound extends Exception {}
 
 class Stato_TestEnv
@@ -12,16 +13,29 @@ class Stato_TestEnv
     {
         if (self::$testsConfig === null) {
             if (!file_exists(dirname(__FILE__) . '/TestConfig.php'))
-                throw new Stato_DbTestsConfigFileNotFound();
+                throw new Stato_TestsConfigFileNotFound();
             self::$testsConfig = include dirname(__FILE__) . '/TestConfig.php';
         }
         return self::$testsConfig;
     }
     
-    public static function getDbTestsConfig()
+    public static function getConfig($package, $class = null)
     {
         $conf = self::getTestsConfig();
-        return $conf['orm'];
+        if (!array_key_exists($package, $conf))
+            throw new Stato_TestConfigNotFound($package);
+        
+        if ($class === null) return $conf[$package];
+        
+        if (!array_key_exists($class, $conf[$package]))
+            throw new Stato_TestConfigNotFound($package.'::'.$class);
+            
+        return $conf[$package][$class];
+    }
+    
+    public static function getDbTestsConfig()
+    {
+        return self::getConfig('orm');
     }
     
     public static function getDbDriversToTest()

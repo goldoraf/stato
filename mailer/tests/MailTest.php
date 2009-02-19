@@ -237,7 +237,7 @@ EOT;
     
     public function testSend()
     {
-        Stato_Mail::setTransport(new Stato_DummyTransport());
+        Stato_Mail::setDefaultTransport(new Stato_DummyTransport());
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
 MIME-Version: 1.0

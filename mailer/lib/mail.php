@@ -24,7 +24,7 @@ class Stato_MailException extends Exception {}
  * the Stato_IMailTransport interface :
  * <code>
  * $transport = new Stato_SmtpTransport();
- * Stato_Mail::setTransport($transport);
+ * Stato_Mail::setDefaultTransport($transport);
  * $mail = new Stato_Mail();
  * ...
  * $mail->send();
@@ -51,6 +51,10 @@ class Stato_Mail
     
     protected $date;
     
+    protected $from;
+    
+    protected $recipients;
+    
     protected $headers;
     
     protected $parts;
@@ -60,7 +64,7 @@ class Stato_Mail
         self::$templateRoot = $path;
     }
     
-    public static function setTransport(Stato_IMailTransport $transport)
+    public static function setDefaultTransport(Stato_IMailTransport $transport)
     {
         self::$transport = $transport;
     }
@@ -74,6 +78,7 @@ class Stato_Mail
         $this->date = $date;
         $this->charset = $charset;
         $this->boundary = md5(uniqid(time()));
+        $this->recipients = array();
         $this->headers = array();
         $this->parts = array();
         $this->setDefaultHeaders();
@@ -85,10 +90,12 @@ class Stato_Mail
         .self::$eol.self::$eol.$this->getBody();
     }
     
-    public function send()
+    public function send($transport = null)
     {
-        $transport = (isset(self::$transport)) ? self::$transport 
-                                               : new Stato_SendmailTransport();
+        if ($transport === null) {
+            $transport = (isset(self::$transport)) ? self::$transport 
+                                                   : new Stato_SendmailTransport();
+        }
         return $transport->send($this);
     }
     
@@ -114,6 +121,7 @@ class Stato_Mail
     
     public function setFrom($adress, $name = null)
     {
+        $this->from = $adress;
         $this->addRecipient('From', $adress, $name);
     }
     
@@ -185,6 +193,16 @@ class Stato_Mail
     public function getSubject()
     {
         return $this->getHeaderValue('Subject');
+    }
+    
+    public function getReturnPath()
+    {
+        return $this->from;
+    }
+    
+    public function getRecipients()
+    {
+        return $this->recipients;
     }
     
     public function getHeaders($exclude = array())
@@ -292,11 +310,12 @@ class Stato_Mail
         return implode(', ', $value);
     }
     
-    private function addRecipient($header, $adress, $name)
+    private function addRecipient($header, $address, $name)
     {
-        $adress = strtr($adress, "\r\n\t", '???');
-        if ($name !== null) $adress = $this->encodeHeader($name)." <$adress>";
-        $this->addHeader($header, $adress, false);
+        $address = strtr($address, "\r\n\t", '???');
+        if (!in_array($address, $this->recipients)) $this->recipients[] = $address;
+        if ($name !== null) $address = $this->encodeHeader($name)." <$address>";
+        $this->addHeader($header, $address, false);
     }
     
     private function encodeHeader($text)

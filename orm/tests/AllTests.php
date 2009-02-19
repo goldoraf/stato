@@ -13,8 +13,11 @@ class Stato_Orm_AllTests
         $suite = new PHPUnit_Framework_TestSuite('Stato ORM');
         try {
             $driversToTest = Stato_TestEnv::getDbDriversToTest();
-        } catch (Stato_DbTestsConfigFileNotFound $e) {
-            $suite->markTestSuiteSkipped('You need a Config.php file to run ORM tests !');
+        } catch (Stato_TestsConfigFileNotFound $e) {
+            $suite->markTestSuiteSkipped('You need a TestConfig.php file to run ORM tests !');
+            return $suite;
+        } catch (Stato_TestConfigNotFound $e) {
+            $suite->markTestSuiteSkipped('Your TestConfig.php file does not appear to contain ORM tests params !');
             return $suite;
         }
         
