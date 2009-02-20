@@ -12,13 +12,14 @@ error_reporting(E_ALL | E_STRICT);
 date_default_timezone_set('Europe/Paris');
 
 /*
- * Prepend the Stato webflow/lib/, orm/lib/, mailer/lib/ and tests/ directories to the include_path
+ * Prepend the Stato libs directories to the include_path
  */
 $path = array(
     dirname(__FILE__),
     dirname(__FILE__).'/../webflow/lib',
     dirname(__FILE__).'/../orm/lib',
     dirname(__FILE__).'/../mailer/lib',
+    dirname(__FILE__).'/../i18n/lib',
     get_include_path()
 );
 set_include_path(implode(PATH_SEPARATOR, $path));
@@ -34,6 +35,7 @@ require_once dirname(__FILE__).'/DatabaseTestCase.php';
  */
 $testsDirs = array(
     'tests',
+    'i18n/tests',
     'mailer/tests',
     'webflow/tests',
     'orm/tests'
