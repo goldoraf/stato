@@ -20,6 +20,7 @@ $path = array(
     dirname(__FILE__).'/../orm/lib',
     dirname(__FILE__).'/../mailer/lib',
     dirname(__FILE__).'/../i18n/lib',
+    dirname(__FILE__).'/../cli/lib',
     get_include_path()
 );
 set_include_path(implode(PATH_SEPARATOR, $path));
@@ -35,6 +36,7 @@ require_once dirname(__FILE__).'/DatabaseTestCase.php';
  */
 $testsDirs = array(
     'tests',
+    'cli/tests',
     'i18n/tests',
     'mailer/tests',
     'webflow/tests',
