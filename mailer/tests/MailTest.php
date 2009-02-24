@@ -11,7 +11,6 @@ class Stato_MailTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {
-        Stato_Mail::setTemplateRoot(dirname(__FILE__).'/files');
         $this->date = new DateTime('2009-02-13 15:47:25', new DateTimeZone('Europe/Paris'));
     }
     
@@ -202,42 +201,8 @@ EOT;
         $this->assertEquals($body, $mail->getBody());
     }
     
-    public function testRenderBody()
-    {
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->renderBody('message_template', array('username' => 'raphael'));
-        $this->assertEquals('Hello raphael', $mail->getBody());
-    }
-    
-    public function testRenderHtmlBody()
-    {
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->renderHtmlBody('html_message_template', array('username' => 'raphael'));
-        $this->assertEquals('Hello <b>raphael</b>', $mail->getBody());
-    }
-    
-    public function testRenderMissingTemplate()
-    {
-        $this->setExpectedException('Stato_MailException');
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->renderBody('missing_template', array('username' => 'raphael'));
-    }
-    
-    public function testRenderBodyWhenTemplateRootNotSetShouldThrow()
-    {
-        $this->setExpectedException('Stato_MailException', 'Template root not set');
-        Stato_Mail::setTemplateRoot(null);
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->renderBody('message_template', array('username' => 'raphael'));
-    }
-    
     public function testSend()
     {
-        Stato_Mail::setDefaultTransport(new Stato_DummyTransport());
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
 MIME-Version: 1.0
@@ -251,7 +216,7 @@ EOT;
         $mail = new Stato_Mail($this->date);
         $mail->addTo('john.doe@fake.net', 'John Doe');
         $mail->setBody('test');
-        $this->assertEquals($message, $mail->send());
+        $this->assertEquals($message, $mail->send(new Stato_DummyTransport()));
     }
 }
 

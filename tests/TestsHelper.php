@@ -11,6 +11,8 @@ error_reporting(E_ALL | E_STRICT);
 
 date_default_timezone_set('Europe/Paris');
 
+mb_internal_encoding("UTF-8");
+
 /*
  * Prepend the Stato libs directories to the include_path
  */

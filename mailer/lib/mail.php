@@ -3,31 +3,14 @@
 class Stato_MailException extends Exception {}
 
 /**
- * Class for sending an email.
+ * Class representing an email message
  * 
- * This class allows you to send emails from your application using templates :
+ * 
  * <code>
- * Stato_Mail::setTemplateRoot('/path/to/msg/templates');
  * $mail = new Stato_Mail();
  * $mail->addTo('foo@bar.net');
- * $mail->renderBody('mytemplate', array('username' => 'foo'));
- * </code>
- * In the mail defined above, the template at /path/to/msg/templates/mytemplate.php 
- * would be used to render the mail body. Parameters passed as second argument 
- * would be available as variables in the template :
- * <code>
- * Hello <?php echo $username; ?>
- * </code>
- * 
- * By default, mails are sent with the Stato_SendmailTransport class which 
- * uses mail() PHP function, but you can use another transport implementing 
- * the Stato_IMailTransport interface :
- * <code>
- * $transport = new Stato_SmtpTransport();
- * Stato_Mail::setDefaultTransport($transport);
- * $mail = new Stato_Mail();
- * ...
- * $mail->send();
+ * $mail->setBody('hello world');
+ * $mail->send(new Stato_SendmailTransport());
  * </code>
  *
  * @package Stato
@@ -38,10 +21,6 @@ class Stato_Mail
     public static $eol = "\n";
     
     public static $lineLength = 72;
-    
-    protected static $templateRoot;
-    
-    protected static $transport;
     
     protected $mimeVersion = '1.0';
     
@@ -58,16 +37,6 @@ class Stato_Mail
     protected $headers;
     
     protected $parts;
-    
-    public static function setTemplateRoot($path)
-    {
-        self::$templateRoot = $path;
-    }
-    
-    public static function setDefaultTransport(Stato_IMailTransport $transport)
-    {
-        self::$transport = $transport;
-    }
     
     public function __construct(DateTime $date = null, $charset = 'UTF-8')
     {
@@ -90,12 +59,8 @@ class Stato_Mail
         .self::$eol.self::$eol.$this->getBody();
     }
     
-    public function send($transport = null)
+    public function send(Stato_IMailTransport $transport)
     {
-        if ($transport === null) {
-            $transport = (isset(self::$transport)) ? self::$transport 
-                                                   : new Stato_SendmailTransport();
-        }
         return $transport->send($this);
     }
     
@@ -138,16 +103,6 @@ class Stato_Mail
     public function setHtmlBody($text, $content_type = 'text/html')
     {
         $this->addPart(array('content_type' => $content_type, 'body' => $text));
-    }
-    
-    public function renderBody($templateName, $locals = array())
-    {
-        $this->setBody($this->renderTemplate($templateName, $locals));
-    }
-    
-    public function renderHtmlBody($templateName, $locals = array())
-    {
-        $this->setHtmlBody($this->renderTemplate($templateName, $locals));
     }
     
     public function addPart($params)
@@ -259,42 +214,6 @@ class Stato_Mail
         $this->boundary = $boundary;
     }
     
-    /**
-     * Renders a message template
-     * 
-     * @param string $templateName
-     * @param array $locals
-     * @return string
-     */
-    private function renderTemplate($templateName, $locals = array())
-    {
-        $templatePath = $this->getTemplatePath($templateName);
-        extract($locals);
-        ob_start();
-        include ($templatePath);
-        return ob_get_clean();
-    }
-    
-    /**
-     * Returns the absolute path of a template (if found)
-     * 
-     * @param string $templateName
-     * @return string
-     */
-    private function getTemplatePath($templateName)
-    {
-        if (file_exists($templateName)) return $templateName;
-        
-        if (!isset(self::$templateRoot))
-            throw new Stato_MailException('Template root not set');
-            
-        $templatePath = self::$templateRoot.'/'.$templateName.'.php';
-        if (!file_exists($templatePath) || !is_readable($templatePath))
-            throw new Stato_MailException("Missing template $templatePath");
-            
-        return $templatePath;
-    }
-    
     private function getFirstPart()
     {
         if (empty($this->parts)) {
@@ -320,11 +239,7 @@ class Stato_Mail
     
     private function encodeHeader($text)
     {
-        if (Stato_Mime::isPrintable($text)) return $text;
-        $quoted = Stato_Mime::encode(str_replace("\n", '', $text), 
-                                     Stato_Mime::QUOTED_PRINTABLE, self::$lineLength, self::$eol);
-        $quoted = str_replace(array('?', ' ', '_'), array('=3F', '=20', '=5F'), $quoted);
-        return "=?{$this->charset}?Q?{$quoted}?=";
+        return mb_encode_mimeheader($text, $this->charset, 'Q', self::$eol);
     }
     
     private function setDefaultHeaders()
