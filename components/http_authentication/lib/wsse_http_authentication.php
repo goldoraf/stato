@@ -50,7 +50,7 @@ class SWsseHttpAuthentication
     {
         try {
             $params = self::decode_params($request);
-            $result = call_user_func_array($login_callback, array($params['Username']));
+            $result = call_user_func($login_callback, $params['Username']);
             if ($result === false) return false;
             list($user, $pwd) = $result;
             $digest = base64_encode(sha1($params['Nonce'].$params['Created'].$pwd, true));
