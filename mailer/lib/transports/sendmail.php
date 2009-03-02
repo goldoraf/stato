@@ -6,9 +6,8 @@ class Stato_SendmailTransport implements Stato_IMailTransport
     {
         $to = $mail->getTo();
         $subject = $mail->getSubject();
-        $headers = $mail->getHeaders(array('To', 'Subject'));
         
-        $result = mail($to, $subject, $mail->getBody(), $mail->prepareHeaders($headers));
+        $result = mail($to, $subject, $mail->getContent(), $mail->getNonMatchingHeaderLines(array('To', 'Subject')));
         
         if (!$result) throw new Exception('Unable to send mail');
     }

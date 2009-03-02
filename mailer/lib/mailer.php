@@ -68,6 +68,12 @@ class Stato_Mailer
         return $mail;
     }
     
+    public function send($methodName, $args)
+    {
+        $mail = $this->prepare($methodName, $args);
+        return $mail->send($this->getTransport());
+    }
+    
     /**
      * Renders a message template
      * 
@@ -80,7 +86,7 @@ class Stato_Mailer
         $templatePath = $this->getTemplatePath($templateName);
         extract($locals);
         ob_start();
-        include ($templatePath);
+        include $templatePath;
         return ob_get_clean();
     }
     
@@ -106,6 +112,6 @@ class Stato_Mailer
     
     protected function getTransport()
     {
-        $transport = (isset(self::$transport)) ? self::$transport : new Stato_SendmailTransport();
+        return (isset(self::$transport)) ? self::$transport : new Stato_SendmailTransport();
     }
 }

@@ -3,6 +3,10 @@
 require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
 
 require_once 'MimeTest.php';
+require_once 'MimeEntityTest.php';
+require_once 'MimePartTest.php';
+require_once 'MimeAttachmentTest.php';
+require_once 'MimeMultipartTest.php';
 require_once 'MailTest.php';
 require_once 'SmtpTest.php';
 require_once 'MailerTest.php';
@@ -13,6 +17,10 @@ class Stato_Mailer_AllTests
     {
         $suite = new PHPUnit_Framework_TestSuite('Stato mailer');
         $suite->addTestSuite('Stato_MimeTest');
+        $suite->addTestSuite('Stato_MimeEntityTest');
+        $suite->addTestSuite('Stato_MimePartTest');
+        $suite->addTestSuite('Stato_MimeAttachmentTest');
+        $suite->addTestSuite('Stato_MimeMultipartTest');
         $suite->addTestSuite('Stato_MailTest');
         try {
             $conf = Stato_TestEnv::getConfig('mailer', 'smtp');

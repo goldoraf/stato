@@ -69,7 +69,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
         }
         $this->mail($mail->getReturnPath());
         foreach ($mail->getRecipients() as $recipient) $this->rcpt($recipient);
-        return $this->data($mail->prepareHeaders().Stato_Mail::$eol.$mail->getBody());
+        return $this->data($mail->__toString());
     }
     
     public function connect()

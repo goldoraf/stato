@@ -17,8 +17,8 @@ class Stato_SmtpTest extends PHPUnit_Framework_TestCase
         $mail = new Stato_Mail();
         $mail->setFrom('root@localhost');
         $mail->addTo('root@localhost', 'John Doe');
-        $mail->setBody('test');
-        $mail->setHtmlBody('<b>test</b>');
+        $mail->setText('test');
+        $mail->setHtmlText('<b>test</b>');
         $this->assertTrue($mail->send($this->smtp));
     }
 }

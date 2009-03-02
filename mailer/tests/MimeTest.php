@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
 
-require_once 'mime.php';
+require_once 'mime/mime.php';
 
 class Stato_MimeTest extends PHPUnit_Framework_TestCase
 {
