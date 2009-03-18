@@ -88,6 +88,8 @@ class Stato_Mail extends Stato_MimeEntity
         $content = new Stato_MimePart($content, $contentType, $encoding, $charset);
         if ($this->isMultipart()) 
             $this->content->addPart($content);
+        elseif ($this->content === null)
+            $this->setContent($content);
         else 
             $this->setContent(new Stato_MimeMultipart(Stato_MimeMultipart::ALTERNATIVE, array($this->content, $content)));
     }
