@@ -3,7 +3,8 @@
 require_once dirname(__FILE__) . '/../../../tests/TestsHelper.php';
 
 require_once 'connection.php';
-require_once 'column.php';
+require_once 'expression.php';
+require_once 'schema.php';
 require_once 'databases/mysql.php';
 
 class Stato_MysqlDialectTest extends PHPUnit_Framework_TestCase

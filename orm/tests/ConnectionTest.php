@@ -4,8 +4,8 @@ require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
 
 require_once 'connection.php';
 require_once 'databases/mysql.php';
-require_once 'column.php';
-require_once 'table.php';
+require_once 'expression.php';
+require_once 'schema.php';
 
 class Stato_ConnectionTest extends Stato_DatabaseTestCase
 {
