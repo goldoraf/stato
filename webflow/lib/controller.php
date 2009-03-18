@@ -194,6 +194,17 @@ class Stato_Controller
     }
     
     /**
+     * Sets a HTTP 1.1 Cache-Control header of "no-cache" so no caching 
+     * should occur by the browser or intermediate caches
+     *
+     * @return void
+     */
+    protected function expiresNow()
+    {
+        $this->response->setHeader('Cache-Control', 'no-cache');
+    }
+    
+    /**
      * Sets the response body and status code header
      *
      * @param mixed $data
