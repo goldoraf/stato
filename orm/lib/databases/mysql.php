@@ -65,6 +65,11 @@ class Stato_MysqlDialect implements Stato_Dialect
         return 'mysql:'.implode(';', $parts);
     }
     
+    public function getDriverOptions()
+    {
+        return array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8;');
+    }
+    
     public function getTableNames(PDO $connection)
     {
         return $connection->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);

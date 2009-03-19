@@ -44,7 +44,8 @@ class Stato_Connection
         $dialectClass = "Stato_{$this->driver}Dialect";
         $this->dialect = new $dialectClass();
         $this->connection = new PDO($this->dialect->getDsn($this->config), 
-                                    $this->config['user'], $this->config['password']);
+                                    $this->config['user'], $this->config['password'],
+                                    $this->dialect->getDriverOptions());
     }
     
     /**
@@ -93,6 +94,8 @@ class Stato_Connection
 interface Stato_Dialect
 {
     public function getDsn(array $params);
+    
+    public function getDriverOptions();
     
     public function getTableNames(PDO $connection);
     
