@@ -8,7 +8,7 @@ class Stato_DefaultCompiler
 {
     protected static $visitables = array(
         'TableClause', 'Table', 'Alias', 'Insert', 'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
-        'Grouping', 'ClauseColumn', 'BindParam', 'Null'
+        'Grouping', 'ClauseColumn', 'Column', 'BindParam', 'Null', 'Join'
     );
     
     protected static $operators = array(
@@ -83,6 +83,12 @@ class Stato_DefaultCompiler
         return $this->compile($alias->table, $bindParams).' AS '.$alias->alias;
     }
     
+    protected function visitJoin(Stato_Join $join, array &$bindParams)
+    {
+        return $this->compile($join->left, $bindParams).(($join->isOuter) ? ' LEFT OUTER JOIN ' : ' JOIN ')
+        .$this->compile($join->right, $bindParams).' ON '.$this->compile($join->onClause, $bindParams);
+    }
+    
     protected function visitExpression(Stato_Expression $clause, array &$bindParams)
     {
         $op = $this->getOperatorString($clause->op);
@@ -116,6 +122,11 @@ class Stato_DefaultCompiler
     }
     
     protected function visitClauseColumn(Stato_ClauseColumn $column, array &$bindParams)
+    {
+        return $this->preparer->formatColumn($column);
+    }
+    
+    protected function visitColumn(Stato_Column $column, array &$bindParams)
     {
         return $this->preparer->formatColumn($column);
     }

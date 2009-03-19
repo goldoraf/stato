@@ -18,7 +18,7 @@ class Stato_DefaultCompilerTest extends PHPUnit_Framework_TestCase
             new Stato_Column('lastname', Stato_Column::STRING),
         ));
          $this->addresses = new Stato_Table('addresses', array(
-            new Stato_Column('user_id', Stato_Column::INTEGER),
+            new Stato_Column('user_id', Stato_Column::INTEGER, array('foreign_key' => 'users.id')),
             new Stato_Column('email_address', Stato_Column::STRING),
         ));
     }
@@ -127,5 +127,15 @@ class Stato_DefaultCompilerTest extends PHPUnit_Framework_TestCase
         $exp = and_($this->users->firstname->eq('John'), $this->users->lastname->eq('Doe'), $or, not_($this->users->id->gt(5)));
         $this->assertEquals('users.firstname = :firstname_1 AND users.lastname = :lastname_1 AND (addresses.email_address = :email_address_1 OR addresses.email_address = :email_address_2) AND users.id <= :id_1', $exp->compile()->__toString());
         $this->assertEquals(array(':email_address_1' => 'john@doe.net', ':email_address_2' => 'doe@john.net', ':firstname_1' => 'John', ':lastname_1' => 'Doe', ':id_1' => 5), $exp->compile()->params);
+    }
+    
+    public function testJoins()
+    {
+        $this->assertEquals('users JOIN addresses ON addresses.email_address LIKE users.firstname',
+            $this->users->join($this->addresses, $this->addresses->email_address->like($this->users->firstname))->__toString());
+        $this->assertEquals('users LEFT OUTER JOIN addresses ON addresses.email_address LIKE users.firstname',
+            $this->users->join($this->addresses, $this->addresses->email_address->like($this->users->firstname), true)->__toString());
+        $this->assertEquals('users JOIN addresses ON users.id = addresses.user_id',
+            $this->users->join($this->addresses)->__toString());
     }
 }

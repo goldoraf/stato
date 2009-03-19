@@ -2,6 +2,8 @@
 
 class Stato_UnknownColumn extends Exception {}
 
+class Stato_JoinConditionError extends Exception {}
+
 class Stato_Operators
 {
     const EQ = 'eq';
@@ -108,6 +110,11 @@ class Stato_TableClause extends Stato_ClauseElement
     public function alias($as)
     {
         return new Stato_Alias($this, $as);
+    }
+    
+    public function join(Stato_TableClause $right, Stato_Expression $onClause = null, $isOuter = false)
+    {
+        return new Stato_Join($this, $right, $onClause, $isOuter);
     }
 }
 
@@ -346,4 +353,50 @@ class Stato_BindParam extends Stato_ClauseElement
 class Stato_Null extends Stato_ClauseElement
 {
     
+}
+
+class Stato_Join extends Stato_ClauseElement
+{
+    public $left;
+    public $right;
+    public $onClause;
+    public $isOuter;
+    
+    public function __construct(Stato_Table $left, Stato_Table $right, Stato_Expression $onClause = null, $isOuter = false)
+    {
+        $this->left = $left;
+        $this->right = $right;
+        $this->isOuter = $isOuter;
+        
+        if ($onClause === null)
+            $onClause = $this->getJoinCondition($left, $right);
+            
+        $this->onClause = $onClause;
+    }
+    
+    private function getJoinCondition(Stato_Table $a, Stato_Table $b)
+    {
+        $crit = array();
+        foreach ($b->foreignKeys as $fk) {
+            $col = $fk->getReferentColumn($a);
+            if ($col) {
+                $crit[] = $col->eq($fk->getParent());
+            }
+        }
+        if ($a != $b) {
+            foreach ($a->foreignKeys as $fk) {
+                $col = $fk->getReferentColumn($b);
+                if ($col) {
+                    $crit[] = $col->eq($fk->getParent());
+                }
+            }
+        }
+        if (count($crit) == 0)
+            throw new Stato_JoinConditionError("Can't find any foreign key relationships "
+            ."between '{$a->name}' and '{$b->name}'");
+        elseif (count($crit) > 1)
+            return new Stato_ExpressionList($crit);
+        
+        return $crit[0];
+    }
 }
