@@ -17,7 +17,7 @@ class Stato_ControllerTest extends PHPUnit_Framework_TestCase
         $this->request = new Stato_Request();
         $this->response = new Stato_Response();
         $this->controller = new FooController($this->request, $this->response);
-        $this->controller->addViewPath(dirname(__FILE__).'/files/views');
+        $this->controller->addViewDir(dirname(__FILE__).'/files/views');
     }
     
     public function testRespond()

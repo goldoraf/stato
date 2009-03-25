@@ -65,7 +65,7 @@ class Stato_Controller
      * Directories that contain templates
      * @var array
      */
-    private $viewPaths = array();
+    private $viewDirs = array();
     
     /**
      * Whether or not the respond method has been called
@@ -122,9 +122,9 @@ class Stato_Controller
      * @param string $path
      * @return void
      */
-    public function addViewPath($path)
+    public function addViewDir($dir)
     {
-        $this->viewPaths[] = $path;
+        $this->viewDirs[] = $dir;
     }
     
     /**
@@ -443,8 +443,8 @@ class Stato_Controller
     private function getTemplatePath($template)
     {
         if (file_exists($template)) return $template;
-        foreach ($this->viewPaths as $path) {
-            $possiblePath = "{$path}/{$template}.php";
+        foreach ($this->viewDirs as $dir) {
+            $possiblePath = "{$dir}/{$template}.php";
             if (file_exists($possiblePath)) return $possiblePath;
         }
         throw new Stato_MissingTemplate($template);
