@@ -45,29 +45,29 @@ class FooController extends Stato_Controller
     
     public function renderSpecificFile()
     {
-        return $this->render(array('template' => dirname(__FILE__).'/views/foo.php'));
+        return $this->render(array('template' => dirname(__FILE__).'/../views/foo.php'));
     }
     
     public function renderSpecificFileWithAssigns()
     {
         $this->username = 'raphael';
-        return $this->render(array('template' => dirname(__FILE__).'/views/bar.php'));
+        return $this->render(array('template' => dirname(__FILE__).'/../views/bar.php'));
     }
     
     public function renderSpecificFileWithLayout()
     {
-        return $this->render(array('template' => dirname(__FILE__).'/views/foo.php', 'layout' => 'main'));
+        return $this->render(array('template' => dirname(__FILE__).'/../views/foo.php', 'layout' => 'main'));
     }
     
     public function renderSpecificFileWithAssignsAndLayout()
     {
         $this->username = 'raphael';
-        return $this->render(array('template' => dirname(__FILE__).'/views/bar.php', 'layout' => 'main'));
+        return $this->render(array('template' => dirname(__FILE__).'/../views/bar.php', 'layout' => 'main'));
     }
     
     public function renderMissingFile()
     {
-        return $this->render(array('template' => dirname(__FILE__).'/views/dummy.php'));
+        return $this->render(array('template' => dirname(__FILE__).'/../views/dummy.php'));
     }
     
     public function renderSpecificTemplate()

@@ -8,7 +8,7 @@ require_once 'response.php';
 require_once 'filters.php';
 require_once 'helpers/string.php';
 
-require_once 'files/controllers_with_filters.php';
+require_once 'files/controllers/controllers_with_filters.php';
 
 class Stato_FiltersTest extends PHPUnit_Framework_TestCase
 {

@@ -8,7 +8,7 @@ require_once 'response.php';
 require_once 'filters.php';
 require_once 'helpers/string.php';
 
-require_once 'files/foo_controller.php';
+require_once 'files/controllers/foo_controller.php';
 
 class Stato_ControllerTest extends PHPUnit_Framework_TestCase
 {

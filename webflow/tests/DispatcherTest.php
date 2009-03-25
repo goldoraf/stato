@@ -22,7 +22,7 @@ class Stato_DispatcherTest extends PHPUnit_Extensions_OutputTestCase
         $this->routeset = new Stato_RouteSet();
         $this->routeset->addRoute(':controller/:action/:id');
         $this->dispatcher = new Stato_Dispatcher($this->routeset);
-        $this->dispatcher->addControllerDir(dirname(__FILE__).'/files');
+        $this->dispatcher->addControllerDir(dirname(__FILE__).'/files/controllers');
     }
     
     public function testSimpleDispatch()
