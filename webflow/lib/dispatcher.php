@@ -1,6 +1,7 @@
 <?php
 
 class Stato_MissingController extends Exception {}
+class Stato_MissingControllerClass extends Exception {}
 
 class Stato_Dispatcher
 {
@@ -34,7 +35,11 @@ class Stato_Dispatcher
         $controllerPath = $this->getControllerPath($controllerName);
         
         require_once $controllerPath;
+        if (!class_exists($controllerClass))
+            throw new Stato_MissingControllerClass();
+            
         $controller = new $controllerClass($this->request, $this->response);
+        $controller->addViewDir(dirname($controllerPath).'/../views');
         $controller->run();
         
         $this->response->send();
