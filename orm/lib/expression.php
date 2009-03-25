@@ -8,6 +8,7 @@ class Stato_Operators
 {
     const EQ = 'eq';
     const NE = 'ne';
+    const IN = 'in';
     const IS = 'is';
     const ISNOT = 'isnot';
     const LT = 'lt';
@@ -19,6 +20,8 @@ class Stato_Operators
     const AND_ = 'and';
     const OR_ = 'or';
     const NOT_ = 'not';
+    const ASC = 'asc';
+    const DESC = 'desc';
     
     private static $opInverses = array(
         self::EQ => self::NE,
@@ -57,12 +60,41 @@ abstract class Stato_ClauseElement
     {
         throw new Exception('Not implemented');
     }
+    
+    protected function inheritsFrom($a, $b)
+    {
+        if (!is_object($a)) return false;
+        $ref = new ReflectionObject($a);
+        return $ref->isSubclassOf(new ReflectionClass($b));
+    }
+}
+
+abstract class Stato_Statement extends Stato_ClauseElement
+{
+    
+}
+
+/**
+ * Describes a list of clauses, separated by an operator.
+ * 
+ * Defaults to comma-separated list.
+ */
+class Stato_ClauseList extends Stato_ClauseElement
+{
+    public $clauses;
+    public $separator;
+    
+    public function __construct(array $clauses, $separator = ',')
+    {
+        $this->clauses = $clauses;
+        $this->separator = $separator;
+    }
 }
 
 class Stato_TableClause extends Stato_ClauseElement
 {
-    public $name;
-    public $columns;
+    protected $name;
+    protected $columns;
     
     public function __construct($name, $columns = null)
     {
@@ -74,9 +106,19 @@ class Stato_TableClause extends Stato_ClauseElement
     public function __get($columnName)
     {
         if (!array_key_exists($columnName, $this->columns))
-            throw new Stato_UnknownColumn("{$columnName} in {$this->table} table");
+            throw new Stato_UnknownColumn("{$columnName} in {$this->name} table");
         
         return new Stato_ClauseColumn($columnName, $this);
+    }
+    
+    public function getName()
+    {
+        return $this->name;
+    }
+    
+    public function getColumns()
+    {
+        return $this->columns;
     }
     
     public function addColumn(Stato_Column $column)
@@ -116,6 +158,11 @@ class Stato_TableClause extends Stato_ClauseElement
     {
         return new Stato_Join($this, $right, $onClause, $isOuter);
     }
+    
+    public function outerJoin(Stato_TableClause $right, Stato_Expression $onClause = null)
+    {
+        return $this->join($right, $onClause, true);
+    }
 }
 
 class Stato_Alias extends Stato_TableClause
@@ -134,7 +181,7 @@ class Stato_Alias extends Stato_TableClause
     }
 }
 
-class Stato_Insert extends Stato_ClauseElement
+class Stato_Insert extends Stato_Statement
 {
     public $table;
     public $values;
@@ -152,25 +199,31 @@ class Stato_Insert extends Stato_ClauseElement
     }
 }
 
-class Stato_Select extends Stato_ClauseElement
+class Stato_Select extends Stato_Statement
 {
-    private $columns;
+    public $whereClause;
+    public $orderByClause;
+    public $offset;
+    public $limit;
+    public $distinct;
     
+    private $columns;
     private $froms;
     
     public function __construct(array $columns, $whereClause = null)
     {
         $this->froms = array();
         $this->columns = array();
+        $this->offset = null;
+        $this->limit = null;
+        $this->whereClause = $whereClause;
+        $this->orderByClause = null;
         
         foreach ($columns as $c) {
             if ($c instanceof Stato_ClauseColumn)
                 $this->columns[] = $c;
-            else {
-                $ref = new ReflectionObject($c);
-                if ($ref->isSubclassOf(new ReflectionClass('Stato_TableClause')))
-                    $this->columns = array_merge($this->columns, $c->getClauseColumns());
-            }
+            elseif ($this->inheritsFrom($c, 'Stato_TableClause'))
+                $this->columns = array_merge($this->columns, $c->getClauseColumns());
         }
         
         foreach ($this->columns as $c) 
@@ -185,6 +238,56 @@ class Stato_Select extends Stato_ClauseElement
     public function getFroms()
     {
         return $this->froms;
+    }
+    
+    public function distinct()
+    {
+        $this->distinct = true;
+        return $this;
+    }
+    
+    public function where(Stato_ClauseElement $whereClause)
+    {
+        if (!$whereClause instanceof Stato_Expression && !$whereClause instanceof Stato_ExpressionList)
+            throw new Exception('where() argument must be instance of Stato_Expression or Stato_ExpressionList');
+        
+        $this->appendWhereClause($whereClause);
+        return $this;
+    }
+    
+    public function orderBy()
+    {
+        $clauses = func_get_args();
+        $this->appendOrderByClause($clauses);
+        return $this;
+    }
+    
+    public function limit($limit)
+    {
+        $this->limit = $limit;
+        return $this;
+    }
+    
+    public function offset($offset)
+    {
+        $this->offset = $offset;
+        return $this;
+    }
+    
+    private function appendWhereClause(Stato_ClauseElement $whereClause)
+    {
+        if ($this->whereClause === null)
+            $this->whereClause = $whereClause;
+        else
+            $this->whereClause = new Stato_ExpressionList($this->whereClause, $whereClause);
+    }
+    
+    private function appendOrderByClause($clauses)
+    {
+        if ($this->orderByClause === null)
+            $this->orderByClause = new Stato_ClauseList($clauses);
+        else
+            $this->orderByClause = new Stato_ClauseList($this->orderByClause->clauses + $clauses);
     }
 }
 
@@ -263,6 +366,27 @@ class Stato_ClauseColumn extends Stato_ClauseElement
         return $this->compare(Stato_Operators::LIKE, '%'.(string) $other.'%');
     }
     
+    /**
+     * Produces the clause IN (...)
+     */
+    public function in($other)
+    {
+        $params = array();
+        foreach ($other as $o) $params[] = $this->bindParam($o);
+        $other = new Stato_Grouping(new Stato_ClauseList($params));
+        return $this->compare(Stato_Operators::IN, $other);
+    }
+    
+    public function asc()
+    {
+        return new Stato_UnaryExpression($this, false, Stato_Operators::ASC);
+    }
+    
+    public function desc()
+    {
+        return new Stato_UnaryExpression($this, false, Stato_Operators::DESC);
+    }
+    
     protected function compare($op, $other)
     {
         if ($other === null)
@@ -274,9 +398,14 @@ class Stato_ClauseColumn extends Stato_ClauseElement
     
     protected function checkLiteral($other)
     {
-        if (!$other instanceof Stato_ClauseColumn)
-            return new Stato_BindParam(':'.$this->name, $other);
+        if (!$this->inheritsFrom($other, 'Stato_ClauseElement'))
+            $other = $this->bindParam($other);
         return $other;
+    }
+    
+    protected function bindParam($other)
+    {
+        return new Stato_BindParam(':'.$this->name, $other);
     }
 }
 
@@ -325,6 +454,11 @@ class Stato_ExpressionList extends Stato_ClauseElement
     {
         $this->expressions = $expressions;
         $this->operator = $operator;
+    }
+    
+    public function append(Stato_ClauseElement $elt)
+    {
+        $this->expressions[] = $elt;
     }
 }
 
@@ -377,14 +511,14 @@ class Stato_Join extends Stato_ClauseElement
     private function getJoinCondition(Stato_Table $a, Stato_Table $b)
     {
         $crit = array();
-        foreach ($b->foreignKeys as $fk) {
+        foreach ($b->getForeignKeys() as $fk) {
             $col = $fk->getReferentColumn($a);
             if ($col) {
                 $crit[] = $col->eq($fk->getParent());
             }
         }
         if ($a != $b) {
-            foreach ($a->foreignKeys as $fk) {
+            foreach ($a->getForeignKeys() as $fk) {
                 $col = $fk->getReferentColumn($b);
                 if ($col) {
                     $crit[] = $col->eq($fk->getParent());
@@ -393,7 +527,7 @@ class Stato_Join extends Stato_ClauseElement
         }
         if (count($crit) == 0)
             throw new Stato_JoinConditionError("Can't find any foreign key relationships "
-            ."between '{$a->name}' and '{$b->name}'");
+            ."between '".$a->getName()."' and '".$b->getName()."'");
         elseif (count($crit) > 1)
             return new Stato_ExpressionList($crit);
         

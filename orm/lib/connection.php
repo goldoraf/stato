@@ -64,6 +64,23 @@ class Stato_Connection
         return $this->connection;
     }
     
+    public function execute($stmt)
+    {
+        if (!is_string($stmt)) {
+            if (!$stmt instanceof Stato_Statement)
+                throw new Exception("Can't execute instances of ".get_class($stmt));
+            $stmt = $stmt->compile();
+            if (empty($stmt->params)) return $this->connection->exec($stmt);
+            
+            $params = $stmt->params;
+            $stmt = $this->connection->prepare($stmt);
+            $stmt->execute($params);
+            return $stmt;
+        }
+        
+        return $this->connection->exec($stmt);
+    }
+    
     public function getTableNames()
     {
         return $this->dialect->getTableNames($this->connection);
@@ -86,7 +103,7 @@ class Stato_Connection
     
     public function dropTable($table)
     {
-        $tableName = (is_object($table)) ? $table->name : $table;
+        $tableName = (is_object($table)) ? $table->getName() : $table;
         return $this->connection->exec($this->dialect->dropTable($tableName));
     }
 }

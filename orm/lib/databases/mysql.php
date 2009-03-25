@@ -96,10 +96,11 @@ class Stato_MysqlDialect implements Stato_Dialect
     public function createTable(Stato_Table $table)
     {
         $columns = array();
-        foreach ($table->columns as $column) $columns[] = $this->getColumnSpecification($column);
-        if ($table->primaryKey) $columns[] = "PRIMARY KEY (`{$table->primaryKey}`)";
+        $name = $table->getName();
+        foreach ($table->getColumns() as $column) $columns[] = $this->getColumnSpecification($column);
+        if ($pk = $table->getPrimaryKey()) $columns[] = "PRIMARY KEY (`{$pk}`)";
         $columns = implode(',', $columns);
-        return "CREATE TABLE `{$table->name}` ({$columns})";
+        return "CREATE TABLE `{$name}` ({$columns})";
     }
     
     public function dropTable($tableName)

@@ -52,10 +52,10 @@ class Stato_Column extends Stato_ClauseColumn
 
 class Stato_Table extends Stato_TableClause
 {
-    public $autoload;
-    public $primaryKey;
-    public $foreignKeys;
-    public $constraints;
+    protected $autoload;
+    protected $primaryKey;
+    protected $foreignKeys;
+    protected $constraints;
     
     public function __construct($name, $columns = null)
     {
@@ -84,6 +84,21 @@ class Stato_Table extends Stato_TableClause
     {
         if (!array_key_exists($columnName, $this->columns)) return false;
         return $this->columns[$columnName];
+    }
+    
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+    
+    public function getPrimaryKeyColumn()
+    {
+        return $this->columns[$this->primaryKey];
+    }
+    
+    public function getForeignKeys()
+    {
+        return $this->foreignKeys;
     }
 }
 

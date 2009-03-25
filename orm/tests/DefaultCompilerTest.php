@@ -42,39 +42,6 @@ class Stato_DefaultCompilerTest extends PHPUnit_Framework_TestCase
         $this->users->insert()->values(array('foo' => 'bar'))->__toString();
     }
     
-    public function testSelect()
-    {
-        $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users',
-            $this->users->select()->__toString()
-        );
-        $this->assertEquals(
-            'SELECT users.firstname, users.lastname FROM users',
-            $this->users->select(array('firstname', 'lastname'))->__toString()
-        );
-        $this->assertEquals(
-            'SELECT users.firstname, users.lastname FROM users',
-            $this->users->select(array($this->users->firstname, $this->users->lastname))->__toString()
-        );
-        $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname, addresses.user_id, addresses.email_address FROM users, addresses',
-            (string) new Stato_Select(array($this->users, $this->addresses))
-        );
-    }
-    
-    public function testAlias()
-    {
-        $this->assertEquals(
-            'SELECT u.firstname, u.lastname FROM users AS u',
-            $this->users->alias('u')->select(array('firstname', 'lastname'))->__toString()
-        );
-        $u = $this->users->alias('u');
-        $this->assertEquals(
-            'SELECT u.firstname, u.lastname FROM users AS u',
-            (string) new Stato_Select(array($u->firstname, $u->lastname))
-        );
-    }
-    
     public function testOperators()
     {
         $this->assertEquals('users.id FOO :id_1', $this->users->id->op('FOO', 1)->__toString());
@@ -86,6 +53,7 @@ class Stato_DefaultCompilerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('users.id <= :id_1', $this->users->id->le(1)->__toString());
         $this->assertEquals('users.id > :id_1', $this->users->id->gt(1)->__toString());
         $this->assertEquals('users.id >= :id_1', $this->users->id->ge(1)->__toString());
+        $this->assertEquals('users.id IN (:id_1,:id_2,:id_3)', $this->users->id->in(array(1,2,3))->__toString());
         $this->assertEquals('users.lastname LIKE :lastname_1', $this->users->lastname->like('D%')->__toString());
         
         $compiled = $this->users->lastname->startswith('D')->compile();
@@ -137,5 +105,70 @@ class Stato_DefaultCompilerTest extends PHPUnit_Framework_TestCase
             $this->users->join($this->addresses, $this->addresses->email_address->like($this->users->firstname), true)->__toString());
         $this->assertEquals('users JOIN addresses ON users.id = addresses.user_id',
             $this->users->join($this->addresses)->__toString());
+    }
+    
+    public function testSelect()
+    {
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users',
+            $this->users->select()->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.firstname, users.lastname FROM users',
+            $this->users->select(array('firstname', 'lastname'))->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.firstname, users.lastname FROM users',
+            $this->users->select(array($this->users->firstname, $this->users->lastname))->__toString()
+        );
+        $this->assertEquals(
+            'SELECT DISTINCT users.lastname FROM users',
+            $this->users->select(array($this->users->lastname))->distinct()->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname, addresses.user_id, addresses.email_address FROM users, addresses',
+            (string) new Stato_Select(array($this->users, $this->addresses))
+        );
+        $this->assertEquals(
+            'SELECT u.firstname, u.lastname FROM users AS u',
+            $this->users->alias('u')->select(array('firstname', 'lastname'))->__toString()
+        );
+        $u = $this->users->alias('u');
+        $this->assertEquals(
+            'SELECT u.firstname, u.lastname FROM users AS u',
+            (string) new Stato_Select(array($u->firstname, $u->lastname))
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.id = :id_1',
+            $this->users->select()->where($this->users->id->eq(1))->__toString()
+        );
+    }
+    
+    public function testOrderBy()
+    {
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id',
+            $this->users->select()->orderBy($this->users->id)->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id ASC,users.firstname DESC',
+            $this->users->select()->orderBy($this->users->id->asc(), $this->users->firstname->desc())->__toString()
+        );
+    }
+    
+    public function testOffsetAndLimit()
+    {
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users LIMIT 10',
+            $this->users->select()->limit(10)->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users LIMIT -1 OFFSET 10',
+            $this->users->select()->offset(10)->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users LIMIT 10 OFFSET 10',
+            $this->users->select()->limit(10)->offset(10)->__toString()
+        );
     }
 }

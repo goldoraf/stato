@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
 
 require_once 'DefaultCompilerTest.php';
 require_once 'ConnectionTest.php';
-//require_once 'StatementTest.php';
+require_once 'QueryTest.php';
 
 class Stato_Orm_AllTests
 {
@@ -37,10 +37,25 @@ class Stato_Orm_AllTests
             
             $driverSuite->addTestSuite('Stato_ConnectionTest');
             
+            self::createTestDatabase();
+            
+            $driverSuite->addTestSuite('Stato_QueryTest');
+            
             $suite->addTestSuite($driverSuite);
         }
         
-        //$suite->addTestSuite('Stato_StatementTestSuite');
         return $suite;
+    }
+    
+    private static function createTestDatabase()
+    {
+        $config = Stato_TestEnv::getDbDriverConfig();
+        $connection = new Stato_Connection($config);
+        $dbname = $config['dbname'];
+        $connection->execute("DROP DATABASE IF EXISTS $dbname");
+        $connection->execute("CREATE DATABASE $dbname");
+        $connection->execute("USE $dbname");
+        $tables = include_once 'files/schema.php';
+        foreach ($tables as $table) $connection->createTable($table);
     }
 }
