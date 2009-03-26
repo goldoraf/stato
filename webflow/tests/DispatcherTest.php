@@ -40,16 +40,16 @@ class Stato_DispatcherTest extends PHPUnit_Extensions_OutputTestCase
         $this->dispatcher->dispatch($this->request, $this->response);
     }
     
-    public function testMissingController()
+    public function testMissingControllerFile()
     {
-        $this->setExpectedException('Stato_MissingController');
+        $this->setExpectedException('Stato_ControllerNotFound');
         $this->request->setRequestUri('/app/index.php/test/foo');
         $this->dispatcher->dispatch($this->request, $this->response);
     }
     
     public function testMissingControllerClass()
     {
-        $this->setExpectedException('Stato_MissingControllerClass');
+        $this->setExpectedException('Stato_ControllerNotFound');
         $this->request->setRequestUri('/app/index.php/missing_class/foo');
         $this->dispatcher->dispatch($this->request, $this->response);
     }
