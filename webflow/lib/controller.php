@@ -30,6 +30,12 @@ class Stato_Controller
     protected $response;
     
     /**
+     * Holds the session object that's used to persist state between requests
+     * @var Stato_Session
+     */
+    protected $session;
+    
+    /**
      * Holds the chain of filters that are run before action code processing
      * @var Stato_FilterChain
      */
@@ -84,6 +90,7 @@ class Stato_Controller
     {
         $this->request = $request;
         $this->response = $response;
+        $this->session = new Stato_Session();
         $this->beforeFilters = new Stato_FilterChain();
         $this->afterFilters  = new Stato_FilterChain();
         $this->aroundFilters = new Stato_FilterChain();
@@ -102,6 +109,8 @@ class Stato_Controller
         if (!$this->actionExists($action))
             throw new Stato_ActionNotFound($action);
             
+        $this->session->start();
+            
         $beforeResult = $this->beforeFilters->process($this, $action, 'before');
         $this->aroundFilters->process($this, $action, 'before');
         
@@ -112,6 +121,8 @@ class Stato_Controller
         
         $this->aroundFilters->process($this, $action, 'after');
         $this->afterFilters->process($this, $action, 'after');
+        
+        $this->session->store();
         
         return $this->response;
     }
@@ -125,6 +136,17 @@ class Stato_Controller
     public function addViewDir($dir)
     {
         $this->viewDirs[] = $dir;
+    }
+    
+    /**
+     * Sets the session persistence handler
+     * 
+     * @param Stato_ISessionHandler $handler
+     * @return void
+     */
+    public function setSessionHandler(Stato_ISessionHandler $handler)
+    {
+        $this->session->setHandler($handler);
     }
     
     /**

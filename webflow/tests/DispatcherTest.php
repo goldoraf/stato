@@ -8,6 +8,7 @@ require_once 'dispatcher.php';
 require_once 'controller.php';
 require_once 'request.php';
 require_once 'response.php';
+require_once 'session.php';
 require_once 'routing.php';
 require_once 'helpers/string.php';
 
