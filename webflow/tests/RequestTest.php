@@ -11,7 +11,7 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->request = new Stato_Request('/app/index.php/foo/bar?k1=v1&k2=v2');
+        $this->request = new Stato_Request();
     }
     
     public function testMethod()
@@ -44,15 +44,17 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('baz', $this->request->foo);
     }
     
-    public function testGetRequestUri()
+    public function testGetSetRequestUri()
     {
-        $this->assertEquals('/app/index.php/foo/bar?k1=v1&k2=v2', $this->request->getRequestUri());
-        $this->request->setRequestUri('/app/test.php/foo/baz');
-        $this->assertEquals('/app/test.php/foo/baz', $this->request->getRequestUri());
+        $_SERVER['REQUEST_URI'] = '/foo/bar?k1=v1&k2=v2';
+        $this->assertEquals('/foo/bar?k1=v1&k2=v2', $this->request->getRequestUri());
+        $this->request->setRequestUri('/foo/baz');
+        $this->assertEquals('/foo/baz', $this->request->getRequestUri());
     }
     
-    public function testGetBaseUrl()
+    public function testGetSetBaseUrl()
     {
+        $_SERVER['REQUEST_URI'] = '/app/index.php/foo/bar';
         $_SERVER['SCRIPT_NAME'] = '/app/index.php';
         $this->assertEquals('/app/index.php', $this->request->getBaseUrl());
         $this->request->setBaseUrl('/app/test.php');
@@ -61,6 +63,15 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
     
     public function testGetBasePath()
     {
+        $_SERVER['REQUEST_URI'] = '/index.php/foo/bar';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $this->assertEquals('', $this->request->getBasePath());
+    }
+    
+    public function testGetBasePathWithAlias()
+    {
+        $_SERVER['REQUEST_URI'] = '/app/index.php/foo/bar';
         $_SERVER['SCRIPT_NAME'] = '/app/index.php';
         $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/app/index.php';
         $this->assertEquals('/app', $this->request->getBasePath());
@@ -68,8 +79,34 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
     
     public function testGetPathInfo()
     {
+        $_SERVER['REQUEST_URI'] = '/index.php/foo/bar';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $this->assertEquals('/foo/bar', $this->request->getPathInfo());
+    }
+    
+    public function testGetPathInfoWithUriParams()
+    {
+        $_SERVER['REQUEST_URI'] = '/index.php/foo/bar?k1=v1&k2=v2';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $this->assertEquals('/foo/bar', $this->request->getPathInfo());
+    }
+    
+    public function testGetPathInfoWithModRewrite()
+    {
+        $_SERVER['REQUEST_URI'] = '/foo/bar';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $this->assertEquals('', $this->request->getBaseUrl());
+        $this->assertEquals('/foo/bar', $this->request->getPathInfo());
+    }
+    
+    public function testGetPathInfoWithAliasAndModRewrite()
+    {
+        $_SERVER['REQUEST_URI'] = '/app/foo/bar?k1=v1&k2=v2';
         $_SERVER['SCRIPT_NAME'] = '/app/index.php';
-        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/app/index.php';
-        $this->assertEquals('foo/bar', $this->request->getPathInfo());
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $this->assertEquals('/foo/bar', $this->request->getPathInfo());
     }
 }

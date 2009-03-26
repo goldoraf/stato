@@ -51,13 +51,11 @@ class Stato_Request
     /**
      * Constructor
      * 
-     * @param string $requestUri
      * @return void
      */
-    public function __construct($requestUri = null)
+    public function __construct()
     {
         if ($this->isPut()) $this->setParams($this->parseRawBodyParams());
-        $this->setRequestUri($requestUri);
     }
     
     /**
@@ -234,8 +232,19 @@ class Stato_Request
      */
     public function setBaseUrl($baseUrl = null)
     {
-        if ($baseUrl === null) $baseUrl = $_SERVER['SCRIPT_NAME'];
-        $this->baseUrl = $baseUrl;
+        if ($baseUrl === null) {
+            $baseUrl = $_SERVER['SCRIPT_NAME'];
+        
+            $requestUri = $this->getRequestUri();
+            if (strpos($requestUri, $baseUrl) !== 0) {
+                if (strpos($requestUri, dirname($baseUrl)) === 0) 
+                    $baseUrl = dirname($baseUrl);
+                elseif (strpos($requestUri, $baseUrl) === false) 
+                    $baseUrl = '';
+            }
+        }
+        
+        $this->baseUrl = rtrim($baseUrl, '/');
     }
     
     /**
@@ -284,12 +293,16 @@ class Stato_Request
         {
             $requestUri = $this->getRequestUri();
             if (strpos($requestUri, '?') !== false) 
-                list($requestUri, ) = explode('?', $requestUri);
+                list($pathInfo, ) = explode('?', $requestUri);
+            else
+                $pathInfo = $requestUri;
             
-            $pathInfo = substr($requestUri, strlen($this->getBaseUrl()));
+            $baseUrl = $this->getBaseUrl();
+            if (!empty($baseUrl))
+                $pathInfo = substr($pathInfo, strlen($baseUrl));
         }
         
-        $this->pathInfo = ltrim((string) $pathInfo, '/');
+        $this->pathInfo = $pathInfo;
     }
     
     /**

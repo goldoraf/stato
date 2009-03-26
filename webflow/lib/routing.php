@@ -53,6 +53,8 @@ class Stato_RouteSet
     
     public function recognizePath($path)
     {
+        $path = ltrim($path, '/');
+        
         if (!isset($this->recognizers)) $this->buildRecognizers();
         
         foreach ($this->recognizers as $regex => $defaults) {
