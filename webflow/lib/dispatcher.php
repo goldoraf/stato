@@ -1,7 +1,7 @@
 <?php
 
-class Stato_MissingController extends Exception {}
-class Stato_MissingControllerClass extends Exception {}
+class Stato_DispatchException extends Exception {}
+class Stato_ControllerNotFound extends Exception {}
 
 class Stato_Dispatcher
 {
@@ -31,12 +31,15 @@ class Stato_Dispatcher
         $this->request->setParams($params);
         
         $controllerName = $this->request->getParam('controller');
+        if (empty($controllerName))
+            throw new Stato_DispatchException('No controller specified in this request');
+        
         $controllerClass = $this->getControllerClass($controllerName);
         $controllerPath = $this->getControllerPath($controllerName);
         
         require_once $controllerPath;
         if (!class_exists($controllerClass))
-            throw new Stato_MissingControllerClass();
+            throw new Stato_ControllerNotFound("$controllerClass class not found");
             
         $controller = new $controllerClass($this->request, $this->response);
         $controller->addViewDir(dirname($controllerPath).'/../views');
@@ -56,6 +59,6 @@ class Stato_Dispatcher
             $possiblePath = "{$dir}/{$controllerName}_controller.php";
             if (file_exists($possiblePath)) return $possiblePath;
         }
-        throw new Stato_MissingController($controllerName);
+        throw new Stato_ControllerNotFound("$controllerName controller file not found");
     }
 }
