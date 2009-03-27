@@ -36,6 +36,12 @@ class Stato_Controller
     protected $session;
     
     /**
+     * Holds the flash object that's used to pass variables to the very next action
+     * @var Stato_Flash
+     */
+    protected $flash;
+    
+    /**
      * Holds the chain of filters that are run before action code processing
      * @var Stato_FilterChain
      */
@@ -91,6 +97,7 @@ class Stato_Controller
         $this->request = $request;
         $this->response = $response;
         $this->session = new Stato_Session();
+        
         $this->beforeFilters = new Stato_FilterChain();
         $this->afterFilters  = new Stato_FilterChain();
         $this->aroundFilters = new Stato_FilterChain();
@@ -110,6 +117,9 @@ class Stato_Controller
             throw new Stato_ActionNotFound($action);
             
         $this->session->start();
+        
+        $this->flash = (isset($this->session['__FLASH__'])) ? $this->session['__FLASH__'] 
+                                                            : new Stato_Flash();
             
         $beforeResult = $this->beforeFilters->process($this, $action, 'before');
         $this->aroundFilters->process($this, $action, 'before');
@@ -121,6 +131,9 @@ class Stato_Controller
         
         $this->aroundFilters->process($this, $action, 'after');
         $this->afterFilters->process($this, $action, 'after');
+        
+        $this->flash->discard();
+        $this->session['__FLASH__'] = $this->flash;
         
         $this->session->store();
         
