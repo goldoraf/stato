@@ -58,6 +58,7 @@ class Stato_Session implements ArrayAccess
     
     public function offsetSet($offset, $value)
     {
+        if (is_array($value)) $value = new ArrayObject($value);
         $_SESSION['__STATO__'][$offset] = $value;
         return;
     }
