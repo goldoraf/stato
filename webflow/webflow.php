@@ -8,4 +8,6 @@ require 'lib/routing.php';
 require 'lib/controller.php';
 require 'lib/filters.php';
 require 'lib/dispatcher.php';
-require 'lib/helpers.php';
+require 'lib/helpers/string.php';
+require 'lib/helpers/number.php';
+require 'lib/helpers/form.php';
