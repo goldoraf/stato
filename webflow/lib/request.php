@@ -11,18 +11,18 @@ class Stato_InvalidHttpMethod extends Exception {}
 class Stato_Request
 {
     /**
+     * Provides quick array access to GET, POST and userland parameters
+     * @var Stato_RequestParams
+     */
+    public $params;
+    
+    /**
      * Allowed HTTP methods
      * @var array 
      */
     protected static $allowedMethods = array(
         'get', 'post', 'put', 'delete', 'head', 'options'
     );
-    
-    /**
-     * Userland parameters
-     * @var array
-     */
-    protected $params = array();
     
     /**
      * Base url
@@ -55,17 +55,8 @@ class Stato_Request
      */
     public function __construct()
     {
+        $this->params = new Stato_RequestParams();
         if ($this->isPut()) $this->setParams($this->parseRawBodyParams());
-    }
-    
-    /**
-     * Access params as public properties
-     * 
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->getParam($key);
     }
     
     /**
@@ -77,16 +68,7 @@ class Stato_Request
      */
     public function getParam($key)
     {
-        switch (true) {
-            case isset($this->params[$key]):
-                return $this->params[$key];
-            case isset($_GET[$key]):
-                return $_GET[$key];
-            case isset($_POST[$key]):
-                return $_POST[$key];
-            default:
-                return null;
-        }
+        return $this->params[$key];
     }
     
     /**
@@ -97,7 +79,7 @@ class Stato_Request
      */
     public function setParams(array $params)
     {
-        $this->params = array_merge($this->params, $params);
+        $this->params->merge($params);
     }
     
     /**
@@ -397,5 +379,63 @@ class Stato_Request
         $params = array();
         if (($data = $this->rawBody()) !== false) parse_str($data, $params);
         return $params;
+    }
+}
+
+/**
+ * Wraps values contained in the GET and POST superglobals
+ * 
+ * Order of precedence: 1. userland params, 2. GET, 3. POST
+ * 
+ * @package Stato
+ * @subpackage webflow
+ */
+class Stato_RequestParams implements ArrayAccess
+{
+    /**
+     * Userland parameters
+     * @var array
+     */
+    protected $params;
+    
+    public function __construct()
+    {
+        $this->params = array();
+    }
+    
+    public function merge($params)
+    {
+        $this->params = array_merge($this->params, $params);
+    }
+    
+    public function offsetExists($key)
+    {
+        return isset($this->params[$key])
+            || isset($_GET[$key])
+            || isset($_POST[$key]);
+    }
+    
+    public function offsetGet($key)
+    {
+        switch (true) {
+            case isset($this->params[$key]):
+                return $this->params[$key];
+            case isset($_GET[$key]):
+                return $_GET[$key];
+            case isset($_POST[$key]):
+                return $_POST[$key];
+            default:
+                return null;
+        }
+    }
+    
+    public function offsetSet($key, $value)
+    {
+        $this->params[$key] = $value;
+    }
+    
+    public function offsetUnset($key)
+    {
+        if (array_key_exists($key, $this->params)) unset($this->params[$key]);
     }
 }

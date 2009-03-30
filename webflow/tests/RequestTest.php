@@ -33,6 +33,27 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
         $this->request->getMethod();
     }
     
+    public function testRequestParams()
+    {
+        $_GET = array('foo' => 'bar');
+        $this->assertEquals('bar', $this->request->params['foo']);
+        $_POST = array('foo' => 'baz');
+        $this->assertEquals('bar', $this->request->params['foo']);
+        $this->request->params['foo'] = 'baz';
+        $this->assertEquals('baz', $this->request->params['foo']);
+        $this->request->params->merge(array('foo' => 'bat', 'hello' => 'world'));
+        $this->assertEquals('bat', $this->request->params['foo']);
+        $this->assertEquals('world', $this->request->params['hello']);
+    }
+    
+    public function testRequestParamsReference()
+    {
+        $this->params = $this->request->params;
+        $this->params['foo'] = 'bar';
+        $this->assertEquals('bar', $this->params['foo']);
+        $this->assertEquals('bar', $this->request->params['foo']);
+    }
+    
     public function testGetParam()
     {
         $_GET = array('foo' => 'bar');
@@ -41,7 +62,6 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $this->request->getParam('foo'));
         $this->request->setParams(array('foo' => 'baz'));
         $this->assertEquals('baz', $this->request->getParam('foo'));
-        $this->assertEquals('baz', $this->request->foo);
     }
     
     public function testGetSetRequestUri()
