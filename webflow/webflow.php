@@ -11,3 +11,6 @@ require 'lib/dispatcher.php';
 require 'lib/helpers/string.php';
 require 'lib/helpers/number.php';
 require 'lib/helpers/form.php';
+require 'lib/form/input.php';
+require 'lib/form/field.php';
+require 'lib/form.php';

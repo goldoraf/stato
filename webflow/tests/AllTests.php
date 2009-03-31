@@ -10,6 +10,7 @@ require_once 'RouteSetTest.php';
 require_once 'FlashTest.php';
 require_once 'DispatcherTest.php';
 require_once 'HelpersTests.php';
+require_once 'FormTests.php';
 
 class Stato_Webflow_AllTests
 {
@@ -24,6 +25,7 @@ class Stato_Webflow_AllTests
         $suite->addTestSuite('Stato_FlashTest');
         $suite->addTestSuite('Stato_DispatcherTest');
         $suite->addTestSuite('Stato_Webflow_HelpersTests');
+        $suite->addTestSuite('Stato_Webflow_FormTests');
         return $suite;
     }
 }
