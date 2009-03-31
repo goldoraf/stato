@@ -129,4 +129,45 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
         $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
         $this->assertEquals('/foo/bar', $this->request->getPathInfo());
     }
+    
+    public function testRequestFilesWithSingleFile()
+    {
+        $_FILES = array('foo' => array(
+            'name' => 'presentation.pdf',
+            'type' => 'application/xpdf',
+            'tmp_name' => '/tmp/phpv9ccw7',
+            'error' => 0,
+            'size' => 823305 
+        ));
+        $file = $this->request->files['foo'];
+        $this->assertEquals('Stato_UploadedFile', get_class($file));
+        $this->assertEquals('presentation.pdf', $file->name);
+        $this->assertEquals('application/xpdf', $file->type);
+        $this->assertEquals('/tmp/phpv9ccw7', $file->tmp);
+        $this->assertEquals(823305, $file->size);
+        $this->assertFalse($file->error);
+        $this->assertFalse($file->isSafe());
+    }
+    
+    public function testRequestFilesWithMultipleFile()
+    {
+        $_FILES = array('foo' => array(
+            'name' => array('presentation.pdf', 'author.jpg'),
+            'type' => array('application/xpdf', 'image/jpeg'),
+            'tmp_name' => array('/tmp/phpv9ccw7', '/tmp/phpXXN67y'),
+            'error' => array(0, 0),
+            'size' => array(823305, 1868562) 
+        ));
+        $files = $this->request->files['foo'];
+        $this->assertTrue(is_array($files));
+        $this->assertEquals('Stato_UploadedFile', get_class($files[0]));
+        $this->assertEquals('presentation.pdf', $files[0]->name);
+        $this->assertEquals('application/xpdf', $files[0]->type);
+        $this->assertEquals('/tmp/phpv9ccw7', $files[0]->tmp);
+        $this->assertEquals(823305, $files[0]->size);
+        $this->assertFalse($files[0]->error);
+        $this->assertFalse($files[0]->isSafe());
+        $this->assertEquals('Stato_UploadedFile', get_class($files[1]));
+        $this->assertEquals('author.jpg', $files[1]->name);
+    }
 }
