@@ -48,7 +48,7 @@ class SColumn
         }
     }
     
-    public function default_value($owner)
+    public function default_value($owner = null)
     {
         return $this->typecast($owner, $this->default);
     }
