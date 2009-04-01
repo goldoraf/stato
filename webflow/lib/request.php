@@ -508,12 +508,12 @@ class Stato_RequestFiles implements ArrayAccess
     public function prepareFiles($files)
     {
         if (!is_array($files['name'])) {
-            return new Stato_UploadedFile($files['name'], $files['tmp_name'], 
+            return new Stato_UploadedFile($files['tmp_name'], $files['name'], 
                                           $files['type'], $files['size'], $files['error']);
         } else {
             $uploads = array();
             foreach ($files['name'] as $k => $v) {
-                $uploads[] = new Stato_UploadedFile($v, $files['tmp_name'][$k], 
+                $uploads[] = new Stato_UploadedFile($files['tmp_name'][$k], $v, 
                                                     $files['type'][$k], $files['size'][$k], $files['error'][$k]);
             }
             return $uploads;
@@ -542,7 +542,7 @@ class Stato_UploadedFile
     
     protected $originalError;
     
-    public function __construct($name, $tmp, $type, $size, $error)
+    public function __construct($tmp, $name, $type, $size, $error)
     {
         $this->name = $name;
         $this->tmp = $tmp;

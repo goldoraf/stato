@@ -317,6 +317,6 @@ class Stato_FormFieldTest extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('Stato_Form_ValidationError', 'No file was submitted.');
         $f = new Stato_Form_FileField();
-        $f->clean(new Stato_UploadedFile('test.jpg', '/tmp/1234', 'image/jpeg', 123, 0));
+        $f->clean(new Stato_UploadedFile('/tmp/1234', 'test.jpg', 'image/jpeg', 123, 0));
     }
 }
