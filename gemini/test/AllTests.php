@@ -10,7 +10,7 @@ require_once 'RoutesTest.php';
 require_once 'SerializersTest.php';
 require_once 'UrlRewriterTest.php';
 require_once 'HelpersTests.php';
-//require_once 'FormTests.php';
+require_once 'FormTests.php';
 
 class StatoGeminiAllTests
 {
@@ -25,6 +25,7 @@ class StatoGeminiAllTests
         $suite->addTestSuite('SerializersTest');
         $suite->addTestSuite('UrlRewriterTest');
         $suite->addTestSuite('HelpersTests');
+        $suite->addTestSuite('FormTests');
         return $suite;
     }
 }

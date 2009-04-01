@@ -11,7 +11,7 @@ class SRequest
 {
     /**
      * Holds both GET and POST parameters in a single array. Uploaded files are held 
-     * in an instance of SUpload class     
+     * in an instance of SUploadedFile class
      */
     public $params = array();
     
@@ -293,19 +293,42 @@ class SRequest
 	}
 }
 
+/**
+ * Represents a file upload.
+ * 
+ * @package Stato
+ * @subpackage gemini
+ */
 class SUploadedFile
 {
     public $original_filename;
     public $content_type;
     public $temp_filename;
+    public $file_size;
+    public $error;
     
-    public function __construct($temp_filename, $orig_filename, $content_type)
+    public function __construct($temp_filename, $orig_filename, $content_type, $file_size)
     {
         $this->temp_filename = $temp_filename;
         $this->original_filename = $orig_filename;
         $this->content_type = $content_type;
+        $this->error = false;
     }
     
+    /**
+     * Tells whether the file was actually uploaded via HTTP POST.
+     * This is useful to help ensure that a malicious user hasn't tried 
+     * to trick your app to gain access to sensible files.
+     */
+    public function is_safe()
+    {
+        return is_uploaded_file($this->temp_filename);
+    }
+    
+    /**
+     * Moves the uploaded file to a new location after checking that the 
+     * file is safe.
+     */
     public function save_as($path, $chmod = null)
     {
         $mv_success = @move_uploaded_file($this->temp_filename, $path);
