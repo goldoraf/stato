@@ -6,7 +6,7 @@ class CreateAppCommand extends SCommand
     protected $allowed_params  = array('project_name' => true);
     
     private $project_dirs      = array('app', 'cache', 'conf', 'db', 'lib', 'log', 'public', 'scripts', 'test');
-    private $project_app_dirs  = array('controllers', 'helpers', 'i18n', 'models', 'views', 'apis');
+    private $project_app_dirs  = array('controllers', 'helpers', 'i18n', 'models', 'views', 'resources');
     private $compilable_layers = array('common', 'gemini', 'mercury');
     
     public function execute()
