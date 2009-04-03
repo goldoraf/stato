@@ -16,9 +16,7 @@ mb_internal_encoding("UTF-8");
 setlocale(LC_TIME, 'en_EN.utf8', 'en_EN', 'en');
 
 define('STATO_CORE_PATH', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
-//vilains hacks
-//define('STATO_APP_ROOT_PATH', str_replace('\\', '/', realpath(dirname(__FILE__).'/..')));
-define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/gemini/lib/templates/createapp'); // pour le RescueTest
+define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/gemini/lib/templates/createapp'); // for RescueTest
 $_SESSION = array();
 
 require_once STATO_CORE_PATH.'/common/common.php';
