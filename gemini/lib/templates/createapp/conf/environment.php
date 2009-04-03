@@ -2,8 +2,10 @@
 
 date_default_timezone_set('Europe/Paris');
 
-// Choose components you're going to use
-// $config->components = array('mailer', 'webservice');
+mb_internal_encoding("UTF-8");
+
+$config->use_i18n = false;
+$config->use_mailer = false;
 
 // Add new inflection rules:
 // (Example)
@@ -12,5 +14,3 @@ date_default_timezone_set('Europe/Paris');
 
 // Include your application configuration below
 
-
-?>

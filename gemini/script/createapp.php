@@ -50,10 +50,6 @@ class CreateAppCommand extends SCommand
             $project_core_path = "$project_path/core";
             $this->create_dir("core", $project_path);
             $this->compile($project_core_path);
-            $this->create_dir('components', $project_core_path);
-            $this->create_dir('vendor', $project_core_path);
-            $this->copy(STATO_CORE_PATH.'/components', 'components', $project_core_path);
-            $this->copy(STATO_CORE_PATH.'/vendor', 'vendor', $project_core_path);
         }
         
         $this->create_file("conf/boot.php", $project_path,

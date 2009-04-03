@@ -55,7 +55,6 @@ class SActionController implements SIDispatchable, SIFilterable
     protected $layout     = false;
     protected $models     = array();
     protected $helpers    = array();
-    protected $components = array();
     
     protected $hidden_actions  = array();
     
@@ -550,9 +549,6 @@ class SActionController implements SIDispatchable, SIFilterable
         
         SDependencies::require_models($this->models);
         SDependencies::require_helpers($this->helpers, $this->module);
-        
-        if (!empty($this->components))
-            SDependencies::require_components($this->components);
     }
     
     private function is_performed()

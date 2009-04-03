@@ -41,16 +41,14 @@ require_once STATO_CORE_PATH.'/mercury/test/connections/'.STATO_TESTING_ADAPTER.
 /*
  * Exclude tests dirs from code coverage
  */
-/*$testsDirs = array(
-    'tests',
-    'cli/tests',
-    'i18n/tests',
-    'mailer/tests',
-    'webflow/tests',
-    'orm/tests'
+$testsDirs = array(
+    'test',
+    'gemini/test',
+    'mercury/test',
+    'common/test'
 );
 foreach ($testsDirs as $dir) {
     PHPUnit_Util_Filter::addDirectoryToFilter(
       dirname(__FILE__).'/../'.$dir, '.php'
     );
-}*/
+}

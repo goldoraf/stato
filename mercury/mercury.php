@@ -12,6 +12,7 @@ require('lib/query_set.php');
 require('lib/fixture.php');
 require('lib/migration.php');
 require('lib/paginator.php');
+require('lib/csv.php');
 
 require('lib/decorators/base_decorator.php');
 require('lib/decorators/list_decorator.php');

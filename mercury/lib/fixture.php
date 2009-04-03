@@ -70,7 +70,6 @@ class SFixture
     {
         if ($this->mode == self::CSV_MODE)
         {
-            SDependencies::require_components(array('csv'));
             $csv = new SCsvIterator(fopen($this->fixture_path.'.csv', 'r'));
             $i = 1;
             foreach($csv as $data)

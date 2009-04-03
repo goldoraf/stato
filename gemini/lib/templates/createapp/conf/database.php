@@ -29,5 +29,3 @@ $config = array
 );
 
 return $config;
-
-?>

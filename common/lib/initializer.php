@@ -22,21 +22,15 @@ class SInitializer
         self::$config = $config;
         
         self::load_environment($config);
-        self::require_components($config);
         self::initialize_logger();
         self::initialize_main_classes_settings();
         self::initialize_database_settings();
+        self::initialize_optional_packages();
     }
     
     public static function load_environment(SConfiguration $config)
     {
         include($config->environment_path());
-    }
-    
-    public static function require_components(SConfiguration $config)
-    {   
-        foreach ($config->components as $comp)
-            require(STATO_CORE_PATH."/components/{$comp}/{$comp}.php");
     }
     
     private static function initialize_logger()
@@ -64,6 +58,16 @@ class SInitializer
         SActiveRecord::$configurations = self::$config->database_configuration();
     }
     
+    private static function initialize_optional_packages()
+    {
+        if (!self::$config->use_i18n)
+        {
+            function __($key, $options = array()) {
+                return $key;
+            }
+        }
+    }
+    
     private static function is_cli_env()
     {
         return defined('STDIN') && defined('STDOUT') && defined('STDERR');
@@ -75,20 +79,17 @@ class SConfiguration
     public $action_controller;
     public $action_view;
     public $active_record;
-    public $mailer;
-    public $web_service;
     
     public $log_path;
     public $database_config_file;
-    public $components;
+    public $use_i18n;
+    public $use_mailer;
     
     private $main_classes = array
     (
         'controller' => 'SActionController',
         'model'      => 'SActiveRecord',
         'view'       => 'SActionView',
-        'webservice' => 'SWebService',
-        'mailer'     => 'SMailer'
     );
     
     private $namespaces = array
@@ -96,8 +97,6 @@ class SConfiguration
         'controller' => 'action_controller',
         'model'      => 'active_record',
         'view'       => 'action_view',
-        'webservice' => 'web_service',
-        'mailer'     => 'mailer'
     );
     
     public function __construct()
@@ -105,12 +104,11 @@ class SConfiguration
         $this->action_controller = new SOptionsHash();
         $this->action_view       = new SOptionsHash();
         $this->active_record     = new SOptionsHash();
-        $this->mailer            = new SOptionsHash();
-        $this->web_service       = new SOptionsHash();
         
         $this->log_path = STATO_APP_ROOT_PATH.'/log/'.STATO_ENV.'.log';
         $this->database_config_file = STATO_APP_ROOT_PATH.'/conf/database.php';
-        $this->components = array();
+        $this->use_i18n = false;
+        $this->use_mailer = false;
     }
     
     public function environment_path()

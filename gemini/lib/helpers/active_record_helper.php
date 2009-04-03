@@ -169,8 +169,7 @@ function error_message_for($object_name, $object, $options=array())
     foreach($errors as $field => $error) $list.= "<li>$error</li>";
         
     $header = SValidation::ERR_VALID_FORM;
-    if (isset($options['header_text'])) $header = $options['header_text'];
-    if (SDependencies::is_loaded_component('i18n')) $header = __($header);
+    if (isset($options['header_text'])) $header = __($options['header_text']);
         
     return content_tag('div', 
         content_tag($header_tag, $header)."<ul>{$list}</ul>", 

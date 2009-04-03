@@ -6,7 +6,6 @@ class SDependencyNotFound extends Exception {}
 
 class SDependencies
 {
-    private static $loaded_components = array();
     private static $model_possible_paths = null;
     
     public static function auto_require_model($class_name)
@@ -81,26 +80,6 @@ class SDependencies
         }
           
         SActionController::$installed_modules = $modules;
-    }
-    
-    public static function require_components($components)
-    {
-        foreach ($components as $component) self::require_component($component);
-    }
-    
-    public static function require_component($component)
-    {
-        $path = STATO_CORE_PATH."/components/$component/$component.php";
-        if (!file_exists($path))
-            throw new SDependencyNotFound("Missing component $component");
-        
-        self::$loaded_components[] = $component;
-        require_once($path);
-    }
-    
-    public static function is_loaded_component($component)
-    {
-        return in_array($component, self::$loaded_components);
     }
     
     private static function descends_from_active_record($class_name)

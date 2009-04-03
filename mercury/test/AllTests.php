@@ -17,6 +17,7 @@ require_once 'MigrationTest.php';
 require_once 'QuerySetTest.php';
 require_once 'SerializationTest.php';
 require_once 'TreeDecoratorTest.php';
+require_once 'CsvTest.php';
 
 class StatoMercuryAllTests
 {
@@ -38,6 +39,7 @@ class StatoMercuryAllTests
         $suite->addTestSuite('QuerySetTest');
         $suite->addTestSuite('SerializationTest');
         $suite->addTestSuite('TreeDecoratorTest');
+        $suite->addTestSuite('CsvTest');
         return $suite;
     }
 }
