@@ -20,7 +20,7 @@ define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/gemini/lib/templates/createapp')
 $_SESSION = array();
 
 require_once STATO_CORE_PATH.'/common/common.php';
-require_once STATO_CORE_PATH.'/components/console/console.php';
+require_once STATO_CORE_PATH.'/cli/cli.php';
 require_once STATO_CORE_PATH.'/gemini/gemini.php';
 require_once STATO_CORE_PATH.'/mercury/mercury.php';
 
