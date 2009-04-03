@@ -9,12 +9,12 @@ class SCodeGenerator
     public static function generate_class($name, $content, $extends = null)
     {
         return self::php_start()."class $name".(($extends !== null) ? " extends $extends" : '')
-        ."\n{\n$content\n}\n".self::php_stop();
+        ."\n{\n$content\n}\n";
     }
     
     public static function generate_file($content)
     {
-        return self::php_start().$content.self::php_stop();
+        return self::php_start().$content."\n";
     }
     
     public static function array_to_string($array, $level = 1)
@@ -74,11 +74,6 @@ class SCodeGenerator
     private static function php_start()
     {
         return "<?php\n\n";
-    }
-    
-    private static function php_stop()
-    {
-        return "\n?>\n";
     }
 }
 
