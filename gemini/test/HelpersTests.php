@@ -15,7 +15,7 @@ class HelpersTests
 {
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('Stato Gemini Helpers');
+        $suite = new PHPUnit_Framework_TestSuite('Stato webflow Helpers');
         $suite->addTestSuite('AjaxHelperTest');
         $suite->addTestSuite('AssetTagHelperTest');
         $suite->addTestSuite('DateHelperTest');

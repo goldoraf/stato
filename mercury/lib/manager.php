@@ -9,7 +9,7 @@
  * describes all objects in the model's table.
  * 
  * @package Stato
- * @subpackage mercury
+ * @subpackage orm
  */
 class SManager
 {

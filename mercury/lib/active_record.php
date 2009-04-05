@@ -13,7 +13,7 @@ class SRecordNotSaved extends Exception { }
  * Any change in the schema of the table is though instantly reflected in the objects.  
  * 
  * @package Stato
- * @subpackage mercury
+ * @subpackage orm
  */
 class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable*/
 {

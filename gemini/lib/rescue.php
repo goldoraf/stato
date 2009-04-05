@@ -67,7 +67,7 @@ class SRescue
     
     public static function html_body_locally($request, $status, $exception)
     {
-        $template_path = STATO_CORE_PATH.'/gemini/lib/templates/rescue.php';
+        $template_path = STATO_CORE_PATH.'/webflow/lib/templates/rescue.php';
         $view = new SActionView();
         return $view->render($template_path, array('exception' => $exception));
     }

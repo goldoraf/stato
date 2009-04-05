@@ -9,7 +9,7 @@ class SAssertionError extends Exception {}
  * <var>SQuerySet</var> objects represents lazy database lookups for a set of objects.
  * 
  * @package Stato
- * @subpackage mercury
+ * @subpackage orm
  */
 class SQuerySet implements Iterator, Countable
 {

@@ -9,8 +9,8 @@ class SInitializer
         $config = new SConfiguration();
         
         require_once(STATO_CORE_PATH.'/common/common.php');
-        require_once(STATO_CORE_PATH.'/gemini/gemini.php');
-        require_once(STATO_CORE_PATH.'/mercury/mercury.php');
+        require_once(STATO_CORE_PATH.'/webflow/webflow.php');
+        require_once(STATO_CORE_PATH.'/orm/orm.php');
         
         include(STATO_APP_ROOT_PATH.'/conf/environment.php');
         

@@ -5,7 +5,7 @@ class SUnknownHttpMethod extends Exception {}
  * Request class
  * 
  * @package Stato
- * @subpackage gemini
+ * @subpackage webflow
  */
 class SRequest
 {
@@ -297,7 +297,7 @@ class SRequest
  * Represents a file upload.
  * 
  * @package Stato
- * @subpackage gemini
+ * @subpackage webflow
  */
 class SUploadedFile
 {

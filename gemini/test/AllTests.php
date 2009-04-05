@@ -12,11 +12,11 @@ require_once 'UrlRewriterTest.php';
 require_once 'HelpersTests.php';
 require_once 'FormTests.php';
 
-class StatoGeminiAllTests
+class StatoWebflowAllTests
 {
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('Stato Gemini');
+        $suite = new PHPUnit_Framework_TestSuite('Stato webflow package');
         $suite->addTestSuite('FiltersTest');
         $suite->addTestSuite('MimeTypeTest');
         $suite->addTestSuite('RequestTest');

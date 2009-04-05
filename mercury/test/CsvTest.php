@@ -6,7 +6,7 @@ class CsvTest extends PHPUnit_Framework_TestCase
 {
     public function test_iterator_with_file()
     {
-        $csv = new SCsvIterator(fopen(STATO_CORE_PATH.'/mercury/test/fixtures/clients.csv', 'r'));
+        $csv = new SCsvIterator(dirname(__FILE__) . '/fixtures/clients.csv', 'r'));
         $this->assertEquals(array('id', 'name'), $csv->fields());
         $csv->rewind();
         $this->assertEquals(array('id' => 1, 'name' => 'apple'), $csv->current());

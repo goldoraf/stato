@@ -6,7 +6,7 @@
  * Provides a set of functions for filtering, formatting and transforming strings.
  * 
  * @package Stato
- * @subpackage gemini
+ * @subpackage webflow
  */
 /**
  * Convert special characters to HTML entities

@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/../../test/tests_helper.php';
 
-require_once STATO_CORE_PATH.'/gemini/lib/serializers.php';
+require_once 'webflow/lib/serializers.php';
 
 class ProductWithExclude extends SActiveRecord
 {

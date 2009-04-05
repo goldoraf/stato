@@ -38,7 +38,7 @@ class GenerateCommand extends SCommand
         $this->create_file("{$path}/resources/{$resource_name}_resource.php", STATO_APP_ROOT_PATH, 
             SCodeGenerator::generate_file(
                 SCodeGenerator::render_template(
-                    STATO_CORE_PATH."/gemini/lib/templates/resource.php",
+                    STATO_CORE_PATH."/webflow/lib/templates/resource.php",
                     array('class_name' => $class_name)
                 )
             )
@@ -72,10 +72,10 @@ class GenerateCommand extends SCommand
         $migration_path = "db/migrate/{$migration_version}_{$migration_name}.php";
         
         if ($table_name === null) {
-            $template = STATO_CORE_PATH."/gemini/lib/templates/empty_migration.php";
+            $template = STATO_CORE_PATH."/webflow/lib/templates/empty_migration.php";
             $assigns = array('class_name' => $migration_class);
         } else {
-            $template = STATO_CORE_PATH."/gemini/lib/templates/migration.php";
+            $template = STATO_CORE_PATH."/webflow/lib/templates/migration.php";
             $assigns = array('table_name' => $table_name, 'class_name' => $migration_class);
         }
         

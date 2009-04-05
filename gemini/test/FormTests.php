@@ -11,7 +11,7 @@ class FormTests
 {
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('Stato Gemini form');
+        $suite = new PHPUnit_Framework_TestSuite('Stato webflow form');
         $suite->addTestSuite('SFormInputTest');
         $suite->addTestSuite('SFormFieldTest');
         $suite->addTestSuite('SFormErrorsTest');

@@ -18,9 +18,9 @@ abstract class SCommand
     
     public static function load($command_name, $args)
     {
-        if (file_exists($command_file = STATO_CORE_PATH."/gemini/script/$command_name.php"))
+        if (file_exists($command_file = STATO_CORE_PATH."/webflow/script/$command_name.php"))
             require $command_file;
-        elseif (file_exists($command_file = STATO_CORE_PATH."/mercury/script/$command_name.php"))
+        elseif (file_exists($command_file = STATO_CORE_PATH."/orm/script/$command_name.php"))
             require $command_file;
         else
             throw new SConsoleException("$command_name command does not exist");

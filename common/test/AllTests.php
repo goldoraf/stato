@@ -10,7 +10,7 @@ class StatoCommonAllTests
 {
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('Stato Gemini');
+        $suite = new PHPUnit_Framework_TestSuite('Stato common classes');
         $suite->addTestSuite('DateTest');
         $suite->addTestSuite('EncryptionTest');
         $suite->addTestSuite('InflectionTest');

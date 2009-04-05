@@ -19,11 +19,11 @@ require_once 'SerializationTest.php';
 require_once 'TreeDecoratorTest.php';
 require_once 'CsvTest.php';
 
-class StatoMercuryAllTests
+class StatoOrmAllTests
 {
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('Stato Mercury');
+        $suite = new PHPUnit_Framework_TestSuite('Stato ORM package');
         $suite->addTestSuite('ActiveRecordTest');
         $suite->addTestSuite('BelongsToTest');
         $suite->addTestSuite('CallbacksTest');
