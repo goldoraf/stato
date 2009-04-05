@@ -19,7 +19,7 @@ define('STATO_CORE_PATH', str_replace('\\', '/', realpath(dirname(__FILE__).'/..
 define('STATO_APP_ROOT_PATH', STATO_CORE_PATH.'/webflow/lib/templates/createapp'); // for RescueTest
 $_SESSION = array();
 
-set_include_path(dirname(__FILE__).'/..' . PATH_SEPARATOR . get_include_path()));
+set_include_path(dirname(__FILE__).'/..' . PATH_SEPARATOR . get_include_path());
 
 require_once 'common/common.php';
 require_once 'cli/cli.php';
