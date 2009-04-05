@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../test/tests_helper.php';
+require_once dirname(__FILE__) . '/../../test/TestsHelper.php';
 
 require_once 'FiltersTest.php';
 require_once 'MimeTypeTest.php';

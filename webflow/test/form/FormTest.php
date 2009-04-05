@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../test/tests_helper.php';
+require_once dirname(__FILE__) . '/../../../test/TestsHelper.php';
 
 if (!function_exists('__')) {
     function __($key, $options = array()) {
