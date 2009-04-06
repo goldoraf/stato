@@ -25,11 +25,22 @@ require_once 'common/common.php';
 require_once 'cli/cli.php';
 require_once 'webflow/webflow.php';
 require_once 'orm/orm.php';
+require_once 'i18n/i18n.php';
 
 require_once 'test/stato_test_case.php';
 require_once 'test/active_test_case.php';
 require_once 'test/controller_mocks.php';
 require_once 'test/mock_record.php';
+
+/*
+ * Prepend the backported Stato libs directories to the include_path
+ */
+$path = array(
+    dirname(__FILE__).'/../i18n/lib',
+    dirname(__FILE__).'/../mailer/lib',
+    get_include_path()
+);
+set_include_path(implode(PATH_SEPARATOR, $path));
 
 define('STATO_TESTING_ADAPTER', 'pdo_mysql');
 define('STATO_FIXTURES_DIR', STATO_CORE_PATH.'/orm/test/fixtures');

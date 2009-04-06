@@ -287,7 +287,7 @@ class SValidation
         if ($human_readable_attr == $attr) 
             $human_readable_attr = str_replace('_', ' ', $attr);
         
-        $message = __($message, array($human_readable_attr, $var));
+        $message = _f($message, array($human_readable_attr, $var));
         
         if (!isset($record->errors[$attr])) $record->errors[$attr] = ucfirst($message);
     }

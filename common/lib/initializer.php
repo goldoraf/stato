@@ -8,11 +8,11 @@ class SInitializer
     {
         $config = new SConfiguration();
         
-        require_once(STATO_CORE_PATH.'/common/common.php');
-        require_once(STATO_CORE_PATH.'/webflow/webflow.php');
-        require_once(STATO_CORE_PATH.'/orm/orm.php');
+        require_once STATO_CORE_PATH.'/common/common.php';
+        require_once STATO_CORE_PATH.'/webflow/webflow.php';
+        require_once STATO_CORE_PATH.'/orm/orm.php';
         
-        include(STATO_APP_ROOT_PATH.'/conf/environment.php');
+        include STATO_APP_ROOT_PATH.'/conf/environment.php';
         
         self::run($config);
     }
@@ -60,10 +60,17 @@ class SInitializer
     
     private static function initialize_optional_packages()
     {
-        if (!self::$config->use_i18n)
-        {
-            function __($key, $options = array()) {
+        if (self::$config->use_i18n) {
+            require_once STATO_CORE_PATH.'/i18n/i18n.php';
+            SI18n::add_data_path(STATO_APP_ROOT_PATH.'/app/i18n');
+        } else {
+            function __($key, $values = array()) {
+                if (!empty($values))
+                    $key = str_replace(array_keys($values), array_values($values), $key);
                 return $key;
+            }
+            function _f($key, $values = array()) {
+                return vsprintf($key, $values);
             }
         }
     }
@@ -118,7 +125,7 @@ class SConfiguration
     
     public function database_configuration()
     {
-        return include($this->database_config_file);
+        return include $this->database_config_file;
     }
     
     public function main_classes()

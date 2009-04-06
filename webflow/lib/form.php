@@ -139,7 +139,7 @@ class SForm
                 $value = $field->clean($value);
                 $this->cleaned_data[$name] = $value;
             } catch (SValidationError $e) {
-                $this->errors[$name] = vsprintf(__($e->get_message()), $e->get_args());
+                $this->errors[$name] = _f($e->get_message(), $e->get_args());
                 $this->cleaned_data[$name] = $e->get_cleaned_value();
             }
         }
