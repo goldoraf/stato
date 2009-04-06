@@ -51,8 +51,17 @@ class Stato_Form_Field
         $this->options = array_merge($this->baseDefaultOptions, $this->defaultOptions, $options);
         $this->errorMessages = array_merge($this->baseDefaultErrorMessages, 
                                            $this->defaultErrorMessages, $this->options['error_messages']);
+        
         list($this->required, $this->label, $this->initial, $this->helpText)
             = array($this->options['required'], $this->options['label'], $this->options['initial'], $this->options['help_text']);
+            
+        if (array_key_exists('input', $this->options)) {
+            $ref = new ReflectionClass($this->options['input']);
+            if (!$ref->isSubclassOf('Stato_Form_Input'))
+                throw new Exception($this->options['input'].' is not a subclass of Stato_Form_Input');
+                
+            $this->input = $this->options['input'];
+        }
     }
     
     public function __toString()

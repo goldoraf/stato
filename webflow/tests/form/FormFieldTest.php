@@ -40,6 +40,18 @@ class Stato_FormFieldTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<input type="text" name="foo" id="id_foo" value="bar" />', $f->render('foo', 'bar', array('id' => 'id_foo')));
     }
     
+    public function testFieldWithInputOption()
+    {
+        $f = new Stato_Form_Field(array('input' => 'Stato_Form_HiddenInput'));
+        $this->assertEquals('<input type="hidden" name="foo" value="bar" />', $f->render('foo', 'bar'));
+    }
+    
+    public function testFieldWithBadInputOptionShouldThrow()
+    {
+        $this->setExpectedException('Exception');
+        $f = new Stato_Form_Field(array('input' => 'Stato_Form_ValidationError'));
+    }
+    
     public function testFieldBind()
     {
         $f = new Stato_Form_Field();
