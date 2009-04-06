@@ -50,7 +50,7 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
     
     public function test_field_with_bad_input_option_should_throw()
     {
-        $this->setExpectedException('SFormException');
+        $this->setExpectedException('Exception');
         $f = new SField(array('input' => 'SRequest'));
     }
     

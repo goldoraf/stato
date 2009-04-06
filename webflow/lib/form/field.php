@@ -62,7 +62,7 @@ class SField
         
         if (array_key_exists('input', $this->options)) {
             $ref = new ReflectionClass($this->options['input']);
-            if (!class_exists($this->options['input']) || !$ref->isSubclassOf('SInput'))
+            if (!$ref->isSubclassOf('SInput'))
                 throw new SFormException($this->options['input'].' is not a subclass of SInput');
                 
             $this->input = $this->options['input'];
