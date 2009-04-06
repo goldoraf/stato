@@ -21,13 +21,13 @@ class SFormErrors extends ArrayObject
 class SForm
 {
     public $errors;
+    public $cleaned_data = array();
     
     protected $data;
     protected $files;
     protected $multipart = false;
     protected $is_bound = false;
     protected $fields = array();
-    protected $cleaned_data = array();
     protected $initial_values = array();
     protected $prefix = null;
     protected $field_decorator = null;
