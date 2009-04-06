@@ -2,9 +2,9 @@
 
 class Stato_I18n_SimpleBackend extends Stato_I18n_AbstractBackend
 {
-    private $initialized = array();
+    protected $initialized = array();
     
-    private $translations = array();
+    protected $translations = array();
     
     protected function lookup($locale, $key)
     {

@@ -14,20 +14,33 @@ abstract class Stato_I18n_AbstractBackend
         '$c%100 == 1 ? 0 : ($c%100 == 2 ? 1 : ($c%100 == 3 || $c%100 == 4 ? 2 : 3))' => array('sl')
     );
     
-    public function translate($locale, $key, $options = array())
+    public function translate($locale, $key, $values = array())
     {
-        if (array_key_exists('count', $options)) $count = $options['count'];
-        $values = array_diff_key($options, array('count' => null));
-        
         $entry = $this->lookup($locale, $key);
-        if (isset($count)) $entry = $this->pluralize($locale, $entry, $count);
         if (!empty($values)) $entry = $this->interpolate($locale, $entry, $values);
         return $entry;
     }
     
+    public function translatef($locale, $key, $values = array())
+    {
+        $entry = $this->lookup($locale, $key);
+        return vsprintf($entry, $values);
+    }
+    
+    public function translateAndPluralize($locale, $key, $count = 0)
+    {
+        $entry = $this->lookup($locale, $key);
+        return $this->pluralize($locale, $entry, $count);
+    }
+    
     protected function interpolate($locale, $entry, $values)
     {
-        return str_replace(array_keys($values), array_values($values), $entry);
+        $pValues = array();
+        foreach ($values as $k => $v) {
+            if (!preg_match('/%[a-zA-Z0-9_\-]+%/', $k)) $k = '%'.$k.'%';
+            $pValues[$k] = $v;
+        }
+        return str_replace(array_keys($pValues), array_values($pValues), $entry);
     }
     
     protected function pluralize($locale, $entry, $c)

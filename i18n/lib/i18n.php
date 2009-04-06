@@ -2,9 +2,19 @@
 
 class Stato_I18nException extends Exception {}
 
-function __($key, $options = array())
+function __($key, $values = array())
 {
-    return Stato_I18n::translate($key, $options);
+    return Stato_I18n::translate($key, $values);
+}
+
+function _f($key, $values = array())
+{
+    return Stato_I18n::translatef($key, $values);
+}
+
+function _p($key, $count = 0)
+{
+    return Stato_I18n::translateAndPluralize($key, $count);
 }
 
 /**
@@ -69,9 +79,21 @@ class Stato_I18n
         return self::$dataPaths;
     }
     
-    public static function translate($key, $options = array())
+    public static function translate($key, $values = array())
     {
         $locale = self::getLocale();
-        return self::getBackend()->translate($locale, $key, $options);
+        return self::getBackend()->translate($locale, $key, $values);
+    }
+    
+    public static function translatef($key, $values = array())
+    {
+        $locale = self::getLocale();
+        return self::getBackend()->translatef($locale, $key, $values);
+    }
+    
+    public static function translateAndPluralize($key, $count = 0)
+    {
+        $locale = self::getLocale();
+        return self::getBackend()->translateAndPluralize($locale, $key, $count);
     }
 }

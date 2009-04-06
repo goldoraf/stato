@@ -28,19 +28,29 @@ class Stato_I18nTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals('Stato est un cadre de travail PHP5.', 
             Stato_I18n::translate('Stato is a PHP5 framework.'));
+        $this->assertEquals('Stato est un cadre de travail PHP5.', 
+            __('Stato is a PHP5 framework.'));
     }
     
-    public function testTranslateInterpolation()
+    public function testTranslateAndInterpolate()
     {
         $this->assertEquals("La date d'aujourd'hui est 31/07/2007", 
-            Stato_I18n::translate("Today's date is %date%", array('%date%' => '31/07/2007')));
+            Stato_I18n::translate("Today's date is %date%", array('date' => '31/07/2007')));
+        $this->assertEquals("La date d'aujourd'hui est 31/07/2007", 
+            __("Today's date is %date%", array('date' => '31/07/2007')));
     }
     
-    public function testPluralization()
+    public function testTranslatef()
     {
-        $this->assertEquals('pas de message', Stato_I18n::translate('inbox', array('count' => 0)));
-        $this->assertEquals('1 message', Stato_I18n::translate('inbox', array('count' => 1)));
-        $this->assertEquals('2 messages', Stato_I18n::translate('inbox', array('count' => 2)));
-        $this->assertEquals('3 messages', Stato_I18n::translate('inbox', array('count' => 3)));
+        $this->assertEquals('Le champ IP est requis.', 
+            Stato_I18n::translatef('%s is required.', array('IP')));
+        $this->assertEquals('Le champ IP est requis.', 
+            _f('%s is required.', array('IP')));
+    }
+    
+    public function testTranslateAndPluralize()
+    {
+        $this->assertEquals('2 messages', Stato_I18n::translateAndPluralize('inbox', 2));
+        $this->assertEquals('2 messages', _p('inbox', 2));
     }
 }
