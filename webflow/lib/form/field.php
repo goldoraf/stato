@@ -56,8 +56,17 @@ class SField
         $this->options = array_merge($this->base_default_options, $this->default_options, $options);
         $this->error_messages = array_merge($this->base_default_error_messages, 
                                            $this->default_error_messages, $this->options['error_messages']);
+        
         list($this->required, $this->label, $this->initial, $this->help_text)
             = array($this->options['required'], $this->options['label'], $this->options['initial'], $this->options['help_text']);
+        
+        if (array_key_exists('input', $this->options)) {
+            $ref = new ReflectionClass($this->options['input']);
+            if (!class_exists($this->options['input']) || !$ref->isSubclassOf('SInput'))
+                throw new SFormException($this->options['input'].' is not a subclass of SInput');
+                
+            $this->input = $this->options['input'];
+        }
     }
     
     public function __toString()

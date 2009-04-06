@@ -42,6 +42,18 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<input type="text" name="foo" value="bar" />', $f->bind('foo', 'bar')->__toString());
     }
     
+    public function test_field_with_input_option()
+    {
+        $f = new SField(array('input' => 'SHiddenInput'));
+        $this->assertEquals('<input type="hidden" name="foo" value="bar" />', $f->render('foo', 'bar'));
+    }
+    
+    public function test_field_with_bad_input_option_should_throw()
+    {
+        $this->setExpectedException('SFormException');
+        $f = new SField(array('input' => 'SRequest'));
+    }
+    
     public function test_char_field_with_length_option()
     {
         $f = new SCharField(array('length' => 3));
