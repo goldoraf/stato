@@ -26,6 +26,7 @@ require_once 'cli/cli.php';
 require_once 'webflow/webflow.php';
 require_once 'orm/orm.php';
 require_once 'i18n/i18n.php';
+require_once 'mailer/mailer.php';
 
 require_once 'test/stato_test_case.php';
 require_once 'test/active_test_case.php';
