@@ -315,6 +315,25 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         $f->clean('Java');
     }
     
+    public function test_multiple_choice_field()
+    {
+        $f = new SMultipleChoiceField(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertEquals(array('IT'), $f->clean(array('IT')));
+    }
+    
+    public function test_multiple_choice_field2()
+    {
+        $f = new SMultipleChoiceField(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertEquals(array('IT', 'Commercial'), $f->clean(array('IT', 'Commercial')));
+    }
+    
+    public function test_multiple_choice_field_invalid_list_validation_error()
+    {
+        $this->setExpectedException('SValidationError', 'Enter a list of values.');
+        $f = new SMultipleChoiceField(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $f->clean('IT');
+    }
+    
     public function test_file_field_without_uploaded_file()
     {
         $f = new SFileField();

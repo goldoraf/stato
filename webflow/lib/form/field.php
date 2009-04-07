@@ -393,6 +393,33 @@ class SChoiceField extends SField
     }
 }
 
+class SMultipleChoiceField extends SChoiceField
+{
+    protected $input = 'SMultipleSelect';
+    protected $default_error_messages = array(
+        'invalid_choice' => 'Select a valid choice.',
+        'invalid_list'   => 'Enter a list of values.'
+    );
+    
+    public function clean($value)
+    {
+        if ($this->required && $this->is_empty($value))
+            throw new SValidationError($this->error_messages['required']);
+            
+        if ($this->is_empty($value)) return array();
+        
+        if (!is_array($value))
+            throw new SValidationError($this->error_messages['invalid_list']);
+        
+        foreach ($value as $v) {
+            if (!$this->is_choice_valid($v))
+                throw new SValidationError($this->error_messages['invalid_choice'], array($v));
+        }
+            
+        return $value;
+    }
+}
+
 class SFileField extends SField
 {
     protected $input = 'SFileInput';

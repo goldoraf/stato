@@ -179,6 +179,19 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
         );
     }
     
+    public function test_multiple_select_with_multiple_choices()
+    {
+        $s = new SMultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertDomEquals(
+            '<select multiple="multiple" name="service">
+            <option value="Marketing" selected="selected">Marketing</option>
+            <option value="IT">IT</option>
+            <option value="Commercial" selected="selected">Commercial</option>
+            </select>',
+            $s->render('service', array('Marketing', 'Commercial'))
+        );
+    }
+    
     private function assertDomEquals($str1, $str2)
     {
     	$this->assertXmlStringEqualsXmlString("<root>$str1</root>", "<root>$str2</root>");
