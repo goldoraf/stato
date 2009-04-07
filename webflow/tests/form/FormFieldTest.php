@@ -319,6 +319,25 @@ class Stato_FormFieldTest extends PHPUnit_Framework_TestCase
         $f->clean('Java');
     }
     
+    public function testMultipleChoiceField()
+    {
+        $f = new Stato_Form_MultipleChoiceField(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertEquals(array('IT'), $f->clean(array('IT')));
+    }
+    
+    public function testMultipleChoiceField2()
+    {
+        $f = new Stato_Form_MultipleChoiceField(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertEquals(array('IT', 'Commercial'), $f->clean(array('IT', 'Commercial')));
+    }
+    
+    public function testMultipleChoiceFieldInvalidListValidationError()
+    {
+        $this->setExpectedException('Stato_Form_ValidationError', 'Enter a list of values.');
+        $f = new Stato_Form_MultipleChoiceField(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $f->clean('IT');
+    }
+    
     public function testFileFieldWithoutUploadedFile()
     {
         $f = new Stato_Form_FileField();

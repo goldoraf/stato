@@ -342,7 +342,7 @@ class Stato_Form_ChoiceField extends Stato_Form_Field
         'choices' => array()
     );
     protected $defaultErrorMessages = array(
-        'invalid_choice'   => 'Select a valid choice.'
+        'invalid_choice' => 'Select a valid choice.'
     );
     
     public function __construct(array $options = array())
@@ -385,6 +385,33 @@ class Stato_Form_ChoiceField extends Stato_Form_Field
             }
         }
         return false;
+    }
+}
+
+class Stato_Form_MultipleChoiceField extends Stato_Form_ChoiceField
+{
+    protected $input = 'Stato_Form_MultipleSelect';
+    protected $defaultErrorMessages = array(
+        'invalid_choice' => 'Select a valid choice.',
+        'invalid_list'   => 'Enter a list of values.'
+    );
+    
+    public function clean($value)
+    {
+        if ($this->required && $this->isEmpty($value))
+            throw new Stato_Form_ValidationError($this->errorMessages['required']);
+            
+        if ($this->isEmpty($value)) return array();
+        
+        if (!is_array($value))
+            throw new Stato_Form_ValidationError($this->errorMessages['invalid_list']);
+        
+        foreach ($value as $v) {
+            if (!$this->isChoiceValid($v))
+                throw new Stato_Form_ValidationError($this->errorMessages['invalid_choice'], array($v));
+        }
+            
+        return $value;
     }
 }
 
