@@ -9,12 +9,23 @@ interface SIFieldDecorator
 
 class SFormErrors extends ArrayObject
 {
+    protected $prefix = null;
+    
     public function __toString()
     {
         $html = "<ul class=\"errorlist\">\n";
-        foreach ($this as $k => $v) $html.= "<li>$v</li>\n";
+        foreach ($this as $k => $v) {
+            $id = (is_null($this->prefix)) ? $k : $this->prefix.'_'.$k;
+            $k = SInflection::humanize($k);
+            $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
+        }
         $html.= "</ul>";
         return $html;
+    }
+    
+    public function set_prefix($prefix)
+    {
+        $this->prefix = $prefix;
     }
 }
 
@@ -90,7 +101,8 @@ class SForm
         $html = array();
         foreach ($this->fields as $name => $field) {
             $bf = new SBoundField($this, $field, $name);
-            $html[] = $open_tag.$bf->label_tag.$bf->render().$close_tag;
+            $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
+            $html[] = $open_tag.$bf->label_tag.$bf->render().$err.$close_tag;
         }
         return implode("\n", $html);
     }
@@ -132,6 +144,7 @@ class SForm
         
         $this->cleaned_data = array();
         $this->errors = new SFormErrors();
+        $this->errors->set_prefix($this->prefix);
         
         foreach ($this->fields as $name => $field) {
             $value = (array_key_exists($name, $this->data)) ? $this->data[$name] : null;
@@ -160,7 +173,7 @@ class SBoundField
     public $label;
     public $label_tag;
     public $html_name;
-    public $errors;
+    public $error;
     public $help_text;
     
     protected $form;
@@ -177,7 +190,7 @@ class SBoundField
         $this->html_name = (is_null($prefix = $this->form->get_prefix())) ? $this->name : "{$prefix}[{$name}]";
         $this->label = (is_null($this->field->label)) ? $this->get_label() : $this->field->label;
         $this->label_tag = $this->get_label_tag();
-        // $this->errors
+        $this->error = (isset($this->form->errors[$name])) ? $this->form->errors[$name] : false;
         $this->help_text = $this->field->help_text;
     }
     

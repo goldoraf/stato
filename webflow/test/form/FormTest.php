@@ -97,6 +97,18 @@ EOT;
         $this->assertEquals($html, $this->form->render());
     }
     
+    public function test_form_basic_rendering_with_error()
+    {
+        $html = <<<EOT
+<p><label for="title">Title</label><input type="text" name="title" id="title" /></p>
+<p><label for="body">Body</label><textarea name="body" cols="40" rows="10" id="body"></textarea></p>
+<p><label for="author">Author</label><input type="text" name="author" id="author" /><span class="error">This field is required.</span></p>
+EOT;
+        $this->form->author = new SCharField(array('required' => true));
+        $this->form->is_valid(array());
+        $this->assertEquals($html, $this->form->render());
+    }
+    
     public function test_is_valid_without_constraints()
     {
         $this->assertTrue($this->form->is_valid(array('title' => 'foo')));
