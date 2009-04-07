@@ -9,12 +9,23 @@ interface Stato_Form_IFieldDecorator
 
 class Stato_Form_Errors extends ArrayObject
 {
+    protected $prefix = null;
+    
     public function __toString()
     {
         $html = "<ul class=\"errorlist\">\n";
-        foreach ($this as $k => $v) $html.= "<li>$v</li>\n";
+        foreach ($this as $k => $v) {
+            $id = (is_null($this->prefix)) ? $k : $this->prefix.'_'.$k;
+            $k = humanize($k);
+            $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
+        }
         $html.= "</ul>";
         return $html;
+    }
+    
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
     }
 }
 
@@ -90,7 +101,8 @@ class Stato_Form
         $html = array();
         foreach ($this->fields as $name => $field) {
             $bf = new Stato_Form_BoundField($this, $field, $name);
-            $html[] = $openTag.$bf->labelTag.$bf->render().$closeTag;
+            $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
+            $html[] = $openTag.$bf->labelTag.$bf->render().$err.$closeTag;
         }
         return implode("\n", $html);
     }
@@ -132,6 +144,7 @@ class Stato_Form
         
         $this->cleanedData = array();
         $this->errors = new Stato_Form_Errors();
+        $this->errors->setPrefix($this->prefix);
         
         foreach ($this->fields as $name => $field) {
             $value = (array_key_exists($name, $this->data)) ? $this->data[$name] : null;
@@ -160,7 +173,7 @@ class Stato_Form_BoundField
     public $label;
     public $labelTag;
     public $htmlName;
-    public $errors;
+    public $error;
     public $helpText;
     
     protected $form;
@@ -177,7 +190,7 @@ class Stato_Form_BoundField
         $this->htmlName = (is_null($prefix = $this->form->getPrefix())) ? $this->name : "{$prefix}[{$name}]";
         $this->label = (is_null($this->field->label)) ? $this->getLabel() : $this->field->label;
         $this->labelTag = $this->getLabelTag();
-        // $this->errors
+        $this->error = (isset($this->form->errors[$name])) ? $this->form->errors[$name] : false;
         $this->helpText = $this->field->helpText;
     }
     

@@ -18,10 +18,22 @@ class Stato_FormErrorsTest extends PHPUnit_Framework_TestCase
     {
         $html = <<<EOT
 <ul class="errorlist">
-<li>This field is required.</li>
-<li>Enter a valid value.</li>
+<li><label for="subject">Subject</label> - This field is required.</li>
+<li><label for="email">Email</label> - Enter a valid value.</li>
 </ul>
 EOT;
+        $this->assertEquals($html, $this->errors->__toString());
+    }
+    
+    public function testRenderingWithPrefix()
+    {
+        $html = <<<EOT
+<ul class="errorlist">
+<li><label for="contact_subject">Subject</label> - This field is required.</li>
+<li><label for="contact_email">Email</label> - Enter a valid value.</li>
+</ul>
+EOT;
+        $this->errors->setPrefix('contact');
         $this->assertEquals($html, $this->errors->__toString());
     }
 }

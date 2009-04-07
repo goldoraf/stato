@@ -102,6 +102,18 @@ EOT;
         $this->assertEquals($html, $this->form->render());
     }
     
+    public function testFormBasicRenderingWithError()
+    {
+        $html = <<<EOT
+<p><label for="title">Title</label><input type="text" name="title" id="title" /></p>
+<p><label for="body">Body</label><textarea name="body" cols="40" rows="10" id="body"></textarea></p>
+<p><label for="author">Author</label><input type="text" name="author" id="author" /><span class="error">This field is required.</span></p>
+EOT;
+        $this->form->author = new Stato_Form_CharField(array('required' => true));
+        $this->form->isValid(array());
+        $this->assertEquals($html, $this->form->render());
+    }
+    
     public function testIsValidWithoutConstraints()
     {
         $this->assertTrue($this->form->isValid(array('title' => 'foo')));
