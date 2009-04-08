@@ -532,19 +532,19 @@ class SUploadedFile
                 $this->error = false;
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                $this->error = self::size;
+                $this->error = self::SIZE;
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                $this->error = self::size;
+                $this->error = self::SIZE;
                 break;
             case UPLOAD_ERR_PARTIAL:
-                $this->error = self::partial;
+                $this->error = self::PARTIAL;
                 break;
             case UPLOAD_ERR_NO_FILE:
-                $this->error = self::no_file;
+                $this->error = self::NO_FILE;
                 break;
             default:
-                $this->error = self::system;
+                $this->error = self::SYSTEM;
         }
         $this->original_error = $error;
     }
