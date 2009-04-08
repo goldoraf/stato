@@ -333,9 +333,7 @@ class SRequest
         if ($base_path === null)
             $base_path = str_replace(basename($_SERVER['SCRIPT_FILENAME']), '', $this->base_url());
         
-        if ($base_path != '/') $base_path = rtrim($base_path, '/');
-        if (empty($base_path)) $base_path = '/';
-        $this->base_path = $base_path;
+        $this->base_path = rtrim($base_path, '/');
     }
     
     /**

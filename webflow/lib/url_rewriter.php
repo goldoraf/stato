@@ -87,11 +87,11 @@ class SUrlRewriter
                 $url.= isset($options['host']) ? $options['host'] : self::$request->host_with_port();
             }
             if ((!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false) 
-            && !preg_match('#^'.self::$request->base_path().'.*#', $path))
-                $url.= self::$request->base_path();
+            && !preg_match('#^'.self::$request->base_url().'.*#', $path))
+                $url.= self::$request->base_url();
         }
         
-        $url.= $path;
+        $url.= '/'.$path;
         if (isset($options['action_suffix'])) $url.= '/'.$options['action_suffix'];
         if (isset($options['trailing_slash'])) $url.= '/';
         if (isset($options['anchor'])) $url.= '#'.$options['anchor'];
