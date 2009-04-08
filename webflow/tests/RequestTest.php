@@ -86,7 +86,7 @@ class Stato_RequestTest extends PHPUnit_Framework_TestCase
         $_SERVER['REQUEST_URI'] = '/index.php/foo/bar';
         $_SERVER['SCRIPT_NAME'] = '/index.php';
         $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
-        $this->assertEquals('', $this->request->getBasePath());
+        $this->assertEquals('/', $this->request->getBasePath());
     }
     
     public function testGetBasePathWithAlias()

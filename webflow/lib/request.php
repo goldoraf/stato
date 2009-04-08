@@ -267,7 +267,8 @@ class Stato_Request
         if ($basePath === null)
             $basePath = str_replace(basename($_SERVER['SCRIPT_FILENAME']), '', $this->getBaseUrl());
         
-        $this->basePath = rtrim($basePath, '/');
+        if ($basePath != '/') $basePath = rtrim($basePath, '/');
+        $this->basePath = $basePath;
     }
     
     /**
