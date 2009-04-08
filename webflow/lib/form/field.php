@@ -369,7 +369,7 @@ class SChoiceField extends SField
     
     protected function get_input()
     {
-        $input = parent::getInput();
+        $input = parent::get_input();
         $input->set_choices($this->choices);
         return $input;
     }
