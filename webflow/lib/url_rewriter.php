@@ -87,8 +87,8 @@ class SUrlRewriter
                 $url.= isset($options['host']) ? $options['host'] : self::$request->host_with_port();
             }
             if ((!isset($options['skip_relative_url_root']) || $options['skip_relative_url_root'] == false) 
-            && !preg_match('#^'.self::$request->relative_url_root().'.*#', $path))
-                $url.= self::$request->relative_url_root();
+            && !preg_match('#^'.self::$request->base_path().'.*#', $path))
+                $url.= self::$request->base_path();
         }
         
         $url.= $path;

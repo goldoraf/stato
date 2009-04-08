@@ -10,7 +10,15 @@ class UrlRewriterTest extends PHPUnit_Framework_TestCase
         $map->connect(':controller/:action/:id');
         SRoutes::initialize($map, false);
         
-        SUrlRewriter::initialize(new MockRequest());
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/index.php/foo/bar';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $_SERVER['SERVER_NAME'] = 'test.host';
+        $_SERVER['SERVER_PORT'] = 80;
+        $request = new SRequest();
+        
+        SUrlRewriter::initialize($request);
     }
     
     public function test_basic()

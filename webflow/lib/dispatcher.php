@@ -14,7 +14,7 @@ interface SIDispatchable
 class SDispatchException extends Exception {}
 
 class SDispatcher
-{	
+{   
     protected $request;
     protected $logger;
     protected $response;
@@ -30,14 +30,14 @@ class SDispatcher
     
     public function dispatch() 
     {
-    	try
-    	{
+        try
+        {
             $map = include(STATO_APP_ROOT_PATH.'/conf/routes.php');
             SRoutes::initialize($map);
-            $this->request->inject_params(SRoutes::recognize($this->request->request_path()));
+            $this->request->inject_params(SRoutes::recognize($this->request->path_info()));
             SUrlRewriter::initialize($this->request);
             
-    		if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
+            if (file_exists($path = STATO_APP_PATH.'/helpers/application_helper.php')) require_once($path);
             
             if (isset($this->request->params['module'])) $module = $this->request->params['module'];
             else $module = null;
@@ -50,8 +50,8 @@ class SDispatcher
                 throw new SDispatchException('No dispatchable class identified !');
             
             $this->log_processing($dispatchable->process_to_log($this->request));
-    		
-    		$this->response = $dispatchable->dispatch($this->request, $this->response);
+            
+            $this->response = $dispatchable->dispatch($this->request, $this->response);
         }
         catch (Exception $e)
         {
@@ -62,7 +62,7 @@ class SDispatcher
         $this->response->out();
         
         $this->log_benchmarking();
-	}
+    }
     
     protected function log_processing($process)
     {
@@ -71,7 +71,6 @@ class SDispatcher
         $log = "\nProcessing {$process}() for ".$this->request->remote_ip().' at '
             .SDateTime::today()->__toString().' ['.strtoupper($this->request->method()).']';
         
-        //if (($sess_id = session_id()) != '') $log.= "\n    Session ID: ".$sess_id;
         $log.= "\n    Parameters: ".serialize($this->request->params);
         
         $this->logger->info($log);

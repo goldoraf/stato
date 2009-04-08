@@ -27,13 +27,13 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
-            $this->rec('posts/view/45'));
+            $this->rec('/posts/view/45'));
         $this->assertEquals(array('controller'=>'posts', 'action'=>'view'),
-            $this->rec('posts/view'));
+            $this->rec('/posts/view'));
         $this->assertEquals(array('controller'=>'posts'),
-            $this->rec('posts'));
+            $this->rec('/posts'));
         $this->assertEquals(array('controller'=>'users', 'action'=>'show'),
-            $this->rec('users/show'));
+            $this->rec('/users/show'));
             
         $this->assertEquals(array('posts/view/45', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'view', 'id'=>45)));
@@ -54,15 +54,15 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('controller'=>'posts', 'action'=>'view', 'id'=>45),
-            $this->rec('posts/view/45'));
+            $this->rec('/posts/view/45'));
         $this->assertEquals(array('controller'=>'posts', 'action'=>'view'),
-            $this->rec('posts/view'));
+            $this->rec('/posts/view'));
         $this->assertEquals(array('controller'=>'posts'),
-            $this->rec('posts'));
+            $this->rec('/posts'));
         $this->assertEquals(array('controller'=>'blog'),
-            $this->rec(''));
+            $this->rec('/'));
         $this->assertEquals(array('controller'=>'users', 'action'=>'show'),
-            $this->rec('users/show'));
+            $this->rec('/users/show'));
             
         $this->assertEquals(array('posts/view/45', array()),
             $this->gen(array('controller'=>'posts', 'action'=>'view', 'id'=>45)));
@@ -84,7 +84,7 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('controller'=>'blog', 'action'=>'recent'),
-            $this->rec(''));
+            $this->rec('/'));
             
         $this->assertEquals(array('', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'recent')));
@@ -99,11 +99,11 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('controller'=>'other', 'action'=>'list'),
-            $this->rec('test/list'));
+            $this->rec('/test/list'));
         $this->assertEquals(array('controller'=>'blog', 'action'=>'posts', 'category'=>'all'),
-            $this->rec('posts'));
+            $this->rec('/posts'));
         $this->assertEquals(array('controller'=>'blog', 'action'=>'posts', 'category'=>'php'),
-            $this->rec('posts/php'));
+            $this->rec('/posts/php'));
             
         $this->assertEquals(array('test/list', array()),
             $this->gen(array('controller'=>'other', 'action'=>'list')));
@@ -124,13 +124,13 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('resource' => 'users', 'username' => 'raphael'),
-            $this->rec('users/raphael'));
+            $this->rec('/users/raphael'));
         $this->assertEquals(array('resource' => 'posts', 'category' => 'all'),
-            $this->rec('posts'));
+            $this->rec('/posts'));
         $this->assertEquals(array('resource' => 'posts', 'category'=>'php'),
-            $this->rec('posts/php'));
+            $this->rec('/posts/php'));
         $this->assertEquals(array('resource' => 'comments', 'id'=>'1234'),
-            $this->rec('api/comments/1234'));
+            $this->rec('/api/comments/1234'));
     }
     
     public function test_date_based()
@@ -142,11 +142,11 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>14),
-            $this->rec('archives/2006/02/14'));
+            $this->rec('/archives/2006/02/14'));
         $this->assertEquals(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>null),
-            $this->rec('archives/2006/02'));
+            $this->rec('/archives/2006/02'));
         $this->assertEquals(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>null, 'day'=>null),
-            $this->rec('archives/2006'));
+            $this->rec('/archives/2006'));
             
         $this->assertEquals(array('archives/2006/02/14', array()),
             $this->gen(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>'02', 'day'=>14)));
@@ -167,23 +167,23 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('module'=>'admin', 'controller'=>'users_roles', 'action'=>'edit', 'id'=>15),
-            $this->rec('admin/users/edit/15'));
+            $this->rec('/admin/users/edit/15'));
         $this->assertEquals(array('module'=>'admin', 'controller'=>'permissions', 'action'=>'edit', 'id'=>15),
-            $this->rec('admin/permissions/edit/15'));
+            $this->rec('/admin/permissions/edit/15'));
         $this->assertEquals(array('module'=>'content', 'controller'=>'photos', 'action'=>'edit', 'id'=>15),
-            $this->rec('cms/photos/edit/15'));
+            $this->rec('/cms/photos/edit/15'));
         $this->assertEquals(array('module'=>'content', 'controller'=>'articles'),
-            $this->rec('cms'));
+            $this->rec('/cms'));
         $this->assertEquals(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
-            $this->rec('process'));
+            $this->rec('/process'));
         $this->assertEquals(array('module'=>'processing', 'controller'=>'images', 'action'=>'list'),
-            $this->rec('process/images'));
+            $this->rec('/process/images'));
         $this->assertEquals(array('module'=>'processing', 'controller'=>'images', 'action'=>'index'),
-            $this->rec('process/images/index'));
+            $this->rec('/process/images/index'));
         $this->assertEquals(array('module'=>'processing', 'controller'=>'pdf', 'action'=>'generate', 'id'=>15),
-            $this->rec('process/pdf/generate/15'));
+            $this->rec('/process/pdf/generate/15'));
         $this->assertEquals(array('controller'=>'home', 'action'=>'about'),
-            $this->rec('home/about'));
+            $this->rec('/home/about'));
             
         $this->assertEquals(array('admin/users/edit/15', array()),
             $this->gen(array('module'=>'admin', 'controller'=>'users', 'action'=>'edit', 'id'=>15)));
@@ -210,13 +210,13 @@ class RoutesTest extends PHPUnit_Framework_TestCase
         $this->set_map($map);
         
         $this->assertEquals(array('controller'=>'articles', 'action'=>'edit', 'id'=>15),
-            $this->rec('articles/edit/15'));
+            $this->rec('/articles/edit/15'));
         $this->assertEquals(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php'),
-            $this->rec('products/web/cms/php'));
+            $this->rec('/products/web/cms/php'));
         $this->assertEquals(array('controller'=>'pages', 'action'=>'view', 'path'=>''),
-            $this->rec(''));
+            $this->rec('/'));
         $this->assertEquals(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'),
-            $this->rec('downloads/pdf/my_book'));
+            $this->rec('/downloads/pdf/my_book'));
             
         $this->assertEquals(array('products/web/cms/php', array()),
             $this->gen(array('controller'=>'pages', 'action'=>'view', 'path'=>'products/web/cms/php')));

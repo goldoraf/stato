@@ -10,26 +10,40 @@ class SUnknownHttpMethod extends Exception {}
 class SRequest
 {
     /**
-     * Holds both GET and POST parameters in a single array. Uploaded files are held 
-     * in an instance of SUploadedFile class
+     * Provides quick array access to GET, POST and userland parameters
+     * @var SRequestParams
      */
-    public $params = array();
+    public $params;
     
+    /**
+     * Provides quick array access to uploaded FILES
+     * @var SRequestFiles
+     */
+    public $files;
+    
+    /**
+     * Allowed HTTP methods
+     * @var array 
+     */
     public static $accepted_http_methods = array('get', 'post', 'put', 'delete', 'head', 'options');
     
-    private $relative_url_root;
-    private $request_uri;
-    private $accepts;
-    private $format;
+    protected $base_url = null;
+    protected $request_uri = null;
+    protected $base_path = null;
+    protected $path_info = null;
+    protected $accepts;
+    protected $format;
     
     public function __construct()
     {
-        $this->parse_request_parameters();
+        $this->params = new SRequestParams();
+        $this->files = new SRequestFiles();
+        if ($this->is_put()) $this->inject_params($this->parse_raw_body_params());
     }
     
     public function inject_params($params)
     {
-        $this->params = array_merge($this->params, $params);
+        $this->params->merge($params);
     }
     
     /**
@@ -215,9 +229,11 @@ class SRequest
     }
     
     /**
-     * Returns the raw post data
+     * Returns the raw body of the request
+     * 
+     * @return string|false
      */
-    public function raw_post_data()
+    public function raw_body()
     {
         $data = file_get_contents('php://input');
         if (strlen(trim($data)) > 0) return $data;
@@ -225,72 +241,264 @@ class SRequest
     }
     
     /**
-     * Return the request URI
+     * Extracts params from the raw body of the request, if present.
+     * 
+     * @return array
+     */
+    private function parse_raw_body_params()
+    {
+        $params = array();
+        if (($data = $this->raw_body()) !== false) parse_str($data, $params);
+        return $params;
+    }
+    
+    /**
+     * Returns the REQUEST_URI
+     *
+     * @return string
      */
     public function request_uri()
     {
-        if (!isset($this->request_uri))
-            $this->request_uri = substr($_SERVER['REQUEST_URI'], strlen($this->relative_url_root()));
+        if ($this->request_uri === null) $this->set_request_uri();
         return $this->request_uri;
     }
     
     /**
-     * Return the request URI minus file extension and querystring (for use with routing)
-     * If a file extension is present, sets the format too
+     * Sets the REQUEST_URI
+     *
+     * If no request URI is passed, uses the value in $_SERVER['REQUEST_URI']
+     * 
+     * @return void
      */
-    public function request_path()
+    public function set_request_uri($request_uri = null)
     {
-        $path = $this->request_uri();
-        if (strpos($path, '?') !== false) list($path, ) = explode('?', $path);
-        
-        // Skip trailing slash
-        if (substr($path, -1) == '/') $path = substr($path, 0, -1);
-        
-        $extension = strrchr($path, '.');
-        if ($extension !== false)
-        {
-            $this->set_format_by_extension(substr($extension, 1));
-            $path = substr($path, 0, - strlen($extension));
-        }
-        
-        return $path;
+        if ($request_uri === null && isset($_SERVER['REQUEST_URI']))
+            $request_uri = $_SERVER['REQUEST_URI'];
+        $this->request_uri = $request_uri;
     }
     
     /**
-     * Returns the path minus the web server relative installation directory
+     * Returns the segment of the url leading to the script name (e.g: /app/index.php)
+     *
+     * @return string
      */
-    public function relative_url_root()
+    public function base_url()
     {
-        if (!isset($this->relative_url_root))
-            $this->relative_url_root = str_replace('/index.php', '/', $_SERVER['SCRIPT_NAME']);
-        return $this->relative_url_root;
+        if ($this->base_url === null) $this->set_base_url();
+        return $this->base_url;
     }
     
-    private function parse_request_parameters()
+    /**
+     * Sets the base url of the request
+     *
+     * If no base url is passed, uses the value in $_SERVER['SCRIPT_NAME']
+     * 
+     * @return void
+     */
+    public function set_base_url($base_url = null)
     {
-        $this->params += $_GET;
-        if ($this->is_put() && ($data = $this->raw_post_data()) !== false) {
-            $put_params = array();
-            parse_str($data, $put_params);
-            $this->params += $put_params;
-        } elseif ($this->is_post()) {
-            $this->params += $_POST;
-            $this->extract_uploaded_files();
-        }
-    }
-    
-    private function extract_uploaded_files()
-    {
-        foreach ($_FILES as $key => $value) {
-        	if (is_array($value['name'])) {
-                foreach ($value['name'] as $k => $v)
-                    if ($value['error'][$k] === UPLOAD_ERR_OK)
-                        $this->params[$key][$k] = new SUploadedFile($value['tmp_name'][$k], $v, $value['type'][$k]);
+        if ($base_url === null) {
+            $base_url = $_SERVER['SCRIPT_NAME'];
+        
+            $request_uri = $this->request_uri();
+            if (strpos($request_uri, $base_url) !== 0) {
+                if (strpos($request_uri, dirname($base_url)) === 0) 
+                    $base_url = dirname($base_url);
+                elseif (strpos($request_uri, $base_url) === false) 
+                    $base_url = '';
             }
-            elseif ($value['error'] === UPLOAD_ERR_OK)
-                $this->params[$key] = new SUploadedFile($value['tmp_name'], $value['name'], $value['type']);
         }
-	}
+        
+        $this->base_url = rtrim($base_url, '/');
+    }
+    
+    /**
+     * Returns the base url minus the script name (e.g: /app)
+     *
+     * @return string
+     */
+    public function base_path()
+    {
+        if ($this->base_path === null) $this->set_base_path();
+        return $this->base_path;
+    }
+    
+    /**
+     * Sets the base path
+     * 
+     * @return void
+     */
+    public function set_base_path($base_path = null)
+    {
+        if ($base_path === null)
+            $base_path = str_replace(basename($_SERVER['SCRIPT_FILENAME']), '', $this->base_url());
+        
+        if ($base_path != '/') $base_path = rtrim($base_path, '/');
+        $this->base_path = $base_path;
+    }
+    
+    /**
+     * Returns everything between the base url and the query string
+     *
+     * @return string
+     */
+    public function path_info()
+    {
+        if ($this->path_info === null) $this->set_path_info();
+        return $this->path_info;
+    }
+    
+    /**
+     * Sets the path info
+     * 
+     * @return void
+     */
+    public function set_path_info($path_info = null)
+    {
+        if ($path_info === null)
+        {
+            $request_uri = $this->request_uri();
+            if (strpos($request_uri, '?') !== false) 
+                list($path_info, ) = explode('?', $request_uri);
+            else
+                $path_info = $request_uri;
+            
+            $base_url = $this->base_url();
+            if (!empty($base_url))
+                $path_info = substr($path_info, strlen($base_url));
+        }
+        
+        $extension = strrchr($path_info, '.');
+        if ($extension !== false)
+        {
+            $this->set_format_by_extension(substr($extension, 1));
+            $path_info = substr($path_info, 0, - strlen($extension));
+        }
+        
+        $this->path_info = $path_info;
+    }
+}
+
+/**
+ * Wraps values contained in the GET and POST superglobals
+ * 
+ * Implements ArrayAccess for an easy access to values. You can also push
+ * your own params in it, it will not overwrite values contained in superglobals.
+ * As a same key can be present in the 3 sources of values, there is an order 
+ * of precedence when you try to access a value: 1. userland params, 2. GET, 3. POST
+ * 
+ * @package Stato
+ * @subpackage webflow
+ */
+class SRequestParams implements ArrayAccess
+{
+    /**
+     * Userland parameters
+     * @var array
+     */
+    protected $params;
+    
+    public function __construct()
+    {
+        $this->params = array();
+    }
+    
+    public function merge($params)
+    {
+        $this->params = array_merge($this->params, $params);
+    }
+    
+    public function offsetExists($key)
+    {
+        return isset($this->params[$key])
+            || isset($_GET[$key])
+            || isset($_POST[$key]);
+    }
+    
+    public function offsetGet($key)
+    {
+        switch (true) {
+            case isset($this->params[$key]):
+                return $this->params[$key];
+            case isset($_GET[$key]):
+                return $_GET[$key];
+            case isset($_POST[$key]):
+                return $_POST[$key];
+            default:
+                return null;
+        }
+    }
+    
+    public function offsetSet($key, $value)
+    {
+        $this->params[$key] = $value;
+    }
+    
+    public function offsetUnset($key)
+    {
+        if (array_key_exists($key, $this->params)) unset($this->params[$key]);
+    }
+}
+
+/**
+ * Wraps uploaded files contained in the FILES superglobal
+ * 
+ * Implements ArrayAccess for an easy access to files. When you try to 
+ * retrieve a particular key and there is/are uploaded file(s) that 
+ * corresponds, you will get either an instance of SUploadedFile or 
+ * an array of instances.
+ * 
+ * @package Stato
+ * @subpackage webflow
+ */
+class SRequestFiles implements ArrayAccess
+{
+    protected $files;
+    
+    public function __construct()
+    {
+        $this->files = array();
+    }
+    
+    public function offsetExists($key)
+    {
+        return isset($this->files[$key]) || isset($_FILES[$key]);
+    }
+    
+    public function offsetGet($key)
+    {
+        if (!$this->offsetExists($key)) return null;
+        if (!isset($this->files[$key])) $this->files[$key] = $this->prepare_files($_FILES[$key]);
+        return $this->files[$key];
+    }
+    
+    public function offsetSet($key, $file)
+    {
+        if (!$file instanceof SUploadedFile)
+            throw new Exception('Only SUploadedFile instances can be added to a SRequestFiles instance');
+        
+        $this->files[$key] = $file;
+    }
+    
+    public function offsetUnset($key)
+    {
+        if (array_key_exists($key, $this->files)) unset($this->params[$key]);
+    }
+    
+    public function prepare_files($files)
+    {
+        if (!is_array($files['name'])) {
+            return new SUploadedFile($files['tmp_name'], $files['name'], 
+                                          $files['type'], $files['size'], $files['error']);
+        } else {
+            $uploads = array();
+            foreach ($files['name'] as $k => $v) {
+                $uploads[] = new SUploadedFile($files['tmp_name'][$k], $v, 
+                                                    $files['type'][$k], $files['size'][$k], $files['error'][$k]);
+            }
+            return $uploads;
+        }
+    }
 }
 
 /**
@@ -301,18 +509,54 @@ class SRequest
  */
 class SUploadedFile
 {
-    public $original_filename;
-    public $content_type;
-    public $temp_filename;
-    public $file_size;
-    public $error;
+    const SIZE = 'size';
+    const PARTIAL = 'partial';
+    const NO_FILE = 'no_file';
+    const SYSTEM = 'system';
     
-    public function __construct($temp_filename, $orig_filename, $content_type, $file_size)
+    public $name;
+    public $size;
+    public $type;
+    public $error;
+    public $tmp;
+    
+    protected $original_error;
+    
+    public function __construct($tmp, $name, $type, $size, $error)
     {
-        $this->temp_filename = $temp_filename;
-        $this->original_filename = $orig_filename;
-        $this->content_type = $content_type;
-        $this->error = false;
+        $this->name = $name;
+        $this->tmp = $tmp;
+        $this->type = $type;
+        $this->size = $size;
+        switch ($error) {
+            case UPLOAD_ERR_OK:
+                $this->error = false;
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+                $this->error = self::size;
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                $this->error = self::size;
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $this->error = self::partial;
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $this->error = self::no_file;
+                break;
+            default:
+                $this->error = self::system;
+        }
+        $this->original_error = $error;
+    }
+    
+    /**
+     * Moves the uploaded file to a new location after checking that the 
+     * file is safe.
+     */
+    public function move($path)
+    {
+        return move_uploaded_file($this->tmp, $path);
     }
     
     /**
@@ -322,19 +566,25 @@ class SUploadedFile
      */
     public function is_safe()
     {
-        return is_uploaded_file($this->temp_filename);
+        return is_uploaded_file($this->tmp);
     }
     
     /**
-     * Moves the uploaded file to a new location after checking that the 
-     * file is safe.
+     * Tries to get the real file mimetype. It uses the fileinfo extension if 
+     * it is available, or uses the mimetype given by the fileserver.
      */
-    public function save_as($path, $chmod = null)
+    public function get_mime_type()
     {
-        $mv_success = @move_uploaded_file($this->temp_filename, $path);
-        if ($chmod === null) return $mv_success;
-        return ($mv_success && @chmod($path, $chmod));
+        if (!class_exists('finfo', false)) return $this->type;
+        $info = new finfo(FILEINFO_MIME);
+        return $info->file($this->tmp);
+    }
+    
+    /**
+     * Returns the original error constant given by PHP
+     */
+    public function get_original_error()
+    {
+        return $this->original_error;
     }
 }
-
-?>
