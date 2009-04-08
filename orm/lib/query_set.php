@@ -215,6 +215,19 @@ class SQuerySet implements Iterator, Countable
         return;
     }
     
+     /**
+     * Updates the records in the current queryset.       
+     */
+    public function update($values)
+    {
+        $clone = clone $this;
+        $clone->includes = array();
+        $clone->joins    = array();
+        $clone->order_by = array();
+        $this->conn->execute("UPDATE {$this->meta->table_name} ".$clone->sql_set($values).' '.$clone->sql_clause());
+        return;
+    }
+    
     /**
      * Returns a new <var>SQuerySet</var> instance with the args ANDed to the existing set.   
      */
@@ -323,6 +336,18 @@ class SQuerySet implements Iterator, Countable
         $components[] = $this->sql_limit();
         foreach ($components as $k => $v) if ($v === null) unset($components[$k]);
         return $this->conn->sanitize_sql(implode(' ', $components), $this->params);
+    }
+    
+    /**
+     * Returns a generated SQL SET
+     */
+    public function sql_set($values)
+    {
+        $set = array();
+        foreach ($values as $k => $v)
+            $set[] = "`$k` = ".$this->conn->quote($v);
+        
+        return 'SET '.join(',', $set);
     }
     
     /**

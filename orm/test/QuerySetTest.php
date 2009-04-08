@@ -195,5 +195,13 @@ class QuerySetTest extends ActiveTestCase
         Company::$objects->filter("name = 'Groupe W'")->delete();
         $this->assertEquals(1, Company::$objects->all()->count());
     }
+    
+    public function test_update()
+    {
+        Employe::$objects->all()->update(array('function' => 'developer'));
+        $this->assertEquals('developer', Employe::$objects->get(1)->function);
+        Employe::$objects->filter("lastname = 'Doe'")->update(array('function' => 'expert'));
+        $this->assertEquals('expert', Employe::$objects->get(1)->function);
+    }
 }
 
