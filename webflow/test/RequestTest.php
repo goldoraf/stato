@@ -80,6 +80,14 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('/', $this->request->base_path());
     }
     
+    public function test_base_path_with_mod_rewrite()
+    {
+        $_SERVER['REQUEST_URI'] = '/foo/bar';
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = '/path/to/www/index.php';
+        $this->assertEquals('/', $this->request->base_path());
+    }
+    
     public function test_base_path_with_alias()
     {
         $_SERVER['REQUEST_URI'] = '/app/index.php/foo/bar';
