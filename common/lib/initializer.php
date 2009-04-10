@@ -73,6 +73,9 @@ class SInitializer
                 return vsprintf($key, $values);
             }
         }
+        if (self::$config->use_mailer) {
+            require_once STATO_CORE_PATH.'/mailer/mailer.php';
+        }
     }
     
     private static function is_cli_env()
