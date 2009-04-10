@@ -19,9 +19,6 @@
  */
 function pagination_links($paginator, $options = array(), $html_options = array())
 {
-    if (!isset($options['params']))
-        $options['params'] = SUrlRewriter::current_params();
-    
     $p = new SPaginationHelper($paginator, $options, $html_options);
     return $p->links();
 }

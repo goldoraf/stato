@@ -11,11 +11,6 @@ class SUrlRewriter
         self::$request = $request;
     }
     
-    public static function current_params()
-    {
-        return self::$request->params;
-    }
-    
     public static function request_param($param)
     {
         if (isset(self::$request->params[$param])) return self::$request->params[$param];
