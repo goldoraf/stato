@@ -173,7 +173,20 @@ class Stato_FormInputTest extends PHPUnit_Framework_TestCase
     {
         $s = new Stato_Form_MultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
         $this->assertDomEquals(
-            '<select multiple="multiple" name="service">
+            '<select multiple="multiple" name="service[]">
+            <option value="Marketing" selected="selected">Marketing</option>
+            <option value="IT">IT</option>
+            <option value="Commercial">Commercial</option>
+            </select>',
+            $s->render('service[]', 'Marketing')
+        );
+    }
+    
+    public function testMultipleSelectShouldAddSquareBracketsToNameAttr()
+    {
+        $s = new Stato_Form_MultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertDomEquals(
+            '<select multiple="multiple" name="service[]">
             <option value="Marketing" selected="selected">Marketing</option>
             <option value="IT">IT</option>
             <option value="Commercial">Commercial</option>
@@ -186,12 +199,12 @@ class Stato_FormInputTest extends PHPUnit_Framework_TestCase
     {
         $s = new Stato_Form_MultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
         $this->assertDomEquals(
-            '<select multiple="multiple" name="service">
+            '<select multiple="multiple" name="service[]">
             <option value="Marketing" selected="selected">Marketing</option>
             <option value="IT">IT</option>
             <option value="Commercial" selected="selected">Commercial</option>
             </select>',
-            $s->render('service', array('Marketing', 'Commercial'))
+            $s->render('service[]', array('Marketing', 'Commercial'))
         );
     }
     
