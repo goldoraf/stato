@@ -163,4 +163,10 @@ class SMultipleSelect extends SSelect
         $attrs['multiple'] = true;
         parent::__construct($attrs);
     }
+    
+    public function render($name, $value = null, array $attrs = array())
+    {
+        if (!preg_match('/.*\[\]$/', $name)) $name.= '[]';
+        return parent::render($name, $value, $attrs);
+    }
 }
