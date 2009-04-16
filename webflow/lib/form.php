@@ -143,11 +143,17 @@ class Stato_Form implements Iterator
         $openTag = '<'.$tag.'>';
         $closeTag = '</'.$tag.'>';
         $html = array();
+        $hiddenFields = array();
         foreach ($this->fields as $name => $field) {
             $bf = new Stato_Form_BoundField($this, $field, $name);
-            $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
-            $html[] = $openTag.$bf->labelTag.$bf->render().$err.$closeTag;
+            if ($bf->isHidden) {
+                $hiddenFields[] = $bf->render();
+            } else {
+                $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
+                $html[] = $openTag.$bf->labelTag.$bf->render().$err.$closeTag;
+            }
         }
+        if (!empty($hiddenFields)) $html[] = implode("\n", $hiddenFields);
         return implode("\n", $html);
     }
     

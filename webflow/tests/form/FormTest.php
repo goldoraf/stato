@@ -102,6 +102,17 @@ EOT;
         $this->assertEquals($html, $this->form->render());
     }
     
+    public function testFormBasicRenderingWithHiddenField()
+    {
+        $html = <<<EOT
+<p><label for="title">Title</label><input type="text" name="title" id="title" /></p>
+<p><label for="body">Body</label><textarea name="body" cols="40" rows="10" id="body"></textarea></p>
+<input type="hidden" name="author_id" id="author_id" />
+EOT;
+        $this->form->author_id = new Stato_Form_IntegerField(array('input' => 'Stato_Form_HiddenInput'));
+        $this->assertEquals($html, $this->form->render());
+    }
+    
     public function testFormBasicRenderingWithError()
     {
         $html = <<<EOT
