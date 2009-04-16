@@ -15,9 +15,13 @@ class SFormErrors extends ArrayObject
     {
         $html = "<ul class=\"errorlist\">\n";
         foreach ($this as $k => $v) {
-            $id = (is_null($this->prefix)) ? $k : $this->prefix.'_'.$k;
-            $k = SInflection::humanize($k);
-            $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
+            if ($k == SForm::FORM_WIDE_ERRORS) {
+                $html.= "<li>$v</li>\n";
+            } else {
+                $id = (is_null($this->prefix)) ? $k : $this->prefix.'_'.$k;
+                $k = SInflection::humanize($k);
+                $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
+            }
         }
         $html.= "</ul>";
         return $html;
@@ -31,6 +35,8 @@ class SFormErrors extends ArrayObject
 
 class SForm
 {
+    const FORM_WIDE_ERRORS = '_all_';
+    
     public $errors;
     public $cleaned_data = array();
     
@@ -151,13 +157,35 @@ class SForm
             try {
                 $value = $field->clean($value);
                 $this->cleaned_data[$name] = $value;
+                
+                $clean_method = 'clean_'.$name;
+                if (method_exists($this, $clean_method)) {
+                    $value = $this->$clean_method($value);
+                    $this->cleaned_data[$name] = $value;
+                }
             } catch (SValidationError $e) {
                 $this->errors[$name] = _f($e->get_message(), $e->get_args());
                 $this->cleaned_data[$name] = $e->get_cleaned_value();
             }
         }
         
+        try {
+            $this->clean();
+        } catch (SValidationError $e) {
+            $this->errors[self::FORM_WIDE_ERRORS] = $e->get_message();
+        }
+        
         return count($this->errors) === 0;
+    }
+    
+    /**
+     * Hook for doing any extra form-wide cleaning after every field been 
+     * cleaned. Any Stato_From_ValidationError raised by this method will not be 
+     * associated with a particular field.
+     */
+    protected function clean()
+    {
+        
     }
     
     protected function bind(array $data = null, array $files = null)
