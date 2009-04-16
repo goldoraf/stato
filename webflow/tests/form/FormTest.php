@@ -157,4 +157,24 @@ EOT;
         $this->assertEquals(array('to' => 'jane@doe.net', 'cc' => 'john@doe.net', 
                                   'subject' => 'donuts', 'body' => 'hello'), $form2->getCleanedData());
     }
+    
+    public function testIsValidWithCleanHook()
+    {
+        require_once 'files/forms/test_form_1.php';
+        $form = new TestForm1;
+        $this->assertFalse($form->isValid(array('lib' => 'bar')));
+        $this->assertEquals('Lib should be "foo"', $form->errors['_all_']);
+        $form = new TestForm1;
+        $this->assertTrue($form->isValid(array('lib' => 'foo')));
+    }
+    
+    public function testIsValidWithCleanFieldHook()
+    {
+        require_once 'files/forms/test_form_2.php';
+        $form = new TestForm2;
+        $this->assertFalse($form->isValid(array('lib' => 'bar')));
+        $this->assertEquals('Lib should be "foo"', $form->errors['lib']);
+        $form = new TestForm2;
+        $this->assertTrue($form->isValid(array('lib' => 'foo')));
+    }
 }

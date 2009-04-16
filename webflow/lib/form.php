@@ -9,28 +9,33 @@ interface Stato_Form_IFieldDecorator
 
 class Stato_Form_Errors extends ArrayObject
 {
-    protected $prefix = null;
+    protected $form;
+    
+    public function __construct(Stato_Form $form)
+    {
+        $this->form = $form;
+        parent::__construct(array());
+    }
     
     public function __toString()
     {
         $html = "<ul class=\"errorlist\">\n";
         foreach ($this as $k => $v) {
-            $id = (is_null($this->prefix)) ? $k : $this->prefix.'_'.$k;
-            $k = humanize($k);
-            $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
+            if ($k == Stato_Form::FORM_WIDE_ERRORS) {
+                $html.= "<li>$v</li>\n";
+            } else {
+                $html.= "<li>".$this->form->{$k}->labelTag." - $v</li>\n";
+            }
         }
         $html.= "</ul>";
         return $html;
     }
-    
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
-    }
 }
 
-class Stato_Form
+class Stato_Form implements Iterator
 {
+    const FORM_WIDE_ERRORS = '_all_';
+    
     public $errors;
     
     protected $data;
@@ -69,6 +74,31 @@ class Stato_Form
     public function __toString()
     {
         return $this->render();
+    }
+    
+    public function current()
+    {
+        return new Stato_Form_BoundField($this, current($this->fields), $this->key());
+    }
+    
+    public function key()
+    {
+        return key($this->fields);
+    }
+    
+    public function next()
+    {
+        next($this->fields);
+    }
+    
+    public function rewind()
+    {
+        reset($this->fields);
+    }
+    
+    public function valid()
+    {
+        return current($this->fields) !== false;
     }
     
     public function addField($name, $field, $options = array())
@@ -143,21 +173,42 @@ class Stato_Form
         if (!$this->isBound) return;
         
         $this->cleanedData = array();
-        $this->errors = new Stato_Form_Errors();
-        $this->errors->setPrefix($this->prefix);
+        $this->errors = new Stato_Form_Errors($this);
         
         foreach ($this->fields as $name => $field) {
             $value = (array_key_exists($name, $this->data)) ? $this->data[$name] : null;
             try {
                 $value = $field->clean($value);
                 $this->cleanedData[$name] = $value;
+                
+                $cleanMethod = 'clean'.$name;
+                if (method_exists($this, $cleanMethod)) {
+                    $value = $this->$cleanMethod($value);
+                    $this->cleanedData[$name] = $value;
+                }
             } catch (Stato_Form_ValidationError $e) {
                 $this->errors[$name] = vsprintf(__($e->getMessage()), $e->getArgs());
                 $this->cleanedData[$name] = $e->getCleanedValue();
             }
         }
         
+        try {
+            $this->clean();
+        } catch (Stato_Form_ValidationError $e) {
+            $this->errors[self::FORM_WIDE_ERRORS] = $e->getMessage();
+        }
+        
         return count($this->errors) === 0;
+    }
+    
+    /**
+     * Hook for doing any extra form-wide cleaning after every field been 
+     * cleaned. Any Stato_From_ValidationError raised by this method will not be 
+     * associated with a particular field.
+     */
+    protected function clean()
+    {
+        
     }
     
     protected function bind(array $data = null, array $files = null)
