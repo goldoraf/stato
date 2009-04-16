@@ -144,11 +144,17 @@ class SForm implements Iterator
         $open_tag = '<'.$tag.'>';
         $close_tag = '</'.$tag.'>';
         $html = array();
+        $hidden_fields = array();
         foreach ($this->fields as $name => $field) {
             $bf = new SBoundField($this, $field, $name);
-            $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
-            $html[] = $open_tag.$bf->label_tag.$bf->render().$err.$close_tag;
+            if ($bf->is_hidden) {
+                $hidden_fields[] = $bf->render();
+            } else {
+                $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
+                $html[] = $open_tag.$bf->label_tag.$bf->render().$err.$close_tag;
+            }
         }
+        if (!empty($hidden_fields)) $html[] = implode("\n", $hidden_fields);
         return implode("\n", $html);
     }
     
