@@ -115,6 +115,20 @@ class SForm implements Iterator
         $this->fields[$name] = $field;
     }
     
+    public function visible_fields()
+    {
+        $visible = array();
+        foreach ($this as $field) if (!$field->is_hidden) $visible[] = $field;
+        return $visible;
+    }
+    
+    public function hidden_fields()
+    {
+        $hidden = array();
+        foreach ($this as $field) if ($field->is_hidden) $hidden[] = $field;
+        return $hidden;
+    }
+    
     public function is_bound()
     {
         return $this->is_bound;
@@ -228,6 +242,7 @@ class SBoundField
     public $html_name;
     public $error;
     public $help_text;
+    public $is_hidden;
     
     protected $form;
     protected $field;
@@ -245,6 +260,7 @@ class SBoundField
         $this->label_tag = $this->get_label_tag();
         $this->error = (isset($this->form->errors[$name])) ? $this->form->errors[$name] : false;
         $this->help_text = $this->field->help_text;
+        $this->is_hidden = $this->field->get_input()->is_hidden();
     }
     
     public function __toString()

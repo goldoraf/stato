@@ -4,6 +4,7 @@ abstract class SInput
 {
     protected $attrs;
     protected $type = null;
+    protected $is_hidden = false;
     
     public function __construct(array $attrs = array())
     {
@@ -13,6 +14,11 @@ abstract class SInput
     public function add_attrs(array $attrs)
     {
         $this->attrs = array_merge($this->attrs, $attrs);
+    }
+    
+    public function is_hidden()
+    {
+        return $this->is_hidden;
     }
     
     public function render($name, $value = null, array $attrs = array())
@@ -49,6 +55,7 @@ class SPasswordInput extends SInput
 class SHiddenInput extends SInput
 {
     protected $type = 'hidden';
+    protected $is_hidden = true;
 }
 
 class SFileInput extends SInput

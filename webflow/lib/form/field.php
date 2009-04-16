@@ -99,7 +99,7 @@ class SField
         return $value;
     }
     
-    protected function get_input()
+    public function get_input()
     {
         $input_class = $this->input;
         return new $input_class();
@@ -367,7 +367,7 @@ class SChoiceField extends SField
         return $value;
     }
     
-    protected function get_input()
+    public function get_input()
     {
         $input = parent::get_input();
         $input->set_choices($this->choices);
