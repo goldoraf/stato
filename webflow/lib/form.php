@@ -33,7 +33,7 @@ class SFormErrors extends ArrayObject
     }
 }
 
-class SForm
+class SForm implements Iterator
 {
     const FORM_WIDE_ERRORS = '_all_';
     
@@ -75,6 +75,31 @@ class SForm
     public function __toString()
     {
         return $this->render();
+    }
+    
+    public function current()
+    {
+        return new SBoundField($this, current($this->fields), $this->key());
+    }
+    
+    public function key()
+    {
+        return key($this->fields);
+    }
+    
+    public function next()
+    {
+        next($this->fields);
+    }
+    
+    public function rewind()
+    {
+        reset($this->fields);
+    }
+    
+    public function valid()
+    {
+        return current($this->fields) !== false;
     }
     
     public function add_field($name, $field, $options = array())
