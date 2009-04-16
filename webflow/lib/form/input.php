@@ -4,6 +4,7 @@ abstract class Stato_Form_Input
 {
     protected $attrs;
     protected $type = null;
+    protected $isHidden = false;
     
     public function __construct(array $attrs = array())
     {
@@ -13,6 +14,11 @@ abstract class Stato_Form_Input
     public function addAttrs(array $attrs)
     {
         $this->attrs = array_merge($this->attrs, $attrs);
+    }
+    
+    public function isHidden()
+    {
+        return $this->isHidden;
     }
     
     public function render($name, $value = null, array $attrs = array())
@@ -49,6 +55,7 @@ class Stato_Form_PasswordInput extends Stato_Form_Input
 class Stato_Form_HiddenInput extends Stato_Form_Input
 {
     protected $type = 'hidden';
+    protected $isHidden = true;
 }
 
 class Stato_Form_FileInput extends Stato_Form_Input

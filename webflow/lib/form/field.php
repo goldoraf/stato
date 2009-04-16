@@ -94,7 +94,7 @@ class Stato_Form_Field
         return $value;
     }
     
-    protected function getInput()
+    public function getInput()
     {
         $inputClass = $this->input;
         return new $inputClass();
@@ -362,7 +362,7 @@ class Stato_Form_ChoiceField extends Stato_Form_Field
         return $value;
     }
     
-    protected function getInput()
+    public function getInput()
     {
         $input = parent::getInput();
         $input->setChoices($this->choices);

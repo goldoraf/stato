@@ -114,6 +114,20 @@ class Stato_Form implements Iterator
         $this->fields[$name] = $field;
     }
     
+    public function visibleFields()
+    {
+        $visible = array();
+        foreach ($this as $field) if (!$field->isHidden) $visible[] = $field;
+        return $visible;
+    }
+    
+    public function hiddenFields()
+    {
+        $hidden = array();
+        foreach ($this as $field) if ($field->isHidden) $hidden[] = $field;
+        return $hidden;
+    }
+    
     public function isBound()
     {
         return $this->isBound;
@@ -226,6 +240,7 @@ class Stato_Form_BoundField
     public $htmlName;
     public $error;
     public $helpText;
+    public $isHidden;
     
     protected $form;
     protected $field;
@@ -243,6 +258,7 @@ class Stato_Form_BoundField
         $this->labelTag = $this->getLabelTag();
         $this->error = (isset($this->form->errors[$name])) ? $this->form->errors[$name] : false;
         $this->helpText = $this->field->helpText;
+        $this->isHidden = $this->field->getInput()->isHidden();
     }
     
     public function __toString()
