@@ -46,6 +46,12 @@ class Stato_FormFieldTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<input type="hidden" name="foo" value="bar" />', $f->render('foo', 'bar'));
     }
     
+    public function testFieldWithInputAttrsOption()
+    {
+        $f = new Stato_Form_Field(array('input_attrs' => array('class' => 'foo')));
+        $this->assertEquals('<input type="text" name="foo" class="foo" value="bar" />', $f->render('foo', 'bar'));
+    }
+    
     public function testFieldWithBadInputOptionShouldThrow()
     {
         $this->setExpectedException('Exception');
@@ -130,6 +136,12 @@ class Stato_FormFieldTest extends PHPUnit_Framework_TestCase
         } catch (Stato_Form_ValidationError $e) {
             $this->assertEquals('bc', $e->getCleanedValue());
         }
+    }
+    
+    public function testTextFieldWithInputAttrsOption()
+    {
+        $f = new Stato_Form_TextField(array('input_attrs' => array('cols' => 80, 'rows' => 20)));
+        $this->assertEquals('<textarea name="bar" cols="80" rows="20"></textarea>', $f->render('bar'));
     }
     
     public function testIntegerField()

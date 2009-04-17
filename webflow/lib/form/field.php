@@ -32,6 +32,7 @@ class Stato_Form_Field
     protected $options;
     protected $required;
     protected $errorMessages;
+    protected $inputAttrs;
     protected $name = null;
     protected $value = null;
     protected $input = 'Stato_Form_TextInput';
@@ -39,7 +40,7 @@ class Stato_Form_Field
     protected $defaultErrorMessages = array();
     protected $baseDefaultOptions = array(
         'required' => false, 'label' => null, 'initial' => null, 
-        'help_text' => null, 'error_messages' => array()
+        'help_text' => null, 'error_messages' => array(), 'input_attrs' => array()
     );
     protected $baseDefaultErrorMessages = array(
         'required' => 'This field is required.',
@@ -52,8 +53,9 @@ class Stato_Form_Field
         $this->errorMessages = array_merge($this->baseDefaultErrorMessages, 
                                            $this->defaultErrorMessages, $this->options['error_messages']);
         
-        list($this->required, $this->label, $this->initial, $this->helpText)
-            = array($this->options['required'], $this->options['label'], $this->options['initial'], $this->options['help_text']);
+        list($this->required, $this->label, $this->initial, $this->helpText, $this->inputAttrs)
+            = array($this->options['required'], $this->options['label'], $this->options['initial'], 
+                    $this->options['help_text'], $this->options['input_attrs']);
             
         if (array_key_exists('input', $this->options)) {
             $ref = new ReflectionClass($this->options['input']);
@@ -79,7 +81,7 @@ class Stato_Form_Field
     public function render($name, $value = null, $htmlAttrs = array())
     {
         $input = $this->getInput();
-        $attrs = array_merge($this->getInputAttrs(), $htmlAttrs);
+        $attrs = array_merge($this->getInputAttrs(), $this->inputAttrs, $htmlAttrs);
         if (!empty($attrs)) $input->addAttrs($attrs);
         return $input->render($name, $value);
     }
