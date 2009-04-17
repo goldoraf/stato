@@ -176,6 +176,40 @@ class Stato_FormFieldTest extends PHPUnit_Framework_TestCase
         $f->clean('3');
     }
     
+    public function testFloatField()
+    {
+        $f = new Stato_Form_FloatField();
+        $this->assertEquals(1.234, $f->clean('1.234'));
+        $this->assertEquals(1.2e3, $f->clean('1.2e3'));
+        $this->assertEquals(7E-10, $f->clean('7E-10'));
+    }
+    
+    public function testFloatFieldWithMaxValueOption()
+    {
+        $f = new Stato_Form_FloatField(array('max_value' => 6));
+        $this->assertEquals(5.99, $f->clean('5.99'));
+    }
+    
+    public function testFloatFieldWithMinValueOption()
+    {
+        $f = new Stato_Form_FloatField(array('min_value' => 2));
+        $this->assertEquals(2.01, $f->clean('2.01'));
+    }
+    
+    public function testFloatFieldMaxValueValidationError()
+    {
+        $this->setExpectedException('Stato_Form_ValidationError', 'Ensure this value is greater than or equal to %s.');
+        $f = new Stato_Form_FloatField(array('max_value' => 8));
+        $f->clean('8.01');
+    }
+    
+    public function testFloatFieldMinValueValidationError()
+    {
+        $this->setExpectedException('Stato_Form_ValidationError', 'Ensure this value is less than or equal to %s.');
+        $f = new Stato_Form_FloatField(array('min_value' => 4));
+        $f->clean('3.99');
+    }
+    
     public function testDateTimeField()
     {
         $f = new Stato_Form_DateTimeField();

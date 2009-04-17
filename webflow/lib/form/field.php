@@ -211,6 +211,43 @@ class Stato_Form_IntegerField extends Stato_Form_Field
     }
 }
 
+class Stato_Form_FloatField extends Stato_Form_Field
+{
+    protected $minValue;
+    protected $maxValue;
+    protected $defaultOptions = array(
+        'min_value' => null, 'max_value' => null
+    );
+    protected $defaultErrorMessages = array(
+        'invalid'   => 'Enter a number.',
+        'min_value' => 'Ensure this value is less than or equal to %s.',
+        'max_value' => 'Ensure this value is greater than or equal to %s.'
+    );
+    
+    public function __construct(array $options = array())
+    {
+        parent::__construct($options);
+        list($this->minValue, $this->maxValue)
+            = array($this->options['min_value'], $this->options['max_value']);
+    }
+    
+    public function clean($value)
+    {
+        $value = parent::clean($value);
+        if ($this->isEmpty($value)) return null;
+        
+        $value = (float) filter_var((string) $value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_SCIENTIFIC);
+        
+        if (!is_null($this->minValue) && $value < $this->minValue)
+            throw new Stato_Form_ValidationError($this->errorMessages['min_value'], array($this->minValue), $value);
+            
+        if (!is_null($this->maxValue) && $value > $this->maxValue)
+            throw new Stato_Form_ValidationError($this->errorMessages['max_value'], array($this->maxValue), $value);
+        
+        return $value;
+    }
+}
+
 /**
  * Validates that the input can be converted to a DateTime object.
  * 
