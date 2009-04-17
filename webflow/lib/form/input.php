@@ -177,3 +177,41 @@ class SMultipleSelect extends SSelect
         return parent::render($name, $value, $attrs);
     }
 }
+
+class SRadioSelect extends SSelect
+{
+    public function render($name, $value = null, array $attrs = array())
+    {
+        $html_attrs = array_merge(array('type' => 'radio', 'name' => $name), $this->attrs, $attrs);
+        $options = $this->render_buttons($this->choices, $html_attrs, $value);
+        return '<ul>'.$options.'</ul>';
+    }
+    
+    protected function render_buttons($set, $html_attrs, $selected = null, $i = 1)
+    {
+        $str = '';
+        $non_assoc = (key($set) === 0);
+        foreach ($set as $value => $lib) {
+            if (is_array($lib)) {
+                $str.= '<li>'.html_escape($value).'</li><ul>'
+                    .$this->render_buttons($lib, $html_attrs, $selected, $i).'</ul>';
+                $i = $i + count($lib);
+            } else {
+                if ($non_assoc) $value = $lib;
+                $final_attrs = $html_attrs;
+                if (array_key_exists('id', $html_attrs)) {
+                    $final_attrs['id'] = $html_attrs['id'].'_'.$i;
+                    $label_for = ' for="'.$final_attrs['id'].'"';
+                } else {
+                    $label_for = '';
+                }
+                $str.= '<li><label'.$label_for.'>';
+                $str.= '<input '.$this->flatten_attrs($final_attrs).' value="'.html_escape($value).'"';
+                if ($value == $selected) $str.= ' checked="checked"';
+                $str.= ' />'.html_escape($lib)."</label></li>\n";
+                $i++;
+            }
+        }
+        return $str;
+    }
+}

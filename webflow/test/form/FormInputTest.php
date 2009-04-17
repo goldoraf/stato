@@ -205,8 +205,84 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
         );
     }
     
+    public function test_radio_select()
+    {
+        $s = new SRadioSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertDomEquals(
+            '<ul>
+            <li><label><input type="radio" name="service" value="Marketing" />Marketing</label></li>
+            <li><label><input type="radio" name="service" checked="checked" value="IT" />IT</label></li>
+            <li><label><input type="radio" name="service" value="Commercial" />Commercial</label></li>
+            </ul>',
+            $s->render('service', 'IT')
+        );
+    }
+    
+    public function test_radio_select_with_id_option()
+    {
+        $s = new SRadioSelect(array('id' => 'foo_service', 'choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertDomEquals(
+            '<ul>
+            <li><label for="foo_service_1"><input type="radio" name="service" id="foo_service_1" value="Marketing" />Marketing</label></li>
+            <li><label for="foo_service_2"><input type="radio" name="service" id="foo_service_2" value="IT" checked="checked" />IT</label></li>
+            <li><label for="foo_service_3"><input type="radio" name="service" id="foo_service_3" value="Commercial" />Commercial</label></li>
+            </ul>',
+            $s->render('service', 'IT')
+        );
+    }
+    
+    public function test_radio_select_with_associative_array()
+    {
+        $s = new SRadioSelect(array('choices' => array(
+            'languages' => array('PHP', 'Python', 'Ruby'),
+            'os' => array('Linux', 'MacOS', 'Windows')
+        )));
+        $this->assertDomEquals(
+            '<ul>
+            <li>languages</li>
+            <ul>
+            <li><label><input type="radio" name="skill" value="PHP" />PHP</label></li>
+            <li><label><input type="radio" name="skill" value="Python" />Python</label></li>
+            <li><label><input type="radio" name="skill" value="Ruby" />Ruby</label></li>
+            </ul>
+            <li>os</li>
+            <ul>
+            <li><label><input type="radio" name="skill" checked="checked" value="Linux" />Linux</label></li>
+            <li><label><input type="radio" name="skill" value="MacOS" />MacOS</label></li>
+            <li><label><input type="radio" name="skill" value="Windows" />Windows</label></li>
+            </ul>
+            </ul>',
+            $s->render('skill', 'Linux')
+        );
+    }
+    
+    public function test_radio_select_with_associative_array_and_id_option()
+    {
+        $s = new SRadioSelect(array('id' => 'foo_skill', 'choices' => array(
+            'languages' => array('PHP', 'Python', 'Ruby'),
+            'os' => array('Linux', 'MacOS', 'Windows')
+        )));
+        $this->assertDomEquals(
+            '<ul>
+            <li>languages</li>
+            <ul>
+            <li><label for="foo_skill_1"><input type="radio" name="skill" id="foo_skill_1" value="PHP" />PHP</label></li>
+            <li><label for="foo_skill_2"><input type="radio" name="skill" id="foo_skill_2" value="Python" />Python</label></li>
+            <li><label for="foo_skill_3"><input type="radio" name="skill" id="foo_skill_3" value="Ruby" />Ruby</label></li>
+            </ul>
+            <li>os</li>
+            <ul>
+            <li><label for="foo_skill_4"><input type="radio" name="skill" id="foo_skill_4" value="Linux" checked="checked" />Linux</label></li>
+            <li><label for="foo_skill_5"><input type="radio" name="skill" id="foo_skill_5" value="MacOS" />MacOS</label></li>
+            <li><label for="foo_skill_6"><input type="radio" name="skill" id="foo_skill_6" value="Windows" />Windows</label></li>
+            </ul>
+            </ul>',
+            $s->render('skill', 'Linux')
+        );
+    }
+    
     private function assertDomEquals($str1, $str2)
     {
-    	$this->assertXmlStringEqualsXmlString("<root>$str1</root>", "<root>$str2</root>");
+        $this->assertXmlStringEqualsXmlString("<root>$str1</root>", "<root>$str2</root>");
     }
 }
