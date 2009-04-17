@@ -37,6 +37,7 @@ class SField
     protected $options;
     protected $required;
     protected $error_messages;
+    protected $input_attrs;
     protected $name = null;
     protected $value = null;
     protected $input = 'STextInput';
@@ -44,7 +45,7 @@ class SField
     protected $default_error_messages = array();
     protected $base_default_options = array(
         'required' => false, 'label' => null, 'initial' => null, 
-        'help_text' => null, 'error_messages' => array()
+        'help_text' => null, 'error_messages' => array(), 'input_attrs' => array()
     );
     protected $base_default_error_messages = array(
         'required' => 'This field is required.',
@@ -57,8 +58,9 @@ class SField
         $this->error_messages = array_merge($this->base_default_error_messages, 
                                            $this->default_error_messages, $this->options['error_messages']);
         
-        list($this->required, $this->label, $this->initial, $this->help_text)
-            = array($this->options['required'], $this->options['label'], $this->options['initial'], $this->options['help_text']);
+        list($this->required, $this->label, $this->initial, $this->help_text, $this->input_attrs)
+            = array($this->options['required'], $this->options['label'], $this->options['initial'], 
+                    $this->options['help_text'], $this->options['input_attrs']);
         
         if (array_key_exists('input', $this->options)) {
             $ref = new ReflectionClass($this->options['input']);
@@ -84,7 +86,7 @@ class SField
     public function render($name, $value = null, $html_attrs = array())
     {
         $input = $this->get_input();
-        $attrs = array_merge($this->get_input_attrs(), $html_attrs);
+        $attrs = array_merge($this->get_input_attrs(), $this->input_attrs, $html_attrs);
         if (!empty($attrs)) $input->add_attrs($attrs);
         return $input->render($name, $value);
     }

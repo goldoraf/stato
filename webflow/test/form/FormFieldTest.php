@@ -48,6 +48,12 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<input type="hidden" name="foo" value="bar" />', $f->render('foo', 'bar'));
     }
     
+    public function test_field_with_input_attrs_option()
+    {
+        $f = new SField(array('input_attrs' => array('class' => 'foo')));
+        $this->assertEquals('<input type="text" name="foo" class="foo" value="bar" />', $f->render('foo', 'bar'));
+    }
+    
     public function test_field_with_bad_input_option_should_throw()
     {
         $this->setExpectedException('Exception');
@@ -126,6 +132,12 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         } catch (SValidationError $e) {
             $this->assertEquals('bc', $e->get_cleaned_value());
         }
+    }
+    
+    public function test_text_field_with_input_attrs_option()
+    {
+        $f = new STextField(array('input_attrs' => array('cols' => 80, 'rows' => 20)));
+        $this->assertEquals('<textarea name="bar" cols="80" rows="20"></textarea>', $f->render('bar'));
     }
     
     public function test_integer_field()
