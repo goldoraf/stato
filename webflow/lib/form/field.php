@@ -216,6 +216,43 @@ class SIntegerField extends SField
     }
 }
 
+class SFloatField extends SField
+{
+    protected $min_value;
+    protected $max_value;
+    protected $default_options = array(
+        'min_value' => null, 'max_value' => null
+    );
+    protected $default_error_messages = array(
+        'invalid'   => 'Enter a number.',
+        'min_value' => 'Ensure this value is less than or equal to %s.',
+        'max_value' => 'Ensure this value is greater than or equal to %s.'
+    );
+    
+    public function __construct(array $options = array())
+    {
+        parent::__construct($options);
+        list($this->min_value, $this->max_value)
+            = array($this->options['min_value'], $this->options['max_value']);
+    }
+    
+    public function clean($value)
+    {
+        $value = parent::clean($value);
+        if ($this->is_empty($value)) return null;
+        
+        $value = (float) filter_var((string) $value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_SCIENTIFIC);
+        
+        if (!is_null($this->min_value) && $value < $this->min_value)
+            throw new SValidationError($this->error_messages['min_value'], array($this->min_value), $value);
+            
+        if (!is_null($this->max_value) && $value > $this->max_value)
+            throw new SValidationError($this->error_messages['max_value'], array($this->max_value), $value);
+        
+        return $value;
+    }
+}
+
 /**
  * Validates that the input can be converted to a DateTime object.
  * 

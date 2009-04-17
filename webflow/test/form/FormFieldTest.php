@@ -172,6 +172,40 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         $f->clean('3');
     }
     
+    public function test_float_field()
+    {
+        $f = new SFloatField();
+        $this->assertEquals(1.234, $f->clean('1.234'));
+        $this->assertEquals(1.2e3, $f->clean('1.2e3'));
+        $this->assertEquals(7E-10, $f->clean('7E-10'));
+    }
+    
+    public function test_float_field_with_max_value_option()
+    {
+        $f = new SFloatField(array('max_value' => 6));
+        $this->assertEquals(5.99, $f->clean('5.99'));
+    }
+    
+    public function test_float_field_with_min_value_option()
+    {
+        $f = new SFloatField(array('min_value' => 2));
+        $this->assertEquals(2.01, $f->clean('2.01'));
+    }
+    
+    public function test_float_field_max_value_validation_error()
+    {
+        $this->setExpectedException('SValidationError', 'Ensure this value is greater than or equal to %s.');
+        $f = new SFloatField(array('max_value' => 8));
+        $f->clean('8.01');
+    }
+    
+    public function test_float_field_min_value_validation_error()
+    {
+        $this->setExpectedException('SValidationError', 'Ensure this value is less than or equal to %s.');
+        $f = new SFloatField(array('min_value' => 4));
+        $f->clean('3.99');
+    }
+    
     public function test_date_time_field()
     {
         $f = new SDateTimeField();
