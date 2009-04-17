@@ -177,3 +177,41 @@ class Stato_Form_MultipleSelect extends Stato_Form_Select
         return parent::render($name, $value, $attrs);
     }
 }
+
+class Stato_Form_RadioSelect extends Stato_Form_Select
+{
+    public function render($name, $value = null, array $attrs = array())
+    {
+        $htmlAttrs = array_merge(array('type' => 'radio', 'name' => $name), $this->attrs, $attrs);
+        $options = $this->renderButtons($this->choices, $htmlAttrs, $value);
+        return "<ul>\n".$options."</ul>\n";
+    }
+    
+    protected function renderButtons($set, $htmlAttrs, $selected = null, $i = 1)
+    {
+        $str = '';
+        $nonAssoc = (key($set) === 0);
+        foreach ($set as $value => $lib) {
+            if (is_array($lib)) {
+                $str.= '<li>'.html_escape($value)."</li>\n<ul>\n"
+                    .$this->renderButtons($lib, $htmlAttrs, $selected, $i)."</ul>\n";
+                $i = $i + count($lib);
+            } else {
+                if ($nonAssoc) $value = $lib;
+                $finalAttrs = $htmlAttrs;
+                if (array_key_exists('id', $htmlAttrs)) {
+                    $finalAttrs['id'] = $htmlAttrs['id'].'_'.$i;
+                    $labelFor = ' for="'.$finalAttrs['id'].'"';
+                } else {
+                    $labelFor = '';
+                }
+                $str.= '<li><label'.$labelFor.'>';
+                $str.= '<input '.$this->flattenAttrs($finalAttrs).' value="'.html_escape($value).'"';
+                if ($value == $selected) $str.= ' checked="checked"';
+                $str.= ' />'.html_escape($lib)."</label></li>\n";
+                $i++;
+            }
+        }
+        return $str;
+    }
+}
