@@ -57,10 +57,16 @@ class RoutesTest extends PHPUnit_Framework_TestCase
             $this->rec('/posts/view/45'));
         $this->assertEquals(array('controller'=>'posts', 'action'=>'view'),
             $this->rec('/posts/view'));
+        $this->assertEquals(array('controller'=>'posts', 'action'=>'view'),
+            $this->rec('/posts/view/'));
         $this->assertEquals(array('controller'=>'posts'),
             $this->rec('/posts'));
+        $this->assertEquals(array('controller'=>'posts'),
+            $this->rec('/posts/'));
         $this->assertEquals(array('controller'=>'blog'),
             $this->rec('/'));
+        $this->assertEquals(array('controller'=>'blog'),
+            $this->rec(''));
         $this->assertEquals(array('controller'=>'users', 'action'=>'show'),
             $this->rec('/users/show'));
             
