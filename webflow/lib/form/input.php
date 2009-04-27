@@ -140,7 +140,7 @@ class SSelect extends SInput
     {
         $final_attrs = array_merge(array('name' => $name), $this->attrs, $attrs);
         $options = $this->render_options($this->choices, $value);
-        return '<select '.$this->flatten_attrs($final_attrs).'>'.$options.'</select>';
+        return '<select '.$this->flatten_attrs($final_attrs).">\n".$options.'</select>';
     }
     
     protected function render_options($set, $selected = null)
@@ -165,16 +165,12 @@ class SSelect extends SInput
 
 class SMultipleSelect extends SSelect
 {
-    public function __construct(array $attrs = array())
-    {
-        $attrs['multiple'] = true;
-        parent::__construct($attrs);
-    }
-    
     public function render($name, $value = null, array $attrs = array())
     {
         if (!preg_match('/.*\[\]$/', $name)) $name.= '[]';
-        return parent::render($name, $value, $attrs);
+        $final_attrs = array_merge(array('name' => $name), $this->attrs, $attrs);
+        $options = $this->render_options($this->choices, $value);
+        return '<select multiple="multiple" '.$this->flatten_attrs($final_attrs).">\n".$options.'</select>';
     }
 }
 
