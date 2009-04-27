@@ -5,6 +5,7 @@ require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
 require_once 'DefaultCompilerTest.php';
 require_once 'ConnectionTest.php';
 require_once 'QueryTest.php';
+require_once 'ActiveRecordTest.php';
 
 class Stato_Orm_AllTests
 {
@@ -40,6 +41,7 @@ class Stato_Orm_AllTests
             self::createTestDatabase();
             
             $driverSuite->addTestSuite('Stato_QueryTest');
+            $driverSuite->addTestSuite('Stato_ActiveRecordTest');
             
             $suite->addTestSuite($driverSuite);
         }

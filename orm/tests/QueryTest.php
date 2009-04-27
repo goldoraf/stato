@@ -49,10 +49,12 @@ class Stato_QueryTest extends Stato_DatabaseTestCase
         $user = $this->query->get(99);
     }
     
-    /*public function testInBulk()
+    public function testInBulk()
     {
         $users = $this->query->inBulk(array(1,2));
-    }*/
+        $this->assertEquals('John Doe', $users[1]->fullname);
+        $this->assertEquals('Jane Doe', $users[2]->fullname);
+    }
     
     protected function getDataSet()
     {

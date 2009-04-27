@@ -5,17 +5,16 @@ class Stato_RoutingError extends Exception {}
 class Stato_RouteSet
 {
     private $routes;
-    
     private $routeSets;
-    
+    private $routeTree;
     private $recognizers;
-    
     private $segmentSeparators;
     
     public function __construct()
     {
         $this->routes = array();
         $this->routeSets = array();
+        $this->routeTree = array();
         $this->segmentSeparators = array('/', '\.');
     }
     
@@ -49,6 +48,14 @@ class Stato_RouteSet
         $route = new Stato_Route($regexParts, $params, $defaults);
         $route->firstOptionalSegment = $firstOptionalSegment;
         $this->routes[] = $route;
+        
+        $controller = (array_key_exists('controller', $route->defaults) && !in_array('controller', $route->params)) ? $route->defaults['controller'] : '*';
+        $action = (array_key_exists('action', $route->defaults)) ? $route->defaults['action'] : '*';
+        
+        if (!array_key_exists($controller, $this->routeTree)) $this->routeTree[$controller] = array();
+        if (!array_key_exists($action, $this->routeTree[$controller])) $this->routeTree[$controller][$action] = array();
+        
+        $this->routeTree[$controller][$action][] = $route;
     }
     
     public function recognizePath($path)
@@ -91,6 +98,46 @@ class Stato_RouteSet
                 $this->addRecognizer($newRegex, $defaults);
             }
         }
+    }
+    
+    public function generate($params)
+    {
+        if (!array_key_exists('controller', $params))
+            throw new Stato_RoutingError('No controller provided');
+            
+        if (array_key_exists($params['controller'], $this->routeTree))
+            $controllerRoutes = $this->routeTree[$params['controller']];
+        else
+            $controllerRoutes = $this->routeTree['*'];
+            
+        if (array_key_exists('action', $params) && array_key_exists($params['action'], $controllerRoutes))
+            $actionRoutes = $controllerRoutes[$params['action']];
+        else
+            $actionRoutes = $controllerRoutes['*'];
+            
+        foreach ($actionRoutes as $route) {
+           $diff = array_diff($route->params, array_keys(array_merge($route->defaults, $params)));
+           current($diff);
+           if (empty($diff) || key($diff) >= $route->firstOptionalSegment)
+                return $this->generateUrl($route, $params);
+        }
+        
+        throw new Stato_RoutingError('No route to match that');
+    }
+    
+    private function generateUrl($route, $params)
+    {
+        $routeString = implode('', $route->segments);
+        preg_match_all('|\(.*\)|U', $routeString, $matches);
+        foreach ($matches[0] as $k => $v) {
+            if (!array_key_exists($route->params[$k], $params)) {
+                $routeString = substr($routeString, 0, strpos($routeString, $v) - 1);
+                return $routeString;
+            }
+            $routeString = str_replace($v, $params[$route->params[$k]], $routeString);
+        }
+            
+        return $routeString;
     }
     
     public function getRecognizers()

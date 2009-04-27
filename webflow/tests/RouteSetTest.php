@@ -22,6 +22,18 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'posts'),
             $set->recognizePath('posts')
         );
+        $this->assertEquals(
+            'posts/view/45',
+            $set->generate(array('controller'=>'posts', 'action'=>'view', 'id'=>45))
+        );
+        $this->assertEquals(
+            'posts/view',
+            $set->generate(array('controller'=>'posts', 'action'=>'view'))
+        );
+        $this->assertEquals(
+            'posts',
+            $set->generate(array('controller'=>'posts'))
+        );
     }
     
     public function testDefaultRouteWithFormat()
@@ -43,6 +55,22 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             array('controller'=>'posts'),
             $set->recognizePath('/posts')
+        );
+        $this->assertEquals(
+            'posts/view/45.json',
+            $set->generate(array('controller'=>'posts', 'action'=>'view', 'id'=>45, 'format' => 'json'))
+        );
+        $this->assertEquals(
+            'posts/view/45',
+            $set->generate(array('controller'=>'posts', 'action'=>'view', 'id'=>45))
+        );
+        $this->assertEquals(
+            'posts/view',
+            $set->generate(array('controller'=>'posts', 'action'=>'view'))
+        );
+        $this->assertEquals(
+            'posts',
+            $set->generate(array('controller'=>'posts'))
         );
     }
     
@@ -66,6 +94,22 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'blog'),
             $set->recognizePath('/')
         );
+        $this->assertEquals(
+            'posts/view/45',
+            $set->generate(array('controller'=>'posts', 'action'=>'view', 'id'=>45))
+        );
+        $this->assertEquals(
+            'posts/view',
+            $set->generate(array('controller'=>'posts', 'action'=>'view'))
+        );
+        $this->assertEquals(
+            'posts',
+            $set->generate(array('controller'=>'posts'))
+        );
+        $this->assertEquals(
+            'blog',
+            $set->generate(array('controller'=>'blog'))
+        );
     }
     
     public function testSimpleRoutes()
@@ -76,6 +120,10 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'bar'),
             $set->recognizePath('/foo')
         );
+        $this->assertEquals(
+            'foo',
+            $set->generate(array('controller'=>'bar'))
+        );
         $set = new Stato_RouteSet();
         $set->addRoute('posts/:category', array('controller'=>'posts', 'action'=>'list', 'category'=>'all'));
         $this->assertEquals(
@@ -85,6 +133,14 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             array('controller'=>'posts', 'action'=>'list', 'category'=>'all'),
             $set->recognizePath('/posts')
+        );
+        $this->assertEquals(
+            'posts/php',
+            $set->generate(array('controller'=>'posts', 'action'=>'list', 'category'=>'php'))
+        );
+        $this->assertEquals(
+            'posts/all',
+            $set->generate(array('controller'=>'posts', 'action'=>'list', 'category'=>'all'))
         );
     }
     
@@ -109,6 +165,10 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'home'),
             $set->recognizePath('/')
         );
+        $this->assertEquals(
+            '',
+            $set->generate(array('controller'=>'home'))
+        );
     }
     
     public function testRouteWithRequirement()
@@ -123,8 +183,11 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
         try { $set->recognizePath('/conference/foo'); } catch (Stato_RoutingError $e) { $recognized = false; }
         $this->assertFalse($recognized);
         $recognized = true;
-        /*try { $set->recognizePath('conference'); } catch (Stato_RoutingError $e) { $recognized = false; }
-        $this->assertFalse($recognized);*/
+        
+        $this->assertEquals(
+            'conference/2009',
+            $set->generate(array('controller'=>'confs', 'year' => 2009))
+        );
     }
     
     public function testRouteWithSubSegments()
@@ -140,6 +203,15 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'articles', 'id' => 45),
             $set->recognizePath('/articles/45')
         );
+        
+        $this->assertEquals(
+            'articles/45',
+            $set->generate(array('controller'=>'articles', 'id' => 45))
+        );
+        $this->assertEquals(
+            'articles/45-foo_bar',
+            $set->generate(array('controller'=>'articles', 'id' => 45, 'slug' => 'foo_bar'))
+        );
     }
     
     public function testDateBasedRoute()
@@ -149,16 +221,29 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
                        array('controller'=>'blog', 'action'=>'by_date', 'month'=>null, 'day'=>null), 
                        array('year'=>'\d{4}', 'day'=>'\d{1,2}', 'month'=>'\d{1,2}'));
         $this->assertEquals(
-            array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>14),
+            array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>2, 'day'=>14),
             $set->recognizePath('/archives/2006/02/14')
         );
         $this->assertEquals(
-            array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>02, 'day'=>null),
+            array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>2, 'day'=>null),
             $set->recognizePath('/archives/2006/02')
         );
         $this->assertEquals(
             array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>null, 'day'=>null),
             $set->recognizePath('/archives/2006')
+        );
+        
+        $this->assertEquals(
+            'archives/2006/2/14',
+            $set->generate(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>2, 'day'=>14))
+        );
+        $this->assertEquals(
+            'archives/2006/2',
+            $set->generate(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006, 'month'=>2))
+        );
+        $this->assertEquals(
+            'archives/2006',
+            $set->generate(array('controller'=>'blog', 'action'=>'by_date', 'year'=>2006))
         );
     }
     
@@ -183,6 +268,19 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             array('controller'=>'pages', 'action'=>'view'),
             $set->recognizePath('/')
+        );
+        
+        $this->assertEquals(
+            '',
+            $set->generate(array('controller'=>'pages', 'action'=>'view', 'path' => ''))
+        );
+        $this->assertEquals(
+            'products/web/cms/php',
+            $set->generate(array('controller'=>'pages', 'action'=>'view', 'path' => 'products/web/cms/php'))
+        );
+        $this->assertEquals(
+            'downloads/pdf/my_book',
+            $set->generate(array('controller'=>'downloads', 'action'=>'send_file', 'filepath'=>'pdf/my_book'))
         );
     }
     
@@ -223,5 +321,10 @@ class Stato_RouteSetTest extends PHPUnit_Framework_TestCase
             array('controller'=>'home'),
             $set->recognizePath('/')
         );
+        
+        /*$this->assertEquals(
+            'blog/posts/45-foo_bar',
+            $set->generate(array('controller'=>'blog', 'action' => 'view', 'id' => 45, 'slug' => 'foo_bar'))
+        );*/
     }
 }

@@ -60,13 +60,6 @@ abstract class Stato_ClauseElement
     {
         throw new Exception('Not implemented');
     }
-    
-    protected function inheritsFrom($a, $b)
-    {
-        if (!is_object($a)) return false;
-        $ref = new ReflectionObject($a);
-        return $ref->isSubclassOf(new ReflectionClass($b));
-    }
 }
 
 abstract class Stato_Statement extends Stato_ClauseElement
@@ -222,7 +215,7 @@ class Stato_Select extends Stato_Statement
         foreach ($columns as $c) {
             if ($c instanceof Stato_ClauseColumn)
                 $this->columns[] = $c;
-            elseif ($this->inheritsFrom($c, 'Stato_TableClause'))
+            elseif ($c instanceof Stato_TableClause)
                 $this->columns = array_merge($this->columns, $c->getClauseColumns());
         }
         
@@ -398,7 +391,7 @@ class Stato_ClauseColumn extends Stato_ClauseElement
     
     protected function checkLiteral($other)
     {
-        if (!$this->inheritsFrom($other, 'Stato_ClauseElement'))
+        if (!$other instanceof Stato_ClauseElement)
             $other = $this->bindParam($other);
         return $other;
     }
