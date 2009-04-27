@@ -165,18 +165,51 @@ class Stato_Form_Select extends Stato_Form_Input
 
 class Stato_Form_MultipleSelect extends Stato_Form_Select
 {
-    public function __construct(array $attrs = array())
-    {
-        $attrs['multiple'] = true;
-        parent::__construct($attrs);
-    }
-    
     public function render($name, $value = null, array $attrs = array())
     {
         if (!preg_match('/.*\[\]$/', $name)) $name.= '[]';
-        return parent::render($name, $value, $attrs);
+        $finalAttrs = array_merge(array('name' => $name), $this->attrs, $attrs);
+        $options = $this->renderOptions($this->choices, $value);
+        return '<select multiple="multiple" '.$this->flattenAttrs($finalAttrs).'>'.$options.'</select>';
     }
 }
+
+/*class Stato_Form_CheckboxMultipleSelect extends Stato_Form_MultipleSelect
+{
+    public function render($name, $value = null, array $attrs = array())
+    {
+        $options = $this->renderCheckboxes($this->choices, $value);
+        return "<ul>\n".$options."</ul>\n";
+    }
+    
+    protected function renderCheckboxes($set, $selected = null, array $attrs = array(), $i = 1)
+    {
+        $str = '';
+        $nonAssoc = (key($set) === 0);
+        foreach ($set as $value => $lib) {
+            if (is_array($lib)) {
+                $str.= '<li>'.html_escape($value)."</li>\n<ul>\n"
+                    .$this->renderCheckboxes($lib, $selected, $i)."</ul>\n";
+                $i = $i + count($lib);
+            } else {
+                if ($nonAssoc) $value = $lib;
+                $finalAttrs = $htmlAttrs;
+                if (array_key_exists('id', $htmlAttrs)) {
+                    $finalAttrs['id'] = $htmlAttrs['id'].'_'.$i;
+                    $labelFor = ' for="'.$finalAttrs['id'].'"';
+                } else {
+                    $labelFor = '';
+                }
+                $str.= '<li><label'.$labelFor.'>';
+                $str.= '<input '.$this->flattenAttrs($finalAttrs).' value="'.html_escape($value).'"';
+                if ($value == $selected) $str.= ' checked="checked"';
+                $str.= ' />'.html_escape($lib)."</label></li>\n";
+                $i++;
+            }
+        }
+        return $str;
+    }
+}*/
 
 class Stato_Form_RadioSelect extends Stato_Form_Select
 {

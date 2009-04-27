@@ -208,6 +208,19 @@ class Stato_FormInputTest extends PHPUnit_Framework_TestCase
         );
     }
     
+    /*public function testCheckboxMultipleSelect()
+    {
+        $s = new Stato_Form_CheckboxMultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $this->assertDomEquals(
+            '<ul>
+            <li><label><input type="checkbox" name="service" multiple="multiple" value="Marketing" />Marketing</label></li>
+            <li><label><input type="checkbox" name="service" multiple="multiple" value="IT" checked="checked" />IT</label></li>
+            <li><label><input type="checkbox" name="service" multiple="multiple" value="Commercial" />Commercial</label></li>
+            </ul>',
+            $s->render('service', 'IT')
+        );
+    }*/
+    
     public function testRadioSelect()
     {
         $s = new Stato_Form_RadioSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
