@@ -2,13 +2,15 @@
 
 <?php
 
-set_include_path(dirname(__FILE__).'/cli/lib' . PATH_SEPARATOR . get_include_path());
+set_include_path(__DIR__ . '/library' . PATH_SEPARATOR . get_include_path());
 
-require 'exception.php';
-require 'command.php';
-require 'option_parser.php';
-require 'command_runner.php';
+function __autoload($className) {
+    $path = str_replace('\\', '/', $className).'.php';
+    require $path;
+}
 
-Stato_Cli_CommandRunner::main($_SERVER['argv']);
+use Stato\Cli\CommandRunner;
+
+CommandRunner::main($_SERVER['argv']);
 
 exit(0);
