@@ -1,0 +1,33 @@
+====== L'API d'internationalisation (i18n) de Stato ======
+
+===== Configurer votre application =====
+
+==== Définir la locale ====
+Afin d'offrir un contenu localisé aux utilisateurs de votre application, vous devez préciser à Stato la locale à utiliser pour la requête en cours, et pour cela, détecter la locale souhaitée par l'utilisateur. Le moyen le plus simple et le plus RESTful est de faire en sorte que la locale fasse partie de l'URL. Vous pouvez par exemple définir une route par défaut de ce type :
+<code php>
+$set->addRoute(':locale/:controller/:action/:id', array('locale' => 'fr', 'controller' => 'home'));
+</code>
+Vous pouvez ainsi récupérer dans vos contrôleurs la locale souhaitée dans ''$this->params['locale']''. Il vous suffit alors de créer un filtre dans votre ''ApplicationController'' :
+<code php>
+class ApplicationController extends Stato_Controller
+{
+    protected function initialize()
+    {
+        $this->beforeFilters->append('setLocale');
+    }
+
+    protected function setLocale()
+    {
+        Stato_I18n::setLocale($this->params['locale']);
+    }
+}
+</code>
+
+=== Définir la locale en fonction des informations fournies par le client ===
+Une des sources d'information possibles est l'entête ''Accept-Language'' qui est fournie notamment par les navigateurs. Une implémentation possible serait donc :
+<code php>
+protected function setLocale()
+{
+    Stato_I18n::setLocale(Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']));
+}
+</code>

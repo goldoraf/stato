@@ -1,0 +1,9 @@
+====== Manuel du développeur ======
+**Ce manuel concerne la version 2.0 en cours de développement.**
+
+  * [[FAQ]]
+  * [[install|Installation et création d'un nouveau projet]]
+
+[[.i18n:index|API d'internationalisation]]
+
+
