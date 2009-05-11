@@ -92,7 +92,7 @@ class SMigrator
         $dir = new DirectoryIterator($migrations_path);
         foreach ($dir as $file)
         {
-            if (preg_match('/([0-9]+)_([_a-z0-9]*)/i', $file->getFileName(), $matches))
+            if (preg_match('/^([0-9]+)_([_a-z0-9]*)/i', $file->getFileName(), $matches))
             {
                 if (isset($files[$matches[1]])) throw new SDuplicateVersionMigrationException($matches[1]);
                 else $files[$matches[1]] = $file->getFileName();
