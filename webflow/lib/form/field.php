@@ -261,6 +261,7 @@ class SFloatField extends SField
  */
 class SDateTimeField extends SField
 {
+    protected $input = 'SDateTimeInput';
     protected $default_error_messages = array(
         'invalid'   => 'Enter a valid date.'
     );
