@@ -76,6 +76,11 @@ class SField
         return $this->render($this->name, $this->value);
     }
     
+    public function is_required()
+    {
+        return $this->required;
+    }
+    
     public function bind($name, $value)
     {
         $this->name = $name;
