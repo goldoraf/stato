@@ -211,3 +211,43 @@ class SRadioSelect extends SSelect
         return $str;
     }
 }
+
+class SCheckboxMultipleSelect extends SMultipleSelect
+{
+    public function render($name, $value = null, array $attrs = array())
+    {
+        if (!preg_match('/.*\[\]$/', $name)) $name.= '[]';
+        $html_attrs = array_merge(array('type' => 'checkbox', 'name' => $name), $this->attrs, $attrs);
+        $options = $this->render_checkboxes($this->choices, $html_attrs, $value);
+        return "<ul>\n".$options."</ul>\n";
+    }
+    
+    protected function render_checkboxes($set, $html_attrs, $selected = null, $i = 1)
+    {
+        $str = '';
+        $non_assoc = (key($set) === 0);
+        if (!is_array($selected)) $selected = array($selected);
+        foreach ($set as $value => $lib) {
+            if (is_array($lib)) {
+                $str.= '<li>'.html_escape($value)."</li>\n<ul>\n"
+                    .$this->render_checkboxes($lib, $html_attrs, $selected, $i)."</ul>\n";
+                $i = $i + count($lib);
+            } else {
+                if ($non_assoc) $value = $lib;
+                $final_attrs = $html_attrs;
+                if (array_key_exists('id', $html_attrs)) {
+                    $final_attrs['id'] = $html_attrs['id'].'_'.$i;
+                    $label_for = ' for="'.$final_attrs['id'].'"';
+                } else {
+                    $label_for = '';
+                }
+                $str.= '<li><label'.$label_for.'>';
+                $str.= '<input '.$this->flatten_attrs($final_attrs).' value="'.html_escape($value).'"';
+                if (in_array($value, $selected)) $str.= ' checked="checked"';
+                $str.= ' />'.html_escape($lib)."</label></li>\n";
+                $i++;
+            }
+        }
+        return $str;
+    }
+}
