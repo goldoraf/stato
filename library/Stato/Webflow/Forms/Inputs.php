@@ -181,22 +181,25 @@ class MultipleSelect extends Select
     }
 }
 
-/*class CheckboxMultipleSelect extends MultipleSelect
+class CheckboxMultipleSelect extends MultipleSelect
 {
     public function render($name, $value = null, array $attrs = array())
     {
-        $options = $this->renderCheckboxes($this->choices, $value);
+        if (!preg_match('/.*\[\]$/', $name)) $name.= '[]';
+        $htmlAttrs = array_merge(array('type' => 'checkbox', 'name' => $name), $this->attrs, $attrs);
+        $options = $this->renderCheckboxes($this->choices, $htmlAttrs, $value);
         return "<ul>\n".$options."</ul>\n";
     }
     
-    protected function renderCheckboxes($set, $selected = null, array $attrs = array(), $i = 1)
+    protected function renderCheckboxes($set, $htmlAttrs, $selected = null, $i = 1)
     {
         $str = '';
         $nonAssoc = (key($set) === 0);
+        if (!is_array($selected)) $selected = array($selected);
         foreach ($set as $value => $lib) {
             if (is_array($lib)) {
                 $str.= '<li>'.$this->htmlEscape($value)."</li>\n<ul>\n"
-                    .$this->renderCheckboxes($lib, $selected, $i)."</ul>\n";
+                    .$this->renderCheckboxes($lib, $htmlAttrs, $selected, $i)."</ul>\n";
                 $i = $i + count($lib);
             } else {
                 if ($nonAssoc) $value = $lib;
@@ -209,14 +212,14 @@ class MultipleSelect extends Select
                 }
                 $str.= '<li><label'.$labelFor.'>';
                 $str.= '<input '.$this->flattenAttrs($finalAttrs).' value="'.$this->htmlEscape($value).'"';
-                if ($value == $selected) $str.= ' checked="checked"';
+                if (in_array($value, $selected)) $str.= ' checked="checked"';
                 $str.= ' />'.$this->htmlEscape($lib)."</label></li>\n";
                 $i++;
             }
         }
         return $str;
     }
-}*/
+}
 
 class RadioSelect extends Select
 {
