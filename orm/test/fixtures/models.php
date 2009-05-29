@@ -119,6 +119,11 @@ class Developer extends SActiveRecord
 {
     public static $objects;
     public static $relationships = array('projects' => 'many_to_many');
+    
+    public function __toString()
+    {
+        return $this->name;
+    }
 }
 
 class Project extends SActiveRecord
@@ -141,7 +146,8 @@ class Article extends SActiveRecord
     public static $relationships = array
     (
         'comments' => 'has_many',
-        'categories' => 'many_to_many'
+        'categories' => 'many_to_many',
+        'author' => array('assoc_type' => 'belongs_to', 'class_name' => 'Developer', 'foreign_key' => 'author_id')
     );
 }
 
@@ -155,6 +161,11 @@ class Category extends SActiveRecord
 {
     public static $objects;
     public static $relationships = array('articles' => 'many_to_many');
+    
+    public function __toString()
+    {
+        return $this->name;
+    }
 }
 
 // For ListDecorator tests
@@ -196,6 +207,22 @@ class User extends SActiveRecord
         $this->validate_confirmation_of('password', array('message' => 'Please confirm your password !'));
         $this->validate_acceptance_of('terms_of_services');
     }
+}
+
+// For inheritance tests
+class Player extends SActiveRecord
+{
+    public static $objects;
+    public static $relationships = array('guns' => 'many_to_many');
+}
+
+class Red extends Player {}
+
+class Blue extends Player {}
+
+class Gun extends SActiveRecord
+{
+    public static $objects;
 }
 
 ?>

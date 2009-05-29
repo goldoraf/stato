@@ -21,5 +21,5 @@ require('lib/helpers.php');
 require('lib/form.php');
 require('lib/form/input.php');
 require('lib/form/field.php');
-
+require('lib/form/active_record_form.php');
 ?>

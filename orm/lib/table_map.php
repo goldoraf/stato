@@ -9,6 +9,8 @@ class STableMap
     public $inheritance_field  = 'type';
     public $attributes         = array();
     public $relationships      = array();
+    public $columns            = array();
+    public $associations       = array();
     public $decorators         = array();
     
     private $content_attributes = null;
@@ -20,10 +22,9 @@ class STableMap
         $this->underscored = SInflection::underscore($class);
         $this->get_meta_from_class();
         if ($this->table_name === null) $this->reset_table_name();
-        $this->attributes = array_merge(
-            SActiveRecord::connection()->columns($this->table_name),
-            $this->instantiate_associations()
-        );
+        $this->columns = SActiveRecord::connection()->columns($this->table_name);
+        $this->associations = $this->instantiate_associations();
+        $this->attributes = array_merge($this->columns, $this->associations);
     }
     
     public function reset_table_name()
@@ -50,9 +51,9 @@ class STableMap
         if ($this->content_attributes === null)
         {
             $this->content_attributes = array();
-            foreach ($this->attributes as $name => $attr)
+            foreach ($this->columns as $name => $attr)
                 if ($name != $this->identity_field && !preg_match('/(_id|_count)$/', $name) 
-                    && $name != $this->inheritance_field && !in_array($name, $filter) && $attr instanceof SColumn)
+                    && $name != $this->inheritance_field && !in_array($name, $filter))
                     if ($this->content_attributes_names === null || in_array($name, $this->content_attributes_names))
                         $this->content_attributes[$name] = $attr;
         }

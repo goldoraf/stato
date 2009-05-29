@@ -102,6 +102,7 @@ PRIMARY KEY ( `id` )
 
 CREATE TABLE `articles` (
 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+`author_id` INT default NULL,
 `title` VARCHAR( 255 ) default NULL,
 `text` TEXT default NULL,
 PRIMARY KEY ( `id` )
@@ -147,4 +148,17 @@ CREATE TABLE `pages` (
   `name` varchar(50) default NULL,
   `parent_id` int(11) default NULL,
   PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;
+
+CREATE TABLE `players` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `type` varchar(50) default NULL,
+  `name` varchar(50) default NULL,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;
+
+
+CREATE TABLE `guns_players` (
+  `gun_id` int(11) NOT NULL default '0',
+  `player_id` int(11) NOT NULL default '0'
 ) TYPE=MyISAM ;

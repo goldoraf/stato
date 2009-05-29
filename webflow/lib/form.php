@@ -49,7 +49,7 @@ class SForm implements Iterator
     protected $prefix = null;
     protected $field_decorator = null;
     
-    public function __construct(array $data = null, array $files = null)
+    public function __construct($data = null, $files = null)
     {
         $this->bind($data, $files);
     }
@@ -145,7 +145,8 @@ class SForm implements Iterator
         $close_tag = '</'.$tag.'>';
         $html = array();
         $hidden_fields = array();
-        foreach ($this->fields as $name => $field) {
+        foreach ($this->list_fields() as $name) {
+            $field = $this->fields[$name];
             $bf = new SBoundField($this, $field, $name);
             if ($bf->is_hidden) {
                 $hidden_fields[] = $bf->render();
@@ -233,11 +234,16 @@ class SForm implements Iterator
         
     }
     
-    protected function bind(array $data = null, array $files = null)
+    protected function bind($data = null, $files = null)
     {
-        $this->is_bound = (!is_null($data) || !is_null($files));
-        $this->data = (!is_null($data)) ? $data : array();
-        $this->files = (!is_null($files)) ? $files : array();
+        $this->is_bound = (is_array($data) || is_array($files));
+        $this->data = (is_array($data)) ? $data : array();
+        $this->files = (is_array($files)) ? $files : array();
+    }
+    
+    protected function list_fields()
+    {
+        return array_keys($this->fields);
     }
 }
 

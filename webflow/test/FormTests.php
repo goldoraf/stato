@@ -6,6 +6,7 @@ require_once 'form/FormInputTest.php';
 require_once 'form/FormFieldTest.php';
 require_once 'form/FormErrorsTest.php';
 require_once 'form/FormTest.php';
+require_once 'form/ActiveRecordFormTest.php';
 
 class FormTests
 {
@@ -16,6 +17,7 @@ class FormTests
         $suite->addTestSuite('SFormFieldTest');
         $suite->addTestSuite('SFormErrorsTest');
         $suite->addTestSuite('SFormTest');
+        $suite->addTestSuite('SActiveRecordFormTest');
         return $suite;
     }
 }

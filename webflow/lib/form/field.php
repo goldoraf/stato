@@ -49,6 +49,7 @@ class SField
     );
     protected $base_default_error_messages = array(
         'required' => 'This field is required.',
+        'unique'   => 'This value is taken.',
         'invalid'  => 'Enter a valid value.'
     );
     
