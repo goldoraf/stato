@@ -377,9 +377,10 @@ class SBooleanField extends SField
     {
         if ($this->input == 'SCheckboxInput') {
             $checkbox = $this->get_input();
-            $checkbox->add_attrs(array('checked' => (bool) $value));
+            $attrs = array_merge(array('checked' => (bool) $value), $this->input_attrs, $html_attrs);
+            $checkbox->add_attrs($attrs);
             $hidden = new SHiddenInput();
-            return $hidden->render($name, $this->unchecked_value) . $checkbox->render($name, $this->checked_value, $html_attrs);
+            return $hidden->render($name, $this->unchecked_value) . $checkbox->render($name, $this->checked_value);
         }
         return parent::render($name, $value, $html_attrs);
     }
