@@ -11,11 +11,14 @@ require_once __DIR__ . '/files/user.php';
 
 class QueryTest extends TestCase
 {
+    protected $fixtures = array('users');
+    
     public function setup()
     {
         parent::setup();
-        $this->query = new Query('User', $this->connection);
         $this->users = User::$table;
+        $this->mapper = new Mapper('User', $this->users);
+        $this->query = new Query($this->mapper, $this->connection);
     }
     
     public function testFilter()
@@ -25,11 +28,45 @@ class QueryTest extends TestCase
         $this->assertEquals('Jane Doe', $users[1]->fullname);
     }
     
+    public function testFilterBy()
+    {
+        $users = $this->query->filterBy(array('login' => 'jdoe', 'password' => 'john'))->all();
+        $this->assertEquals(1, count($users));
+        $this->assertEquals('John Doe', $users[0]->fullname);
+    }
+    
+    public function testFilterByWithArrayValue()
+    {
+        $users = $this->query->filterBy(array('id' => array(1,2)))->all();
+        $this->assertEquals(2, count($users));
+    }
+    
     public function testCloning()
     {
         $users1 = $this->query->filter($this->users->fullname->like('%Doe'));
         $users2 = $users1->filter($this->users->id->gt(1));
         $this->assertNotEquals($users1, $users2);
+    }
+    
+    public function testLimit()
+    {
+        $users = $this->query->filter($this->users->fullname->like('%Doe'))->limit(1)->all();
+        $this->assertEquals(1, count($users));
+        $this->assertEquals('John Doe', $users[0]->fullname);
+    }
+    
+    public function testOrderBy()
+    {
+        $users = $this->query->orderBy($this->users->id->desc())->all();
+        $this->assertEquals('John Doe', $users[1]->fullname);
+        $this->assertEquals('Jane Doe', $users[0]->fullname);
+    }
+    
+    public function testOrderByString()
+    {
+        $users = $this->query->orderBy('-id')->all();
+        $this->assertEquals('John Doe', $users[1]->fullname);
+        $this->assertEquals('Jane Doe', $users[0]->fullname);
     }
     
     public function testGet()
@@ -50,12 +87,5 @@ class QueryTest extends TestCase
         $users = $this->query->inBulk(array(1,2));
         $this->assertEquals('John Doe', $users[1]->fullname);
         $this->assertEquals('Jane Doe', $users[2]->fullname);
-    }
-    
-    protected function getDataSet()
-    {
-        $dataSet = new \PHPUnit_Extensions_Database_DataSet_CsvDataSet();
-        $dataSet->addTable('users', __DIR__ . '/fixtures/users.csv');
-        return $dataSet;
     }
 }

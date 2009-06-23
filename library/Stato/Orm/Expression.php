@@ -79,10 +79,15 @@ class ClauseList extends ClauseElement
     public $clauses;
     public $separator;
     
-    public function __construct(array $clauses, $separator = ',')
+    public function __construct(array $clauses = array(), $separator = ',')
     {
         $this->clauses = $clauses;
         $this->separator = $separator;
+    }
+    
+    public function append(ClauseElement $elt)
+    {
+        $this->clauses[] = $elt;
     }
 }
 
@@ -91,7 +96,7 @@ class TableClause extends ClauseElement
     protected $name;
     protected $columns;
     
-    public function __construct($name, $columns = null)
+    public function __construct($name, array $columns)
     {
         $this->name = $name;
         $this->columns = array();
@@ -241,12 +246,10 @@ class Select extends Statement
         return $this;
     }
     
-    public function where(ClauseElement $whereClause)
+    public function where()
     {
-        if (!$whereClause instanceof Expression && !$whereClause instanceof ExpressionList)
-            throw new Exception('where() argument must be instance of Expression or ExpressionList');
-        
-        $this->appendWhereClause($whereClause);
+        $expressions = func_get_args();
+        $this->appendWhereClause($expressions);
         return $this;
     }
     
@@ -269,20 +272,21 @@ class Select extends Statement
         return $this;
     }
     
-    private function appendWhereClause(ClauseElement $whereClause)
+    private function appendWhereClause($expressions)
     {
-        if ($this->whereClause === null)
-            $this->whereClause = $whereClause;
-        else
-            $this->whereClause = new ExpressionList($this->whereClause, $whereClause);
+        if ($this->whereClause === null) $this->whereClause = new ExpressionList();
+        foreach ($expressions as $expression) {
+            if (!$expression instanceof Expression && !$expression instanceof ExpressionList)
+                throw new Exception('where() argument must be instance of Expression or ExpressionList');
+            
+            $this->whereClause->append($expression);
+        }
     }
     
     private function appendOrderByClause($clauses)
     {
-        if ($this->orderByClause === null)
-            $this->orderByClause = new ClauseList($clauses);
-        else
-            $this->orderByClause = new ClauseList($this->orderByClause->clauses + $clauses);
+        if ($this->orderByClause === null) $this->orderByClause = new ClauseList();
+        foreach ($clauses as $clause) $this->orderByClause->append($clause);
     }
 }
 
@@ -445,7 +449,7 @@ class ExpressionList extends ClauseElement
     public $expressions;
     public $operator;
     
-    public function __construct(array $expressions, $operator = Operators::AND_)
+    public function __construct(array $expressions = array(), $operator = Operators::AND_)
     {
         $this->expressions = $expressions;
         $this->operator = $operator;

@@ -142,6 +142,14 @@ class CompilerTest extends TestCase
             'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.id = :id_1',
             $this->users->select()->where($this->users->id->eq(1))->__toString()
         );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
+            $this->users->select()->where($this->users->firstname->like('John'), $this->users->lastname->like('Doe'))->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
+            $this->users->select()->where($this->users->firstname->like('John'))->where($this->users->lastname->like('Doe'))->__toString()
+        );
     }
     
     public function testOrderBy()
@@ -149,6 +157,10 @@ class CompilerTest extends TestCase
         $this->assertEquals(
             'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id',
             $this->users->select()->orderBy($this->users->id)->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id ASC,users.firstname DESC',
+            $this->users->select()->orderBy($this->users->id->asc())->orderBy($this->users->firstname->desc())->__toString()
         );
         $this->assertEquals(
             'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id ASC,users.firstname DESC',

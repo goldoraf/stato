@@ -3,18 +3,70 @@
 namespace Stato\Orm;
 
 require_once 'Schema.php';
+require_once 'Properties.php';
 
 class Mapper
 {
-    private static $mapping = array();
+    private static $instances = array();
+    private static $defaultRelationOptions = array('primary_join' => null, 'collection' => false);
     
-    public static function addClass($class, Table $table)
+    public $entity;
+    public $table;
+    public $columns;
+    public $properties;
+    
+    public static function getClassMapper($className)
     {
-        self::$mapping[$class] = $table;
+        if (!array_key_exists($className, self::$instances)) {
+            $ref = new \ReflectionClass($className);
+            if ($ref->isSubclassOf(__NAMESPACE__ . '\Entity')) {
+                self::$instances[$className] = new EntityMapper($className);
+            } else {
+                throw new Exception("No mapper available for {$className} class");
+            }
+        }
+            
+        return self::$instances[$className];
     }
     
-    public static function getTable($class)
+    public static function create($className, Table $table, 
+    
+    public function __construct($entity, Table $table, array $relations = array())
     {
-        return self::$mapping[$class];
+        $this->entity = $entity;
+        $ref = new \ReflectionClass($this->entity);
+        $this->table = $table;
+        $this->columns = $this->table->getColumns();
+        
+        $this->properties = array();
+        foreach ($relations as $name => $relation) {
+            $this->properties[$name] 
+                = new PropertyLoader($relation->mapper, $this, $relation->options['primary_join'],
+                    $relation->options['collection']);
+        }
+        
+        self::$instances[$this->entity] = $this;
+    }
+    
+    public function populate($object, $values)
+    {
+        foreach ($this->columns as $name => $column) {
+            if (array_key_exists($name, $values))
+                $object->$name = $values[$name];
+            else
+                $object->$name = (!$column->default) ? null : $column->default;
+        }
+    }
+    
+    public function fetch(\PDOStatement $stmt)
+    {
+        $class = $this->entity;
+        $stmt->setFetchMode(\PDO::FETCH_INTO, new $class);
+        return $stmt->fetch(\PDO::FETCH_INTO);
+    }
+    
+    public function getProperty($propertyName)
+    {
+        return false;
     }
 }

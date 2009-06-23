@@ -2,15 +2,14 @@
 
 use Stato\Orm\Table;
 use Stato\Orm\Column;
-use Stato\Orm\Mapper;
 
 class User
 {
     public static $table;
     
-    public $fullname;
+    /*public $fullname;
     public $login;
-    public $password;
+    public $password;*/
     
     public function __toString()
     {
@@ -25,5 +24,4 @@ $users = new Table('users', array(
     new Column('password', Column::STRING),
 ));
 
-Mapper::addClass('User', $users);
 User::$table = $users;

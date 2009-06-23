@@ -4,6 +4,17 @@ namespace Stato\Orm;
 
 require_once 'Schema.php';
 
+class UnboundConnectionError extends Exception
+{
+    public function __construct($class)
+    {
+        parent::__construct("The {$class} is not bound to a Connection.  "
+           ."Execution can not proceed without a database to execute "
+           ."against.  Either execute with an explicit connection or "
+           ."assign {$class} to enable implicit execution.");
+    }
+}
+
 /**
  * Connects a PDO connection to a specific SQL dialect
  * 
@@ -74,7 +85,7 @@ class Connection
             if (!$stmt instanceof Statement)
                 throw new Exception("Can't execute instances of ".get_class($stmt));
             $stmt = $stmt->compile();
-            if (empty($stmt->params)) return $this->connection->exec($stmt);
+            if (empty($stmt->params)) return $this->connection->query($stmt);
             
             $params = $stmt->params;
             $stmt = $this->connection->prepare($stmt);

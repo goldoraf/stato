@@ -56,20 +56,17 @@ class Column extends ClauseColumn
 
 class Table extends TableClause
 {
-    protected $autoload;
     protected $primaryKey;
     protected $foreignKeys;
     protected $constraints;
     
-    public function __construct($name, $columns = null)
+    public function __construct($name, array $columns)
     {
         $this->name = $name;
-        $this->autoload = ($columns === null);
         $this->primaryKey = false;
         $this->foreignKeys = array();
         $this->constraints = array();
-        if ($columns !== null)
-            foreach ($columns as $column) $this->addColumn($column);
+        foreach ($columns as $column) $this->addColumn($column);
     }
     
     public function addColumn(Column $column)

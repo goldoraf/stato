@@ -32,27 +32,13 @@ class AllTests
             $driverSuite->addTestSuite($dialectTestSuite);
             
             $driverSuite->addTestSuite('Stato\Orm\ConnectionTest');
-            
-            self::createTestDatabase();
-            
             $driverSuite->addTestSuite('Stato\Orm\QueryTest');
-            $driverSuite->addTestSuite('Stato\Orm\ActiveRecordTest');
+            $driverSuite->addTestSuite('Stato\Orm\EntityTest');
+            $driverSuite->addTestSuite('Stato\Orm\RelationsTest');
             
             $suite->addTestSuite($driverSuite);
         }
         
         return $suite;
-    }
-    
-    private static function createTestDatabase()
-    {
-        $config = TestEnv::getDbDriverConfig();
-        $connection = new Connection($config);
-        $dbname = $config['dbname'];
-        $connection->execute("DROP DATABASE IF EXISTS $dbname");
-        $connection->execute("CREATE DATABASE $dbname");
-        $connection->execute("USE $dbname");
-        $tables = include_once 'files/schema.php';
-        foreach ($tables as $table) $connection->createTable($table);
     }
 }

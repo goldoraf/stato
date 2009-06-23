@@ -19,29 +19,62 @@ class RecordNotFound extends Exception {}
 class Query implements \Iterator, \Countable
 {
     private $entity;
+    private $mapper;
     private $table;
     private $pk;
     private $connection;
-    private $criterion;
     private $count;
     private $cache;
+    private $stmt;
     
-    public function __construct($entity, Connection $connection)
+    
+    public function __construct(Mapper $mapper, Connection $connection)
     {
-        $this->entity = $entity;
-        $this->table = Mapper::getTable($this->entity);
+        $this->mapper = $mapper;
+        $this->entity = $this->mapper->entity;
+        $this->table = $this->mapper->table;
         $this->pk = $this->table->getPrimaryKeyColumn();
         $this->connection = $connection;
-        $this->criterion = new ExpressionList(array());
         $this->count = 0;
         $this->cache = null;
+        $this->stmt = null;
     }
     
     public function __clone()
     {
         $this->count = 0;
         $this->cache = null;
-        $this->criterion = clone $this->criterion;
+        $this->stmt = null;
+        if (isset($this->criterion)) 
+            $this->criterion = clone $this->criterion;
+        if (isset($this->orderBy)) 
+            $this->orderBy = clone $this->orderBy;
+    }
+    
+    public function __toString()
+    {
+        return $this->getStatement()->__toString();
+    }
+    
+    public function rewind()
+    {
+        if ($this->cache === null) {
+            $this->stmt = $this->execute();
+            $this->cache = array();
+        }
+        $this->count = 0;
+    }
+
+    public function valid()
+    {
+        if ($this->stmt !== null) {
+            if (($entity = $this->fetch($this->stmt)) !== false) {
+                $this->cache[] = $entity;
+            } else {
+                $this->stmt->closeCursor();
+            }
+        }
+        return isset($this->cache[$this->count]);
     }
     
     public function current()
@@ -58,27 +91,6 @@ class Query implements \Iterator, \Countable
     {
         $this->count++;
     }
-
-    public function rewind()
-    {
-        $this->count = 0;
-    }
-
-    public function valid()
-    {
-        if ($this->cache === null) $this->cache = $this->all();
-        return isset($this->cache[$this->count]);
-    }
-    
-    /**
-     * Retrieves the first item of the result set.
-     */
-    public function first()
-    {
-        $this->rewind();
-        if ($this->valid()) return $this->current();
-        else return null;
-    }
     
     /**
      * Performs a SELECT COUNT() and returns the number of records as an integer.
@@ -87,8 +99,6 @@ class Query implements \Iterator, \Countable
      */
     public function count()
     {
-        if ($this->cache !== null) return count($this->cache);
-        
         // TODO
     }
     
@@ -97,9 +107,25 @@ class Query implements \Iterator, \Countable
      */
     public function all()
     {
-        $stmt = $this->connection->execute($this->getStatement());
-        $stmt->setFetchMode(\PDO::FETCH_CLASS, $this->entity);
-        return $stmt->fetchAll();
+        $set = array();
+        foreach ($this as $entity) $set[] = $entity;
+        return $set;
+    }
+    
+    /**
+     * Retrieves the first item of the result set.
+     */
+    public function first()
+    {
+        // TODO
+    }
+    
+    /**
+     * Retrieves the last item of the result set.
+     */
+    public function last()
+    {
+        // TODO
     }
     
     /**
@@ -130,7 +156,7 @@ class Query implements \Iterator, \Countable
     }
     
     /**
-     * Returns a new <var>Stato_Query</var> instance with the args ANDed to the existing set.   
+     * Returns a new <var>Query</var> instance with the args ANDed to the existing set.   
      */
     public function filter()
     {
@@ -140,16 +166,91 @@ class Query implements \Iterator, \Countable
         return $clone;
     }
     
+    public function filterBy(array $values)
+    {
+        $clone = clone $this;
+        foreach ($values as $columnName => $value) {
+            $column = $this->table->{$columnName};
+            if (is_array($value))
+                $clone->appendCriterion($column->in($value));
+            else
+                $clone->appendCriterion($column->eq($value));
+        }
+        return $clone;
+    }
+    
+    /**
+     * Returns a new <var>Query</var> instance with a limited result set.   
+     */
+    public function limit($limit, $offset = 0)
+    {
+        $clone = clone $this;
+        $clone->limit = $limit;
+        $clone->offset = $offset;
+        return $clone;
+    }
+    
+    /**
+     * Returns a new <var>Query</var> instance with the ordering changed.   
+     */
+    public function orderBy()
+    {
+        $args = func_get_args();
+        $clone = clone $this;
+        foreach ($args as $arg) {
+            /*if (!is_string($arg) && !$arg instanceof ClauseElement)
+                throw new QueryException('orderBy() arguments must be instances of ClauseElement or strings');*/
+            if (is_string($arg)) {
+                $desc = false;
+                if ($arg{0} == '-') {
+                    $arg = substr($arg, 1);
+                    $desc = true;
+                }
+                $column = $this->table->{$arg};
+                if ($desc) $arg = $column->desc();
+                else $arg = $column->asc();
+            }
+            $clone->appendOrderBy($arg);
+        }
+        return $clone;
+    }
+    
     public function appendCriterion($criterion)
     {
-        if (!is_string($criterion) && !$criterion instanceof ClauseElement)
-            throw new QueryException('filter() arguments must be instances of ClauseElement or strings');
+        if (!isset($this->criterion)) $this->criterion = new ExpressionList();
+        /*if (!is_string($criterion) && !$criterion instanceof ClauseElement)
+            throw new QueryException('filter() arguments must be instances of ClauseElement or strings');*/
         
         $this->criterion->append($criterion);
     }
     
-    protected function getStatement()
+    public function appendOrderBy($clause)
     {
-        return $this->table->select()->where($this->criterion);
+        if (!isset($this->orderBy)) $this->orderBy = new ClauseList();
+        $this->orderBy->append($clause);
+    }
+    
+    private function fetch($stmt)
+    {
+        return $this->mapper->fetch($stmt);
+    }
+    
+    private function execute()
+    {
+        return $this->connection->execute($this->getStatement());
+    }
+    
+    private function getStatement()
+    {
+        $stmt = $this->table->select();
+        
+        if (isset($this->criterion)) 
+            $stmt = call_user_func_array(array($stmt, 'where'), $this->criterion->expressions);
+        
+        if (isset($this->limit)) $stmt = $stmt->limit($this->limit);
+        if (isset($this->offset)) $stmt = $stmt->offset($this->offset);
+        if (isset($this->orderBy)) $stmt = $stmt->orderBy($this->orderBy);
+        
+        return $stmt;
     }
 }
