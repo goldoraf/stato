@@ -29,8 +29,6 @@ class Mapper
         return self::$instances[$className];
     }
     
-    public static function create($className, Table $table, 
-    
     public function __construct($entity, Table $table, array $relations = array())
     {
         $this->entity = $entity;
