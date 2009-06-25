@@ -13,8 +13,7 @@ class SYamlBackendTest extends PHPUnit_Framework_TestCase
         if (!extension_loaded('syck'))
             $this->mark_test_skipped('The Syck extension is not available');
              
-        SI18n::add_data_path(dirname(__FILE__).'/data/yaml');
-        $this->backend = new SYamlBackend();
+        $this->backend = new SYamlBackend(dirname(__FILE__).'/data/yaml');
     }
     
     public function test_translate()

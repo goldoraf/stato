@@ -10,7 +10,6 @@ class SXliffBackendTest extends SYamlBackendTest
 {
     public function setup()
     {
-        SI18n::add_data_path(dirname(__FILE__).'/data/xliff');
-        $this->backend = new SXliffBackend();
+        $this->backend = new SXliffBackend(dirname(__FILE__).'/data/xliff');
     }
 }

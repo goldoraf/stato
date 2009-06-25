@@ -2,9 +2,15 @@
 
 class SSimpleBackend extends SAbstractBackend
 {
+    protected $data_paths = array();
     protected $initialized = array();
-    
     protected $translations = array();
+    
+    public function __construct($data_paths)
+    {
+        if (!is_array($data_paths)) $data_paths = array($data_paths);
+        $this->data_paths = $data_paths;   
+    }
     
     protected function lookup($locale, $key)
     {
@@ -17,7 +23,7 @@ class SSimpleBackend extends SAbstractBackend
     
     protected function init_translations($locale)
     {
-        $this->load_translations(SI18n::get_data_paths(), $locale);
+        $this->load_translations($locale);
         $this->initialized[] = $locale;
     }
     
@@ -26,11 +32,11 @@ class SSimpleBackend extends SAbstractBackend
         return in_array($locale, $this->initialized);
     }
     
-    protected function load_translations($paths, $locale)
+    protected function load_translations($locale)
     {
         $this->translations[$locale] = array();
         
-        foreach ($paths as $path) {
+        foreach ($this->data_paths as $path) {
             $file = $this->get_translation_file_path($path, $locale);
             if (file_exists($file)) {
                 $translations = $this->load_translation_file($file);

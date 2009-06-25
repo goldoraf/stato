@@ -41,7 +41,7 @@ class SI18n
     public static function get_backend()
     {
         if (!isset(self::$backend)) 
-            self::set_backend(new SSimpleBackend());
+            self::set_backend(new SSimpleBackend(self::$data_paths));
         
         return self::$backend;
     }
