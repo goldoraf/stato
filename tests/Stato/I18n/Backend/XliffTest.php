@@ -11,7 +11,6 @@ class XliffTest extends YamlTest
 {
     public function setup()
     {
-        I18n::addDataPath(__DIR__ . '/../data/xliff');
-        $this->backend = new Xliff();
+        $this->backend = new Xliff(__DIR__ . '/../data/xliff');
     }
 }

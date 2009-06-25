@@ -14,8 +14,7 @@ class YamlTest extends TestCase
         if (!extension_loaded('syck'))
             $this->markTestSkipped('The Syck extension is not available');
              
-        I18n::addDataPath(__DIR__ . '/../data/yaml');
-        $this->backend = new Yaml();
+        $this->backend = new Yaml(__DIR__ . '/../data/yaml');
     }
     
     public function testTranslate()

@@ -46,7 +46,7 @@ namespace Stato\I18n
         public static function getBackend()
         {
             if (!isset(self::$backend)) 
-                self::setBackend(new Backend\Simple());
+                self::setBackend(new Backend\Simple(self::$dataPaths));
             
             return self::$backend;
         }

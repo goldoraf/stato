@@ -7,6 +7,7 @@ use Stato\I18n\Exception;
 
 class Simple
 {
+    protected $dataPaths = array();
     protected $initialized = array();
     protected $translations = array();
     
@@ -21,6 +22,12 @@ class Simple
         '$c == 1 ? 0 : ($c%10 >= 2 && $c%10 <= 4 && ($c%100 < 10 || $c%100 >= 20) ? 1 : 2)' => array('pl'),
         '$c%100 == 1 ? 0 : ($c%100 == 2 ? 1 : ($c%100 == 3 || $c%100 == 4 ? 2 : 3))' => array('sl')
     );
+    
+    public function __construct($dataPaths)
+    {
+        if (!is_array($dataPaths)) $dataPaths = array($dataPaths);
+        $this->dataPaths = $dataPaths;   
+    }
     
     public function translate($locale, $key, $values = array())
     {
@@ -80,7 +87,7 @@ class Simple
     
     protected function initTranslations($locale)
     {
-        $this->loadTranslations(I18n::getDataPaths(), $locale);
+        $this->loadTranslations($locale);
         $this->initialized[] = $locale;
     }
     
@@ -89,11 +96,11 @@ class Simple
         return in_array($locale, $this->initialized);
     }
     
-    protected function loadTranslations($paths, $locale)
+    protected function loadTranslations($locale)
     {
         $this->translations[$locale] = array();
         
-        foreach ($paths as $path) {
+        foreach ($this->dataPaths as $path) {
             $file = $this->getTranslationFilePath($path, $locale);
             if (file_exists($file)) {
                 $translations = $this->loadTranslationFile($file);
