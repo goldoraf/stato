@@ -6,7 +6,7 @@ require_once 'i18n.php';
 require_once 'backend/abstract.php';
 require_once 'backend/yaml.php';
 
-class SYamlBackendTest extends PHPUnit_Framework_TestCase
+class SYamlBackendTest extends SSimpleBackendTest
 {
     public function setup()
     {
@@ -16,31 +16,25 @@ class SYamlBackendTest extends PHPUnit_Framework_TestCase
         $this->backend = new SYamlBackend(dirname(__FILE__).'/data/yaml');
     }
     
-    public function test_translate()
+    public function teardown()
     {
-        $this->assertEquals('Stato est un cadre de travail PHP5.', 
-            $this->backend->translate('fr', 'Stato is a PHP5 framework.'));
+        @unlink(dirname(__FILE__) . '/tmp/klingon.yml');
+        @unlink(dirname(__FILE__) . '/tmp/fr.yml');
     }
     
-    public function test_translate_and_interpolate()
+    public function test_save()
     {
-        $this->assertEquals("La date d'aujourd'hui est 31/07/2007", 
-            $this->backend->translate('fr', "Today's date is %date%", array('%date%' => '31/07/2007')));
-        $this->assertEquals("La date d'aujourd'hui est 31/07/2007", 
-            $this->backend->translate('fr', "Today's date is %date%", array('date' => '31/07/2007')));
+        $this->backend->store('klingon', 'The Klingon culture is a very ancient one, though there is no record of its roots.', 
+                                         'tIQqu\' tlhIngan Segh tIgh je, \'ach mungDaj qonlu\'be\'.');
+        $this->backend->save('klingon', dirname(__FILE__) . '/tmp');
+        
+        $backend = new SYamlBackend(dirname(__FILE__) . '/tmp');
+        $this->assertEquals('tIQqu\' tlhIngan Segh tIgh je, \'ach mungDaj qonlu\'be\'.',
+            $backend->translate('klingon', 'The Klingon culture is a very ancient one, though there is no record of its roots.'));
     }
     
-    public function test_translatef()
+    public function test_save_with_existent_translations()
     {
-        $this->assertEquals('Le champ IP est requis.', 
-            $this->backend->translatef('fr', '%s is required.', array('IP')));
-    }
-    
-    public function test_translate_and_pluralize()
-    {
-        $this->assertEquals('pas de message', $this->backend->translate_and_pluralize('fr', 'inbox', 0));
-        $this->assertEquals('1 message', $this->backend->translate_and_pluralize('fr', 'inbox', 1));
-        $this->assertEquals('2 messages', $this->backend->translate_and_pluralize('fr', 'inbox', 2));
-        $this->assertEquals('3 messages', $this->backend->translate_and_pluralize('fr', 'inbox', 3));
+        
     }
 }
