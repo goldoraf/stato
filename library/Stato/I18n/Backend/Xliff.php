@@ -4,6 +4,53 @@ namespace Stato\I18n\Backend;
 
 class Xliff extends Simple
 {
+    public function save($locale, $path)
+    {
+        $xml = new \XMLWriter();
+        $xml->openMemory();
+        $xml->setIndent(true);
+        $xml->startDocument('1.0', 'UTF-8');
+        $xml->startElement('xliff');
+        $xml->writeAttribute('version', '1.0');
+        $xml->startElement('file');
+        $xml->writeAttribute('original', 'global');
+        $xml->writeAttribute('source-language', 'en');
+        $xml->writeAttribute('target-language', $locale);
+        $xml->writeAttribute('datatype', 'plaintext');
+        $xml->startElement('body');
+        
+        $count = 1;
+        foreach ($this->translations[$locale] as $key => $translation) {
+            if (is_array($translation)) {
+                $count2 = 0;
+                $xml->startElement('group');
+                $xml->writeAttribute('restype', 'x-gettext-plurals');
+                foreach ($translation as $k => $v) {
+                    $xml->startElement('trans-unit');
+                    $xml->writeAttribute('id', "{$count}[{$count2}]");
+                    if (is_string($k)) $xml->writeAttribute('resname', $k);
+                    $xml->writeElement('source', $key);
+                    $xml->writeElement('target', $v);
+                    $xml->endElement();
+                    $count2++;
+                }
+                $xml->endElement();
+            } else {
+                $xml->startElement('trans-unit');
+                $xml->writeAttribute('id', $count);
+                $xml->writeElement('source', $key);
+                $xml->writeElement('target', $translation);
+                $xml->endElement();
+            }
+            $count++;
+        }
+        
+        $xml->endElement();
+        $xml->endElement();
+        $xml->endElement();
+        file_put_contents($this->getTranslationFilePath($path, $locale), $xml->flush());
+    }
+    
     protected function loadTranslationFile($file)
     {
         $xml = simplexml_load_file($file);

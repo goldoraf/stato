@@ -7,7 +7,7 @@ use Stato\TestCase;
 
 require_once __DIR__ . '/../../TestsHelper.php';
 
-class YamlTest extends TestCase
+class YamlTest extends SimpleTest
 {
     public function setup()
     {
@@ -17,31 +17,29 @@ class YamlTest extends TestCase
         $this->backend = new Yaml(__DIR__ . '/../data/yaml');
     }
     
-    public function testTranslate()
+    public function tearDown()
     {
-        $this->assertEquals('Stato est un cadre de travail PHP5.', 
-            $this->backend->translate('fr', 'Stato is a PHP5 framework.'));
+        @unlink(__DIR__ . '/../tmp/klingon.yml');
+        @unlink(__DIR__ . '/../tmp/fr.yml');
     }
     
-    public function testTranslateAndInterpolate()
+    public function testSave()
     {
-        $this->assertEquals("La date d'aujourd'hui est 31/07/2007", 
-            $this->backend->translate('fr', "Today's date is %date%", array('%date%' => '31/07/2007')));
-        $this->assertEquals("La date d'aujourd'hui est 31/07/2007", 
-            $this->backend->translate('fr', "Today's date is %date%", array('date' => '31/07/2007')));
+        $this->backend->store('klingon', 'The Klingon culture is a very ancient one, though there is no record of its roots.', 
+                                         'tIQqu\' tlhIngan Segh tIgh je, \'ach mungDaj qonlu\'be\'.');
+        $this->backend->save('klingon', __DIR__ . '/../tmp');
+        
+        $backend = new Yaml(__DIR__ . '/../tmp');
+        $this->assertEquals('tIQqu\' tlhIngan Segh tIgh je, \'ach mungDaj qonlu\'be\'.',
+            $backend->translate('klingon', 'The Klingon culture is a very ancient one, though there is no record of its roots.'));
     }
     
-    public function testTranslatef()
+    public function testSaveWithExistentTranslations()
     {
-        $this->assertEquals('Le champ IP est requis.', 
-            $this->backend->translatef('fr', '%s is required.', array('IP')));
-    }
-    
-    public function testTranslateAndPluralize()
-    {
-        $this->assertEquals('pas de message', $this->backend->translateAndPluralize('fr', 'inbox', 0));
-        $this->assertEquals('1 message', $this->backend->translateAndPluralize('fr', 'inbox', 1));
-        $this->assertEquals('2 messages', $this->backend->translateAndPluralize('fr', 'inbox', 2));
-        $this->assertEquals('3 messages', $this->backend->translateAndPluralize('fr', 'inbox', 3));
+        $this->backend->store('fr', 'hello world', 'bonjour le monde', 'foo_controller.php:10');
+        $this->backend->save('fr', __DIR__ . '/../tmp');
+        $backend = new Yaml(__DIR__ . '/../tmp');
+        $this->assertEquals('bonjour le monde', $backend->translate('fr', 'hello world'));
+        $this->assertEquals('Stato est un cadre de travail PHP5.', $backend->translate('fr', 'Stato is a PHP5 framework.'));
     }
 }

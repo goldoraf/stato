@@ -10,6 +10,7 @@ class Simple
     protected $dataPaths = array();
     protected $initialized = array();
     protected $translations = array();
+    protected $comments = array();
     
     private static $pluralRules = array
     (
@@ -46,6 +47,40 @@ class Simple
     {
         $entry = $this->lookup($locale, $key);
         return $this->pluralize($locale, $entry, $count);
+    }
+    
+    public function addKey($locale, $key, $comment = null)
+    {
+        $translation = $this->lookup($locale, $key);
+        $this->store($locale, $key, $translation, $comment);
+    }
+    
+    public function store($locale, $key, $translation, $comment = null)
+    {
+        if (!$this->isInitialized($locale)) $this->initTranslations($locale);
+        $this->translations[$locale][$key] = $translation;
+        if (!is_null($comment)) $this->comments[$locale][$key] = $comment;
+    }
+    
+    public function save($locale, $path)
+    {
+        $php = '';
+        foreach ($this->translations[$locale] as $key => $translation) {
+            $php.= "    '".addcslashes($key, "'")."' => ";
+            if (is_array($translation)) {
+                $php.= "array(\n";
+                foreach ($translation as $k => $v) {
+                    $php.= "        ";
+                    if (is_string($k)) $php.= "'".addcslashes($k, "'")."' => ";
+                    $php.= "'".addcslashes($v, "'")."',\n";
+                }
+                $php.= "    ),\n";
+            } else {
+                $php.= "'".addcslashes($translation, "'")."',\n";
+            }
+        }
+        file_put_contents($this->getTranslationFilePath($path, $locale), 
+                          "<?php\n\nreturn array(\n{$php});");
     }
     
     protected function interpolate($locale, $entry, $values)
@@ -99,6 +134,7 @@ class Simple
     protected function loadTranslations($locale)
     {
         $this->translations[$locale] = array();
+        $this->comments[$locale] = array();
         
         foreach ($this->dataPaths as $path) {
             $file = $this->getTranslationFilePath($path, $locale);

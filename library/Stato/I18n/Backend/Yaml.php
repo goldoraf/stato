@@ -6,6 +6,12 @@ use Stato\I18n\Exception;
 
 class Yaml extends Simple
 {
+    public function save($locale, $path)
+    {
+        file_put_contents($this->getTranslationFilePath($path, $locale), 
+                          syck_dump($this->translations[$locale]));
+    }
+    
     protected function loadTranslationFile($file)
     {
         if (!function_exists('syck_load'))
