@@ -67,6 +67,18 @@ class FieldsTest extends TestCase
         $this->assertEquals('<input type="text" name="foo" value="bar" />', $f->bind('foo', 'bar')->__toString());
     }
     
+    public function testCharFieldNoEncodeQuotes()
+    {
+        $f = new CharField();
+        $this->assertEquals('foo\'bar', $f->clean('foo\'bar'));
+    }
+    
+    public function testCharFieldNoEncodeAmp()
+    {
+        $f = new CharField();
+        $this->assertEquals('foo&bar', $f->clean('foo&bar'));
+    }
+    
     public function testCharFieldWithLengthOption()
     {
         $f = new CharField(array('length' => 3));

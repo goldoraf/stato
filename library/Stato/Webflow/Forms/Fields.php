@@ -146,7 +146,7 @@ class CharField extends Field
         $value = parent::clean($value);
         if ($this->isEmpty($value)) return '';
         
-        $value = filter_var($value, FILTER_SANITIZE_STRING);
+        $value = filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         
         if (!is_null($this->regex) && !filter_var($value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $this->regex))))
             throw new ValidationError($this->errorMessages['invalid'], array(), $value);
