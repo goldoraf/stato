@@ -60,6 +60,18 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         $f = new SField(array('input' => 'SRequest'));
     }
     
+    public function test_char_field_no_encode_quotes()
+    {
+        $f = new SCharField();
+        $this->assertEquals('foo\'bar', $f->clean('foo\'bar'));
+    }
+    
+    public function test_char_field_no_encode_amp()
+    {
+        $f = new SCharField();
+        $this->assertEquals('foo&bar', $f->clean('foo&bar'));
+    }
+    
     public function test_char_field_with_length_option()
     {
         $f = new SCharField(array('length' => 3));
