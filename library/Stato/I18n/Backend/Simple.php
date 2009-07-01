@@ -66,6 +66,9 @@ class Simple
     {
         $php = '';
         foreach ($this->translations[$locale] as $key => $translation) {
+            if (array_key_exists($key, $this->comments[$locale]) && !empty($this->comments[$locale][$key])) {
+                $php.= "    //".$this->comments[$locale][$key]."\n";
+            }
             $php.= "    '".addcslashes($key, "'")."' => ";
             if (is_array($translation)) {
                 $php.= "array(\n";

@@ -89,6 +89,7 @@ return array(
         '1 message',
         '%d messages',
     ),
+    //foo_controller.php:10
     'hello world' => 'bonjour le monde',
 );
 EOT;
