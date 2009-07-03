@@ -492,8 +492,8 @@ class SRequestFiles implements ArrayAccess
         } else {
             $uploads = array();
             foreach ($files['name'] as $k => $v) {
-                $uploads[] = new SUploadedFile($files['tmp_name'][$k], $v, 
-                                                    $files['type'][$k], $files['size'][$k], $files['error'][$k]);
+                $uploads[$k] = new SUploadedFile($files['tmp_name'][$k], $v, 
+                                                 $files['type'][$k], $files['size'][$k], $files['error'][$k]);
             }
             return $uploads;
         }
