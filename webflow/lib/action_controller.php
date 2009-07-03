@@ -93,10 +93,10 @@ class SActionController implements SIDispatchable, SIFilterable
         
         $class_name = self::controller_class($name);
         if (!file_exists($path = self::controller_file($name, $module)))
-    		throw new SUnknownControllerException("$class_name not found !");
-    		
-    	require_once($path);
-		$controller = new $class_name();
+            throw new SUnknownControllerException("$class_name not found !");
+            
+        require_once($path);
+        $controller = new $class_name();
         $controller->set_module($module);
         return $controller;
     }
@@ -431,6 +431,7 @@ class SActionController implements SIDispatchable, SIFilterable
     
     protected function send_streamed_data($data)
     {
+        $this->performed_render = true;
         $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
         $this->response->send_headers();
         $this->response->sent = true;
@@ -600,7 +601,7 @@ class SActionController implements SIDispatchable, SIFilterable
     
     private static function controller_class($req_controller)
     { 
-    	return SInflection::camelize($req_controller).'Controller';
+        return SInflection::camelize($req_controller).'Controller';
     }
     
     private static function controller_file($req_controller, $module)
