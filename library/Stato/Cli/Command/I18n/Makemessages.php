@@ -20,6 +20,7 @@ class Makemessages extends Command
         
         $this->addOption('-p', '--path', Option::STRING);
         $this->addOption('-l', '--lang', Option::STRING);
+        $this->addOption('-b', '--backend', Option::STRING);
     }
     
     public function run($options = array(), $args = array())
@@ -35,17 +36,32 @@ class Makemessages extends Command
             return;
         }
         
+        if (!isset($options['lang'])) {
+            echo "Please provide a language code.\n";
+            return;
+        }
+        
+        $backendName = (!isset($options['backend'])) ? 'simple' : $options['backend'];
+        $backendClass = 'Stato\\I18n\\Backend\\'.ucfirst($backendName);
+        $backend = new $backendClass($localePath);
+        
+        $this->messages = array();
+        
         $it = new \RecursiveDirectoryIterator($appPath);
         foreach (new \RecursiveIteratorIterator($it) as $file) {
             if ($file->isFile()) $this->extractMessages((string) $file);
         }
+        
+        foreach ($this->messages as $comment => $message) {
+            $backend->addKey($options['lang'], $message, $comment);
+        }
+        
+        $backend->save($options['lang'], $localePath);
     }
     
     private function extractMessages($filepath)
     {
-        $this->messages = array();
         $this->tokens = token_get_all(file_get_contents($filepath));
-        
         while ($token = current($this->tokens)) {
             if (!is_string($token)) {
                 list($id, $text) = $token;
@@ -65,7 +81,7 @@ class Makemessages extends Command
             if (is_string($t) || (is_array($t) && ($t[0] == T_WHITESPACE || $t[0] == T_DOC_COMMENT || $t[0] == T_COMMENT))) {
                 next($this->tokens);
             } else {
-                $this->storeMessage($t[1], $currentFile, $t[2]);
+                $this->storeMessage(trim($t[1], "'"), $currentFile, $t[2]);
                 next($this->tokens);
                 return;
             }

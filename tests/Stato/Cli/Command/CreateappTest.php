@@ -14,6 +14,11 @@ class CreateappTest extends TestCase
         $this->path = __DIR__ . '/../files/sandbox';
     }
     
+    public function tearDown()
+    {
+        // recursive rm
+    }
+    
     public function testRun()
     {
         $this->command->run(array('path' => $this->path), array('testapp'));

@@ -12,6 +12,7 @@ class AllTests
     {
         $suite = new TestSuite('Stato CLI Commands');
         $suite->addTestSuite('Stato\Cli\Command\CreateappTest');
+        $suite->addTestSuite('Stato\Cli\Command\MakemessagesTest');
         return $suite;
     }
 }
