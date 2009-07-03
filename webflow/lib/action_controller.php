@@ -401,6 +401,7 @@ class SActionController implements SIDispatchable, SIFilterable
         
         if (is_resource($data))
         {
+            $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
             $this->response->send_headers();
             rewind($data);
             fpassthru($data);
@@ -429,6 +430,7 @@ class SActionController implements SIDispatchable, SIFilterable
         
         if ($params['stream'] === true)
         {
+            $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
             $this->response->send_headers();
             $fp = @fopen($path, "rb");
             fpassthru($fp);
