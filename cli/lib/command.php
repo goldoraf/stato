@@ -8,6 +8,8 @@ abstract class SCommand
     protected $allowed_options = array();
     protected $allowed_params  = array();
     
+    protected static $packages = array('webflow', 'orm', 'i18n');
+    
     public static function find_and_execute()
     {
         $args = $_SERVER['argv'];
@@ -18,15 +20,22 @@ abstract class SCommand
     
     public static function load($command_name, $args)
     {
-        if (file_exists($command_file = STATO_CORE_PATH."/webflow/script/$command_name.php"))
-            require $command_file;
-        elseif (file_exists($command_file = STATO_CORE_PATH."/orm/script/$command_name.php"))
-            require $command_file;
-        else
+        if (!self::find_command_file($command_name))
             throw new SConsoleException("$command_name command does not exist");
 
         $command_class = SInflection::camelize($command_name).'Command';
         return new $command_class($args);
+    }
+    
+    protected static function find_command_file($command_name)
+    {
+        foreach (self::$packages as $package) {
+            if (file_exists($command_file = STATO_CORE_PATH."/$package/script/$command_name.php")) {
+                require $command_file;
+                return true;
+            }
+        }
+        return false;
     }
     
     public function __construct($args)
