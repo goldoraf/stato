@@ -6,6 +6,7 @@ class SResponse
 {
     public $body         = null;
     public $status       = null;
+    public $sent         = false;
     public $assigns      = array();
     public $headers      = array();
     public $redirected_to = null;
@@ -37,6 +38,7 @@ class SResponse
     
     public function out()
 	{
+        if ($this->sent) return;
         $this->send_headers();
         echo $this->body;
     }

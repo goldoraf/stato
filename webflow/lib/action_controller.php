@@ -400,14 +400,9 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->send_file_headers($params);
         
         if (is_resource($data))
-        {
-            $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
-            $this->response->send_headers();
-            rewind($data);
-            fpassthru($data);
-            exit();
-        }
-        $this->render_text($data);
+            $this->send_streamed_data($data);
+        else
+            $this->render_text($data);
     }
     
     protected function send_file($path, $params=array())
@@ -429,14 +424,18 @@ class SActionController implements SIDispatchable, SIFilterable
         $this->send_file_headers($params);
         
         if ($params['stream'] === true)
-        {
-            $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
-            $this->response->send_headers();
-            $fp = @fopen($path, "rb");
-            fpassthru($fp);
-            return;
-        }
-        else $this->render_text(file_get_contents($path));
+            $this->send_streamed_data(@fopen($path, "rb"));
+        else
+            $this->render_text(file_get_contents($path));
+    }
+    
+    protected function send_streamed_data($data)
+    {
+        $this->response->status = self::DEFAULT_RENDER_STATUS_CODE;
+        $this->response->send_headers();
+        $this->response->sent = true;
+        rewind($data);
+        fpassthru($data);
     }
     
     protected function cache_page($content = null, $options = array())
