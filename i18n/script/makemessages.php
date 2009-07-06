@@ -35,7 +35,8 @@ class MakemessagesCommand extends SCommand
         
         $it = new RecursiveDirectoryIterator($app_path);
         foreach (new RecursiveIteratorIterator($it) as $file) {
-            if ($file->isFile()) $this->extract_messages((string) $file);
+            if ($file->isFile() && !preg_match('/\.svn/', $file->getPathname()))
+                $this->extract_messages((string) $file);
         }
         
         foreach ($this->messages as $comment => $message) {

@@ -30,17 +30,20 @@ class SSimpleBackend extends SAbstractBackend
     {
         $php = '';
         foreach ($this->translations[$locale] as $key => $translation) {
-            $php.= "    '".addcslashes($key, "'")."' => ";
+            if (array_key_exists($key, $this->comments[$locale]) && !empty($this->comments[$locale][$key])) {
+                $php.= "    //".$this->comments[$locale][$key]."\n";
+            }
+            $php.= "    '".addcslashes(stripslashes($key), "'")."' => ";
             if (is_array($translation)) {
                 $php.= "array(\n";
                 foreach ($translation as $k => $v) {
                     $php.= "        ";
-                    if (is_string($k)) $php.= "'".addcslashes($k, "'")."' => ";
-                    $php.= "'".addcslashes($v, "'")."',\n";
+                    if (is_string($k)) $php.= "'".addcslashes(stripslashes($k), "'")."' => ";
+                    $php.= "'".addcslashes(stripslashes($v), "'")."',\n";
                 }
                 $php.= "    ),\n";
             } else {
-                $php.= "'".addcslashes($translation, "'")."',\n";
+                $php.= "'".addcslashes(stripslashes($translation), "'")."',\n";
             }
         }
         file_put_contents($this->get_translation_file_path($path, $locale), 
