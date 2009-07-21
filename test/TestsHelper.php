@@ -4,6 +4,7 @@
  * Include PHPUnit dependencies
  */
 require_once 'PHPUnit/Framework.php';
+require_once 'PHPUnit/Extensions/OutputTestCase.php';
 
 ob_start();
 

@@ -209,20 +209,4 @@ class User extends SActiveRecord
     }
 }
 
-// For inheritance tests
-class Player extends SActiveRecord
-{
-    public static $objects;
-    public static $relationships = array('guns' => 'many_to_many');
-}
-
-class Red extends Player {}
-
-class Blue extends Player {}
-
-class Gun extends SActiveRecord
-{
-    public static $objects;
-}
-
 ?>

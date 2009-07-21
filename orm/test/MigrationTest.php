@@ -12,12 +12,17 @@ class Reminder extends SActiveRecord
     public static $objects;
 }
 
-class MigrationTest extends StatoTestCase
+class MigrationTest extends PHPUnit_Extensions_OutputTestCase
 {
     public function __construct()
     {
         parent::__construct();
         SMapper::add_manager_to_class('Person');
+    }
+    
+    protected function assertNothingThrown()
+    {
+        return $this->assertTrue(true);
     }
     
     public function teardown()
