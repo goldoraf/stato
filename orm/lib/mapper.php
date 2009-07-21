@@ -7,7 +7,7 @@ class SMapper
     public static function add_manager_to_class($class)
     {
         $ref = new ReflectionClass($class);
-        if ($ref->hasProperty('objects')) 
+        if ($ref->hasProperty('objects') && is_null($ref->getStaticPropertyValue('objects'))) 
             $ref->setStaticPropertyValue('objects', self::retrieve_manager($class));
     }
     

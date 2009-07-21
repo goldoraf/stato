@@ -31,8 +31,13 @@ class STableMap
     {
         if (($parent = $this->descends_from()) == 'SActiveRecord')
             $this->table_name = SInflection::pluralize(SInflection::underscore($this->class));
-        else
-            $this->table_name = SInflection::pluralize(SInflection::underscore($parent));
+        else {
+            do {
+                $ref = new ReflectionClass($parent);
+                $parent = $ref->getParentClass()->getName();
+            } while ($parent != 'SActiveRecord');
+            $this->table_name = SInflection::pluralize(SInflection::underscore($ref->getName()));
+        }
             
         if (SActiveRecord::$table_name_prefix !== null)
             $this->table_name = SActiveRecord::$table_name_prefix.'_'.$this->table_name;

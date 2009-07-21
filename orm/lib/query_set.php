@@ -382,9 +382,8 @@ class SQuerySet implements Iterator, Countable
         
         if ($row !== null 
             && in_array($meta->inheritance_field, array_keys($meta->attributes))
-            && (SDependencies::model_exists($row[$meta->inheritance_field])) !== false
             && isset($row[$meta->inheritance_field])) 
-            $class = $row[$meta->inheritance_field];
+            $class = SInflection::camelize($row[$meta->inheritance_field]);
         else
             $class = $meta->class;
         
@@ -489,7 +488,7 @@ class SQuerySet implements Iterator, Countable
     
     protected function type_condition()
     {
-        return $this->meta->inheritance_field.' = \''.strtolower($this->meta->class).'\'';
+        return $this->meta->inheritance_field.' = \''.SInflection::underscore($this->meta->class).'\'';
     }
     
     protected function fetch_all()

@@ -209,4 +209,20 @@ class User extends SActiveRecord
     }
 }
 
+// for inheritance tests
+class Food extends SActiveRecord
+{
+    public static $objects;
+    public static $relationships = array('ingredients' => 'many_to_many');
+}
+
+class Pizza extends Food {}
+class Burger extends Food {}
+class MaxiBurger extends Burger {}
+
+class Ingredient extends SActiveRecord
+{
+    public static $objects;
+}
+
 ?>
