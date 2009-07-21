@@ -152,6 +152,7 @@ CREATE TABLE `pages` (
 
 CREATE TABLE `foods` (
   `id` int(10) unsigned NOT NULL auto_increment,
+  `chief_id` int(11) default NULL,
   `type` varchar(50) default NULL,
   `name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
@@ -166,4 +167,17 @@ CREATE TABLE `ingredients` (
 CREATE TABLE `foods_ingredients` (
   `food_id` int(11) NOT NULL default '0',
   `ingredient_id` int(11) NOT NULL default '0'
+) TYPE=MyISAM ;
+
+CREATE TABLE `chiefs` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `name` varchar(50) default NULL,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM ;
+
+CREATE TABLE `recipes` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `food_id` int(11) default NULL,
+  `name` varchar(50) default NULL,
+  PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;

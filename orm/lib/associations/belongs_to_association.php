@@ -7,7 +7,7 @@ class SBelongsToMeta extends SAssociationMeta
         parent::__construct($owner_meta, $assoc_name, $options);
         $this->assert_valid_options($options);
         if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
-        else $this->foreign_key = SInflection::underscore($this->class).'_id';
+        else $this->foreign_key = $this->base_meta()->get_possible_fk();
     }
 }
 

@@ -11,10 +11,12 @@ class SMapper
             $ref->setStaticPropertyValue('objects', self::retrieve_manager($class));
     }
     
-    public static function retrieve($class)
+    public static function retrieve($class, $load_associations = true)
     {
         if (!isset(self::$cache[$class]))
             self::$cache[$class] = new STableMap($class);
+        
+        if ($load_associations) self::$cache[$class]->load_associations();
         
         return self::$cache[$class];
     }

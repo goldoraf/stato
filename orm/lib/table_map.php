@@ -13,8 +13,10 @@ class STableMap
     public $associations       = array();
     public $decorators         = array();
     
-    private $content_attributes = null;
+    private $content_attributes       = null;
     private $content_attributes_names = null;
+    private $possible_fk              = null;
+    private $associations_loaded      = false;
     
     public function __construct($class)
     {
@@ -22,22 +24,23 @@ class STableMap
         $this->underscored = SInflection::underscore($class);
         $this->get_meta_from_class();
         if ($this->table_name === null) $this->reset_table_name();
-        $this->columns = SActiveRecord::connection()->columns($this->table_name);
+        $this->attributes = $this->columns = SActiveRecord::connection()->columns($this->table_name);
+    }
+    
+    public function load_associations()
+    {
+        if ($this->associations_loaded) return;
         $this->associations = $this->instantiate_associations();
-        $this->attributes = array_merge($this->columns, $this->associations);
+        $this->attributes = array_merge($this->attributes, $this->associations);
+        $this->associations_loaded = true;
     }
     
     public function reset_table_name()
     {
         if (($parent = $this->descends_from()) == 'SActiveRecord')
             $this->table_name = SInflection::pluralize(SInflection::underscore($this->class));
-        else {
-            do {
-                $ref = new ReflectionClass($parent);
-                $parent = $ref->getParentClass()->getName();
-            } while ($parent != 'SActiveRecord');
-            $this->table_name = SInflection::pluralize(SInflection::underscore($ref->getName()));
-        }
+        else
+            $this->table_name = SInflection::pluralize(SInflection::underscore($this->get_real_parent_class()));
             
         if (SActiveRecord::$table_name_prefix !== null)
             $this->table_name = SActiveRecord::$table_name_prefix.'_'.$this->table_name;
@@ -64,6 +67,28 @@ class STableMap
         }
                
         return $this->content_attributes;
+    }
+    
+    public function get_possible_fk()
+    {
+        if ($this->possible_fk === null)
+        {
+            if (($parent = $this->descends_from()) == 'SActiveRecord')
+                $this->possible_fk = $this->underscored.'_id';
+            else
+                $this->possible_fk = SInflection::underscore($this->get_real_parent_class()).'_id';
+        }
+        return $this->possible_fk;
+    }
+    
+    protected function get_real_parent_class()
+    {
+        $parent = $this->descends_from();
+        do {
+            $ref = new ReflectionClass($parent);
+            $parent = $ref->getParentClass()->getName();
+        } while ($parent != 'SActiveRecord');
+        return $ref->getName();
     }
     
     protected function instantiate_associations()

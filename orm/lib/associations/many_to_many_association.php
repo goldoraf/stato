@@ -11,18 +11,18 @@ class SManyToManyMeta extends SAssociationMeta
         parent::__construct($owner_meta, $assoc_name, $options);
         $this->assert_valid_options($options, array('association_foreign_key', 'join_table', 'scope'));
         if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
-        else $this->foreign_key = $owner_meta->underscored.'_id';
+        else $this->foreign_key = $owner_meta->get_possible_fk();
         if (isset($options['association_foreign_key'])) $this->assoc_foreign_key = $options['association_foreign_key'];
-        else $this->assoc_foreign_key = SInflection::underscore($this->class).'_id';
+        else $this->assoc_foreign_key = $this->base_meta()->get_possible_fk();
         if (isset($options['join_table'])) $this->join_table = $options['join_table'];
-        else $this->join_table = $this->join_table_name($owner_meta->class, $this->class);
+        else $this->join_table = $this->join_table_name($owner_meta, $this->base_meta());
         if (isset($options['scope'])) $this->scope = $options['scope'];
     }
     
-    private function join_table_name($first_name, $second_name)
+    private function join_table_name($first_meta, $second_meta)
     {
-        $first_name  = $this->undecorated_table_name($first_name);
-        $second_name = $this->undecorated_table_name($second_name);
+        $first_name  = $first_meta->table_name;
+        $second_name = $second_meta->table_name;
         
         if ($first_name < $second_name)
             $table_name = "${first_name}_${second_name}";
@@ -35,11 +35,6 @@ class SManyToManyMeta extends SAssociationMeta
             $table_name.= '_'.SActiveRecord::$table_name_suffix;
             
         return $table_name;
-    }
-    
-    private function undecorated_table_name($class_name)
-    {
-        return SInflection::pluralize(SInflection::underscore($class_name));
     }
 }
 

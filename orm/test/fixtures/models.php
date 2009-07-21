@@ -213,7 +213,11 @@ class User extends SActiveRecord
 class Food extends SActiveRecord
 {
     public static $objects;
-    public static $relationships = array('ingredients' => 'many_to_many');
+    public static $relationships = array(
+        'ingredients' => 'many_to_many',
+        'chief' => 'belongs_to',
+        'recipes' => 'has_many'
+    );
 }
 
 class Pizza extends Food {}
@@ -223,6 +227,19 @@ class MaxiBurger extends Burger {}
 class Ingredient extends SActiveRecord
 {
     public static $objects;
+    public static $relationships = array('foods' => 'many_to_many');
+}
+
+class Chief extends SActiveRecord
+{
+    public static $objects;
+    public static $relationships = array('foods' => 'has_many');
+}
+
+class Recipe extends SActiveRecord
+{
+    public static $objects;
+    public static $relationships = array('food' => 'belongs_to');
 }
 
 ?>

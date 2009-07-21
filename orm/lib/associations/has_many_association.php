@@ -20,7 +20,7 @@ class SHasManyMeta extends SAssociationMeta
             $through_class = SInflection::camelize(SInflection::singularize($options['through']));
             $through_meta = SMapper::retrieve($through_class);;
             $this->through_table_name = $through_meta->table_name;
-            $this->through_foreign_key = $owner_meta->underscored.'_id';
+            $this->through_foreign_key = $owner_meta->get_possible_fk();
             
             if (isset($through_meta->relationships[$this->underscored]))
                 $r = $through_meta->relationships[$this->underscored];
@@ -31,14 +31,14 @@ class SHasManyMeta extends SAssociationMeta
             else $this->source_assoc_type = $r;
             
             if ($this->source_assoc_type == 'belongs_to')
-                $this->foreign_key = $owner_meta->underscored.'_id';
+                $this->foreign_key = $owner_meta->get_possible_fk();
             elseif ($this->source_assoc_type == 'has_many')
-                $this->foreign_key = $through_meta->underscored.'_id';
+                $this->foreign_key = $through_meta->get_possible_fk();
         }
         else
         {
             if (isset($options['foreign_key'])) $this->foreign_key = $options['foreign_key'];
-            else $this->foreign_key = $owner_meta->underscored.'_id';
+            else $this->foreign_key = $owner_meta->get_possible_fk();
             
             if (isset($options['order'])) $this->order = $options['order'];
             
