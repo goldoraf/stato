@@ -9,13 +9,6 @@ class SAssociation
         $this->meta = $meta;
     }
     
-    public function typecast($owner, $value)
-    {
-        $manager = $this->meta->get_manager($owner);
-        $manager->replace($value);
-        return $manager;
-    }
-    
     public function default_value($owner)
     {
         return $this->meta->get_manager($owner);

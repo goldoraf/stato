@@ -53,6 +53,7 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     public function __construct($values = null)
     {
         $this->meta = SMapper::retrieve(get_class($this));
+        $this->init_values();
         $this->ensure_proper_type();
         if ($values != null && is_array($values)) $this->populate($values);
     }
@@ -223,17 +224,28 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return ($this->has_attribute_changed($name)) ? $this->changed_values[$name] : @$this->values[$name];
     }
     
+    public function init_values()
+    {
+        foreach ($this->meta->attributes as $name => $attr) $this->values[$name] = $attr->default_value($this);
+    }
+    
     /**
      * Sets all attributes at once. Used by <var>SQuerySet</var> class to instantiate records.
      */
-    public function set_attributes($values=array())
+    public function hydrate($values=array())
     {
         foreach($values as $key => $value)
         {
-            if (!is_object($value) && $value !== null && !is_bool($value)) $value = stripslashes($value);
+            /*if (!is_object($value) && $value !== null && !is_bool($value)) $value = stripslashes($value);
             if (!$this->attr_exists($key)) $this->values[$key] = $value;
-            else $this->values[$key] = $this->meta->attributes[$key]->typecast($this, $value);
+            else $this->values[$key] = $this->meta->attributes[$key]->typecast($this, $value);*/
+            if ($this->attr_exists($key)) {
+                if (in_array($key, $this->attr_serialized)) $value = unserialize($value);
+                else $value = $this->meta->attributes[$key]->typecast($this, $value);
+            }
+            $this->values[$key] = $value;
         }
+        $this->set_as_loaded();
     }
     
     /**
@@ -250,12 +262,7 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         foreach($values as $key => $value)
         {
             if (is_array($value)) $multi_params_attributes[$key] = $value;
-            elseif (!in_array($key, $attr_protected))
-            {
-                if (!is_object($value) && $value !== null && !is_bool($value)) $this->$key = stripslashes($value);
-                else $this->$key = $value;
-            }
-            if (!$this->attr_exists($key)) $this->values[$key] = $value;
+            elseif (!in_array($key, $attr_protected)) $this->$key = $value;
         }
         
         if (!empty($multi_params_attributes)) $this->assign_multiparams_attributes($multi_params_attributes);
@@ -462,33 +469,22 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
      */
     protected function read_attribute($name)
     {
-        if (!isset($this->values[$name]))
-        {
-            if (!$this->attr_exists($name)) return null;
-            $this->values[$name] = $this->meta->attributes[$name]->default_value($this);
-        }
-        if (in_array($name, $this->attr_serialized) && is_string($this->values[$name]))
-            return unserialize($this->values[$name]);
-        else
-            return $this->values[$name];
+        if (!isset($this->values[$name])) return null;
+        return $this->values[$name];
     }
     
     /**
      * Updates the attribute identified by <var>$name</var> with the specified <var>$value</var>
-     * after it has been typecast.     
      */
     protected function write_attribute($name, $value)
     {
-        if ($this->attr_exists($name)) 
-            $value = $this->meta->attributes[$name]->typecast($this, $value);
-            
         if (!array_key_exists($name, $this->changed_values))
         {
             $old = $this->read_attribute($name);
             if ($old != $value) $this->changed_values[$name] = $old;
         }
-        
-        $this->values[$name] = $value;
+        if ($this->is_a_relation($name)) $this->values[$name]->replace($value);
+        else $this->values[$name] = $value;
     }
     
     protected function before_create() {}
@@ -709,6 +705,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         return array_key_exists($name, $this->meta->attributes);
     }
     
+    public function is_a_relation($name)
+    {
+        return array_key_exists($name, $this->meta->relationships);
+    }
+    
     private function read_id()
     {
         return $this->read_attribute($this->meta->identity_field);
@@ -738,11 +739,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
             switch ($type)
             {
                 case SColumn::DATE:
-                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day'];
+                    $this->$key = new SDate($value['year'], $value['month'], $value['day']);
                     break;
                 case SColumn::DATETIME:
-                    $this->$key = $value['year'].'-'.$value['month'].'-'.$value['day']
-                                  .' '.$value['hour'].':'.$value['min'].':'.$value['sec'];
+                    $this->$key = new SDateTime($value['year'], $value['month'], $value['day'],
+                                               $value['hour'], $value['min'], $value['sec']);
                     break;
             }
         }

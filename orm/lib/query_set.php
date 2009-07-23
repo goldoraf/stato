@@ -391,8 +391,7 @@ class SQuerySet implements Iterator, Countable
         else
         {
             $record = new $class();
-            $record->set_attributes($row);
-            $record->set_as_loaded();
+            $record->hydrate($row);
         }
         
         if (count($meta->decorators) != 0)

@@ -109,9 +109,6 @@ class ActiveRecordTest extends ActiveTestCase
         $this->assertTrue($post->published);
         $post->published = false;
         $this->assertFalse($post->published);
-        $post->published = 'True';
-        $this->assertTrue($post->published);
-        $post->published = false;
         $post->save();
         $post_bis = Post::$objects->get(1);
         $this->assertFalse($post_bis->published);
