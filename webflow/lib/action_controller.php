@@ -192,6 +192,15 @@ class SActionController implements SIDispatchable, SIFilterable
     
     }
     
+    /**
+     * Executes another action (and renders its template) in the context of the requested action.
+     */
+    protected function forward($action_name)
+    {
+        $this->$action_name();
+        $this->render_action($action_name);
+    }
+    
     protected function render($status = null)
     {
         $this->render_action($this->action_name(), $status);
