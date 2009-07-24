@@ -58,6 +58,19 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         if ($values != null && is_array($values)) $this->populate($values);
     }
     
+    public function __sleep()
+    {
+        foreach (array_keys($this->meta->relationships) as $relation) unset($this->values[$relation]);
+        return array('errors', 'attr_protected', 'attr_serialized', 'attr_required', 'attr_unique',
+            'attr_unique', 'validations', 'record_timestamps', 'values', 'changed_values', 'meta', 'new_record');
+    }
+    
+    public function __wakeup()
+    {
+        foreach (array_keys($this->meta->relationships) as $relation) 
+            $this->values[$relation] = $this->meta->attributes[$relation]->default_value($this);
+    }
+    
     public function __get($name)
     {
         $acc_method = 'read_'.$name;
