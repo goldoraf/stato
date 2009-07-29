@@ -123,7 +123,7 @@ class SMailer
                 $mail->set_text($this->render($template.'.plain', $this->body));
             if (file_exists($this->get_template_path($template.'.html')))
                 $mail->set_html_text($this->render($template.'.html', $this->body));
-        } else {
+        } elseif (is_string($this->body) && !empty($this->body)) {
             $mail->set_text($this->body);
         }
         
