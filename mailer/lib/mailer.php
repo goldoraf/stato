@@ -5,18 +5,17 @@
  * 
  * This class allows you to send emails using templates :
  * <code>
- * SMailer::setTemplateRoot('/path/to/msg/templates');
+ * SMailer::set_template_root('/path/to/msg/templates');
  * 
  * class UserMailer extends SMailer
  * {
- *     public function welcomeEmail($user) {
- *         $mail = new SMail();
- *         $mail->setTo($user->email_address);
- *         $mail->setBody($this->renderMessage('welcome', array('username' => $user->name)));
+ *     public function welcome_email($user) {
+ *         $this->to = $user->email_address;
+ *         $this->body = array('username' => $user->name);
  *     }
  * }
  * </code>
- * In the mail defined above, the template at /path/to/msg/templates/welcome.php 
+ * In the mail defined above, the template at /path/to/msg/templates/welcome_email.php 
  * would be used to render the mail body. Parameters passed as second argument 
  * would be available as variables in the template :
  * <code>
@@ -28,7 +27,7 @@
  * the SIMailTransport interface :
  * <code>
  * $transport = new SSmtpTransport();
- * SMailer::setDefaultTransport($transport);
+ * SMailer::set_default_transport($transport);
  * </code>
  *
  * @package Stato
