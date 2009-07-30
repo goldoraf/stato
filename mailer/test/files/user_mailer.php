@@ -10,6 +10,14 @@ class UserMailer extends SMailer
         return $mail;
     }
     
+    protected function welcomeMessage($user)
+    {
+        $mail = new SMail();
+        $mail->add_to($user->mail, $user->name);
+        $mail->set_text($this->render('welcome.plain', array('username' => $user->name)));
+        return $mail;
+    }
+    
     protected function greetings_message($user)
     {
         $mail = new SMail();

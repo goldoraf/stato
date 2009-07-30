@@ -77,9 +77,9 @@ class SMailer
     
     public function __call($method_name, $args)
     {
-        if (preg_match('/^send_([a-zA-Z0-9_]*)$/', $method_name, $m))
+        if (preg_match('/^send([a-zA-Z0-9_]*)$/', $method_name, $m))
             return $this->send($m[1], $args);
-        elseif (preg_match('/^prepare_([a-zA-Z0-9_]*)$/', $method_name, $m))
+        elseif (preg_match('/^prepare([a-zA-Z0-9_]*)$/', $method_name, $m))
             return $this->prepare($m[1], $args);
         
         throw new SMailException(get_class($this)."::$method_name() method does not exist");
@@ -87,6 +87,9 @@ class SMailer
     
     public function prepare($method_name, $args)
     {
+        if (strpos($method_name, '_') === 0)
+            $method_name = substr($method_name, 1);
+        
         if (!method_exists($this, $method_name))
             throw new SMailException(get_class($this)."::$method_name() method does not exist");
         

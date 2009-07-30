@@ -30,6 +30,12 @@ class SMailerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('Welcome John Doe', $mail->get_content());
     }
     
+    public function test_prepare_with_camelcase_method()
+    {
+        $mail = $this->mailer->prepareWelcomeMessage($this->user);
+        $this->assertEquals('Welcome John Doe', $mail->get_content());
+    }
+    
     public function test_render_html_message()
     {
         $mail = $this->mailer->prepare_greetings_message($this->user);
