@@ -8,8 +8,8 @@ class SMailException extends Exception {}
  * 
  * <code>
  * $mail = new SMail();
- * $mail->addTo('foo@bar.net');
- * $mail->setText('hello world');
+ * $mail->add_to('foo@bar.net');
+ * $mail->set_text('hello world');
  * $mail->send(new SSendmailTransport());
  * </code>
  *

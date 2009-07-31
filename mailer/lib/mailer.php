@@ -15,7 +15,7 @@
  *     }
  * }
  * </code>
- * In the mail defined above, the template at /path/to/msg/templates/welcome_email.php 
+ * In the mail defined above, the template at /path/to/msg/templates/welcome_email.plain.php 
  * would be used to render the mail body. Parameters passed as second argument 
  * would be available as variables in the template :
  * <code>
