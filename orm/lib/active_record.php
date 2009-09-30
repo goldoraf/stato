@@ -44,11 +44,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     protected static $conn = null;
     protected static $rollback_clones = array();
     
-    protected $values         = array();
-    protected $changed_values = array();
-    
     protected $meta       = null;
     protected $new_record = true;
+    
+    protected $values         = array();
+    protected $changed_values = array();
     
     public function __construct($values = null)
     {

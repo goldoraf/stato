@@ -44,6 +44,11 @@ class SQuerySet implements Iterator, Countable
         $this->cache = null;
     }
     
+    public function __toString()
+    {
+        return $this->prepare_select();
+    }
+    
     /**
      * Iterator method
      */
@@ -507,6 +512,7 @@ class SQuerySet implements Iterator, Countable
     
     protected function fetch_all_with_assocs()
     {
+        $this->meta->load_associations();
         $pk = $this->meta->table_name.'_'.$this->meta->identity_field;
         $class = $this->meta->class;
         $records = array();

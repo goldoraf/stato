@@ -68,6 +68,7 @@ CREATE TABLE `developers_projects` (
 
 CREATE TABLE `projects` (
   `id` int(10) unsigned NOT NULL auto_increment,
+  `client_id` int(11) default NULL,
   `name` varchar(50) default NULL,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM ;

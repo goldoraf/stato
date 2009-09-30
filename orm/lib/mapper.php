@@ -33,6 +33,11 @@ class SMapper
         unset(self::$cache[$class]);
         SActiveRecord::connection()->reset_columns_cache();
     }
+    
+    public static function reset_cache()
+    {
+        self::$cache = array();
+    }
 }
 
 ?>

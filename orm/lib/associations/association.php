@@ -87,7 +87,7 @@ class SAssociationMeta
         }
     }
     
-    protected function base_meta()
+    public function base_meta()
     {
         if ($this->base_meta === null) $this->base_meta = SMapper::retrieve($this->class, false);
         return $this->base_meta;

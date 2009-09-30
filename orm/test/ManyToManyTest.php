@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../test/TestsHelper.php';
 
 class ManyToManyTest extends ActiveTestCase
 {
-    public $fixtures = array('developers', 'projects', 'developers_projects');
+    public $fixtures = array('developers', 'projects', 'developers_projects', 'clients');
     
     public function test_basic()
     {
@@ -12,6 +12,15 @@ class ManyToManyTest extends ActiveTestCase
         $this->assertEquals(2, $ben->projects->count());
         $proj = Project::$objects->get(1);
         $this->assertEquals(1, $proj->developers->count());
+    }
+    
+    public function test_queryset_with_includes_fails_because_of_non_loaded_associations_meta()
+    {
+        SMapper::reset_cache(); // we reset so metas will be reloaded without associations metas loaded...
+        $ben = Developer::$objects->get(1);
+        $projs = $ben->projects->includes('client')->to_array();
+        $this->assertEquals('apple', $projs[0]->client->name);
+        $this->assertEquals('ibm', $projs[1]->client->name);
     }
     
     public function test_add()
@@ -23,11 +32,6 @@ class ManyToManyTest extends ActiveTestCase
         $richard->projects->add($proj);
         $this->assertEquals(2, $richard->projects->count());
         $this->assertEquals(2, $proj->developers->count());
-    }
-    
-    public function test_add_collection()
-    {
-    
     }
     
     public function test_add_before_save()
@@ -74,11 +78,6 @@ class ManyToManyTest extends ActiveTestCase
         $this->assertEquals(1, $ben2->projects->count());
         $proj2 = Project::$objects->get(1);
         $this->assertEquals(0, $proj2->developers->count());
-    }
-    
-    public function test_delete_collection()
-    {
-    
     }
     
     public function test_clear()

@@ -129,7 +129,11 @@ class Developer extends SActiveRecord
 class Project extends SActiveRecord
 {
     public static $objects;
-    public static $relationships = array('developers' => 'many_to_many');
+    public static $relationships = array
+    (
+        'developers' => 'many_to_many',
+        'client' => 'belongs_to'
+    );
 }
 
 // For hasOne tests
