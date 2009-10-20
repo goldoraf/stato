@@ -6,6 +6,7 @@ class SActiveRecordForm extends SForm
     protected $instance;
     protected $meta;
     protected $include;
+    protected $exclude;
     
     protected static $column_mapping = array
     (
@@ -90,6 +91,7 @@ class SActiveRecordForm extends SForm
     protected function list_fields()
     {
         if (isset($this->include)) return $this->include;
+        if (isset($this->exclude)) return array_diff(array_keys($this->fields), $this->exclude);
         return array_keys($this->fields);
     }
     
