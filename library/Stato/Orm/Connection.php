@@ -146,7 +146,7 @@ class Connection
     }
 }
 
-class ResultProxy
+class ResultProxy implements \IteratorAggregate
 {
     private $connection;
     private $stmt;
@@ -155,6 +155,12 @@ class ResultProxy
     {
         $this->connection = $connection;
         $this->stmt = $stmt;
+        $this->setFetchMode(Connection::FETCH_ASSOC);
+    }
+    
+    public function getIterator()
+    {
+        return new \IteratorIterator($this->stmt);
     }
     
     public function setFetchMode($mode, $arg = null)
@@ -190,5 +196,10 @@ class ResultProxy
     public function fetch()
     {
         return $this->stmt->fetch();
+    }
+    
+    public function fetchAll()
+    {
+        return $this->stmt->fetchAll();
     }
 }

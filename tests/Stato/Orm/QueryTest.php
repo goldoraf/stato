@@ -2,8 +2,6 @@
 
 namespace Stato\Orm;
 
-use TestUser;
-
 use User;
 
 require_once __DIR__ . '/../TestsHelper.php';

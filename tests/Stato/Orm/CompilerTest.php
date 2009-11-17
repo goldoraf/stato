@@ -182,4 +182,32 @@ class CompilerTest extends \PHPUnit_Framework_TestCase
             $this->users->select()->limit(10)->offset(10)->__toString()
         );
     }
+    
+    public function testUpdate()
+    {
+        $this->assertEquals(
+            'UPDATE users SET id = :id, firstname = :firstname, lastname = :lastname',
+            $this->users->update()->__toString()
+        );
+        $this->assertEquals(
+            'UPDATE users SET firstname = :firstname',
+            $this->users->update()->values(array('firstname' => 'Jack'))->__toString()
+        );
+        $this->assertEquals(
+            'UPDATE users SET lastname = :lastname WHERE users.lastname LIKE :lastname_1',
+            $this->users->update()->values(array('lastname' => 'DOE'))->where($this->users->lastname->like('Doe'))->__toString()
+        );
+    }
+    
+    public function testDelete()
+    {
+        $this->assertEquals(
+            'DELETE FROM users',
+            $this->users->delete()->__toString()
+        );
+        $this->assertEquals(
+            'DELETE FROM users WHERE users.lastname LIKE :lastname_1',
+            $this->users->delete()->where($this->users->lastname->like('Doe'))->__toString()
+        );
+    }
 }

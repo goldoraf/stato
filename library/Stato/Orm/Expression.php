@@ -144,6 +144,16 @@ class TableClause extends ClauseElement
         return new Insert($this, $values);
     }
     
+    public function update(array $values = null, $whereClause = null)
+    {
+        return new Update($this, $values, $whereClause);
+    }
+    
+    public function delete($whereClause = null)
+    {
+        return new Delete($this, $whereClause);
+    }
+    
     public function select($columns = null, $whereClause = null)
     {
         return new Select($this->getClauseColumns($columns), $whereClause);
@@ -196,6 +206,59 @@ class Insert extends Statement
     {
         $this->values = $values;
         return $this;
+    }
+}
+
+abstract class UpdateBase extends Statement
+{
+    public $whereClause;
+    
+    public function where()
+    {
+        $expressions = func_get_args();
+        $this->appendWhereClause($expressions);
+        return $this;
+    }
+    
+    private function appendWhereClause($expressions)
+    {
+        if ($this->whereClause === null) $this->whereClause = new ExpressionList();
+        foreach ($expressions as $expression) {
+            if (!$expression instanceof Expression && !$expression instanceof ExpressionList)
+                throw new Exception('where() argument must be instance of Expression or ExpressionList');
+            
+            $this->whereClause->append($expression);
+        }
+    }
+}
+
+class Update extends UpdateBase
+{
+    public $table;
+    public $values;
+    
+    public function __construct(Table $table, array $values = null, $whereClause = null)
+    {
+        $this->table = $table;
+        $this->values = $values;
+        $this->whereClause = $whereClause;
+    }
+    
+    public function values(array $values)
+    {
+        $this->values = $values;
+        return $this;
+    }
+}
+
+class Delete extends UpdateBase
+{
+    public $table;
+    
+    public function __construct(Table $table, $whereClause = null)
+    {
+        $this->table = $table;
+        $this->whereClause = $whereClause;
     }
 }
 

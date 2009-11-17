@@ -9,7 +9,7 @@ class UnknownOperator extends Exception {}
 class Compiler
 {
     protected static $visitables = array(
-        'TableClause', 'Table', 'Alias', 'Insert', 'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
+        'TableClause', 'Table', 'Alias', 'Insert', 'Update', 'Delete', 'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
         'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 'NullElement', 'Join'
     );
     
@@ -66,6 +66,28 @@ class Compiler
         return 'INSERT INTO '.$insert->table->getName().' ('
             .implode(', ', array_keys($colParams)).') VALUES ('
             .implode(', ', array_values($colParams)).')';
+    }
+    
+    protected function visitUpdate(Update $update)
+    {
+        $set = array();
+        $colParams = $this->getColumnParams($update);
+        foreach ($colParams as $k => $v) $set[] = $k.' = '.$v;
+        
+        $sql = 'UPDATE '.$update->table->getName().' SET '.implode(', ', $set);
+        $where = $update->whereClause;
+        if ($where !== null) $sql.= ' WHERE '.$this->process($where);
+        
+        return $sql;
+    }
+    
+    protected function visitDelete(Delete $delete)
+    {
+        $sql = 'DELETE FROM '.$delete->table->getName();
+        $where = $delete->whereClause;
+        if ($where !== null) $sql.= ' WHERE '.$this->process($where);
+        
+        return $sql;
     }
     
     protected function visitSelect(Select $select)
