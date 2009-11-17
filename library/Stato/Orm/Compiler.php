@@ -34,28 +34,33 @@ class Compiler
     
     protected $preparer;
     
+    protected $bindParams;
+    
+    protected $bindCounter;
+    
     public function __construct()
     {
         $this->preparer = new IdentifierPreparer();
+        $this->bindParams = array();
+        $this->bindCounter = array();
     }
     
     public function compile(ClauseElement $elmt)
     {
-        $bindParams = array('counter' => array(), 'params' => array());
-        $sqlString = $this->process($elmt, $bindParams);
-        return new Compiled($sqlString, $bindParams['params']);
+        $sqlString = $this->process($elmt);
+        return new Compiled($sqlString, $this->bindParams);
     }
     
-    protected function process(ClauseElement $elmt, &$bindParams)
+    protected function process(ClauseElement $elmt)
     {
         if (!preg_match('/^([a-zA-Z_]*)$/', str_replace(__NAMESPACE__.'\\', '', get_class($elmt)), $m) || !in_array($m[1], self::$visitables))
             throw new UnknownClauseElementType(get_class($elmt));
         
         $visitMethod = 'visit'.$m[1];
-        return $this->$visitMethod($elmt, $bindParams);
+        return $this->$visitMethod($elmt);
     }
     
-    protected function visitInsert(Insert $insert, array &$bindParams)
+    protected function visitInsert(Insert $insert)
     {
         $colParams = $this->getColumnParams($insert);
         return 'INSERT INTO '.$insert->table->getName().' ('
@@ -63,57 +68,57 @@ class Compiler
             .implode(', ', array_values($colParams)).')';
     }
     
-    protected function visitSelect(Select $select, array &$bindParams)
+    protected function visitSelect(Select $select)
     {
         $columns = array();
         foreach ($select->getColumns() as $c) {
-            $columns[] = $this->process($c, $bindParams);
+            $columns[] = $this->process($c);
         }
         $froms = array();
         foreach ($select->getFroms() as $f) {
-            $froms[] = $this->process($f, $bindParams);
+            $froms[] = $this->process($f);
         }
         $sql = 'SELECT '.(($select->distinct) ? 'DISTINCT ' : '').implode(', ', $columns)
              .' FROM '.implode(', ', $froms);
         $where = $select->whereClause;
         $orderBy = $select->orderByClause;
         $limit = $this->getLimitClause($select->offset, $select->limit);
-        if ($where !== null) $sql.= ' WHERE '.$this->process($where, $bindParams);
-        if ($orderBy !== null) $sql.= ' ORDER BY '.$this->process($orderBy, $bindParams);
+        if ($where !== null) $sql.= ' WHERE '.$this->process($where);
+        if ($orderBy !== null) $sql.= ' ORDER BY '.$this->process($orderBy);
         if (!empty($limit)) $sql.= $limit;
         return $sql;
     }
     
-    protected function visitTableClause(TableClause $table, array &$bindParams)
+    protected function visitTableClause(TableClause $table)
     {
         return $this->preparer->formatTable($table->getName());
     }
     
-    protected function visitTable(Table $table, array &$bindParams)
+    protected function visitTable(Table $table)
     {
         return $this->preparer->formatTable($table->getName());
     }
     
-    protected function visitAlias(Alias $alias, array &$bindParams)
+    protected function visitAlias(Alias $alias)
     {
-        return $this->process($alias->table, $bindParams).' AS '.$alias->alias;
+        return $this->process($alias->table).' AS '.$alias->alias;
     }
     
-    protected function visitJoin(Join $join, array &$bindParams)
+    protected function visitJoin(Join $join)
     {
-        return $this->process($join->left, $bindParams).(($join->isOuter) ? ' LEFT OUTER JOIN ' : ' JOIN ')
-        .$this->process($join->right, $bindParams).' ON '.$this->process($join->onClause, $bindParams);
+        return $this->process($join->left).(($join->isOuter) ? ' LEFT OUTER JOIN ' : ' JOIN ')
+        .$this->process($join->right).' ON '.$this->process($join->onClause);
     }
     
-    protected function visitExpression(Expression $clause, array &$bindParams)
+    protected function visitExpression(Expression $clause)
     {
         $op = $this->getOperatorString($clause->op);
-        return $this->process($clause->left, $bindParams).' '.$op.' '.$this->process($clause->right, $bindParams);
+        return $this->process($clause->left).' '.$op.' '.$this->process($clause->right);
     }
     
-    protected function visitUnaryExpression(UnaryExpression $exp, array &$bindParams)
+    protected function visitUnaryExpression(UnaryExpression $exp)
     {
-        $str = $this->process($exp->element, $bindParams);
+        $str = $this->process($exp->element);
         if ($exp->operator)
             $str = $this->getOperatorString($exp->operator).' '.$str;
         if ($exp->modifier)
@@ -121,52 +126,52 @@ class Compiler
         return $str;
     }
     
-    protected function visitExpressionList(ExpressionList $list, array &$bindParams)
+    protected function visitExpressionList(ExpressionList $list)
     {
         $exps = array();
         $op = $this->getOperatorString($list->operator);
         foreach ($list->expressions as $exp) {
             if ($exp instanceof ExpressionList) $exp = new Grouping($exp);
-            $exps[] = $this->process($exp, $bindParams);
+            $exps[] = $this->process($exp);
         }
         return implode(' '.$op.' ', $exps);
     }
     
-    protected function visitGrouping(Grouping $grouping, array &$bindParams)
+    protected function visitGrouping(Grouping $grouping)
     {
-        return '('.$this->process($grouping->element, $bindParams).')';
+        return '('.$this->process($grouping->element).')';
     }
     
-    protected function visitClauseList(ClauseList $list, array &$bindParams)
+    protected function visitClauseList(ClauseList $list)
     {
         $elements = array();
-        foreach ($list->clauses as $elt) $elements[] = $this->process($elt, $bindParams);
+        foreach ($list->clauses as $elt) $elements[] = $this->process($elt);
         return implode($list->separator, $elements);
     }
     
-    protected function visitClauseColumn(ClauseColumn $column, array &$bindParams)
+    protected function visitClauseColumn(ClauseColumn $column)
     {
         return $this->preparer->formatColumn($column);
     }
     
-    protected function visitColumn(Column $column, array &$bindParams)
+    protected function visitColumn(Column $column)
     {
         return $this->preparer->formatColumn($column);
     }
     
-    protected function visitBindParam(BindParam $param, array &$bindParams)
+    protected function visitBindParam(BindParam $param)
     {
-        if (!array_key_exists($param->key, $bindParams['counter']))
-            $bindParams['counter'][$param->key] = 1;
+        if (!array_key_exists($param->key, $this->bindCounter))
+            $this->bindCounter[$param->key] = 1;
         else
-            $bindParams['counter'][$param->key]++;
+            $this->bindCounter[$param->key]++;
             
-        $key = $param->key.'_'.$bindParams['counter'][$param->key];
-        $bindParams['params'][$key] = $param->value;
+        $key = $param->key.'_'.$this->bindCounter[$param->key];
+        $this->bindParams[$key] = $param->value;
         return $key;
     }
     
-    protected function visitNullElement(NullElement $null, array &$bindParams)
+    protected function visitNullElement(NullElement $null)
     {
         return 'NULL';
     }
@@ -185,15 +190,22 @@ class Compiler
     protected function getColumnParams($insert)
     {
         $colParams = array();
-        if ($insert->values !== null) {
+        if ($insert->values === null) {
+            $params = array_keys($insert->table->getColumns());
+            foreach ($params as $p) $colParams[$p] = ":{$p}";
+        } else {
             $params = array_keys($insert->values);
             $diff = array_diff($params, array_keys($insert->table->getColumns()));
+            
             if (!empty($diff))
                 throw new UnknownColumn(implode(', ', $diff).' in '.$insert->table->getName().' table');
-        } else {
-            $params = array_keys($insert->table->getColumns());
+            
+            foreach ($params as $p) {
+                $bindName = ":{$p}";
+                $colParams[$p] = $bindName;
+                $this->bindParams[$bindName] = $insert->values[$p];
+            }
         }
-        foreach ($params as $p) $colParams[$p] = ":{$p}";
         return $colParams;
     }
     

@@ -60,7 +60,7 @@ abstract class ClauseElement
     
     public function negate()
     {
-        throw new Exception('Not implemented');
+        throw new \Exception('Not implemented');
     }
 }
 
@@ -139,7 +139,7 @@ class TableClause extends ClauseElement
         return $clauses;
     }
     
-    public function insert($values = null)
+    public function insert(array $values = null)
     {
         return new Insert($this, $values);
     }
@@ -186,13 +186,13 @@ class Insert extends Statement
     public $table;
     public $values;
     
-    public function __construct(Table $table, $values = null)
+    public function __construct(Table $table, array $values = null)
     {
         $this->table = $table;
         $this->values = $values;
     }
     
-    public function values($values)
+    public function values(array $values)
     {
         $this->values = $values;
         return $this;

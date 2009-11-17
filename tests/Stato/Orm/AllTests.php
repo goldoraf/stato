@@ -32,6 +32,7 @@ class AllTests
             $driverSuite->addTestSuite($dialectTestSuite);
             
             $driverSuite->addTestSuite('Stato\Orm\ConnectionTest');
+            $driverSuite->addTestSuite('Stato\Orm\StatementTest');
             $driverSuite->addTestSuite('Stato\Orm\QueryTest');
             $driverSuite->addTestSuite('Stato\Orm\EntityTest');
             $driverSuite->addTestSuite('Stato\Orm\RelationsTest');

@@ -37,19 +37,19 @@ class TestCase extends \PHPUnit_Extensions_Database_TestCase
         $this->connection->execute("CREATE DATABASE {$this->dbName}");
         $this->connection->execute("USE {$this->dbName}");
         
-        foreach ($this->fixtures as $fixture) {
-            if (!array_key_exists($fixture, self::$tables))
-                throw new \Exception($fixture.' table is not defined in the test DB schema file');
-                
-            $this->connection->createTable(self::$tables[$fixture]);
-        }
+        foreach (self::$tables as $table)
+            $this->connection->createTable($table);
     }
     
     protected function getDataSet()
     {
         $dataSet = new \PHPUnit_Extensions_Database_DataSet_CsvDataSet();
-        foreach ($this->fixtures as $fixture)
+        foreach ($this->fixtures as $fixture) {
+            if (!array_key_exists($fixture, self::$tables))
+                throw new \Exception($fixture.' table is not defined in the test DB schema file');
+            
             $dataSet->addTable($fixture, __DIR__ . '/fixtures/'.$fixture.'.csv');
+        }
         return $dataSet;
     }
 }

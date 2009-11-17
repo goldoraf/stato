@@ -24,6 +24,21 @@ class UnboundConnectionError extends Exception
 class Connection
 {
     /**
+     * Returns an associative array
+     */
+    const FETCH_ASSOC = 1;
+    
+    /**
+     * Returns a new instance of the provided class
+     */
+    const FETCH_OBJECT = 2;
+    
+    /**
+     * Returns a new entity instance
+     */
+    const FETCH_ENTITY = 3;
+    
+    /**
      * User-provided configuration
      *
      * @var array
@@ -44,6 +59,11 @@ class Connection
      */
     private $dialect = null;
     
+    /**
+     * Specific DB name
+     *
+     * @var string
+     */
     private $driver = null;
     
     /**
@@ -79,21 +99,24 @@ class Connection
         return $this->connection;
     }
     
-    public function execute($stmt)
+    public function execute($stmt, array $params = array())
     {
         if (!is_string($stmt)) {
             if (!$stmt instanceof Statement)
                 throw new Exception("Can't execute instances of ".get_class($stmt));
-            $stmt = $stmt->compile();
-            if (empty($stmt->params)) return $this->connection->query($stmt);
             
+            $stmt = $stmt->compile();
             $params = $stmt->params;
-            $stmt = $this->connection->prepare($stmt);
-            $stmt->execute($params);
-            return $stmt;
         }
         
-        return $this->connection->exec($stmt);
+        if (empty($params)) {
+            $pdoStmt = $this->connection->query($stmt);
+        } else {
+            $pdoStmt = $this->connection->prepare($stmt);
+            $pdoStmt->execute($params);
+        }
+        
+        return new ResultProxy($this->connection, $pdoStmt);
     }
     
     public function getTableNames()
@@ -120,5 +143,52 @@ class Connection
     {
         $tableName = (is_object($table)) ? $table->getName() : $table;
         return $this->connection->exec($this->dialect->dropTable($tableName));
+    }
+}
+
+class ResultProxy
+{
+    private $connection;
+    private $stmt;
+    
+    public function __construct(\PDO $connection, \PDOStatement $stmt)
+    {
+        $this->connection = $connection;
+        $this->stmt = $stmt;
+    }
+    
+    public function setFetchMode($mode, $arg = null)
+    {
+        switch ($mode) {
+            case Connection::FETCH_ASSOC:
+                $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+                break;
+            case Connection::FETCH_OBJECT:
+                $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $arg);
+                break;
+            case Connection::FETCH_ENTITY:
+                $this->stmt->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $arg);
+                break;
+        }
+    }
+    
+    public function lastInsertId()
+    {
+        return $this->connection->lastInsertId();
+    }
+    
+    public function close()
+    {
+        $this->stmt->closeCursor();
+    }
+    
+    public function rowCount()
+    {
+        return $this->stmt->rowCount();
+    }
+    
+    public function fetch()
+    {
+        return $this->stmt->fetch();
     }
 }

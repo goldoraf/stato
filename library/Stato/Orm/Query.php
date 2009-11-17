@@ -25,7 +25,7 @@ class Query implements \Iterator, \Countable
     private $connection;
     private $count;
     private $cache;
-    private $stmt;
+    private $result;
     
     
     public function __construct(Mapper $mapper, Connection $connection)
@@ -37,14 +37,14 @@ class Query implements \Iterator, \Countable
         $this->connection = $connection;
         $this->count = 0;
         $this->cache = null;
-        $this->stmt = null;
+        $this->result = null;
     }
     
     public function __clone()
     {
         $this->count = 0;
         $this->cache = null;
-        $this->stmt = null;
+        $this->result = null;
         if (isset($this->criterion)) 
             $this->criterion = clone $this->criterion;
         if (isset($this->orderBy)) 
@@ -59,7 +59,7 @@ class Query implements \Iterator, \Countable
     public function rewind()
     {
         if ($this->cache === null) {
-            $this->stmt = $this->execute();
+            $this->result = $this->execute();
             $this->cache = array();
         }
         $this->count = 0;
@@ -67,11 +67,11 @@ class Query implements \Iterator, \Countable
 
     public function valid()
     {
-        if ($this->stmt !== null) {
-            if (($entity = $this->fetch($this->stmt)) !== false) {
+        if ($this->result !== null) {
+            if (($entity = $this->result->fetch()) !== false) {
                 $this->cache[] = $entity;
             } else {
-                $this->stmt->closeCursor();
+                $this->result->close();
             }
         }
         return isset($this->cache[$this->count]);
@@ -221,6 +221,8 @@ class Query implements \Iterator, \Countable
         /*if (!is_string($criterion) && !$criterion instanceof ClauseElement)
             throw new QueryException('filter() arguments must be instances of ClauseElement or strings');*/
         
+        if (is_callable($criterion)) $criterion = $criterion($this->table);
+        
         $this->criterion->append($criterion);
     }
     
@@ -230,14 +232,11 @@ class Query implements \Iterator, \Countable
         $this->orderBy->append($clause);
     }
     
-    private function fetch($stmt)
-    {
-        return $this->mapper->fetch($stmt);
-    }
-    
     private function execute()
     {
-        return $this->connection->execute($this->getStatement());
+        $res = $this->connection->execute($this->getStatement());
+        $this->mapper->setFetchMode($res);
+        return $res;
     }
     
     private function getStatement()

@@ -2,15 +2,30 @@
 
 namespace Stato\Orm;
 
+use Stato\TestEnv;
+
 require_once __DIR__ . '/../TestsHelper.php';
 
-class ConnectionTest extends TestCase
+class ConnectionTest extends \PHPUnit_Framework_TestCase
 {
+    public function setup()
+    {
+        $this->connection = new Connection(TestEnv::getDbDriverConfig());
+    }
+    
     public function testGetConnection()
     {
         $this->assertThat(
             $this->connection->getPDOConnection(),
             $this->isInstanceOf('PDO')
+        );
+    }
+    
+    public function testExecute()
+    {
+        $this->assertThat(
+            $this->connection->execute('SELECT 1'),
+            $this->isInstanceOf('Stato\Orm\ResultProxy')
         );
     }
     

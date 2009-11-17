@@ -7,7 +7,7 @@ require_once __DIR__ . '/../TestsHelper.php';
 require_once 'Stato/Orm/Schema.php';
 require_once 'Stato/Orm/Helpers.php';
 
-class CompilerTest extends TestCase
+class CompilerTest extends \PHPUnit_Framework_TestCase
 {
     public function setup()
     {
@@ -20,7 +20,6 @@ class CompilerTest extends TestCase
             new Column('user_id', Column::INTEGER, array('foreign_key' => 'users.id')),
             new Column('email_address', Column::STRING),
         ));
-        parent::setup();
     }
     
     public function testTableClause()

@@ -2,6 +2,8 @@
 
 namespace Stato\Orm;
 
+use TestUser;
+
 use User;
 
 require_once __DIR__ . '/../TestsHelper.php';
@@ -16,7 +18,7 @@ class QueryTest extends TestCase
     public function setup()
     {
         parent::setup();
-        $this->users = User::$table;
+        $this->users = self::$tables['users'];
         $this->mapper = new Mapper('User', $this->users);
         $this->query = new Query($this->mapper, $this->connection);
     }
@@ -24,6 +26,16 @@ class QueryTest extends TestCase
     public function testFilter()
     {
         $users = $this->query->filter($this->users->fullname->like('%Doe'))->all();
+        $this->assertEquals('John Doe', $users[0]->fullname);
+        $this->assertEquals('Jane Doe', $users[1]->fullname);
+    }
+    
+    public function testFilterWithClosure()
+    {
+        $users = $this->query->filter(function($u) {
+            return $u->fullname->like('%Doe');
+        });
+        $users = $users->all();
         $this->assertEquals('John Doe', $users[0]->fullname);
         $this->assertEquals('Jane Doe', $users[1]->fullname);
     }

@@ -56,11 +56,9 @@ class Mapper
         }
     }
     
-    public function fetch(\PDOStatement $stmt)
+    public function setFetchMode(ResultProxy $res)
     {
-        $class = $this->entity;
-        $stmt->setFetchMode(\PDO::FETCH_INTO, new $class);
-        return $stmt->fetch(\PDO::FETCH_INTO);
+        $res->setFetchMode(Connection::FETCH_OBJECT, $this->entity);
     }
     
     public function getProperty($propertyName)

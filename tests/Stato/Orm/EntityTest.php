@@ -52,6 +52,15 @@ class EntityTest extends TestCase
     public function testFilterBy()
     {
         $posts = Post::filterBy(array('author' => 'John Doe'))->all();
-        
+        $this->assertEquals('Frameworks : A new hope...', $posts[0]->title);
+        $this->assertEquals('PHP6 and namespaces', $posts[1]->title);
+    }
+    
+    public function testFilterWithClosure()
+    {
+        $posts = Post::filter(function($p) { return $p->author->like('%Doe'); });
+        $posts = $posts->all();
+        $this->assertEquals('Frameworks : A new hope...', $posts[0]->title);
+        $this->assertEquals('PHP6 and namespaces', $posts[1]->title);
     }
 }

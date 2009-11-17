@@ -48,6 +48,11 @@ class Entity
         return static::getQuery()->get($id);
     }
     
+    public static function filter()
+    {
+        return call_user_func_array(array(static::getQuery(), 'filter'), func_get_args());
+    }
+    
     public static function filterBy($values)
     {
         return static::getQuery()->filterBy($values);
@@ -78,5 +83,10 @@ class EntityMapper extends Mapper
         $table = Entity::$metadata->getTable($entity::getTablename());
         
         parent::__construct($entity, $table, $relations);
+    }
+    
+    public function setFetchMode(ResultProxy $res)
+    {
+        $res->setFetchMode(Connection::FETCH_ENTITY, $this->entity);
     }
 }

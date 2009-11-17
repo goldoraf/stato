@@ -10,12 +10,11 @@ require_once __DIR__ . '/../../TestsHelper.php';
 
 require_once 'Stato/Orm/Schema.php';
 
-class MysqlTest extends TestCase
+class MysqlTest extends \PHPUnit_Framework_TestCase
 {
     public function setup()
     {
         $this->dialect = new Mysql();
-        parent::setup();
     }
     
     public function testGetDsn()
