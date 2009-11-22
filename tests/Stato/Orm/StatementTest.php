@@ -13,7 +13,7 @@ class StatementTest extends TestCase
     public function setup()
     {
         parent::setup();
-        $this->users = self::$tables['users'];
+        $this->users = $this->db->getTable('users');
     }
     
     public function testInsert()
@@ -31,7 +31,7 @@ class StatementTest extends TestCase
         $this->assertEquals(array('id' => 1, 'fullname' => 'John Doe', 'login' => 'jdoe', 'password' => 'john'), $res->fetch());
         $this->assertEquals(array('id' => 2, 'fullname' => 'Jane Doe', 'login' => 'jane', 'password' => 'psss'), $res->fetch());
         
-        $res = $this->connection->execute($this->users->select(array($this->users->fullname, $this->users->login)));
+        $res = $this->connection->execute(select(array($this->users->fullname, $this->users->login)));
         $users = array();
         foreach ($res as $row) $users[] = $row;
         $this->assertEquals(array(array('fullname' => 'John Doe', 'login' => 'jdoe'), array('fullname' => 'Jane Doe', 'login' => 'jane')), $users);
@@ -49,7 +49,7 @@ class StatementTest extends TestCase
     {
         $res = $this->connection->execute($this->users->update()->values(array('password' => 'password')));
         $this->assertEquals(2, $res->rowCount());
-        $res = $this->connection->execute($this->users->select(array($this->users->login, $this->users->password)));
+        $res = $this->connection->execute(select(array($this->users->login, $this->users->password)));
         $this->assertEquals(array(array('login' => 'jdoe', 'password' => 'password'), array('login' => 'jane', 'password' => 'password')),
                             $res->fetchAll());
         
@@ -57,7 +57,7 @@ class StatementTest extends TestCase
             $this->users->update()->values(array('fullname' => 'John I. Doe jr.'))->where($this->users->fullname->like('John Doe'))
         );
         $this->assertEquals(1, $res->rowCount());
-        $res = $this->connection->execute($this->users->select(array($this->users->fullname)));
+        $res = $this->connection->execute(select(array($this->users->fullname)));
         $this->assertEquals(array(array('fullname' => 'John I. Doe jr.'), array('fullname' => 'Jane Doe')), $res->fetchAll());
     }
     

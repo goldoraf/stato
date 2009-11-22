@@ -10,7 +10,7 @@ class Compiler
 {
     protected static $visitables = array(
         'TableClause', 'Table', 'Alias', 'Insert', 'Update', 'Delete', 'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
-        'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 'NullElement', 'Join'
+        'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 'NullElement', 'Join', 'ColumnWildcard'
     );
     
     protected static $operators = array(
@@ -19,6 +19,7 @@ class Compiler
         Operators::IN => 'IN',
         Operators::IS => 'IS',
         Operators::ISNOT => 'IS NOT',
+        Operators::BETWEEN => 'BETWEEN',
         Operators::LT => '<',
         Operators::LE => '<=',
         Operators::GT => '>',
@@ -124,6 +125,11 @@ class Compiler
     protected function visitAlias(Alias $alias)
     {
         return $this->process($alias->table).' AS '.$alias->alias;
+    }
+    
+    protected function visitColumnWildcard(ColumnWildcard $wildcard)
+    {
+        return $this->preparer->formatWildcard($wildcard);
     }
     
     protected function visitJoin(Join $join)
@@ -259,10 +265,16 @@ class IdentifierPreparer
         return $this->quoteIdentifier($table);
     }
     
+    public function formatWildcard($wildcard)
+    {
+        if (is_null($wildcard->table)) return '*';
+        return $this->formatTable($wildcard->table->getName()).'.*';
+    }
+    
     public function formatColumn(ClauseColumn $column)
     {
-        if ($column->table === null) return $this->quoteIdentifier($column->name);
-        else return $this->formatTable($column->table->getName()).'.'.$this->quoteIdentifier($column->name);
+        if (is_null($column->table)) return $this->quoteIdentifier($column->name);
+        return $this->formatTable($column->table->getName()).'.'.$this->quoteIdentifier($column->name);
     }
 }
 

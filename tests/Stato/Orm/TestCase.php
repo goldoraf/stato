@@ -11,17 +11,17 @@ class TestCase extends \PHPUnit_Extensions_Database_TestCase
 {
     protected static $tables;
     
-    protected $fixtures = array();
+    protected $db;
+    protected $connection;
     protected $connectionConfig;
-    protected $dbName;
+    protected $fixtures = array();
     
     public function setup()
     {
         if (!isset(self::$tables)) self::$tables = include_once 'files/schema.php';
-        
         $this->connectionConfig = TestEnv::getDbDriverConfig();
-        $this->dbName = $this->connectionConfig['dbname'];
         $this->connection = new Connection($this->connectionConfig);
+        $this->db = new Database($this->connection);
         $this->createTestDatabase();
         parent::setup();
     }
@@ -33,12 +33,15 @@ class TestCase extends \PHPUnit_Extensions_Database_TestCase
     
     protected function createTestDatabase()
     {
-        $this->connection->execute("DROP DATABASE IF EXISTS {$this->dbName}");
-        $this->connection->execute("CREATE DATABASE {$this->dbName}");
-        $this->connection->execute("USE {$this->dbName}");
+        $dbName = $this->connectionConfig['dbname'];
+        $this->connection->execute("DROP DATABASE IF EXISTS {$dbName}");
+        $this->connection->execute("CREATE DATABASE {$dbName}");
+        $this->connection->execute("USE {$dbName}");
         
-        foreach (self::$tables as $table)
+        foreach (self::$tables as $table) {
             $this->connection->createTable($table);
+            $this->db->addTable($table);
+        }
     }
     
     protected function getDataSet()

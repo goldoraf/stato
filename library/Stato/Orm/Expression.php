@@ -3,7 +3,7 @@
 namespace Stato\Orm;
 
 class UnknownColumn extends Exception {}
-
+class ClauseTypeError extends Exception {}
 class JoinConditionError extends Exception {}
 
 class Operators
@@ -13,6 +13,7 @@ class Operators
     const IN = 'in';
     const IS = 'is';
     const ISNOT = 'isnot';
+    const BETWEEN = 'between';
     const LT = 'lt';
     const LE = 'le';
     const GT = 'gt';
@@ -47,6 +48,8 @@ class Operators
 
 abstract class ClauseElement
 {
+    public $froms = array();
+    
     public function __toString()
     {
         return $this->compile()->__toString();
@@ -126,19 +129,6 @@ class TableClause extends ClauseElement
         $this->columns[$column->name] = $column;
     }
     
-    public function getClauseColumns($columns = null)
-    {
-        $clauses = array();
-        if ($columns === null) $columns = array_keys($this->columns);
-        foreach ($columns as $column) {
-            if ($column instanceof ClauseColumn)
-                $clauses[] = $column;
-            else
-                $clauses[] = new ClauseColumn($column, $this);
-        }
-        return $clauses;
-    }
-    
     public function insert(array $values = null)
     {
         return new Insert($this, $values);
@@ -154,9 +144,9 @@ class TableClause extends ClauseElement
         return new Delete($this, $whereClause);
     }
     
-    public function select($columns = null, $whereClause = null)
+    public function select($whereClause = null)
     {
-        return new Select($this->getClauseColumns($columns), $whereClause);
+        return new Select($this, $whereClause);
     }
     
     public function alias($as)
@@ -188,6 +178,16 @@ class Alias extends TableClause
         $this->alias = $alias;
         $this->name = $alias;
         $this->columns = $table->columns;
+    }
+}
+
+class ColumnWildcard extends ClauseElement
+{
+    public $table;
+    
+    public function __construct(TableClause $table = null)
+    {
+        $this->table = $table;
     }
 }
 
@@ -271,30 +271,43 @@ class Select extends Statement
     public $distinct;
     
     private $columns;
-    private $froms;
+    public $froms;
     
-    public function __construct(array $columns, $whereClause = null)
+    public function __construct($columns, $whereClause = null)
     {
         $this->froms = array();
         $this->columns = array();
         $this->offset = null;
         $this->limit = null;
-        $this->whereClause = $whereClause;
+        $this->whereClause = null;
         $this->orderByClause = null;
         
+        if (!is_array($columns)) $columns = array($columns);
+        
         foreach ($columns as $c) {
-            if ($c instanceof ClauseColumn)
+            if ($c instanceof ClauseColumn) {
                 $this->columns[] = $c;
-            elseif ($c instanceof TableClause)
-                $this->columns = array_merge($this->columns, $c->getClauseColumns());
+                if (!in_array($c->table, $this->froms)) $this->froms[] = $c->table;
+            } elseif ($c instanceof TableClause) {
+                if (!in_array($c, $this->froms)) $this->froms[] = $c;
+            } else {
+                throw new ClauseTypeError('Columns passed to Select constructor must be instances of ClauseColumn or TableClause');
+            }
         }
         
-        foreach ($this->columns as $c) 
-            if (!in_array($c->table, $this->froms)) $this->froms[] = $c->table;
+        if (!is_null($whereClause)) $this->appendWhereClause($whereClause);
     }
     
     public function getColumns()
     {
+        if (count($this->columns) == 0) {
+            if (count($this->froms) == 1) return array(new ColumnWildcard());
+            $columns = array();
+            foreach ($this->froms as $from) {
+                $columns[] = new ColumnWildcard($from);
+            }
+            return $columns;
+        }
         return $this->columns;
     }
     
@@ -306,6 +319,17 @@ class Select extends Statement
     public function distinct()
     {
         $this->distinct = true;
+        return $this;
+    }
+    
+    public function from($froms)
+    {
+        if (!is_array($froms)) $froms = array($froms);
+        foreach ($froms as $from) {
+            if (!$from instanceof TableClause && !$from instanceof Join)
+                throw new ClauseTypeError('from() arguments must be instances of TableClause or Join');
+        }
+        $this->froms = $froms;
         return $this;
     }
     
@@ -335,21 +359,33 @@ class Select extends Statement
         return $this;
     }
     
-    private function appendWhereClause($expressions)
+    private function appendWhereClause($whereClause)
     {
-        if ($this->whereClause === null) $this->whereClause = new ExpressionList();
-        foreach ($expressions as $expression) {
-            if (!$expression instanceof Expression && !$expression instanceof ExpressionList)
-                throw new Exception('where() argument must be instance of Expression or ExpressionList');
-            
-            $this->whereClause->append($expression);
-        }
+        if (is_array($whereClause)) $whereClause = new ExpressionList($whereClause);
+        
+        $this->updateFromClause($whereClause);
+        
+        if (!is_null($this->whereClause))
+            $this->whereClause = and_($this->whereClause, $whereClause);
+        else
+            $this->whereClause = $whereClause;
     }
     
     private function appendOrderByClause($clauses)
     {
         if ($this->orderByClause === null) $this->orderByClause = new ClauseList();
         foreach ($clauses as $clause) $this->orderByClause->append($clause);
+    }
+    
+    private function updateFromClause($expression)
+    {
+        $froms = $expression->getFroms();
+        foreach ($froms as $from) {
+            if (!$from instanceof TableClause && !$from instanceof Join)
+                throw new ClauseTypeError('from() arguments must be instances of TableClause or Join');
+                
+            if (!in_array($from, $this->froms)) $this->froms[] = $from;
+        }
     }
 }
 
@@ -439,6 +475,16 @@ class ClauseColumn extends ClauseElement
         return $this->compare(Operators::IN, $other);
     }
     
+    /**
+     * Produces a BETWEEN clause, ie <column> BETWEEN <left> AND <right>
+     */
+    public function between($left, $right)
+    {
+        return new Expression($this, 
+            new ExpressionList(array($this->checkLiteral($left), $this->checkLiteral($right))), 
+            Operators::BETWEEN);
+    }
+    
     public function asc()
     {
         return new UnaryExpression($this, false, Operators::ASC);
@@ -447,6 +493,11 @@ class ClauseColumn extends ClauseElement
     public function desc()
     {
         return new UnaryExpression($this, false, Operators::DESC);
+    }
+    
+    public function label()
+    {
+        
     }
     
     protected function compare($op, $other)
@@ -471,6 +522,15 @@ class ClauseColumn extends ClauseElement
     }
 }
 
+class Label extends ClauseColumn
+{
+    public function __construct($name, $table = null)
+    {
+        $this->name = $name;
+        $this->table = $table;
+    }
+}
+
 class Expression extends ClauseElement
 {
     public $left;
@@ -490,6 +550,11 @@ class Expression extends ClauseElement
         if (!$nop) return new UnaryExpression(new Grouping($this), Operators::NOT_);
         $this->op = $nop;
         return $this;
+    }
+    
+    public function getFroms()
+    {
+        return array_merge($this->left->froms, $this->right->froms);
     }
 }
 
@@ -521,6 +586,13 @@ class ExpressionList extends ClauseElement
     public function append(ClauseElement $elt)
     {
         $this->expressions[] = $elt;
+    }
+    
+    public function getFroms()
+    {
+        $froms = array();
+        foreach ($this->expressions as $exp) $froms = array_merge($froms, $exp->getFroms());
+        return $froms;
     }
 }
 
@@ -595,4 +667,28 @@ class Join extends ClauseElement
         
         return $crit[0];
     }
+}
+
+function select($columns, $whereClause = null)
+{
+    return new Select($columns, $whereClause);
+}
+
+function and_()
+{
+    $expressions = func_get_args();
+    if (count($expressions) == 1) return $expressions[0];
+    return new ExpressionList($expressions, Operators::AND_);
+}
+
+function or_()
+{
+    $expressions = func_get_args();
+    if (count($expressions) == 1) return $expressions[0];
+    return new ExpressionList($expressions, Operators::OR_);
+}
+
+function not_(ClauseElement $elt)
+{
+    return $elt->negate();
 }

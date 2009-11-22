@@ -5,9 +5,8 @@ namespace Stato\Orm;
 require_once __DIR__ . '/../TestsHelper.php';
 
 require_once 'Stato/Orm/Schema.php';
-require_once 'Stato/Orm/Helpers.php';
 
-class CompilerTest extends \PHPUnit_Framework_TestCase
+class ExpressionTest extends \PHPUnit_Framework_TestCase
 {
     public function setup()
     {
@@ -25,20 +24,6 @@ class CompilerTest extends \PHPUnit_Framework_TestCase
     public function testTableClause()
     {
         $this->assertEquals('users', $this->users->__toString());
-    }
-    
-    public function testInsert()
-    {
-        $this->assertEquals(
-            'INSERT INTO users (id, firstname, lastname) VALUES (:id, :firstname, :lastname)',
-            $this->users->insert()->__toString()
-        );
-        $this->assertEquals(
-            'INSERT INTO users (firstname, lastname) VALUES (:firstname, :lastname)',
-            $this->users->insert()->values(array('firstname' => 'John', 'lastname' => 'Doe'))->__toString()
-        );
-        $this->setExpectedException('Stato\Orm\UnknownColumn');
-        $this->users->insert()->values(array('foo' => 'bar'))->__toString();
     }
     
     public function testOperators()
@@ -64,6 +49,8 @@ class CompilerTest extends \PHPUnit_Framework_TestCase
         $compiled = $this->users->lastname->contains('D')->compile();
         $this->assertEquals('users.lastname LIKE :lastname_1', $compiled->__toString());
         $this->assertEquals(array(':lastname_1' => '%D%'), $compiled->params);
+        
+        $this->assertEquals('users.id BETWEEN :id_1 AND :id_2', $this->users->id->between(1,3)->__toString());
     }
     
     public function testOperatorsNegate()
@@ -106,63 +93,98 @@ class CompilerTest extends \PHPUnit_Framework_TestCase
             $this->users->join($this->addresses)->__toString());
     }
     
-    public function testSelect()
+    public function testSelectColumns()
     {
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users',
-            $this->users->select()->__toString()
+            'SELECT * FROM users',
+            select($this->users)->__toString()
+        );
+        $this->assertEquals(
+            'SELECT users.*, addresses.* FROM users, addresses',
+            select(array($this->users, $this->addresses))->__toString()
         );
         $this->assertEquals(
             'SELECT users.firstname, users.lastname FROM users',
-            $this->users->select(array('firstname', 'lastname'))->__toString()
+            select(array($this->users->firstname, $this->users->lastname))->__toString()
         );
         $this->assertEquals(
-            'SELECT users.firstname, users.lastname FROM users',
-            $this->users->select(array($this->users->firstname, $this->users->lastname))->__toString()
+            'SELECT users.firstname, addresses.email_address FROM users, addresses',
+            select(array($this->users->firstname, $this->addresses->email_address))->__toString()
         );
+    }
+    
+    public function testSelectDistinct()
+    {
         $this->assertEquals(
             'SELECT DISTINCT users.lastname FROM users',
-            $this->users->select(array($this->users->lastname))->distinct()->__toString()
+            select(array($this->users->lastname))->distinct()->__toString()
         );
+    }
+    
+    public function testTableClauseSelect()
+    {
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname, addresses.user_id, addresses.email_address FROM users, addresses',
-            (string) new Select(array($this->users, $this->addresses))
+            'SELECT * FROM users',
+            $this->users->select()->__toString()
         );
-        $this->assertEquals(
-            'SELECT u.firstname, u.lastname FROM users AS u',
-            $this->users->alias('u')->select(array('firstname', 'lastname'))->__toString()
-        );
+    }
+    
+    public function testAlias()
+    {
+        $this->assertEquals('users AS u', $this->users->alias('u')->__toString());
+        
         $u = $this->users->alias('u');
         $this->assertEquals(
             'SELECT u.firstname, u.lastname FROM users AS u',
-            (string) new Select(array($u->firstname, $u->lastname))
+            select(array($u->firstname, $u->lastname))->__toString()
         );
+        
+        $a1 = $this->addresses->alias('a1');
+        $a2 = $this->addresses->alias('a2');
+        $select = select(array($this->users), and_(
+            $this->users->id->eq($a1->user_id),
+            $this->users->id->eq($a2->user_id),
+            $a1->email_address->eq('john@gmail.com'),
+            $a2->email_address->eq('john@yahoo.com')
+        ));
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.id = :id_1',
+            'SELECT * FROM users WHERE users.id = a1.user_id AND users.id = a2.user_id AND a1.email_address = :email_address_1 AND a2.email_address = :email_address_2',
+            $select->__toString()
+        );
+    }
+    
+    public function testSelectWithJoins()
+    {
+        $this->assertEquals(
+            'SELECT * FROM users JOIN addresses ON users.id = addresses.user_id',
+            $this->users->select()->from($this->users->join($this->addresses))->__toString()
+        );
+    }
+    
+    public function testWhere()
+    {
+        $this->assertEquals(
+            'SELECT * FROM users WHERE users.id = :id_1',
             $this->users->select()->where($this->users->id->eq(1))->__toString()
         );
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
+            'SELECT * FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
             $this->users->select()->where($this->users->firstname->like('John'), $this->users->lastname->like('Doe'))->__toString()
-        );
-        $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
-            $this->users->select()->where($this->users->firstname->like('John'))->where($this->users->lastname->like('Doe'))->__toString()
         );
     }
     
     public function testOrderBy()
     {
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id',
+            'SELECT * FROM users ORDER BY users.id',
             $this->users->select()->orderBy($this->users->id)->__toString()
         );
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id ASC,users.firstname DESC',
+            'SELECT * FROM users ORDER BY users.id ASC,users.firstname DESC',
             $this->users->select()->orderBy($this->users->id->asc())->orderBy($this->users->firstname->desc())->__toString()
         );
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users ORDER BY users.id ASC,users.firstname DESC',
+            'SELECT * FROM users ORDER BY users.id ASC,users.firstname DESC',
             $this->users->select()->orderBy($this->users->id->asc(), $this->users->firstname->desc())->__toString()
         );
     }
@@ -170,17 +192,31 @@ class CompilerTest extends \PHPUnit_Framework_TestCase
     public function testOffsetAndLimit()
     {
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users LIMIT 10',
+            'SELECT * FROM users LIMIT 10',
             $this->users->select()->limit(10)->__toString()
         );
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users LIMIT -1 OFFSET 10',
+            'SELECT * FROM users LIMIT -1 OFFSET 10',
             $this->users->select()->offset(10)->__toString()
         );
         $this->assertEquals(
-            'SELECT users.id, users.firstname, users.lastname FROM users LIMIT 10 OFFSET 10',
+            'SELECT * FROM users LIMIT 10 OFFSET 10',
             $this->users->select()->limit(10)->offset(10)->__toString()
         );
+    }
+    
+    public function testInsert()
+    {
+        $this->assertEquals(
+            'INSERT INTO users (id, firstname, lastname) VALUES (:id, :firstname, :lastname)',
+            $this->users->insert()->__toString()
+        );
+        $this->assertEquals(
+            'INSERT INTO users (firstname, lastname) VALUES (:firstname, :lastname)',
+            $this->users->insert()->values(array('firstname' => 'John', 'lastname' => 'Doe'))->__toString()
+        );
+        $this->setExpectedException('Stato\Orm\UnknownColumn');
+        $this->users->insert()->values(array('foo' => 'bar'))->__toString();
     }
     
     public function testUpdate()

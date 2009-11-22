@@ -22,7 +22,8 @@ class AllTests
             return $suite;
         }
         
-        $suite->addTestSuite('Stato\Orm\CompilerTest');
+        $suite->addTestSuite('Stato\Orm\DatabaseTest');
+        $suite->addTestSuite('Stato\Orm\ExpressionTest');
         
         foreach ($driversToTest as $driver) {
             TestEnv::setCurrentTestedDriver($driver);
@@ -33,9 +34,9 @@ class AllTests
             
             $driverSuite->addTestSuite('Stato\Orm\ConnectionTest');
             $driverSuite->addTestSuite('Stato\Orm\StatementTest');
-            $driverSuite->addTestSuite('Stato\Orm\QueryTest');
-            $driverSuite->addTestSuite('Stato\Orm\EntityTest');
-            $driverSuite->addTestSuite('Stato\Orm\RelationsTest');
+            //$driverSuite->addTestSuite('Stato\Orm\DatasetTest');
+            //$driverSuite->addTestSuite('Stato\Orm\EntityTest');
+            //$driverSuite->addTestSuite('Stato\Orm\RelationsTest');
             
             $suite->addTestSuite($driverSuite);
         }
