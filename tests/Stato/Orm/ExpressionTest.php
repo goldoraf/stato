@@ -207,6 +207,14 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         );
     }
     
+    public function testSubqueries()
+    {
+        $this->assertEquals(
+            'SELECT users.lastname FROM users WHERE users.id = (SELECT users.id FROM users)',
+            select(array($this->users->lastname))->where($this->users->id->eq(select(array($this->users->id))))->__toString()
+        );
+    }
+    
     public function testInsert()
     {
         $this->assertEquals(

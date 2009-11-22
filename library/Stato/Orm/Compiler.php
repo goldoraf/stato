@@ -39,11 +39,17 @@ class Compiler
     
     protected $bindCounter;
     
+    /**
+     * Keeps track of nested SELECT statements
+     */
+    protected $selectCount;
+    
     public function __construct()
     {
         $this->preparer = new IdentifierPreparer();
         $this->bindParams = array();
         $this->bindCounter = array();
+        $this->selectCount = 0;
     }
     
     public function compile(ClauseElement $elmt)
@@ -59,6 +65,11 @@ class Compiler
         
         $visitMethod = 'visit'.$m[1];
         return $this->$visitMethod($elmt);
+    }
+    
+    protected function isSubquery()
+    {
+        return $this->selectCount > 1;
     }
     
     protected function visitInsert(Insert $insert)
@@ -93,6 +104,7 @@ class Compiler
     
     protected function visitSelect(Select $select)
     {
+        $this->selectCount++;
         $columns = array();
         foreach ($select->getColumns() as $c) {
             $columns[] = $this->process($c);
@@ -109,6 +121,8 @@ class Compiler
         if ($where !== null) $sql.= ' WHERE '.$this->process($where);
         if ($orderBy !== null) $sql.= ' ORDER BY '.$this->process($orderBy);
         if (!empty($limit)) $sql.= $limit;
+        if ($this->isSubquery()) $sql = '('.$sql.')';
+        $this->selectCount--;
         return $sql;
     }
     
