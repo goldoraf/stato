@@ -10,7 +10,7 @@ class Compiler
 {
     protected static $visitables = array(
         'TableClause', 'Table', 'Alias', 'Insert', 'Update', 'Delete', 'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
-        'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 'NullElement', 'Join', 'ColumnWildcard'
+        'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 'NullElement', 'Join', 'ColumnWildcard', 'Label'
     );
     
     protected static $operators = array(
@@ -180,6 +180,11 @@ class Compiler
     protected function visitClauseColumn(ClauseColumn $column)
     {
         return $this->preparer->formatColumn($column);
+    }
+    
+    protected function visitLabel(Label $label)
+    {
+        return $this->preparer->formatColumn($label).' AS '.$this->preparer->quoteIdentifier($label->as);
     }
     
     protected function visitColumn(Column $column)

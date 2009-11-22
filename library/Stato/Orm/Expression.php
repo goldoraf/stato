@@ -495,9 +495,9 @@ class ClauseColumn extends ClauseElement
         return new UnaryExpression($this, false, Operators::DESC);
     }
     
-    public function label()
+    public function label($as)
     {
-        
+        return new Label($this->name, $as, $this->table);
     }
     
     protected function compare($op, $other)
@@ -524,9 +524,12 @@ class ClauseColumn extends ClauseElement
 
 class Label extends ClauseColumn
 {
-    public function __construct($name, $table = null)
+    public $as;
+    
+    public function __construct($name, $as, $table = null)
     {
         $this->name = $name;
+        $this->as = $as;
         $this->table = $table;
     }
 }

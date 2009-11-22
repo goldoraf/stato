@@ -51,6 +51,8 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(':lastname_1' => '%D%'), $compiled->params);
         
         $this->assertEquals('users.id BETWEEN :id_1 AND :id_2', $this->users->id->between(1,3)->__toString());
+        
+        $this->assertEquals('users.id AS uid', $this->users->id->label('uid')->__toString());
     }
     
     public function testOperatorsNegate()
