@@ -13,55 +13,84 @@ class RecordNotFound extends Exception {}
  * @package Stato
  * @subpackage Orm
  */
-class Dataset /*extends Statement implements \Iterator, \Countable*/
+class Dataset /*implements \Iterator, \Countable*/
 {
     private $table;
     private $connection;
     private $statement;
     
-    public function __construct(Table $table, Connection $conn)
+    public function __construct(Table $table, Connection $conn, Statement $stmt = null)
     {
+        if (is_null($stmt)) $stmt = new Select(array($table));
+        
         $this->table = $table;
         $this->connection = $conn;
+        $this->statement = $stmt;
+    }
+    
+    public function __toString()
+    {
+        $compiler = new Compiler();
+        return $compiler->compile($this->statement)->string;
+    }
+    
+    public function __clone()
+    {
+        $this->statement = clone $this->statement;
     }
     
     public function filter()
     {
-        $args = func_get_args();
-        if (count($args) == 1) {
-            if (is_array($args[0])) {
-                foreach ($args[0] as $col => $param) {
-                    if (is_array($param))
-                        $this->appendWhereClause($this->getClauseColumn($col)->in($param));
-                    else
-                        $this->appendWhereClause($this->getClauseColumn($col)->eq($param));
-                }
-            }
-        } else {
-            
-        }
-        /*foreach ($args as $arg) {
-            if (is_array($arg)) {
-                if (count($arg) == 1) {
-                    list($col, $param) = 
-                    $this->appendWhereClause($this->getClauseColumn($col)->eq($param));
-                }
-                $list = new ExpressionList();
-                foreach ($arg as $col => $param) {
-                    $list->append($this->getClauseColumn($col)->eq($param));
-                }
-                $this->appendWhereClause($list);
-            }
-        }*/
-        
-        return $this;
+        return $this->filterOrExclude(func_get_args());
     }
     
-    private function getClauseColumn($columnName)
+    public function exclude()
     {
-        foreach ($this->froms as $table) {
-            if (($clauseColumn = $table->getClauseColumn($columnName)) !== false) return $clauseColumn;
+        return $this->filterOrExclude(func_get_args(), true);
+    }
+    
+    public function filterBy(array $args)
+    {
+        return $this->filterOrExclude($this->prepareFilterArgs($args));
+    }
+    
+    public function excludeBy(array $args)
+    {
+        return $this->filterOrExclude($this->prepareFilterArgs($args), true);
+    }
+    
+    private function filterOrExclude($args, $exclude = false)
+    {
+        $stmt = clone $this->statement;
+        foreach ($args as $k => $arg) {
+            if (is_callable($arg)) {
+                $args[$k] = $arg($this->table);
+            }
         }
-        throw new UnknownColumn("{$columnName} not found in this dataset");
+        if (!$exclude) {
+            call_user_func_array(array($stmt, 'where'), $args);
+        } elseif (count($args) == 1) {
+            $stmt->where(not_($args[0]));
+        } else {
+            $stmt->where(not_(new ExpressionList($args)));
+        }
+        return $this->newInstance($stmt);
+    }
+    
+    private function prepareFilterArgs(array $args)
+    {
+        $newArgs = array();
+        foreach ($args as $col => $param) {
+            if (is_array($param))
+                $newArgs[] = $this->table->{$col}->in($param);
+            else
+                $newArgs[] = $this->table->{$col}->eq($param);
+        }
+        return $newArgs;
+    }
+    
+    private function newInstance(Statement $stmt = null)
+    {
+        return new Dataset($this->table, $this->connection, $stmt);
     }
 }

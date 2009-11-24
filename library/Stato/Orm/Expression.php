@@ -11,6 +11,7 @@ class Operators
     const EQ = 'eq';
     const NE = 'ne';
     const IN = 'in';
+    const NOTIN = 'notin';
     const IS = 'is';
     const ISNOT = 'isnot';
     const BETWEEN = 'between';
@@ -29,6 +30,8 @@ class Operators
     private static $opInverses = array(
         self::EQ => self::NE,
         self::NE => self::EQ,
+        self::IN => self::NOTIN,
+        self::NOTIN => self::IN,
         self::IS => self::ISNOT,
         self::ISNOT => self::IS,
         self::LT => self::GE,
@@ -335,15 +338,19 @@ class Select extends Statement
     
     public function where()
     {
-        $expressions = func_get_args();
-        $this->appendWhereClause($expressions);
+        $clauses = func_get_args();
+        if (count($clauses) == 1) 
+            $whereClause = $clauses[0];
+        else
+            $whereClause = new ExpressionList($clauses);
+        $this->appendWhereClause($whereClause);
         return $this;
     }
     
     public function orderBy()
     {
         $clauses = func_get_args();
-        $this->appendOrderByClause($clauses);
+        foreach ($clauses as $clause) $this->appendOrderByClause($clause);
         return $this;
     }
     
@@ -361,8 +368,6 @@ class Select extends Statement
     
     private function appendWhereClause($whereClause)
     {
-        if (is_array($whereClause)) $whereClause = new ExpressionList($whereClause);
-        
         $this->updateFromClause($whereClause);
         
         if (!is_null($this->whereClause))
@@ -371,10 +376,10 @@ class Select extends Statement
             $this->whereClause = $whereClause;
     }
     
-    private function appendOrderByClause($clauses)
+    private function appendOrderByClause($clause)
     {
-        if ($this->orderByClause === null) $this->orderByClause = new ClauseList();
-        foreach ($clauses as $clause) $this->orderByClause->append($clause);
+        if (is_null($this->orderByClause)) $this->orderByClause = new ClauseList();
+        $this->orderByClause->append($clause);
     }
     
     private function updateFromClause($expression)
@@ -573,6 +578,11 @@ class UnaryExpression extends ClauseElement
         $this->operator = $operator;
         $this->modifier = $modifier;
     }
+    
+    public function getFroms()
+    {
+        return $this->element->getFroms();
+    }
 }
 
 class ExpressionList extends ClauseElement
@@ -597,6 +607,11 @@ class ExpressionList extends ClauseElement
         foreach ($this->expressions as $exp) $froms = array_merge($froms, $exp->getFroms());
         return $froms;
     }
+    
+    public function negate()
+    {
+        return new UnaryExpression(new Grouping($this), Operators::NOT_);
+    }
 }
 
 class Grouping extends ClauseElement
@@ -606,6 +621,11 @@ class Grouping extends ClauseElement
     public function __construct($element)
     {
         $this->element = $element;
+    }
+    
+    public function getFroms()
+    {
+        return $this->element->getFroms();
     }
 }
 

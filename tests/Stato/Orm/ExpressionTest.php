@@ -173,6 +173,10 @@ class ExpressionTest extends \PHPUnit_Framework_TestCase
             'SELECT * FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
             $this->users->select()->where($this->users->firstname->like('John'), $this->users->lastname->like('Doe'))->__toString()
         );
+        $this->assertEquals(
+            'SELECT * FROM users WHERE users.firstname LIKE :firstname_1 AND users.lastname LIKE :lastname_1',
+            $this->users->select()->where(and_($this->users->firstname->like('John'), $this->users->lastname->like('Doe')))->__toString()
+        );
     }
     
     public function testOrderBy()

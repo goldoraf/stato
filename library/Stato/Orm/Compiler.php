@@ -17,6 +17,7 @@ class Compiler
         Operators::EQ => '=',
         Operators::NE => '!=',
         Operators::IN => 'IN',
+        Operators::NOTIN => 'NOT IN',
         Operators::IS => 'IS',
         Operators::ISNOT => 'IS NOT',
         Operators::BETWEEN => 'BETWEEN',
