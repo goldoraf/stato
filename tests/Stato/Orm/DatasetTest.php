@@ -90,4 +90,11 @@ class DatasetTest extends TestCase
             $this->db->from('users')->exclude(and_($u->login->eq('jdoe'), $u->password->eq('test')))->__toString()
         );
     }
+    
+    public function testGenerativeSelects()
+    {
+        $q1 = $this->db->from('users')->filter(function($u) { return $u->password->eq('test'); });
+        $q2 = $q1->filter(function($u) { return $u->login->ne('jdoe'); });
+        $this->assertNotEquals($q2, $q1);
+    }
 }

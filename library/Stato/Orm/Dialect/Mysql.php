@@ -24,7 +24,7 @@ class Mysql implements IDialect
         'int'        => Column::INTEGER,
         'integer'    => Column::INTEGER,
         //'longblob',
-        'longtext'   => Column::STRING,
+        'longtext'   => Column::TEXT,
         //'mediumblob',
         'mediumint'  => Column::INTEGER,
         'mediumtext' => Column::TEXT,
