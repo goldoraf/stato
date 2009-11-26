@@ -99,6 +99,11 @@ class Connection
         return $this->connection;
     }
     
+    public function getDialect()
+    {
+        return $this->dialect;
+    }
+    
     public function execute($stmt, array $params = array())
     {
         if (!is_string($stmt)) {

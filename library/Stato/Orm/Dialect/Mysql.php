@@ -55,6 +55,8 @@ class Mysql implements IDialect
         Column::BOOLEAN   => array('type' => 'tinyint', 'length' => 1)
     );
     
+    private $name = 'mysql';
+    
     public function getDsn(array $params)
     {
         $parts = array();
@@ -138,10 +140,36 @@ class Mysql implements IDialect
         return "'{$column->default}'";
     }
     
+    public function getResultProcessor($columnType)
+    {
+        $possibleTypeClasses = array($this->name.$columnType, $columnType, 'GenericType');
+        foreach ($possibleTypeClasses as $possibleClass) {
+            $class = __NAMESPACE__ . '\\' . $possibleClass;
+            if (class_exists($class, false)) {
+                $type = new $class;
+                break;
+            }
+        }
+        return $type->getResultProcessor();
+    }
+    
     private function reflectColumnType($sqlColumn)
     {
         if (!isset(self::$columnTypes[$sqlColumn]))
             throw new UnknownColumnType($sqlColumn);
         return self::$columnTypes[$sqlColumn];
+    }
+}
+
+class MysqlBoolean implements IType
+{
+    public function getBindProcessor()
+    {
+        return function($value) { return $value === true ? '1' : '0'; };
+    }
+    
+    public function getResultProcessor()
+    {
+        return function($value) { return $value === '1' ? true : false; };
     }
 }

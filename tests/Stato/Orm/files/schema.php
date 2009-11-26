@@ -16,7 +16,7 @@ return array(
         new Column('id', Column::INTEGER, array('primary_key' => true, 'auto_increment' => true)),
         new Column('title', Column::STRING),
         new Column('author', Column::STRING),
-        new Column('text', Column::STRING),
+        new Column('text', Column::TEXT),
         new Column('published', Column::BOOLEAN),
         new Column('created_on', Column::DATETIME),
         new Column('updated_on', Column::DATETIME),
@@ -38,5 +38,13 @@ return array(
         new Column('name', Column::STRING),
         new Column('price', Column::FLOAT),
         new Column('company_id', Column::INTEGER),
+    )),
+    'articles' => new Table('articles', array(
+        new Column('id', Column::INTEGER, array('length' => 11, 'nullable' => false, 'primary_key' => true, 'auto_increment' => true)),
+        new Column('title', Column::STRING, array('length' => 50)),
+        new Column('body', Column::TEXT),
+        new Column('published', Column::BOOLEAN),
+        new Column('created_on', Column::DATETIME),
+        new Column('price', Column::FLOAT),
     )),
 );

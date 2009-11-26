@@ -8,9 +8,4 @@ class Session
     {
         $this->connection = $connection;
     }
-    
-    public function query($entity)
-    {
-        return new Query($entity, $this->connection);
-    }
 }

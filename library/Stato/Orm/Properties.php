@@ -36,6 +36,6 @@ class RelationProperty
     {
         if (is_null($this->primaryJoin)) {
             $this->primaryJoin = new Join($this->mapper->table, $this->parentMapper->table);
-        }echo $this->primaryJoin;
+        }
     }
 }

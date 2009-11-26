@@ -35,6 +35,7 @@ class AllTests
             $driverSuite->addTestSuite('Stato\Orm\ConnectionTest');
             $driverSuite->addTestSuite('Stato\Orm\StatementTest');
             $driverSuite->addTestSuite('Stato\Orm\DatasetTest');
+            $driverSuite->addTestSuite('Stato\Orm\MapperTest');
             //$driverSuite->addTestSuite('Stato\Orm\EntityTest');
             //$driverSuite->addTestSuite('Stato\Orm\RelationsTest');
             

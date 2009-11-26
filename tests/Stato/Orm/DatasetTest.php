@@ -91,10 +91,47 @@ class DatasetTest extends TestCase
         );
     }
     
+    public function testLimit()
+    {
+        $users = $this->db->from('users')->filter(function($u) { return $u->fullname->like('%Doe'); })->limit(1)->toArray();
+        $this->assertEquals(1, count($users));
+        $this->assertEquals('John Doe', $users[0]['fullname']);
+        $users = $this->db->from('users')->filter(function($u) { return $u->fullname->like('%Doe'); })->limit(1, 1)->toArray();
+        $this->assertEquals(1, count($users));
+        $this->assertEquals('Jane Doe', $users[0]['fullname']);
+    }
+    
+    public function testOrderBy()
+    {
+        $u = $this->db->getTable('users');
+        $users = $this->db->from('users')->orderBy($u->id->desc())->toArray();
+        $this->assertEquals('John Doe', $users[1]['fullname']);
+        $this->assertEquals('Jane Doe', $users[0]['fullname']);
+    }
+    
+    public function testOrderByString()
+    {
+        $users = $this->db->from('users')->orderBy('-id')->toArray();
+        $this->assertEquals('John Doe', $users[1]['fullname']);
+        $this->assertEquals('Jane Doe', $users[0]['fullname']);
+    }
+    
     public function testGenerativeSelects()
     {
         $q1 = $this->db->from('users')->filter(function($u) { return $u->password->eq('test'); });
         $q2 = $q1->filter(function($u) { return $u->login->ne('jdoe'); });
         $this->assertNotEquals($q2, $q1);
+    }
+    
+    public function testGet()
+    {
+        $this->assertEquals(array('id' => '1', 'fullname' => 'John Doe', 'login' => 'jdoe', 'password' => 'john'),
+            $this->db->from('users')->get(1));
+    }
+    
+    public function testRecordNotFound()
+    {
+        $this->setExpectedException('Stato\Orm\RecordNotFound');
+        $user = $this->db->from('users')->get(99);
     }
 }
