@@ -18,16 +18,18 @@ class Dataset implements \IteratorAggregate, \Countable
     private $table;
     private $connection;
     private $mapper;
+    private $session;
     private $statement;
     private $iterator;
     
-    public function __construct(Table $table, Connection $conn, Mapper $mapper = null, Statement $stmt = null)
+    public function __construct(Table $table, Connection $conn, Mapper $mapper = null, Session $session = null, Statement $stmt = null)
     {
         if (is_null($stmt)) $stmt = new Select(array($table));
         
         $this->table = $table;
         $this->connection = $conn;
         $this->mapper = $mapper;
+        $this->session = $session;
         $this->statement = $stmt;
         $this->iterator = null;
     }
@@ -52,7 +54,7 @@ class Dataset implements \IteratorAggregate, \Countable
         if (is_null($this->iterator)) {
             $res = $this->connection->execute($this->statement);
             if (!is_null($this->mapper))
-                $this->iterator = new DatasetIterator($res, $this->mapper->getHydrator($this->connection->getDialect()));
+                $this->iterator = new DatasetIterator($res, $this->mapper->getHydrator($this->connection->getDialect()), $this->session);
             else
                 $this->iterator = new DatasetIterator($res);
         }
@@ -225,7 +227,7 @@ class Dataset implements \IteratorAggregate, \Countable
     
     private function newInstance(Statement $stmt = null)
     {
-        return new Dataset($this->table, $this->connection, $this->mapper, $stmt);
+        return new Dataset($this->table, $this->connection, $this->mapper, $this->session, $stmt);
     }
 }
 
@@ -235,13 +237,15 @@ class DatasetIterator implements \Iterator
     private $cache;
     private $result;
     private $hydrator;
+    private $session;
     
-    public function __construct(ResultProxy $result, ObjectHydrator $hydrator = null)
+    public function __construct(ResultProxy $result, ObjectHydrator $hydrator = null, Session $session = null)
     {
         $this->pos = 0;
         $this->cache = array();
         $this->result = $result;
         $this->hydrator = $hydrator;
+        $this->session = $session;
     }
     
     public function rewind()
@@ -278,7 +282,7 @@ class DatasetIterator implements \Iterator
             $this->result = null;
             return false;
         }
-        if (!is_null($this->hydrator)) $row = $this->hydrator->newInstance($row);
+        if (!is_null($this->hydrator)) $row = $this->hydrator->newInstance($row, $this->session);
         $this->cache[] = $row;
         return true;
     }

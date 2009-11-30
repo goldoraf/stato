@@ -140,7 +140,7 @@ class Mysql implements IDialect
         return "'{$column->default}'";
     }
     
-    public function getResultProcessor($columnType)
+    public function getTypecastingClass($columnType)
     {
         $possibleTypeClasses = array($this->name.$columnType, $columnType, 'GenericType');
         foreach ($possibleTypeClasses as $possibleClass) {
@@ -150,7 +150,7 @@ class Mysql implements IDialect
                 break;
             }
         }
-        return $type->getResultProcessor();
+        return $type;
     }
     
     private function reflectColumnType($sqlColumn)

@@ -5,14 +5,16 @@ namespace Stato\Orm;
 class Database implements \ArrayAccess
 {
     private $tables;
-    private $mappers;
+    private $tablesToClasses;
+    private $classesToMappers;
     private $connection;
     
     public function __construct(Connection $conn = null)
     {
         if (!is_null($conn)) $this->connect($conn);
         $this->tables = array();
-        $this->mappers = array();
+        $this->tablesToClasses = array();
+        $this->classesToMappers = array();
     }
     
     public function offsetGet($tableName)
@@ -53,7 +55,7 @@ class Database implements \ArrayAccess
     
     public function from($tableName)
     {
-        return new Dataset($this->getTable($tableName), $this->getConnection(), $this->getMapper($tableName));
+        return new Dataset($this->getTable($tableName), $this->getConnection(), $this->getMapperForTable($tableName));
     }
     
     public function addTable(Table $table)
@@ -77,12 +79,21 @@ class Database implements \ArrayAccess
     
     public function addMapper(Mapper $mapper)
     {
-        $this->mappers[$mapper->getTableName()] = $mapper;
+        $this->tablesToClasses[$mapper->getTableName()] = $mapper->getClassName();
+        $this->classesToMappers[$mapper->getClassName()] = $mapper;
     }
     
-    public function getMapper($tableName)
+    public function getMapper($className)
     {
-        if (!array_key_exists($tableName, $this->mappers)) return null;
-        return $this->mappers[$tableName];
+        if (!array_key_exists($className, $this->classesToMappers))
+            throw new Exception("Mapper not found for '$className'");
+        
+        return $this->classesToMappers[$className];
+    }
+    
+    public function getMapperForTable($tableName)
+    {
+        if (!array_key_exists($tableName, $this->tablesToClasses)) return null;
+        return $this->classesToMappers[$this->tablesToClasses[$tableName]];
     }
 }

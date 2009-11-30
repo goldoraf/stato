@@ -10,16 +10,19 @@ class Mapper
     private static $defaultOptions = array();
     
     private $className;
-    private $tableName;
-    private $columns;
+    private $table;
+    private $identifier;
     private $properties;
     private $hydrator;
+    private $dessicator;
     
     public function __construct($className, Table $table, array $options = array())
     {
         $this->className = $className;
-        $this->tableName = $table->getName();
+        $this->table = $table;
+        $this->identifier = $this->table->getPrimaryKey();
         $this->hydrator = null;
+        $this->dessicator = null;
         
         $this->properties = array();
         $ref = new \ReflectionClass($this->className);
@@ -40,7 +43,17 @@ class Mapper
     
     public function getTableName()
     {
-        return $this->tableName;
+        return $this->table->getName();
+    }
+    
+    public function getClassName()
+    {
+        return $this->className;
+    }
+    
+    public function getIdentifier()
+    {
+        return $this->identifier;
     }
     
     public function getHydrator(Dialect\IDialect $dialect)
@@ -48,10 +61,31 @@ class Mapper
         if (is_null($this->hydrator)) {
             $this->hydrator = new ObjectHydrator($this->className);
             foreach ($this->properties as $propertyName => $column) {
-                $this->hydrator->addProcessor($column->name, $propertyName, $dialect->getResultProcessor($column->type));
+                $this->hydrator->addProcessor($column->name, $propertyName, $dialect->getTypecastingClass($column->type)->getResultProcessor());
             }
         }
         return $this->hydrator;
+    }
+    
+    public function getDessicator(Dialect\IDialect $dialect)
+    {
+        if (is_null($this->dessicator)) {
+            $this->dessicator = new ObjectDessicator($this->className);
+            foreach ($this->properties as $propertyName => $column) {
+                $this->dessicator->addProcessor($propertyName, $column->name, $dialect->getTypecastingClass($column->type)->getBindProcessor());
+            }
+        }
+        return $this->dessicator;
+    }
+    
+    public function insertObject($object, Connection $conn)
+    {
+        $dessicator = $this->getDessicator($conn->getDialect());
+        $insert = new Insert($this->table, $dessicator->dessicate($object));
+        $res = $conn->execute($insert);
+        $id = $res->lastInsertId();
+        $object = $this->getHydrator($conn->getDialect())->hydrate($object, array($this->identifier => $id));
+        return $id;
     }
 }
 
@@ -68,15 +102,22 @@ class ObjectHydrator
         $this->columnToProperties = array();
     }
     
-    public function newInstance(array $values)
+    public function newInstance(array $values, Session $session = null)
     {
-        return $this->hydrate($this->reflector->newInstance(), $values);
+        if (!is_null($session))
+            $instance = $session->newInstance($this->reflector->getName(), $values);
+        else
+            $instance = $this->reflector->newInstance();
+        
+        return $this->hydrate($instance, $values);
     }
     
     public function hydrate($object, array $values)
     {
-        foreach ($this->columnToProperties as $columnName => $propertyName) {
-            $value = call_user_func($this->processors[$propertyName], $values[$columnName]);
+        foreach ($values as $columnName => $value) {
+            if (!isset($this->columnToProperties[$columnName])) continue;
+            $propertyName = $this->columnToProperties[$columnName];
+            $value = call_user_func($this->processors[$propertyName], $value);
             $property = $this->reflector->getProperty($propertyName);
             $property->setAccessible(true);
             $property->setValue($object, $value);
@@ -87,6 +128,38 @@ class ObjectHydrator
     public function addProcessor($columnName, $propertyName, $processor)
     {
         $this->columnToProperties[$columnName] = $propertyName;
+        $this->processors[$propertyName] = $processor;
+    }
+}
+
+class ObjectDessicator
+{
+    private $reflector;
+    private $processors;
+    private $propertyToColumns;
+    
+    public function __construct($className)
+    {
+        $this->reflector = new \ReflectionClass($className);
+        $this->processors = array();
+        $this->propertyToColumns = array();
+    }
+    
+    public function dessicate($object)
+    {
+        $values = array();
+        foreach ($this->propertyToColumns as $propertyName => $columnName) {
+            $property = $this->reflector->getProperty($propertyName);
+            $property->setAccessible(true);
+            $value = call_user_func($this->processors[$propertyName], $property->getValue($object));
+            $values[$columnName] = $value;
+        }
+        return $values;
+    }
+    
+    public function addProcessor($propertyName, $columnName, $processor)
+    {
+        $this->propertyToColumns[$propertyName] = $columnName;
         $this->processors[$propertyName] = $processor;
     }
 }

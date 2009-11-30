@@ -124,6 +124,21 @@ class Connection
         return new ResultProxy($this->connection, $pdoStmt);
     }
     
+    public function beginTransaction()
+    {
+        $this->connection->beginTransaction();
+    }
+    
+    public function commit()
+    {
+        $this->connection->commit();
+    }
+    
+    public function rollback()
+    {
+        $this->connection->rollback();
+    }
+    
     public function getTableNames()
     {
         return $this->dialect->getTableNames($this->connection);
