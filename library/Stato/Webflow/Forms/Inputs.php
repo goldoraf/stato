@@ -37,7 +37,7 @@ abstract class Input
         foreach($attrs as $key => $value) {
             if ($value !== null && $value !== false) {
                 if ($value === true) $set[] = $key.'="'.$key.'"';
-                else $set[] = $key.'="'.$value.'"';
+                else $set[] = $key.'="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"';
             }
         }
         return implode(" ", $set);

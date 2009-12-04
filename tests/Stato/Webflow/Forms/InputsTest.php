@@ -22,6 +22,12 @@ class InputsTest extends TestCase
         $this->assertEquals('<input type="text" name="title" />', $i->render('title'));
     }
     
+    public function testTextInputWithQuotedValue()
+    {
+        $i = new TextInput();
+        $this->assertEquals('<input type="text" name="title" value="Jack &quot;Bull&quot; O&#039;Connor" />', $i->render('title', 'Jack "Bull" O\'Connor'));
+    }
+    
     public function testRenderTextInputWithAttrs()
     {
         $i = new TextInput();
