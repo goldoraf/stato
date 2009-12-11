@@ -1,6 +1,8 @@
 <?php
 
-class Article
+use Stato\Orm\Entity;
+
+class Article extends Entity
 {
     public $id;
     public $title;
@@ -10,7 +12,7 @@ class Article
     public $price;
 }
 
-class ArticleWithPrivateProperties
+class ArticleWithPrivateProperties extends Entity
 {
     private $id;
     private $title;
@@ -24,4 +26,15 @@ class ArticleWithPrivateProperties
         return array('id' => $this->id, 'title' => $this->title, 'body' => $this->body,
             'published' => $this->published, 'created_on' => $this->created_on, 'price' => $this->price);
     }
+}
+
+class ArticleWithoutProperties extends Entity
+{
+    
+}
+
+class ArticleWithWeirdProperties extends Entity
+{
+    public $i;
+    public $t;
 }

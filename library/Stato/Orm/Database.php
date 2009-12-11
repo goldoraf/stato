@@ -2,12 +2,21 @@
 
 namespace Stato\Orm;
 
-class Database implements \ArrayAccess
+use ArrayAccess;
+
+class Database implements ArrayAccess
 {
+    private static $instance;
+    
     private $tables;
     private $tablesToClasses;
     private $classesToMappers;
     private $connection;
+    
+    public static function getInstance()
+    {
+        return self::$instance;
+    }
     
     public function __construct(Connection $conn = null)
     {
@@ -15,6 +24,8 @@ class Database implements \ArrayAccess
         $this->tables = array();
         $this->tablesToClasses = array();
         $this->classesToMappers = array();
+        
+        self::$instance = $this;
     }
     
     public function offsetGet($tableName)
@@ -73,8 +84,9 @@ class Database implements \ArrayAccess
     
     public function map($className, $tableName, array $options = array())
     {
-        $mapper = new Mapper($className, $this->getTable($tableName), $options);
+        $mapper = new Mapper($className, $this->getTable($tableName), $this->getConnection(), $options);
         $this->addMapper($mapper);
+        return $mapper;
     }
     
     public function addMapper(Mapper $mapper)

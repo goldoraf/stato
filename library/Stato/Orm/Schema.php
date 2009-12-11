@@ -69,6 +69,14 @@ class Table extends TableClause
         foreach ($columns as $column) $this->addColumn($column);
     }
     
+    public function __get($columnName)
+    {
+        if (!array_key_exists($columnName, $this->columns))
+            throw new UnknownColumn("{$columnName} in {$this->name} table");
+        
+        return $this->columns[$columnName];
+    }
+    
     public function addColumn(Column $column)
     {
         if ($column->primaryKey) $this->primaryKey = $column->name;

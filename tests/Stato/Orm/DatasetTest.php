@@ -134,4 +134,11 @@ class DatasetTest extends TestCase
         $this->setExpectedException('Stato\Orm\RecordNotFound');
         $user = $this->db->from('users')->get(99);
     }
+    
+    public function testInsert()
+    {
+        $res = $this->db->from('users')->insert(array('fullname' => 'Foo Bar', 'login' => 'foo', 'password' => 'bar'));
+        $this->assertEquals(3, $res->lastInsertId());
+        $this->assertEquals(1, $res->rowCount());
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace Stato\Orm;
 
+use \Iterator, \IteratorAggregate, \Countable;
+
 class DatasetException extends Exception {}
 class RecordNotFound extends Exception {}
 
@@ -13,7 +15,7 @@ class RecordNotFound extends Exception {}
  * @package Stato
  * @subpackage Orm
  */
-class Dataset implements \IteratorAggregate, \Countable
+class Dataset implements IteratorAggregate, Countable
 {
     private $table;
     private $connection;
@@ -46,6 +48,21 @@ class Dataset implements \IteratorAggregate, \Countable
         $this->iterator = null;
     }
     
+    public function getMapper()
+    {
+        return $this->mapper;
+    }
+    
+    public function setMapper(Mapper $mapper)
+    {
+        $this->mapper = $mapper;
+    }
+    
+    public function getTableName()
+    {
+        return $this->table->getName();
+    }
+    
     /**
      * Returns an iterator over the results from executing the dataset's resulting SQL.
      */
@@ -54,7 +71,7 @@ class Dataset implements \IteratorAggregate, \Countable
         if (is_null($this->iterator)) {
             $res = $this->connection->execute($this->statement);
             if (!is_null($this->mapper))
-                $this->iterator = new DatasetIterator($res, $this->mapper->getHydrator($this->connection->getDialect()), $this->session);
+                $this->iterator = new DatasetIterator($res, $this->mapper->getHydrator(), $this->session);
             else
                 $this->iterator = new DatasetIterator($res);
         }
@@ -97,6 +114,14 @@ class Dataset implements \IteratorAggregate, \Countable
     public function last()
     {
         // TODO
+    }
+    
+    /**
+     * Performs a INSERT with the provided values.
+     */
+    public function insert($values)
+    {
+        return $this->connection->execute($this->table->insert()->values($values));
     }
     
     /**
@@ -231,7 +256,7 @@ class Dataset implements \IteratorAggregate, \Countable
     }
 }
 
-class DatasetIterator implements \Iterator
+class DatasetIterator implements Iterator
 {
     private $pos;
     private $cache;
