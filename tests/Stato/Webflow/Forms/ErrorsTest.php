@@ -10,7 +10,7 @@ class ErrorsTest extends TestCase
 {
     public function setup()
     {
-        if (!function_exists('\__')) {
+        if (!function_exists('__')) {
             eval('function __($key, $options = array()) {
                 return $key;
             }');
