@@ -1,0 +1,33 @@
+==== How to convert Stato 2.0 from php 5.3 to php 5.2 ====
+First create a migration repository :
+
+host:~# mkdir migration
+
+Move the migration script into this directtory
+
+host:~# cp 5.3to5.2.sh migration/
+
+Get the latest stato revision from github :
+
+host:~# cd migration
+host:~/migration# git clone git://github.com/goldoraf/stato.git
+host:~/migration# ls
+5.3to5.2.sh  stato
+
+Then juste execute the shell script (it can be very long, about 20 minutes
+ depending on the hardware):
+
+host:~/migration# time sh 5.3to5.2.sh
+...
+host:~/migration# ls 
+5.3to5.2.sh  stato stato52
+
+The stato52 repository should  contain the stato version compatible with 
+php 5.2, to be sure go to the test repository and execute the stato unit
+test suite :
+host:~/migration# cd stato52/tests/Stato
+host:~/migration/stato52/tests/Stato# phpunit Stato_AllTests AllTests.php
+
+This is it.
+Take a look at the TODO file, to see known bugs and work in progress.
+

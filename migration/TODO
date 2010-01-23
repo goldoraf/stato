@@ -1,0 +1,37 @@
+==== KNOWN BUGS ====
+
+#1 : Unit test case for Stato_Webflow_Forms_FormTest::testIsValidWithVariousConstraints
+fail with : 
+There was 1 failure: 
+Failed asserting that two arrays are equal.
+[...]
+-    [cc] => xssxssjohn@
++    [cc] => xss/xssjohn@
+
+It's a php behaviour change (or bug fixe I'm not really sure) between php 5.2 
+and php 5.3.
+Not really important, Stato will just not trim / in the left part of the email
+ in php 5.2 (which seems to be normal to me...).
+
+#2 : Stato Orm not migrated :
+Yes it's not and will not be.
+
+#3 : Multiple Unit test case fail with : 
+file_put_contents(/path/to/stato52/tests/Stato/Cli/Command/../files/locale/en.php): failed to open stream: No such file or directory
+Just do :
+host:~# mkdir /path/to/stato52/tests/Stato/Cli/Command/../files/locale/
+
+#3 : Multiple Unit test case fail with : 
+file_put_contents(/path/to/stato52/tests/Stato/I18n/Backend/../tmp/klingon.php)
+Just do :
+host:~# mkdir /path/to/stato52/tests/Stato/I18n/Backend/../tmp/
+
+#4 : The stato.php file is not successfully migrated
+Well is not hard to manually migrate it :
+replace '\\' by '_' at line 8
+replace CommandRunner by Stato_Cli_CommandRunner at line 14
+==== TODO ====
+
+# Migrate the documentation
+
+# Fasten the migration script
