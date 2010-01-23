@@ -114,8 +114,8 @@ do
           DIFF=`echo ${QUOTEDNAMESPACE#$CURRENT}`
           DIFF=`echo $DIFF | sed 's/_/\\\/g'`
           PARTIALPATH="$DIFF\\\\$CLASS"
-          sed -i "s/\([^\]\)$PARTIALPATH\(\([^\]\)\|$\)/\1$FULLCLASS\3/g" $PHP52
-          sed -i "s/\([^\]\)$PARTIALPATH\(\([^\]\)\|$\)/\1$FULLCLASS\3/g" $PHP52
+          sed -i "s/\([^\.]\)$PARTIALPATH\(\([^\.]\)\|$\)/\1$FULLCLASS\3/g" $PHP52
+          sed -i "s/\([^\.]\)$PARTIALPATH\(\([^\.]\)\|$\)/\1$FULLCLASS\3/g" $PHP52
         fi
       fi
     done  
@@ -132,8 +132,8 @@ do
     then
       for PHP52 in `grep -rl "^\s*\(namespace\s*$NAMESPACE\|use\s*$FULLPATH\)\s*;\s*" $STATO52`
       do
-        sed -i "s/\([^\/']\)\<$CLASS\>\(\([^\/']\)\|$\)/\1$FULLCLASS\3/g" $PHP52
-        sed -i "s/\([^\/']\)\<$CLASS\>\(\([^\/']\)\|$\)/\1$FULLCLASS\3/g" $PHP52
+        sed -i "s/\([^\./']\)\<$CLASS\>\(\([^\./']\)\|$\)/\1$FULLCLASS\3/g" $PHP52
+        sed -i "s/\([^\./']\)\<$CLASS\>\(\([^\./']\)\|$\)/\1$FULLCLASS\3/g" $PHP52
       done
     fi
   done

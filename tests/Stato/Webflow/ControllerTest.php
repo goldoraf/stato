@@ -4,7 +4,7 @@
 
 require_once dirname(__FILE__) . '/../TestsHelper.php';
 
-require_once 'files/controllers/foo_controller.php';
+require_once 'files/controllers/FooController.php';
 
 class Stato_Webflow_ControllerTest extends Stato_Webflow_TestCase
 {
