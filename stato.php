@@ -9,8 +9,6 @@ function __autoload($className) {
     require $path;
 }
 
-
-
 Stato_Cli_CommandRunner::main($_SERVER['argv']);
 
 exit(0);
