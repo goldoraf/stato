@@ -11,12 +11,8 @@ class CreateappTest extends TestCase
     public function setup()
     {
         $this->command = new Createapp();
-        $this->path = __DIR__ . '/../files/sandbox';
-    }
-    
-    public function tearDown()
-    {
-        // recursive rm
+        $this->path = sys_get_temp_dir().'/STATO'.rand();
+        mkdir($this->path);
     }
     
     public function testRun()
