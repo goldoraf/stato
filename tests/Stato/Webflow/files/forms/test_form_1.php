@@ -1,18 +1,16 @@
 <?php
 
-use Stato\Webflow\Forms as forms;
-
-class TestForm1 extends forms\Form
+class TestForm1 extends \Stato\Webflow\Forms\Form
 {
     public function __construct(array $data = null, array $files = null)
     {
         parent::__construct($data, $files);
-        $this->lib = new forms\CharField;
+        $this->lib = new \Stato\Webflow\Forms\CharField;
     }
     
     protected function clean()
     {
         if ($this->cleanedData['lib'] != 'foo')
-            throw new forms\ValidationError('Lib should be "foo"');
+            throw new \Stato\Webflow\Forms\ValidationError('Lib should be "foo"');
     }
 }
