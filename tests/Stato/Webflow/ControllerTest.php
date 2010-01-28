@@ -4,7 +4,7 @@ namespace Stato\Webflow;
 
 require_once __DIR__ . '/../TestsHelper.php';
 
-require_once 'files/controllers/foo_controller.php';
+require_once 'files/controllers/FooController.php';
 
 class ControllerTest extends TestCase
 {

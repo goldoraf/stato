@@ -57,8 +57,9 @@ class Dispatcher
     
     protected function getControllerPath($controllerName)
     {
+	$controllerName = ucfirst(strtolower($controllerName));
         foreach ($this->controllerDirs as $dir) {
-            $possiblePath = "{$dir}/{$controllerName}_controller.php";
+            $possiblePath = "{$dir}/{$controllerName}Controller.php";
             if (file_exists($possiblePath)) return $possiblePath;
         }
         throw new ControllerNotFound("$controllerName controller file not found");
