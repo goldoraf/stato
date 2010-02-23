@@ -13,7 +13,7 @@ class AllTests
         $suite->addTest(Webflow\AllTests::suite());
         $suite->addTest(Cli\AllTests::suite());
         $suite->addTest(Mailer\AllTests::suite());
-        $suite->addTest(Orm\AllTests::suite());
+#        $suite->addTest(Orm\AllTests::suite());
         return $suite;
     }
 }
