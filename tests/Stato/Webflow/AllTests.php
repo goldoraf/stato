@@ -20,6 +20,7 @@ class AllTests
         $suite->addTestSuite('Stato\Webflow\DispatcherTest');
         $suite->addTest(Helper\AllTests::suite());
         $suite->addTest(Forms\AllTests::suite());
+        $suite->addTest(Plugin\AllTests::suite());
         return $suite;
     }
 }
