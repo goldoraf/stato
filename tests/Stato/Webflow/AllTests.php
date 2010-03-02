@@ -20,6 +20,7 @@ class Stato_Webflow_AllTests
         $suite->addTestSuite('Stato_Webflow_DispatcherTest');
         $suite->addTest(Stato_Webflow_Helper_AllTests::suite());
         $suite->addTest(Stato_Webflow_Forms_AllTests::suite());
+        $suite->addTest(Stato_Webflow_Plugin_AllTests::suite());
         return $suite;
     }
 }

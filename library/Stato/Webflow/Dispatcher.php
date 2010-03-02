@@ -10,12 +10,14 @@ class Stato_Webflow_Dispatcher
     protected $request;
     protected $response;
     protected $routeset;
-    
+    public $plugins;
+ 
     protected $controllerDirs = array();
     
     public function __construct(Stato_Webflow_RouteSet $routeset)
     {
         $this->routeset = $routeset;
+	$this->plugins = new Stato_Webflow_Plugin_Broker();
     }
     
     public function addControllerDir($dir)
@@ -27,15 +29,23 @@ class Stato_Webflow_Dispatcher
     {
         $this->request  = ($request  !== null) ? $request  : new Stato_Webflow_Request();
         $this->response = ($response !== null) ? $response : new Stato_Webflow_Response();
-        
+
+       	$this->plugins->setRequest($this->request)->setResponse($this->response);
+ 
+        $this->plugins->preRouting($this->request);
+
         $pathInfo = $this->request->getPathInfo();
         $params = $this->routeset->recognizePath($pathInfo);
         $this->request->setParams($params);
-        
+
+ 
         $controllerName = $this->request->getParam('controller');
         if (empty($controllerName))
             throw new Stato_Webflow_DispatchException('No controller specified in this request');
         
+	$this->plugins->postRouting();       
+
+	$this->plugins->preDispatch();       
         $controllerClass = $this->getControllerClass($controllerName);
         $controllerPath = $this->getControllerPath($controllerName);
         
@@ -46,6 +56,8 @@ class Stato_Webflow_Dispatcher
         $controller = new $controllerClass($this->request, $this->response);
         $controller->addViewDir(dirname($controllerPath).'/../views');
         $controller->run();
+
+	$this->plugins->postDispatch();       
         
         $this->response->send();
     }

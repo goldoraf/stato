@@ -155,7 +155,7 @@ EOT;
         $form->body = new Stato_Webflow_Forms_TextField;
         $form2 = clone $form;
         $this->assertFalse($form->isValid(array('cc' => '<xss></xss>john@', 'subject' => 'doh', 'body' => 'hello')));
-        $this->assertEquals(array('to' => null, 'cc' => 'xssxssjohn@', 'subject' => 'doh', 'body' => 'hello'),
+        $this->assertEquals(array('to' => null, 'cc' => 'xss/xssjohn@', 'subject' => 'doh', 'body' => 'hello'),
                             $form->getCleanedData());
         $this->assertEquals('This field is required.', $form->errors['to']);
         $this->assertEquals('Enter a valid e-mail address.', $form->errors['cc']);
