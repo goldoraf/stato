@@ -3,7 +3,8 @@
 namespace Stato\Webflow;
 
 
-abstract class Plugin {
+abstract class Plugin 
+{
 
     protected $response;
     protected $request;

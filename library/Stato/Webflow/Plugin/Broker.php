@@ -40,19 +40,23 @@ class Broker extends Plugin implements \ArrayAccess, \Iterator
         reset($this->plugins);
     }
 
-    public function current() {
+    public function current() 
+    {
         return current($this->plugins);
     }
 
-    public function key() {
+    public function key() 
+    {
         return key($this->plugins);
     }
 
-    public function next() {
+    public function next() 
+    {
         next($this->plugins);
     }
 
-    public function valid() {
+    public function valid() 
+    {
         return current($this->plugins); 
     }
 
