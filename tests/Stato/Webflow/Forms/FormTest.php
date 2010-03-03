@@ -100,6 +100,16 @@ EOT;
         $this->assertEquals($html, $this->form->render());
     }
     
+    public function testSetInitialValues()
+    {
+        $html = <<<EOT
+<p><label for="title">Title</label><input type="text" name="title" id="title" value="foo" /></p>
+<p><label for="body">Body</label><textarea name="body" cols="40" rows="10" id="body">bar</textarea></p>
+EOT;
+        $this->form->setInitialValues(array('title' => 'foo', 'body' => 'bar'));
+        $this->assertEquals($html, $this->form->render());
+    }
+    
     public function testFormBasicRenderingWithHiddenField()
     {
         $html = <<<EOT
