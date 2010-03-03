@@ -1,13 +1,13 @@
 <?php
 
-use Stato\Orm\Entity;
+use Stato\Orm\ActiveRecord;
 
-class Post extends Entity
+class Post extends ActiveRecord
 {
     
 }
 
-class MyPost extends Entity
+class MyPost extends ActiveRecord
 {
     protected static $tablename = 'posts';   
 }

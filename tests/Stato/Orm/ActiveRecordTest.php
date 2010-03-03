@@ -8,7 +8,7 @@ require_once __DIR__ . '/../TestsHelper.php';
 
 require_once __DIR__ . '/files/post.php';
 
-class EntityTest extends TestCase
+class ActiveRecordTest extends TestCase
 {
     protected $fixtures = array('posts');
     

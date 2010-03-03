@@ -2,7 +2,7 @@
 
 namespace Stato\Orm;
 
-class Entity
+class ActiveRecord
 {
     protected static $tableName;
     
@@ -72,8 +72,9 @@ class Entity
     
     public function __construct(array $values = array())
     {
-        foreach ($values as $k => $v) $this->{$k} = $v;
+        $this->values = array();
         $this->new = true;
+        $this->populate($values);
     }
     
     public function isNew()
@@ -99,5 +100,10 @@ class Entity
     public function delete()
     {
         static::getMapper()->deleteObject($this);
+    }
+    
+    protected function populate(array $values)
+    {
+        
     }
 }

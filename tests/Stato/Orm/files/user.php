@@ -1,8 +1,6 @@
 <?php
 
-use Stato\Orm\Entity;
-
-class User extends Entity
+class User
 {
     public $id;
     public $fullname;

@@ -26,7 +26,10 @@ class SessionTest extends TestCase
     
     public function testSaveAndFlush()
     {
-        $user = new User(array('fullname' => 'James Bond', 'login' => 'james', 'password' => '007'));
+        $user = new User();
+        $user->fullname = 'James Bond';
+        $user->login = 'james';
+        $user->password = '007';
         $this->session->save($user);
         $this->session->flush();
         $reloaded_user = $this->session->query('User')->filterBy(array('login' => 'james'))->first();
