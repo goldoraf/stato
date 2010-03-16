@@ -151,7 +151,6 @@ class ObjectHydrator
                 $property->setValue($object, $value);
             }
         }
-        $object->setAsLoaded();
         return $object;
     }
     

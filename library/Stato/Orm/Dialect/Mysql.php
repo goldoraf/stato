@@ -59,6 +59,8 @@ class Mysql implements IDialect
     
     public function getDsn(array $params)
     {
+        if (isset($params['dsn'])) return $params['dsn'];
+        
         $parts = array();
         if (isset($params['unix_socket']))
             $parts[] = "unix_socket={$params['unix_socket']}";
