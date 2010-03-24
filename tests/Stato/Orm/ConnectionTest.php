@@ -3,14 +3,15 @@
 namespace Stato\Orm;
 
 use Stato\TestEnv;
+use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../TestsHelper.php';
 
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {
-        $this->connection = new Connection(TestEnv::getDbDriverConfig());
+        $this->connection = TestEnv::getDbConnection();
     }
     
     public function testGetConnection()

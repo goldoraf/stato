@@ -2,11 +2,13 @@
 
 namespace Stato\Orm;
 
+use PHPUnit_Framework_TestCase;
+
 require_once __DIR__ . '/../TestsHelper.php';
 
 require_once 'Stato/Orm/Schema.php';
 
-class ExpressionTest extends \PHPUnit_Framework_TestCase
+class ExpressionTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {

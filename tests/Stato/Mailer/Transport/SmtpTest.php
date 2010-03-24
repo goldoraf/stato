@@ -12,7 +12,12 @@ class SmtpTest extends TestCase
 {
     public function setup()
     {
-        $conf = TestEnv::getConfig('mailer', 'smtp');
+        $conf = TestEnv::getSmtpConfig();
+        if (!$conf) {
+            $this->markTestSkipped(
+              'No SMTP server configured.'
+            );
+        }
         $this->smtp = new Smtp($conf['host'], $conf);
     }
     

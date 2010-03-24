@@ -1,2 +1,2 @@
-tests/Stato/TestConfig.php
+tests/phpunit.xml
 

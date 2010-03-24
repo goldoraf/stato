@@ -2,69 +2,48 @@
 
 namespace Stato;
 
-class TestConfigNotFound extends \Exception {}
-class TestsConfigFileNotFound extends \Exception {}
-class DbDriverConfigNotFound extends \Exception {}
-
 class TestEnv
 {
-    private static $testsConfig = null;
-    private static $currentTestedDriver = null;
-    
-    public static function getTestsConfig()
+    public static function getDbConnection()
     {
-        if (self::$testsConfig === null) {
-            if (!file_exists(dirname(__FILE__) . '/TestConfig.php'))
-                throw new TestsConfigFileNotFound();
-            self::$testsConfig = include dirname(__FILE__) . '/TestConfig.php';
-        }
-        return self::$testsConfig;
-    }
-    
-    public static function getConfig($package, $class = null)
-    {
-        $conf = self::getTestsConfig();
-        if (!array_key_exists($package, $conf))
-            throw new TestConfigNotFound($package);
+        $config = self::getDbConfig();
         
-        if ($class === null) return $conf[$package];
+        $tmpConn = new Orm\Connection($config);
+        $tmpConn->dropDatabase($config['dbname']);
+        $tmpConn->createDatabase($config['dbname']);
+        $tmpConn->close();
         
-        if (!array_key_exists($class, $conf[$package]))
-            throw new TestConfigNotFound($package.'::'.$class);
-            
-        return $conf[$package][$class];
+        $conn = new Orm\Connection($config);
+        return $conn;
     }
     
-    public static function getDbTestsConfig()
+    public static function getDbConfig()
     {
-        return self::getConfig('orm');
+        $config = array(
+            'driver'   => $GLOBALS['db_driver'],
+            'host'     => $GLOBALS['db_host'],
+            'user'     => $GLOBALS['db_user'],
+            'password' => $GLOBALS['db_password'],
+            'dbname'   => $GLOBALS['db_name'],
+            'dsn'      => $GLOBALS['db_dsn']
+        );
+        
+        return $config;
     }
     
-    public static function getDbDriversToTest()
+    public static function getSmtpConfig()
     {
-        $conf = self::getDbTestsConfig();
-        return array_keys($conf);
-    }
-    
-    public static function setCurrentTestedDriver($driverName)
-    {
-        self::$currentTestedDriver = $driverName;
-    }
-    
-    public static function getDbDriverConfig($driverName = null)
-    {
-        $conf = self::getDbTestsConfig();
-        if ($driverName === null) {
-            if (self::$currentTestedDriver === null) {
-                $drivers = self::getDbDriversToTest();
-                $driverName = array_shift($drivers);
-            } else {
-                $driverName = self::$currentTestedDriver;
-            }
-        }
-        if (!array_key_exists($driverName, $conf))
-            throw new DbDriverConfigNotFound($driverName);
-            
-        return $conf[$driverName];
+        if (!isset($GLOBALS['smtp_host'])) return false;
+        
+        $config = array(
+            'host' => $GLOBALS['smtp_host'],
+            'port' => $GLOBALS['smtp_port'],
+            'ssl'  => $GLOBALS['smtp_ssl'],
+            'auth' => $GLOBALS['smtp_auth'],
+            'username' => $GLOBALS['smtp_username'],
+            'password' => $GLOBALS['smtp_password'],
+        );
+        
+        return $config;
     }
 }

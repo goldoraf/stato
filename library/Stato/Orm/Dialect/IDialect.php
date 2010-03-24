@@ -19,6 +19,10 @@ interface IDialect
     
     public function dropTable($tableName);
     
+    public function createDatabase($dbName);
+    
+    public function dropDatabase($dbName);
+    
     public function addColumn($tableName, Column $column);
     
     public function getColumnSpecification(Column $column);

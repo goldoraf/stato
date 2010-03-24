@@ -94,6 +94,11 @@ class Connection
         $this->logger = $logger;
     }
     
+    public function close()
+    {
+        $this->connection = null;
+    }
+    
     public function getPDOConnection()
     {
         return $this->connection;
@@ -102,6 +107,11 @@ class Connection
     public function getDialect()
     {
         return $this->dialect;
+    }
+    
+    public function getDatabase()
+    {
+        return $this->config['dbname'];
     }
     
     public function execute($stmt, array $params = array())
@@ -163,6 +173,16 @@ class Connection
     {
         $tableName = (is_object($table)) ? $table->getName() : $table;
         return $this->connection->exec($this->dialect->dropTable($tableName));
+    }
+    
+    public function createDatabase($dbName)
+    {
+        return $this->connection->exec($this->dialect->createDatabase($dbName));
+    }
+    
+    public function dropDatabase($dbName)
+    {
+        return $this->connection->exec($this->dialect->dropDatabase($dbName));
     }
 }
 

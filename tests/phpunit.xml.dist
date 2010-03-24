@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit>
+    <php>
+        <var name="db_driver" value="mysql"/>
+        <var name="db_host" value="localhost"/>
+        <var name="db_user" value="stato"/>
+        <var name="db_password" value=""/>
+        <var name="db_name" value="stato_orm_tests"/>
+        <var name="db_dsn" value="mysql:host=localhost;dbname=stato_orm_tests"/>
+        
+        <var name="smtp_host" value="localhost"/>
+        <var name="smtp_port" value="25"/>
+        <var name="smtp_ssl" value="false"/>
+        <var name="smtp_auth" value="false"/>
+        <var name="smtp_username" value=""/>
+        <var name="smtp_password" value=""/>
+    </php>
+</phpunit>

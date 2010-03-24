@@ -84,6 +84,16 @@ class Mysql implements IDialect
         return $connection->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
     }
     
+    public function createDatabase($dbName)
+    {
+        return "CREATE DATABASE $dbName";
+    }
+    
+    public function dropDatabase($dbName)
+    {
+        return "DROP DATABASE IF EXISTS $dbName";
+    }
+    
     public function reflectTable(\PDO $connection, $tableName)
     {
         $columns = array();

@@ -6,11 +6,13 @@ use Stato\Orm\TestCase;
 use Stato\Orm\Column;
 use Stato\Orm\Table;
 
+use PHPUnit_Framework_TestCase;
+
 require_once __DIR__ . '/../../TestsHelper.php';
 
 require_once 'Stato/Orm/Schema.php';
 
-class MysqlTest extends \PHPUnit_Framework_TestCase
+class MysqlTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {

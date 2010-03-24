@@ -3,14 +3,15 @@
 namespace Stato\Orm;
 
 use Stato\TestEnv;
+use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../TestsHelper.php';
 
-class DatabaseTest extends \PHPUnit_Framework_TestCase
+class DatabaseTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {
-        $this->connection = new Connection(TestEnv::getDbDriverConfig());
+        $this->connection = TestEnv::getDbConnection();
         $this->database = new Database($this->connection);
         $this->usersTable = new Table('users', array(
             new Column('id', Column::INTEGER, array('primary_key' => true, 'auto_increment' => true)),
@@ -38,7 +39,7 @@ class DatabaseTest extends \PHPUnit_Framework_TestCase
     public function testConnect()
     {
         $db = new Database();
-        $db->connect(TestEnv::getDbDriverConfig());
+        $db->connect(TestEnv::getDbConfig());
         $this->assertThat(
             $db->getConnection(),
             $this->isInstanceOf('\Stato\Orm\Connection')
