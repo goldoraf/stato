@@ -2,6 +2,7 @@
 
 namespace Stato\Model;
 
+use \Exception;
 class MethodMissingException extends Exception {}
 class PropertyMissingException extends Exception {}
 
@@ -19,9 +20,14 @@ class Metadata
     
     private $methods = array();
     
-    public function addProperty($name)
+    public function addProperty($name, $type = self::STRING, array $options = array())
     {
-        $this->properties[$name] = array('type' => self::STRING);
+        $this->properties[$name] = new Property($name, $type, $options);
+    }
+    
+    public function getProperties()
+    {
+        return $this->properties;
     }
     
     public function defineDynamicMethods($methodTarget, $prefix, $suffix = '', array $properties = null)

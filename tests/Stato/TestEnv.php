@@ -4,15 +4,11 @@ namespace Stato;
 
 class TestEnv
 {
+    private static $tables;
+    
     public static function getDbConnection()
     {
         $config = self::getDbConfig();
-        
-        $tmpConn = new Orm\Connection($config);
-        $tmpConn->dropDatabase($config['dbname']);
-        $tmpConn->createDatabase($config['dbname']);
-        $tmpConn->close();
-        
         $conn = new Orm\Connection($config);
         return $conn;
     }
@@ -27,6 +23,8 @@ class TestEnv
             'dbname'   => $GLOBALS['db_name'],
             'dsn'      => $GLOBALS['db_dsn']
         );
+        
+        self::createTestDatabase($config);
         
         return $config;
     }
@@ -45,5 +43,25 @@ class TestEnv
         );
         
         return $config;
+    }
+    
+    public static function getDbSchema()
+    {
+        if (!isset(self::$tables)) self::$tables = include_once __DIR__ . '/Orm/files/schema.php';
+        return self::$tables;
+    }
+    
+    public static function createTestDatabase($config)
+    {
+        $tmpConn = new Orm\Connection($config);
+        $tmpConn->dropDatabase($config['dbname']);
+        $tmpConn->createDatabase($config['dbname']);
+        $tmpConn->close();
+        
+        $conn = new Orm\Connection($config);
+        
+        foreach (self::getDbSchema() as $table) {
+            $conn->createTable($table);
+        }
     }
 }

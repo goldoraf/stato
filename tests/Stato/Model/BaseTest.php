@@ -86,16 +86,9 @@ class BaseTest extends TestCase
         $this->assertTrue($e->hasChanged());
     }
     
-    public function testNewObjectHasNotChanged()
+    public function testNewObjectWithArgsHasChanged()
     {
         $e = new Event(array('title' => 'Dinner with John'));
-        $this->assertFalse($e->hasChanged());
-    }
-    
-    public function testObjectHasChanged()
-    {
-        $e = new Event(array('title' => 'Dinner with John'));
-        $e->setTitle('Dinner with Jane');
         $this->assertTrue($e->hasChanged());
     }
     
@@ -108,7 +101,7 @@ class BaseTest extends TestCase
     
     public function testHasPropertyNotChanged()
     {
-        $e = new Event(array('title' => 'Dinner with John'));
+        $e = new Event();
         $this->assertFalse($e->hasPropertyChanged('title'));
     }
     

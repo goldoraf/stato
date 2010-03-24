@@ -47,4 +47,9 @@ return array(
         new Column('created_on', Column::DATETIME),
         new Column('price', Column::FLOAT),
     )),
+    'events' => new Table('events', array(
+        new Column('id', Column::INTEGER, array('length' => 11, 'nullable' => false, 'primary_key' => true, 'auto_increment' => true)),
+        new Column('title', Column::STRING, array('length' => 50)),
+        
+    )),
 );

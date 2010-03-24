@@ -2,6 +2,7 @@
 
 namespace Stato\Model;
 
+use \Exception;
 use Stato\Model\Interfaces\Changeable;
 
 class MethodMissingTargetException extends Exception {}
@@ -10,31 +11,49 @@ class Base implements Changeable
 {
     protected static $metadata;
     
-    static public function setMetadata(Metadata $meta)
+    protected static $repositories = array();
+    
+    public static function setMetadata(Metadata $meta)
     {
         $meta->defineDynamicMethods('getProperty', 'get');
         $meta->defineDynamicMethods('setProperty', 'set');
         self::$metadata[get_called_class()] = $meta;
     }
     
-    static public function getMetadata()
+    public static function getRepository()
     {
-        $class = get_called_class();
-        if (!isset(self::$metadata[$class])) {
-            throw new Exception("No metadata class assigned to class $class");
+        return Repository::get(self::getRepositoryName());
+    }
+    
+    public static function getRepositoryName()
+    {
+        if (array_key_exists(get_called_class(), self::$repositories)) {
+            return self::$repositories[get_called_class()];
         }
-        return self::$metadata[$class];
+        return self::getDefaultRepositoryName();
+    }
+    
+    public static function getDefaultRepositoryName()
+    {
+        return Repository::getDefaultName();
+    }
+    
+    public static function setRepositoryName($name)
+    {
+        self::$repositories[get_called_class()] = $name;
     }
     
     protected $values = array();
     
     protected $changedValues = array();
     
+    protected $saved = false;
+    
     public function __construct(array $values = null)
     {
         if (!is_null($values)) {
-            static::getMetadata()->checkPropertiesExistence(array_keys($values));
-            $this->values = $values;
+            $this->getMetadata()->checkPropertiesExistence(array_keys($values));
+            foreach ($values as $k => $v) $this->__set($k, $v);
         }
     }
     
@@ -59,7 +78,7 @@ class Base implements Changeable
     public function __call($method, $args)
     {
         list($propertyName, $methodTarget) 
-            = static::getMetadata()->getMethodMissingTarget($method, get_called_class());
+            = $this->getMetadata()->getMethodMissingTarget($method, get_called_class());
         if (!method_exists($this, $methodTarget)) {
             throw new MethodMissingTargetException("Call to undefined method target '$methodTarget'");
         }
@@ -67,9 +86,18 @@ class Base implements Changeable
         return call_user_func_array(array($this, $methodTarget), $args);
     }
     
+    public function getMetadata()
+    {
+        $class = get_class($this);
+        if (!isset(self::$metadata[$class])) {
+            throw new Exception("No metadata class assigned to class $class");
+        }
+        return self::$metadata[$class];
+    }
+    
     public function getProperty($name)
     {
-        if (!static::getMetadata()->hasProperty($name)) {
+        if (!$this->getMetadata()->hasProperty($name)) {
             throw new PropertyMissingException("Missing $name property");
         }
         return array_key_exists($name, $this->values) ? $this->values[$name] : null;
@@ -77,11 +105,51 @@ class Base implements Changeable
     
     public function setProperty($name, $value)
     {
-        if (!static::getMetadata()->hasProperty($name)) {
+        if (!$this->getMetadata()->hasProperty($name)) {
             throw new PropertyMissingException("Missing $name property");
         }
         $this->trackChange($name, $value);
         $this->values[$name] = $value;
+    }
+    
+    public function save()
+    {
+        if (!$this->hasChanged()) {
+            return $this->isSaved();
+        }
+        if ($this->isNew()) {
+            return $this->create();
+        } else {
+            return $this->update();
+        }
+    }
+    
+    public function isNew()
+    {
+        return !$this->isSaved();
+    }
+    
+    public function isSaved()
+    {
+        return $this->saved == true;
+    }
+    
+    protected function create()
+    {
+        /*properties.each do |property|
+        unless property.serial? || property.loaded?(self)
+          property.set(self, property.default_for(self))
+        end
+      end*/
+      static::getRepository()->create($this);
+      $this->saved = true;
+      $this->changedValues = array();
+      return true;
+    }
+    
+    protected function update()
+    {
+        
     }
     
     /**
@@ -101,6 +169,11 @@ class Base implements Changeable
     public function getChangedProperties()
     {
         return array_keys($this->changedValues);
+    }
+    
+    public function getChangedValues()
+    {
+        return $this->changedValues;
     }
     
     /**
