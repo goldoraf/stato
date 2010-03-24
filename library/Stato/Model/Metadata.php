@@ -52,4 +52,9 @@ class Metadata
             throw new PropertyMissingException("Properties not defined: ".implode($missingProperties));
         }
     }
+    
+    public function hasProperty($name)
+    {
+        return array_key_exists($name, $this->properties);
+    }
 }
