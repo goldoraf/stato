@@ -9,15 +9,15 @@ class MethodMissingTargetException extends Exception {}
 
 class Base implements Changeable
 {
-    protected static $metadata;
+    protected static $metaclass;
     
     protected static $repositories = array();
     
-    public static function setMetadata(Metadata $meta)
+    public static function setMetaclass(Metaclass $meta)
     {
         $meta->defineDynamicMethods('getProperty', 'get');
         $meta->defineDynamicMethods('setProperty', 'set');
-        self::$metadata[get_called_class()] = $meta;
+        self::$metaclass[get_called_class()] = $meta;
     }
     
     public static function getRepository()
@@ -52,7 +52,7 @@ class Base implements Changeable
     public function __construct(array $values = null)
     {
         if (!is_null($values)) {
-            $this->getMetadata()->checkPropertiesExistence(array_keys($values));
+            $this->getMetaclass()->checkPropertiesExistence(array_keys($values));
             foreach ($values as $k => $v) $this->__set($k, $v);
         }
     }
@@ -78,7 +78,7 @@ class Base implements Changeable
     public function __call($method, $args)
     {
         list($propertyName, $methodTarget) 
-            = $this->getMetadata()->getMethodMissingTarget($method, get_called_class());
+            = $this->getMetaclass()->getMethodMissingTarget($method, get_called_class());
         if (!method_exists($this, $methodTarget)) {
             throw new MethodMissingTargetException("Call to undefined method target '$methodTarget'");
         }
@@ -86,18 +86,18 @@ class Base implements Changeable
         return call_user_func_array(array($this, $methodTarget), $args);
     }
     
-    public function getMetadata()
+    public function getMetaclass()
     {
         $class = get_class($this);
-        if (!isset(self::$metadata[$class])) {
-            throw new Exception("No metadata class assigned to class $class");
+        if (!isset(self::$metaclass[$class])) {
+            throw new Exception("No metaclass assigned to class $class");
         }
-        return self::$metadata[$class];
+        return self::$metaclass[$class];
     }
     
     public function getProperty($name)
     {
-        if (!$this->getMetadata()->hasProperty($name)) {
+        if (!$this->getMetaclass()->hasProperty($name)) {
             throw new PropertyMissingException("Missing $name property");
         }
         return array_key_exists($name, $this->values) ? $this->values[$name] : null;
@@ -105,7 +105,7 @@ class Base implements Changeable
     
     public function setProperty($name, $value)
     {
-        if (!$this->getMetadata()->hasProperty($name)) {
+        if (!$this->getMetaclass()->hasProperty($name)) {
             throw new PropertyMissingException("Missing $name property");
         }
         $this->trackChange($name, $value);

@@ -43,6 +43,11 @@ class Property
     public $key;
     
     /**
+     * If true, column value is auto incrementing
+     */
+    public $serial;
+    
+    /**
      * Allows specifying the column in the datastore which the property corresponds to
      * (only applicable for RDBMS or column-oriented stores)
      */
@@ -62,7 +67,8 @@ class Property
         if (array_key_exists('column',  $this->options)) $this->column  = $this->options['column'];
         if (array_key_exists('default', $this->options)) $this->default = $this->options['default'];
         
-        $this->key      = $this->popOption('key', false);
+        $this->serial   = $this->popOption('serial', false);
+        $this->key      = $this->popOption('key', $this->serial || false);
         $this->required = $this->popOption('required', $this->key);
         $this->nullable = $this->popOption('nullable', !$this->required);
         $this->index    = $this->popOption('nullable', false);

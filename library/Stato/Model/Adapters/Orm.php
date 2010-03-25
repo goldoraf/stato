@@ -9,6 +9,8 @@ class Orm
 {
     private $connection;
     
+    private $tables = array();
+    
     public function __construct($config)
     {
         $this->connection = new Connection($config);
@@ -16,21 +18,28 @@ class Orm
     
     public function create($object)
     {
+        $meta = $object->getMetaclass();
+        $serial = $meta->getSerial();
         $values = $object->getChangedValues();
         $bindValues = array();
         
-        foreach ($object->getMetadata()->getProperties() as $property => $options) {
-            if (!array_key_exists($property, $values)) continue;
+        foreach ($meta->getProperties() as $property) {
+            if (!array_key_exists($property->name, $values)) continue;
             
-            $bindValues[$property] = $values[$property];
+            // serial property has been set manually, don't change it
+            if ($property->name == $serial) {
+                $serial = false;
+            }
+            
+            $bindValues[$property->name] = $values[$property->name];
         }
         
-        $namingConvention = $this->getStorageNamingConvention();
-        $table = $this->connection->reflectTable($namingConvention(get_class($object)));
+        $insert = new Insert($this->getCorrespondingTable(get_class($object)), $bindValues);
+        $result = $this->connection->execute($insert);
         
-        $insert = new Insert($table, $bindValues);
-        $res = $this->connection->execute($insert);
-        $id = $res->lastInsertId();
+        if ($result->affectedRows() === 1 && $serial) {
+            $object->{$serial} = $result->lastInsertId();
+        }
     }
     
     public function getStorageNamingConvention()
@@ -38,5 +47,14 @@ class Orm
         return function($className) {
             return strtolower($className).'s';
         };
+    }
+    
+    public function getCorrespondingTable($class)
+    {
+        if (!array_key_exists($class, $this->tables)) {
+            $namingConvention = $this->getStorageNamingConvention();
+            $this->tables[$class] = $this->connection->reflectTable($namingConvention($class));
+        }
+        return $this->tables[$class];
     }
 }

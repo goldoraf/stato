@@ -9,7 +9,7 @@ require_once __DIR__ . '/models/Contact.php';
 
 use Contact;
 
-class MetadataTest extends TestCase
+class MetaclassTest extends TestCase
 {
     public function testDefineDynamicMethods()
     {
@@ -36,7 +36,7 @@ class MetadataTest extends TestCase
     public function testUndefinedProperty()
     {
         $this->setExpectedException('\Stato\Model\PropertyMissingException');
-        $m = new Metadata();
+        $m = new Metaclass();
         $m->addProperty('foo');
         $m->defineDynamicMethods('getProperty', 'get', '', array('bar'));
     }

@@ -6,9 +6,13 @@ use \Exception;
 class MethodMissingException extends Exception {}
 class PropertyMissingException extends Exception {}
 
-class Metadata
+class Metaclass
 {
+    const SERIAL = 'serial';
+    
     const STRING = 'string';
+    
+    const TEXT = 'text';
     
     const DATETIME = 'datetime';
     
@@ -20,14 +24,22 @@ class Metadata
     
     private $methods = array();
     
+    private $serial = false;
+    
     public function addProperty($name, $type = self::STRING, array $options = array())
     {
         $this->properties[$name] = new Property($name, $type, $options);
+        if ($type == self::SERIAL) $this->serial = $name;
     }
     
     public function getProperties()
     {
         return $this->properties;
+    }
+    
+    public function getSerial()
+    {
+        return $this->serial;
     }
     
     public function defineDynamicMethods($methodTarget, $prefix, $suffix = '', array $properties = null)

@@ -2,6 +2,8 @@
 
 namespace Stato\Orm;
 
+use \PDO, \PDOStatement, \IteratorAggregate, \IteratorIterator;
+
 require_once 'Schema.php';
 
 class UnboundConnectionError extends Exception
@@ -78,9 +80,9 @@ class Connection
         $this->driver = ucfirst($this->config['driver']);
         $dialectClass = __NAMESPACE__ . "\Dialect\\{$this->driver}";
         $this->dialect = new $dialectClass();
-        $this->connection = new \PDO($this->dialect->getDsn($this->config), 
-                                     $this->config['user'], $this->config['password'],
-                                     $this->dialect->getDriverOptions());
+        $this->connection = new PDO($this->dialect->getDsn($this->config), 
+                                    $this->config['user'], $this->config['password'],
+                                    $this->dialect->getDriverOptions());
     }
     
     /**
@@ -186,12 +188,12 @@ class Connection
     }
 }
 
-class ResultProxy implements \IteratorAggregate
+class ResultProxy implements IteratorAggregate
 {
     private $connection;
     private $stmt;
     
-    public function __construct(\PDO $connection, \PDOStatement $stmt)
+    public function __construct(PDO $connection, PDOStatement $stmt)
     {
         $this->connection = $connection;
         $this->stmt = $stmt;
@@ -200,20 +202,20 @@ class ResultProxy implements \IteratorAggregate
     
     public function getIterator()
     {
-        return new \IteratorIterator($this->stmt);
+        return new IteratorIterator($this->stmt);
     }
     
     public function setFetchMode($mode, $arg = null)
     {
         switch ($mode) {
             case Connection::FETCH_ASSOC:
-                $this->stmt->setFetchMode(\PDO::FETCH_ASSOC);
+                $this->stmt->setFetchMode(PDO::FETCH_ASSOC);
                 break;
             case Connection::FETCH_OBJECT:
-                $this->stmt->setFetchMode(\PDO::FETCH_CLASS, $arg);
+                $this->stmt->setFetchMode(PDO::FETCH_CLASS, $arg);
                 break;
             case Connection::FETCH_ENTITY:
-                $this->stmt->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $arg);
+                $this->stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $arg);
                 break;
         }
     }
@@ -231,6 +233,11 @@ class ResultProxy implements \IteratorAggregate
     public function rowCount()
     {
         return $this->stmt->rowCount();
+    }
+    
+    public function affectedRows()
+    {
+        return $this->rowCount();
     }
     
     public function fetch()

@@ -2,13 +2,14 @@
 
 use Stato\Model;
 
-class EventMetadata extends Model\Metadata
+class EventMetaclass extends Model\Metaclass
 {
     public function __construct()
     {
-        $this->addProperty('title');
-        $this->addProperty('description');
-        $this->addProperty('startAt', self::DATETIME);
+        $this->addProperty('id',          self::SERIAL);
+        $this->addProperty('title',       self::STRING);
+        $this->addProperty('description', self::TEXT);
+        $this->addProperty('startAt',     self::DATETIME);
     }
 }
 
@@ -20,6 +21,6 @@ class Event extends Model\Base
     }
 }
 
-Event::setMetadata(new EventMetadata);
+Event::setMetaclass(new EventMetaclass);
 
 class EventWithoutMeta extends Model\Base {}

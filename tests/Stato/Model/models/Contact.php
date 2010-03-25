@@ -2,7 +2,7 @@
 
 use Stato\Model;
 
-class ContactMetadata extends Model\Metadata
+class ContactMetaclass extends Model\Metaclass
 {
     public function __construct()
     {
@@ -21,4 +21,4 @@ class Contact extends Model\Base
     }
 }
 
-Contact::setMetadata(new ContactMetadata);
+Contact::setMetaclass(new ContactMetaclass);
