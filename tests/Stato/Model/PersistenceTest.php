@@ -30,4 +30,11 @@ class PersistenceTest extends TestCase
         $this->assertTrue($event->save());
         $this->assertEquals(1, $event->id);
     }
+    
+    public function testGet()
+    {
+        Event::create(array('title' => 'Dinner with John'));
+        $event = Event::get(1);
+        $this->assertEquals('Dinner with John', $event->title);
+    }
 }

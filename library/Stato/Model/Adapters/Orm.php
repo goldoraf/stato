@@ -2,8 +2,10 @@
 
 namespace Stato\Model\Adapters;
 
+use Stato\Model\Query;
 use Stato\Orm\Connection;
 use Stato\Orm\Insert;
+use Stato\Orm\Select;
 
 class Orm
 {
@@ -20,18 +22,13 @@ class Orm
     {
         $meta = $object->getMetaclass();
         $serial = $meta->getSerial();
-        $values = $object->getChangedValues();
+        $changed = $object->getChangedProperties();
         $bindValues = array();
-        
-        foreach ($meta->getProperties() as $property) {
-            if (!array_key_exists($property->name, $values)) continue;
-            
-            // serial property has been set manually, don't change it
-            if ($property->name == $serial) {
+        foreach ($changed as $property) {
+            if ($property == $serial) {
                 $serial = false;
             }
-            
-            $bindValues[$property->name] = $values[$property->name];
+            $bindValues[$property] = $object->__get($property);
         }
         
         $insert = new Insert($this->getCorrespondingTable(get_class($object)), $bindValues);
@@ -40,6 +37,24 @@ class Orm
         if ($result->affectedRows() === 1 && $serial) {
             $object->{$serial} = $result->lastInsertId();
         }
+    }
+    
+    public function read(Query $query)
+    {
+        $meta   = $query->getMetaclass();
+        $table  = $this->getCorrespondingTable($meta->getModelName());
+        $select = new Select(array($table));
+        
+        $conditions = array();
+        foreach ($query->getConditions() as $condition) {
+            $columnName = isset($condition->subject->column) 
+                        ? $condition->subject->column : $condition->subject->name;
+            $conditions[] = $table->{$columnName}->op($condition->operator, $condition->value);
+        }
+        call_user_func_array(array($select, 'where'), $conditions);
+        
+        $result = $this->connection->execute($select);
+        return $result->fetchAll();
     }
     
     public function getStorageNamingConvention()
@@ -56,5 +71,10 @@ class Orm
             $this->tables[$class] = $this->connection->reflectTable($namingConvention($class));
         }
         return $this->tables[$class];
+    }
+    
+    private function getTable($tableName)
+    {
+        
     }
 }

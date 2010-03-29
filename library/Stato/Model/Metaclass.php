@@ -20,16 +20,44 @@ class Metaclass
     
     const FLOAT = 'float';
     
+    private $model;
+    
     private $properties = array();
     
     private $methods = array();
     
     private $serial = false;
     
+    private $key = array();
+    
+    private $columnMap;
+    
+    public function __get($propertyName)
+    {
+        if (!array_key_exists($propertyName, $this->properties)) {
+            throw new PropertyMissingException("Undefined property '$propertyName'");
+        }
+        return $this->properties[$propertyName];
+    }
+    
     public function addProperty($name, $type = self::STRING, array $options = array())
     {
-        $this->properties[$name] = new Property($name, $type, $options);
-        if ($type == self::SERIAL) $this->serial = $name;
+        $property = new Property($name, $type, $options);
+        if ($property->type == self::SERIAL) $this->serial = $name;
+        if ($property->key) $this->key[] = $property;
+        
+        $this->properties[$name] = $property;
+        $this->columnMap[isset($property->column) ? $property->column : $property->name] = $property->name;
+    }
+    
+    public function setModelName($name)
+    {
+        $this->model = $name;
+    }
+    
+    public function getModelName()
+    {
+        return $this->model;
     }
     
     public function getProperties()
@@ -40,6 +68,31 @@ class Metaclass
     public function getSerial()
     {
         return $this->serial;
+    }
+    
+    public function getKey()
+    {
+        return $this->key;
+    }
+    
+    public function load($records)
+    {
+        $models = array();
+        foreach ($records as $record) {
+            $model = $this->instantiate();
+            foreach ($record as $column => $value) {
+                $model->__set($this->columnMap[$column], $value); // TODO : typecasting
+            }
+            $model->setAsSaved();
+            $models[] = $model;
+        }
+        return $models;
+    }
+    
+    public function instantiate()
+    {
+        $class = $this->model;
+        return new $class;
     }
     
     public function defineDynamicMethods($methodTarget, $prefix, $suffix = '', array $properties = null)

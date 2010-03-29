@@ -2,6 +2,8 @@
 
 namespace Stato\Model;
 
+use Stato\Model\Query\Condition;
+use Stato\Model\Query\Operators;
 use \Exception;
 
 class Property
@@ -67,12 +69,56 @@ class Property
         if (array_key_exists('column',  $this->options)) $this->column  = $this->options['column'];
         if (array_key_exists('default', $this->options)) $this->default = $this->options['default'];
         
-        $this->serial   = $this->popOption('serial', false);
-        $this->key      = $this->popOption('key', $this->serial || false);
+        $this->key      = $this->popOption('key', $this->type == Metaclass::SERIAL);
         $this->required = $this->popOption('required', $this->key);
         $this->nullable = $this->popOption('nullable', !$this->required);
         $this->index    = $this->popOption('nullable', false);
         $this->lazy     = $this->popOption('nullable', false);
+    }
+    
+    public function eq($value)
+    {
+        return $this->compare(Operators::EQ, $value);
+    }
+    
+    public function ne($value)
+    {
+        return $this->compare(Operators::NE, $value);
+    }
+    
+    public function lt($value)
+    {
+        return $this->compare(Operators::LT, $value);
+    }
+    
+    public function le($value)
+    {
+        return $this->compare(Operators::LE, $value);
+    }
+    
+    public function gt($value)
+    {
+        return $this->compare(Operators::GT, $value);
+    }
+    
+    public function ge($value)
+    {
+        return $this->compare(Operators::GE, $value);
+    }
+    
+    public function like($value)
+    {
+        return $this->compare(Operators::LIKE, $value);
+    }
+    
+    public function in($value)
+    {
+        return $this->compare(Operators::IN, $value);
+    }
+    
+    private function compare($operator, $value)
+    {
+        return new Condition($this, $value, $operator);
     }
     
     private function popOption($optionName, $optionDefault)

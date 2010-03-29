@@ -64,4 +64,9 @@ class Repository
     {
         return $this->getAdapter()->create($object);
     }
+    
+    public function read(Query $query)
+    {
+        return $query->getMetaclass()->load($this->getAdapter()->read($query));
+    }
 }

@@ -13,16 +13,61 @@ class Base implements Changeable
     
     protected static $repositories = array();
     
+    public static function create(array $values)
+    {
+        $class = get_called_class();
+        $model = new $class($values);
+        $model->save();
+        return $model;
+    }
+    
+    public static function get()
+    {
+        $key = func_get_args();
+        $repository = static::getRepository();
+        return static::first(1, static::getKeyConditions($key));
+    }
+    
+    public static function first($limit = 1, $conditions = array())
+    {
+        $query = static::getQuery()->update($conditions)->limit($limit);
+        $records = static::getRepository()->read($query);
+        return $records[0];
+    }
+    
+    protected static function getKeyConditions($key)
+    {
+        $keyProperties = static::getMeta()->getKey();
+        $conditions = array();
+        foreach ($keyProperties as $k => $p) $conditions[] = $p->eq($key[$k]);
+        return $conditions;
+    }
+    
+    protected static function getQuery()
+    {
+        return new Query(static::getMeta());
+    }
+    
     public static function setMetaclass(Metaclass $meta)
     {
         $meta->defineDynamicMethods('getProperty', 'get');
         $meta->defineDynamicMethods('setProperty', 'set');
+        $meta->setModelName(get_called_class());
         self::$metaclass[get_called_class()] = $meta;
+    }
+    
+    public static function getMeta()
+    {
+        $class = get_called_class();
+        if (!isset(self::$metaclass[$class])) {
+            throw new Exception("No metaclass assigned to class $class");
+        }
+        return self::$metaclass[$class];
     }
     
     public static function getRepository()
     {
-        return Repository::get(self::getRepositoryName());
+        return Repository::get(static::getRepositoryName());
     }
     
     public static function getRepositoryName()
@@ -118,9 +163,9 @@ class Base implements Changeable
             return $this->isSaved();
         }
         if ($this->isNew()) {
-            return $this->create();
+            return $this->_create();
         } else {
-            return $this->update();
+            return $this->_update();
         }
     }
     
@@ -134,7 +179,12 @@ class Base implements Changeable
         return $this->saved == true;
     }
     
-    protected function create()
+    public function setAsSaved()
+    {
+        $this->saved = true;
+    }
+    
+    protected function _create()
     {
         /*properties.each do |property|
         unless property.serial? || property.loaded?(self)
@@ -147,7 +197,7 @@ class Base implements Changeable
       return true;
     }
     
-    protected function update()
+    protected function _update()
     {
         
     }

@@ -6,11 +6,25 @@ use Stato\TestCase;
 
 require_once __DIR__ . '/../TestsHelper.php';
 require_once __DIR__ . '/models/Contact.php';
+require_once __DIR__ . '/models/Event.php';
 
 use Contact;
+use Event, EventMetaclass;
 
 class MetaclassTest extends TestCase
 {
+    public function testGetSerial()
+    {
+        $meta = new EventMetaclass();
+        $this->assertEquals('id', $meta->getSerial());
+    }
+    
+    public function testGetKey()
+    {
+        $meta = new EventMetaclass();
+        $this->assertEquals(array(new Property('id', Metaclass::SERIAL)), $meta->getKey());
+    }
+    
     public function testDefineDynamicMethods()
     {
         $c = new Contact();
