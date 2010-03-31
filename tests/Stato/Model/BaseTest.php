@@ -2,13 +2,9 @@
 
 namespace Stato\Model;
 
-use Stato\TestCase;
-
-require_once __DIR__ . '/../TestsHelper.php';
-require_once __DIR__ . '/models/Event.php';
+require_once __DIR__ . '/TestsHelper.php';
 
 use Event;
-use EventWithoutMeta;
 use DateTime;
 
 class BaseTest extends TestCase

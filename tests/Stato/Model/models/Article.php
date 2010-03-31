@@ -8,6 +8,11 @@ class Article
     public $published;
     public $created_on;
     public $price;
+    
+    public function __construct(array $values = array())
+    {
+        foreach ($values as $k => $v) $this->{$k} = $v;
+    }
 }
 
 class ArticleWithPrivateProperties
@@ -19,20 +24,19 @@ class ArticleWithPrivateProperties
     private $created_on;
     private $price;
     
-    public function toArray()
+    public function __construct(array $values = array())
     {
-        return array('id' => $this->id, 'title' => $this->title, 'body' => $this->body,
-            'published' => $this->published, 'created_on' => $this->created_on, 'price' => $this->price);
+        foreach ($values as $k => $v) $this->{$k} = $v;
     }
-}
-
-class ArticleWithoutProperties
-{
-    
 }
 
 class ArticleWithWeirdProperties
 {
     public $i;
     public $t;
+    
+    public function __construct($title = null)
+    {
+        $this->t = $title;
+    }
 }

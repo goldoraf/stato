@@ -2,26 +2,21 @@
 
 namespace Stato\Model;
 
-use Stato\TestCase;
+require_once __DIR__ . '/TestsHelper.php';
 
-require_once __DIR__ . '/../TestsHelper.php';
-require_once __DIR__ . '/models/Contact.php';
-require_once __DIR__ . '/models/Event.php';
-
-use Contact;
-use Event, EventMetaclass;
+use Contact, FooMetaclass;
 
 class MetaclassTest extends TestCase
 {
     public function testGetSerial()
     {
-        $meta = new EventMetaclass();
+        $meta = new FooMetaclass();
         $this->assertEquals('id', $meta->getSerial());
     }
     
     public function testGetKey()
     {
-        $meta = new EventMetaclass();
+        $meta = new FooMetaclass();
         $this->assertEquals(array(new Property('id', Metaclass::SERIAL)), $meta->getKey());
     }
     

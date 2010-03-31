@@ -9,9 +9,12 @@ class MethodMissingTargetException extends Exception {}
 
 class Base implements Changeable
 {
-    protected static $metaclass;
-    
     protected static $repositories = array();
+    
+    public static function __callStatic($methodName, $args)
+    {
+        return call_user_func_array(array(static::getDataset(), $methodName), $args);
+    }
     
     public static function create(array $values)
     {
@@ -21,61 +24,26 @@ class Base implements Changeable
         return $model;
     }
     
-    public static function get()
+    protected static function getDataset()
     {
-        $key = func_get_args();
-        $repository = static::getRepository();
-        return static::first(1, static::getKeyConditions($key));
+        return new Dataset(static::getMetaclass(), static::getRepository());
     }
     
-    public static function first($limit = 1, $conditions = array())
+    public static function getRepository($name = null)
     {
-        $query = static::getQuery()->update($conditions)->limit($limit);
-        $records = static::getRepository()->read($query);
-        return $records[0];
-    }
-    
-    protected static function getKeyConditions($key)
-    {
-        $keyProperties = static::getMeta()->getKey();
-        $conditions = array();
-        foreach ($keyProperties as $k => $p) $conditions[] = $p->eq($key[$k]);
-        return $conditions;
-    }
-    
-    protected static function getQuery()
-    {
-        return new Query(static::getMeta());
-    }
-    
-    public static function setMetaclass(Metaclass $meta)
-    {
-        $meta->defineDynamicMethods('getProperty', 'get');
-        $meta->defineDynamicMethods('setProperty', 'set');
-        $meta->setModelName(get_called_class());
-        self::$metaclass[get_called_class()] = $meta;
-    }
-    
-    public static function getMeta()
-    {
-        $class = get_called_class();
-        if (!isset(self::$metaclass[$class])) {
-            throw new Exception("No metaclass assigned to class $class");
+        if (is_null($name)) {
+            $name = static::getRepositoryName();
         }
-        return self::$metaclass[$class];
-    }
-    
-    public static function getRepository()
-    {
-        return Repository::get(static::getRepositoryName());
+        return Repository::get($name);
     }
     
     public static function getRepositoryName()
     {
-        if (array_key_exists(get_called_class(), self::$repositories)) {
-            return self::$repositories[get_called_class()];
+        $className = get_called_class();
+        if (array_key_exists($className, self::$repositories)) {
+            return self::$repositories[$className];
         }
-        return self::getDefaultRepositoryName();
+        return static::getDefaultRepositoryName();
     }
     
     public static function getDefaultRepositoryName()
@@ -88,6 +56,21 @@ class Base implements Changeable
         self::$repositories[get_called_class()] = $name;
     }
     
+    public static function setMetaclass(Metaclass $metaclass)
+    {
+        $metaclass->defineDynamicMethods('getProperty', 'get');
+        $metaclass->defineDynamicMethods('setProperty', 'set');
+        $metaclass->setModelClass(get_called_class());
+        static::getRepository()->addMetaclass($metaclass);
+    }
+    
+    public static function getMetaclass()
+    {
+        return static::getRepository()->getMetaclass(get_called_class());
+    }
+    
+    protected $metaclass;
+    
     protected $values = array();
     
     protected $changedValues = array();
@@ -96,8 +79,9 @@ class Base implements Changeable
     
     public function __construct(array $values = null)
     {
+        $this->metaclass = static::getMetaclass();
         if (!is_null($values)) {
-            $this->getMetaclass()->checkPropertiesExistence(array_keys($values));
+            $this->metaclass->checkPropertiesExistence(array_keys($values));
             foreach ($values as $k => $v) $this->__set($k, $v);
         }
     }
@@ -123,7 +107,7 @@ class Base implements Changeable
     public function __call($method, $args)
     {
         list($propertyName, $methodTarget) 
-            = $this->getMetaclass()->getMethodMissingTarget($method, get_called_class());
+            = $this->metaclass->getMethodMissingTarget($method, get_called_class());
         if (!method_exists($this, $methodTarget)) {
             throw new MethodMissingTargetException("Call to undefined method target '$methodTarget'");
         }
@@ -131,18 +115,9 @@ class Base implements Changeable
         return call_user_func_array(array($this, $methodTarget), $args);
     }
     
-    public function getMetaclass()
-    {
-        $class = get_class($this);
-        if (!isset(self::$metaclass[$class])) {
-            throw new Exception("No metaclass assigned to class $class");
-        }
-        return self::$metaclass[$class];
-    }
-    
     public function getProperty($name)
     {
-        if (!$this->getMetaclass()->hasProperty($name)) {
+        if (!$this->metaclass->hasProperty($name)) {
             throw new PropertyMissingException("Missing $name property");
         }
         return array_key_exists($name, $this->values) ? $this->values[$name] : null;
@@ -150,7 +125,7 @@ class Base implements Changeable
     
     public function setProperty($name, $value)
     {
-        if (!$this->getMetaclass()->hasProperty($name)) {
+        if (!$this->metaclass->hasProperty($name)) {
             throw new PropertyMissingException("Missing $name property");
         }
         $this->trackChange($name, $value);
@@ -186,15 +161,11 @@ class Base implements Changeable
     
     protected function _create()
     {
-        /*properties.each do |property|
-        unless property.serial? || property.loaded?(self)
-          property.set(self, property.default_for(self))
-        end
-      end*/
-      static::getRepository()->create($this);
-      $this->saved = true;
-      $this->changedValues = array();
-      return true;
+        /* on set les props à leur valeur par défaut sauf pour le serial et les relations */
+        static::getRepository()->create($this);
+        $this->saved = true;
+        $this->changedValues = array();
+        return true;
     }
     
     protected function _update()

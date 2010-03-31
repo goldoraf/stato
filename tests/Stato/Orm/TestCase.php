@@ -2,7 +2,6 @@
 
 namespace Stato\Orm;
 
-use Exception;
 use Stato\TestEnv;
 use PHPUnit_Extensions_Database_TestCase;
 use PHPUnit_Extensions_Database_DataSet_CsvDataSet;
@@ -20,11 +19,8 @@ class TestCase extends PHPUnit_Extensions_Database_TestCase
     
     public function setup()
     {
+        TestEnv::createTestDatabase();
         $this->connection = TestEnv::getDbConnection();
-        $this->db = new Database($this->connection);
-        foreach (TestEnv::getDbSchema() as $table) {
-            $this->db->addTable($table);
-        }
         parent::setup();
     }
     

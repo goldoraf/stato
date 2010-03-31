@@ -8,12 +8,17 @@ require_once 'Stato/Orm/Expression.php';
 
 class StatementTest extends TestCase
 {
-    protected $fixtures = array('users');
+    protected $fixtures = array('users_light');
     
     public function setup()
     {
         parent::setup();
-        $this->users = $this->db->getTable('users');
+        $this->users = new Table('users_light', array(
+            new Column('id', Column::INTEGER, array('primary_key' => true, 'auto_increment' => true)),
+            new Column('fullname', Column::STRING),
+            new Column('login', Column::STRING),
+            new Column('password', Column::STRING)
+        ));
     }
     
     public function testInsert()

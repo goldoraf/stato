@@ -3,8 +3,9 @@
 namespace Stato\Model;
 
 use Stato\Model\Query\Condition;
+use Stato\Model\Query\Sort;
 use Stato\Model\Query\Operators;
-use \Exception;
+use \Exception, \DateTime, \ReflectionObject;
 
 class Property
 {
@@ -60,20 +61,76 @@ class Property
      */
     public $index;
     
+    public $unique;
+    
+    private $reflector;
+    
     public function __construct($name, $type, $options = array())
     {
+        $this->validateOptions($options);
+        
         $this->name = $name;
         $this->type = $type;
         $this->options = $options;
         
-        if (array_key_exists('column',  $this->options)) $this->column  = $this->options['column'];
         if (array_key_exists('default', $this->options)) $this->default = $this->options['default'];
         
         $this->key      = $this->popOption('key', $this->type == Metaclass::SERIAL);
         $this->required = $this->popOption('required', $this->key);
         $this->nullable = $this->popOption('nullable', !$this->required);
-        $this->index    = $this->popOption('nullable', false);
-        $this->lazy     = $this->popOption('nullable', false);
+        $this->length   = $this->popOption('length', null);
+        $this->index    = $this->popOption('index', false);
+        $this->unique   = $this->popOption('unique', false);
+        $this->lazy     = $this->popOption('lazy', false);
+        $this->column   = $this->popOption('column', $this->name);
+    }
+    
+    public function get($object)
+    {
+        if ($object instanceof Base) {
+            // TODO : use a getter ?
+            return $object->__get($this->name);
+        } else {
+            $ref = $this->getReflector($object);
+            $ref->setAccessible(true);
+            return $ref->getValue($object);
+        }
+    }
+    
+    public function set($object, $value)
+    {
+        if ($object instanceof Base) {
+            // TODO : use a setter ?
+            $object->__set($this->name, $this->typecast($value));
+        } else {
+            $ref = $this->getReflector($object);
+            $ref->setAccessible(true);
+            $ref->setValue($object, $this->typecast($value));
+        }
+    }
+    
+    public function typecast($value)
+    {
+        switch ($this->type) {
+            case Metaclass::SERIAL:
+                return (int) $value;
+            case Metaclass::INTEGER:
+                return (int) $value;
+            case Metaclass::BOOLEAN:
+                return ($value == 'true' || $value = 't' || $value == '1') ? true : false;
+            case Metaclass::DATE:
+                return new DateTime($value);
+            case Metaclass::DATETIME:
+                return new DateTime($value);
+            case Metaclass::TIMESTAMP:
+                $date = new DateTime();
+                $date->setTimestamp($value);
+                return $date;
+            case Metaclass::FLOAT:
+                return (float) $value;
+            default:
+                return $value;
+        }
     }
     
     public function eq($value)
@@ -116,9 +173,34 @@ class Property
         return $this->compare(Operators::IN, $value);
     }
     
+    public function desc()
+    {
+        return new Sort($this, false);
+    }
+    
+    public function asc()
+    {
+        return new Sort($this, true);
+    }
+    
     private function compare($operator, $value)
     {
         return new Condition($this, $value, $operator);
+    }
+    
+    private function validateOptions(array $options)
+    {
+        // TODO
+        // for example, verify that the type is STRING if there is a length option
+    }
+    
+    private function getReflector($object)
+    {
+        if (!isset($this->reflector)) {
+            $ref = new ReflectionObject($object);
+            $this->reflector = $ref->getProperty($this->name);
+        }
+        return $this->reflector;
     }
     
     private function popOption($optionName, $optionDefault)

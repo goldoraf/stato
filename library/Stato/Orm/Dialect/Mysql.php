@@ -4,6 +4,8 @@ namespace Stato\Orm\Dialect;
 
 use Stato\Orm\Table;
 use Stato\Orm\Column;
+use Stato\Orm\Connection;
+use PDO;
 
 class Mysql implements IDialect
 {
@@ -52,7 +54,8 @@ class Mysql implements IDialect
         Column::DATE      => array('type' => 'date'),
         Column::TIMESTAMP => array('type' => 'datetime'),
         Column::INTEGER   => array('type' => 'int', 'length' => 11),
-        Column::BOOLEAN   => array('type' => 'tinyint', 'length' => 1)
+        //Column::BOOLEAN   => array('type' => 'tinyint', 'length' => 1)
+        Column::BOOLEAN   => array('type' => 'boolean')
     );
     
     private $name = 'mysql';
@@ -79,9 +82,11 @@ class Mysql implements IDialect
         return array(/*PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8;'*/);
     }
     
-    public function getTableNames(\PDO $connection)
+    public function getTableNames(Connection $connection)
     {
-        return $connection->query('SHOW TABLES')->fetchAll(\PDO::FETCH_COLUMN);
+        $result = $connection->execute('SHOW TABLES');
+        $result->setFetchMode(PDO::FETCH_COLUMN, 0);
+        return $result->fetchAll();
     }
     
     public function createDatabase($dbName)
@@ -94,15 +99,19 @@ class Mysql implements IDialect
         return "DROP DATABASE IF EXISTS $dbName";
     }
     
-    public function reflectTable(\PDO $connection, $tableName)
+    public function reflectTable(Connection $connection, $tableName)
     {
         $columns = array();
-        $rs = $connection->query("SHOW COLUMNS FROM {$tableName}");
+        $rs = $connection->execute("SHOW COLUMNS FROM {$tableName}");
         foreach ($rs as $row) {
             $options = array();
-            preg_match('/^(?P<type>\w+)(\((?P<length>\d+)\))?$/', $row['Type'], $options);
             $name = $row['Field'];
-            $type = $this->reflectColumnType($options['type']);
+            if ($row['Type'] == 'tinyint(1)') {
+                $type = Column::BOOLEAN; // TODO : remove this hack !!!
+            } else {
+                preg_match('/^(?P<type>\w+)(\((?P<length>\d+)\))?$/', $row['Type'], $options);
+                $type = $this->reflectColumnType($options['type']);
+            }
             $options['nullable'] = ($row['Null'] == 'YES') ? true : false;
             $options['primary_key'] = ($row['Key'] == 'PRI') ? true : false;
             $options['auto_increment'] = (preg_match('/auto_increment/i', $row['Extra'])) ? true : false;
@@ -120,6 +129,11 @@ class Mysql implements IDialect
         if ($pk = $table->getPrimaryKey()) $columns[] = "PRIMARY KEY (`{$pk}`)";
         $columns = implode(',', $columns);
         return "CREATE TABLE `{$name}` ({$columns})";
+    }
+    
+    public function truncateTable($tableName)
+    {
+        return "TRUNCATE TABLE `{$tableName}`";
     }
     
     public function dropTable($tableName)
@@ -152,36 +166,10 @@ class Mysql implements IDialect
         return "'{$column->default}'";
     }
     
-    public function getTypecastingClass($columnType)
-    {
-        $possibleTypeClasses = array($this->name.$columnType, $columnType, 'GenericType');
-        foreach ($possibleTypeClasses as $possibleClass) {
-            $class = __NAMESPACE__ . '\\' . $possibleClass;
-            if (class_exists($class, false)) {
-                $type = new $class;
-                break;
-            }
-        }
-        return $type;
-    }
-    
     private function reflectColumnType($sqlColumn)
     {
         if (!isset(self::$columnTypes[$sqlColumn]))
             throw new UnknownColumnType($sqlColumn);
         return self::$columnTypes[$sqlColumn];
-    }
-}
-
-class MysqlBoolean implements IType
-{
-    public function getBindProcessor()
-    {
-        return function($value) { return $value === true ? '1' : '0'; };
-    }
-    
-    public function getResultProcessor()
-    {
-        return function($value) { return $value === '1' ? true : false; };
     }
 }

@@ -17,8 +17,8 @@ mb_internal_encoding("UTF-8");
  * Prepend the Stato library and tests directories to the include_path
  */
 $path = array(
-    dirname(__FILE__).'/..',
-    dirname(__FILE__).'/../../library',
+    __DIR__ . '/..',
+    __DIR__ . '/../../library',
     get_include_path()
 );
 set_include_path(implode(PATH_SEPARATOR, $path));

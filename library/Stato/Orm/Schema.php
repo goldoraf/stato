@@ -32,13 +32,13 @@ class Column extends ClauseColumn
     {
         $this->name = $name;
         $this->type = $type;
-        $this->primaryKey = $this->popOption($options, 'primary_key', false);
-        $this->foreignKey = $this->popOption($options, 'foreign_key', false);
-        $this->nullable = $this->popOption($options, 'nullable', !$this->primaryKey);
-        $this->default = $this->popOption($options, 'default', false);
-        $this->length = $this->popOption($options, 'length', null);
-        $this->index = $this->popOption($options, 'index', false);
-        $this->unique = $this->popOption($options, 'unique', false);
+        $this->primaryKey    = $this->popOption($options, 'primary_key', false);
+        $this->foreignKey    = $this->popOption($options, 'foreign_key', false);
+        $this->nullable      = $this->popOption($options, 'nullable', !$this->primaryKey);
+        $this->default       = $this->popOption($options, 'default', false);
+        $this->length        = $this->popOption($options, 'length', null);
+        $this->index         = $this->popOption($options, 'index', false);
+        $this->unique        = $this->popOption($options, 'unique', false);
         $this->autoIncrement = $this->popOption($options, 'auto_increment', false);
         
         if (is_string($this->foreignKey)) 

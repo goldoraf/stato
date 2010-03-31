@@ -11,6 +11,15 @@ return array(
         new Column('fullname', Column::STRING),
         new Column('login', Column::STRING),
         new Column('password', Column::STRING),
+        new Column('country', Column::STRING),
+        new Column('activated', Column::BOOLEAN),
+        new Column('registration_date', Column::DATETIME),
+    )),
+    'users_light' => new Table('users_light', array(
+        new Column('id', Column::INTEGER, array('primary_key' => true, 'auto_increment' => true)),
+        new Column('fullname', Column::STRING),
+        new Column('login', Column::STRING),
+        new Column('password', Column::STRING)
     )),
     'posts' => new Table('posts', array(
         new Column('id', Column::INTEGER, array('primary_key' => true, 'auto_increment' => true)),

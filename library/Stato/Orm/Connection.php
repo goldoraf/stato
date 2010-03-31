@@ -2,7 +2,7 @@
 
 namespace Stato\Orm;
 
-use \PDO, \PDOStatement, \IteratorAggregate, \IteratorIterator;
+use \PDO, \PDOStatement, \IteratorAggregate, \IteratorIterator, \DateTime;
 
 require_once 'Schema.php';
 
@@ -14,6 +14,15 @@ class UnboundConnectionError extends Exception
            ."Execution can not proceed without a database to execute "
            ."against.  Either execute with an explicit connection or "
            ."assign {$class} to enable implicit execution.");
+    }
+}
+
+class ConnectionException extends Exception
+{
+    public function __construct(array $info)
+    {
+        list($sqlstate, $code, $msg) = $info;
+        parent::__construct("[SQLSTATE:$sqlstate] $msg", $code);
     }
 }
 
@@ -128,9 +137,16 @@ class Connection
         
         if (empty($params)) {
             $pdoStmt = $this->connection->query($stmt);
+            if ($pdoStmt === false) {
+                throw new ConnectionException($this->connection->errorInfo());
+            }
         } else {
             $pdoStmt = $this->connection->prepare($stmt);
-            $pdoStmt->execute($params);
+            $this->bindValues($pdoStmt, $params);
+            $result = $pdoStmt->execute();
+            if ($result === false) {
+                throw new ConnectionException($pdoStmt->errorInfo());
+            }
         }
         
         return new ResultProxy($this->connection, $pdoStmt);
@@ -153,7 +169,7 @@ class Connection
     
     public function getTableNames()
     {
-        return $this->dialect->getTableNames($this->connection);
+        return $this->dialect->getTableNames($this);
     }
     
     public function hasTable($tableName)
@@ -163,28 +179,56 @@ class Connection
     
     public function reflectTable($tableName)
     {
-        return $this->dialect->reflectTable($this->connection, $tableName);
+        return $this->dialect->reflectTable($this, $tableName);
     }
     
     public function createTable(Table $table)
     {
-        return $this->connection->exec($this->dialect->createTable($table));
+        return $this->execute($this->dialect->createTable($table));
+    }
+    
+    public function truncateTable($table)
+    {
+        $tableName = (is_object($table)) ? $table->getName() : $table;
+        return $this->execute($this->dialect->truncateTable($tableName));
     }
     
     public function dropTable($table)
     {
         $tableName = (is_object($table)) ? $table->getName() : $table;
-        return $this->connection->exec($this->dialect->dropTable($tableName));
+        return $this->execute($this->dialect->dropTable($tableName));
     }
     
     public function createDatabase($dbName)
     {
-        return $this->connection->exec($this->dialect->createDatabase($dbName));
+        return $this->execute($this->dialect->createDatabase($dbName));
     }
     
     public function dropDatabase($dbName)
     {
-        return $this->connection->exec($this->dialect->dropDatabase($dbName));
+        return $this->execute($this->dialect->dropDatabase($dbName));
+    }
+    
+    private function bindValues(PDOStatement $stmt, array $params)
+    {
+        foreach ($params as $bind => $param) {
+            $type = PDO::PARAM_STR;
+            if ($param instanceof DateTime) {
+                $param = $param->format('Y-m-d H:i:s');
+            } elseif (is_bool($param)) {
+                $type = PDO::PARAM_BOOL;
+            } elseif (is_null($param)) {
+                $type = PDO::PARAM_NULL;
+            } elseif (is_int($param)) {
+                $type = PDO::PARAM_INT;
+            } else {
+                $param = (string) $param;
+            }
+            
+            if (!$stmt->bindValue($bind, $param, $type)) {
+                throw new ConnectionException($stmt->errorInfo());
+            }
+        }
     }
 }
 
@@ -217,6 +261,8 @@ class ResultProxy implements IteratorAggregate
             case Connection::FETCH_ENTITY:
                 $this->stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, $arg);
                 break;
+            default:
+                (is_null($arg)) ? $this->stmt->setFetchMode($mode) : $this->stmt->setFetchMode($mode, $arg);
         }
     }
     

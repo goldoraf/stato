@@ -2,27 +2,29 @@
 
 namespace Stato\Model;
 
-use \Exception;
+use \Exception, \ReflectionObject;
 class MethodMissingException extends Exception {}
 class PropertyMissingException extends Exception {}
 
 class Metaclass
 {
-    const SERIAL = 'serial';
+    const SERIAL    = 'serial';
+    const INTEGER   = 'integer';
+    const STRING    = 'string';
+    const BOOLEAN   = 'boolean';
+    const DATE      = 'date';
+    const DATETIME  = 'datetime';
+    const TIMESTAMP = 'timestamp';
+    const FLOAT     = 'float';
+    const TEXT      = 'text';
     
-    const STRING = 'string';
+    protected $model;
     
-    const TEXT = 'text';
+    protected $repositoryName;
     
-    const DATETIME = 'datetime';
+    protected $storageName = null;
     
-    const INTEGER = 'integer';
-    
-    const FLOAT = 'float';
-    
-    private $model;
-    
-    private $properties = array();
+    protected $properties = array();
     
     private $methods = array();
     
@@ -30,38 +32,56 @@ class Metaclass
     
     private $key = array();
     
-    private $columnMap;
+    private $columnMap = array();
     
     public function __get($propertyName)
     {
-        if (!array_key_exists($propertyName, $this->properties)) {
-            throw new PropertyMissingException("Undefined property '$propertyName'");
-        }
-        return $this->properties[$propertyName];
+        return $this->getProperty($propertyName);
+    }
+    
+    public function __set($propertyName, Property $property)
+    {
+        $this->appendProperty($property);
     }
     
     public function addProperty($name, $type = self::STRING, array $options = array())
     {
-        $property = new Property($name, $type, $options);
-        if ($property->type == self::SERIAL) $this->serial = $name;
-        if ($property->key) $this->key[] = $property;
-        
-        $this->properties[$name] = $property;
-        $this->columnMap[isset($property->column) ? $property->column : $property->name] = $property->name;
+        $this->appendProperty(new Property($name, $type, $options));
     }
     
-    public function setModelName($name)
+    public function getProperty($name)
     {
-        $this->model = $name;
+        if (!array_key_exists($name, $this->properties)) {
+            throw new PropertyMissingException("Undefined property '$propertyName'");
+        }
+        return $this->properties[$name];
     }
     
-    public function getModelName()
+    public function setModelClass($className)
+    {
+        $this->model = $className;
+    }
+    
+    public function getModelClass()
     {
         return $this->model;
     }
     
-    public function getProperties()
+    public function setStorageName($storageName)
     {
+        $this->storageName = $storageName;
+    }
+    
+    public function getStorageName()
+    {
+        return $this->storageName;
+    }
+    
+    public function getProperties(array $propertyNames = null)
+    {
+        if (!is_null($propertyNames)) {
+            return array_intersect_key($this->properties, array_flip($propertyNames));
+        }
         return $this->properties;
     }
     
@@ -77,16 +97,20 @@ class Metaclass
     
     public function load($records)
     {
-        $models = array();
+        $objects = array();
         foreach ($records as $record) {
-            $model = $this->instantiate();
+            $object = $this->instantiate();
             foreach ($record as $column => $value) {
-                $model->__set($this->columnMap[$column], $value); // TODO : typecasting
+                if (!array_key_exists($column, $this->columnMap)) continue;
+                $property = $this->getPropertyFromColumnName($column);
+                $property->set($object, $value);
             }
-            $model->setAsSaved();
-            $models[] = $model;
+            if ($object instanceof Base) {
+                $object->setAsSaved();
+            }
+            $objects[] = $object;
         }
-        return $models;
+        return $objects;
     }
     
     public function instantiate()
@@ -127,5 +151,27 @@ class Metaclass
     public function hasProperty($name)
     {
         return array_key_exists($name, $this->properties);
+    }
+    
+    private function getPropertyFromColumnName($columnName)
+    {
+        if (!array_key_exists($columnName, $this->columnMap)) {
+            throw new Exception("No property found for column '$columnName'");
+        }
+        $propertyName = $this->columnMap[$columnName];
+        return $this->getProperty($propertyName);
+    }
+    
+    private function appendProperty(Property $property)
+    {
+        if (array_key_exists($property->name, $this->properties)) {
+            throw new Exception("Already defined property '{$property->name}'");
+        }
+        
+        if ($property->type == self::SERIAL) $this->serial = $property->name;
+        if ($property->key) $this->key[] = $property;
+        
+        $this->properties[$property->name] = $property;
+        $this->columnMap[$property->column] = $property->name;
     }
 }

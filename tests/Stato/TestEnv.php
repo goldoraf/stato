@@ -24,8 +24,6 @@ class TestEnv
             'dsn'      => $GLOBALS['db_dsn']
         );
         
-        self::createTestDatabase($config);
-        
         return $config;
     }
     
@@ -51,8 +49,10 @@ class TestEnv
         return self::$tables;
     }
     
-    public static function createTestDatabase($config)
+    public static function createTestDatabase()
     {
+        $config = self::getDbConfig();
+        
         $tmpConn = new Orm\Connection($config);
         $tmpConn->dropDatabase($config['dbname']);
         $tmpConn->createDatabase($config['dbname']);
@@ -62,6 +62,14 @@ class TestEnv
         
         foreach (self::getDbSchema() as $table) {
             $conn->createTable($table);
+        }
+    }
+    
+    public static function emptyTestDatabase()
+    {
+        $conn = self::getDbConnection();
+        foreach (self::getDbSchema() as $table) {
+            $conn->truncateTable($table);
         }
     }
 }

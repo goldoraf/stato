@@ -18,4 +18,9 @@ class Condition
         $this->value    = $value;
         $this->operator = $operator;
     }
+    
+    public function negate()
+    {
+        $this->negated = true;
+    }
 }

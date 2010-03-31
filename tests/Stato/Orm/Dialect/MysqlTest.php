@@ -41,9 +41,9 @@ class MysqlTest extends PHPUnit_Framework_TestCase
             new Column('product', Column::STRING, array('length' => 50, 'default' => null))));
         $this->assertEquals('`product` varchar(50) NOT NULL', $this->dialect->getColumnSpecification(
             new Column('product', Column::STRING, array('length' => 50, 'nullable' => false))));
-        $this->assertEquals('`flag` tinyint(1)', $this->dialect->getColumnSpecification(
+        $this->assertEquals('`flag` boolean', $this->dialect->getColumnSpecification(
             new Column('flag', Column::BOOLEAN)));
-        $this->assertEquals('`flag` tinyint(1) DEFAULT 1', $this->dialect->getColumnSpecification(
+        $this->assertEquals('`flag` boolean DEFAULT 1', $this->dialect->getColumnSpecification(
             new Column('flag', Column::BOOLEAN, array('default' => true))));
         $this->assertEquals('`id` int(11) NOT NULL auto_increment', $this->dialect->getColumnSpecification(
             new Column('id', Column::INTEGER, array('nullable' => false, 'auto_increment' => true))));
