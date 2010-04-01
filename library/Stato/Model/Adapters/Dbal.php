@@ -6,14 +6,13 @@ use Stato\Model\Query;
 use Stato\Model\Property;
 use Stato\Model\Metaclass;
 use Stato\Model\Base;
-use Stato\Orm\Connection;
-use Stato\Orm\Insert;
-use Stato\Orm\Select;
+use Stato\Dbal\Connection;
+use Stato\Dbal\Insert;
+use Stato\Dbal\Select;
 
-use \Closure;
-use \ReflectionObject;
+use \Closure, \ReflectionObject;
 
-class Orm
+class Dbal
 {
     private $connection;
     

@@ -9,7 +9,7 @@ class TestEnv
     public static function getDbConnection()
     {
         $config = self::getDbConfig();
-        $conn = new Orm\Connection($config);
+        $conn = new Dbal\Connection($config);
         return $conn;
     }
     
@@ -45,7 +45,7 @@ class TestEnv
     
     public static function getDbSchema()
     {
-        if (!isset(self::$tables)) self::$tables = include_once __DIR__ . '/Orm/files/schema.php';
+        if (!isset(self::$tables)) self::$tables = include_once __DIR__ . '/Dbal/files/schema.php';
         return self::$tables;
     }
     
@@ -53,12 +53,12 @@ class TestEnv
     {
         $config = self::getDbConfig();
         
-        $tmpConn = new Orm\Connection($config);
+        $tmpConn = new Dbal\Connection($config);
         $tmpConn->dropDatabase($config['dbname']);
         $tmpConn->createDatabase($config['dbname']);
         $tmpConn->close();
         
-        $conn = new Orm\Connection($config);
+        $conn = new Dbal\Connection($config);
         
         foreach (self::getDbSchema() as $table) {
             $conn->createTable($table);

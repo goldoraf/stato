@@ -2,8 +2,8 @@
 
 namespace Stato\Model;
 
-use Exception;
-use ReflectionClass;
+use \Exception;
+use \ReflectionClass;
 
 class RepositoryNotSetupException extends Exception {}
 
@@ -39,7 +39,7 @@ class Repository
         }
         $driverName = strtolower($config['driver']);
         if (in_array($driverName, array('mysql'))) {
-            $adapterClass = __NAMESPACE__ . '\Adapters\Orm';
+            $adapterClass = __NAMESPACE__ . '\Adapters\Dbal';
         } else {
             throw new Exception("No adapter found for '$driverName' driver");
         }

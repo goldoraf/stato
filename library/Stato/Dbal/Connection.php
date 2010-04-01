@@ -1,8 +1,8 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
 
-use \PDO, \PDOStatement, \IteratorAggregate, \IteratorIterator, \DateTime;
+use \Exception, \PDO, \PDOStatement, \IteratorAggregate, \IteratorIterator, \DateTime;
 
 require_once 'Schema.php';
 
@@ -30,7 +30,7 @@ class ConnectionException extends Exception
  * Connects a PDO connection to a specific SQL dialect
  * 
  * @package Stato
- * @subpackage Orm
+ * @subpackage Dbal
  */
 class Connection
 {

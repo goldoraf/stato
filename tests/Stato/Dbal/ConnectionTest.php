@@ -1,9 +1,10 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
 
 use Stato\TestEnv;
-use PHPUnit_Framework_TestCase;
+
+use \PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../TestsHelper.php';
 
@@ -26,7 +27,7 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     {
         $this->assertThat(
             $this->connection->execute('SELECT 1'),
-            $this->isInstanceOf('Stato\Orm\ResultProxy')
+            $this->isInstanceOf('Stato\Dbal\ResultProxy')
         );
     }
     

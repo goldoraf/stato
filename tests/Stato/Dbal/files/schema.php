@@ -1,9 +1,9 @@
 <?php
 
-require_once 'Stato/Orm/Schema.php';
+require_once 'Stato/Dbal/Schema.php';
 
-use Stato\Orm\Table;
-use Stato\Orm\Column;
+use Stato\Dbal\Table;
+use Stato\Dbal\Column;
 
 return array(
     'users' => new Table('users', array(

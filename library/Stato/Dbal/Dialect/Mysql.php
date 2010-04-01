@@ -1,11 +1,12 @@
 <?php
 
-namespace Stato\Orm\Dialect;
+namespace Stato\Dbal\Dialect;
 
-use Stato\Orm\Table;
-use Stato\Orm\Column;
-use Stato\Orm\Connection;
-use PDO;
+use Stato\Dbal\Table;
+use Stato\Dbal\Column;
+use Stato\Dbal\Connection;
+
+use \PDO;
 
 class Mysql implements IDialect
 {

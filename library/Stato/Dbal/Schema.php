@@ -1,6 +1,8 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
+
+use \Exception;
 
 require_once 'Expression.php';
 

@@ -1,6 +1,8 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
+
+use \Exception;
 
 class UnknownClauseElementType extends Exception {}
 
@@ -9,8 +11,10 @@ class UnknownOperator extends Exception {}
 class Compiler
 {
     protected static $visitables = array(
-        'TableClause', 'Table', 'Alias', 'Insert', 'Update', 'Delete', 'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
-        'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 'NullElement', 'Join', 'ColumnWildcard', 'Label'
+        'TableClause', 'Table', 'Alias', 'Insert', 'Update', 'Delete', 
+        'Select', 'Expression', 'UnaryExpression', 'ExpressionList', 
+        'Grouping', 'ClauseList', 'ClauseColumn', 'Column', 'BindParam', 
+        'NullElement', 'Join', 'ColumnWildcard', 'Label'
     );
     
     protected static $operators = array(

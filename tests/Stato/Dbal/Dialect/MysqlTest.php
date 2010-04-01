@@ -1,16 +1,16 @@
 <?php
 
-namespace Stato\Orm\Dialect;
+namespace Stato\Dbal\Dialect;
 
-use Stato\Orm\TestCase;
-use Stato\Orm\Column;
-use Stato\Orm\Table;
+use Stato\Dbal\TestCase;
+use Stato\Dbal\Column;
+use Stato\Dbal\Table;
 
-use PHPUnit_Framework_TestCase;
+use \PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../TestsHelper.php';
 
-require_once 'Stato/Orm/Schema.php';
+require_once 'Stato/Dbal/Schema.php';
 
 class MysqlTest extends PHPUnit_Framework_TestCase
 {

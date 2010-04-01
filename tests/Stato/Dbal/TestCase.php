@@ -1,10 +1,11 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
 
 use Stato\TestEnv;
-use PHPUnit_Extensions_Database_TestCase;
-use PHPUnit_Extensions_Database_DataSet_CsvDataSet;
+
+use \PHPUnit_Extensions_Database_TestCase;
+use \PHPUnit_Extensions_Database_DataSet_CsvDataSet;
 
 require_once __DIR__ . '/../TestsHelper.php';
 

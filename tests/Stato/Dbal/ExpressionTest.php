@@ -1,12 +1,12 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
 
-use PHPUnit_Framework_TestCase;
+use \PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../TestsHelper.php';
 
-require_once 'Stato/Orm/Schema.php';
+require_once 'Stato/Dbal/Schema.php';
 
 class ExpressionTest extends PHPUnit_Framework_TestCase
 {
@@ -231,7 +231,7 @@ class ExpressionTest extends PHPUnit_Framework_TestCase
             'INSERT INTO users (firstname, lastname) VALUES (:firstname, :lastname)',
             $this->users->insert()->values(array('firstname' => 'John', 'lastname' => 'Doe'))->__toString()
         );
-        $this->setExpectedException('Stato\Orm\UnknownColumn');
+        $this->setExpectedException('Stato\Dbal\UnknownColumn');
         $this->users->insert()->values(array('foo' => 'bar'))->__toString();
     }
     

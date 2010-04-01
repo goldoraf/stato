@@ -1,10 +1,10 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
 
 require_once __DIR__ . '/../TestsHelper.php';
 
-require_once 'Stato/Orm/Expression.php';
+require_once 'Stato/Dbal/Expression.php';
 
 class StatementTest extends TestCase
 {

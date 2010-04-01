@@ -1,9 +1,13 @@
 <?php
 
-namespace Stato\Orm;
+namespace Stato\Dbal;
+
+use \Exception;
 
 class UnknownColumn extends Exception {}
+
 class ClauseTypeError extends Exception {}
+
 class JoinConditionError extends Exception {}
 
 class Operators
