@@ -19,7 +19,7 @@ class CommandRunnerTest extends TestCase
     
     public function testStatoVersion()
     {
-        $this->expectOutputRegex("/stato version/", ob_get_clean());
+        $this->expectOutputRegex("/stato version/");
         CommandRunner::main(array('./stato.php', '--version'));
     }
     
