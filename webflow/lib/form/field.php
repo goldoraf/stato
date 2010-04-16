@@ -45,7 +45,8 @@ class SField
     protected $default_error_messages = array();
     protected $base_default_options = array(
         'required' => false, 'label' => null, 'initial' => null, 
-        'help_text' => null, 'error_messages' => array(), 'input_attrs' => array()
+        'help_text' => null, 'error_messages' => array(), 
+        'input_attrs' => array(), 'input_options' => array()
     );
     protected $base_default_error_messages = array(
         'required' => 'This field is required.',
@@ -59,9 +60,9 @@ class SField
         $this->error_messages = array_merge($this->base_default_error_messages, 
                                            $this->default_error_messages, $this->options['error_messages']);
         
-        list($this->required, $this->label, $this->initial, $this->help_text, $this->input_attrs)
+        list($this->required, $this->label, $this->initial, $this->help_text, $this->input_attrs, $this->input_options)
             = array($this->options['required'], $this->options['label'], $this->options['initial'], 
-                    $this->options['help_text'], $this->options['input_attrs']);
+                    $this->options['help_text'], $this->options['input_attrs'], $this->options['input_options']);
         
         if (array_key_exists('input', $this->options)) {
             $ref = new ReflectionClass($this->options['input']);
@@ -94,6 +95,8 @@ class SField
         $input = $this->get_input();
         $attrs = array_merge($this->get_input_attrs(), $this->input_attrs, $html_attrs);
         if (!empty($attrs)) $input->add_attrs($attrs);
+        $options = array_merge($this->get_input_options(), $this->input_options);
+        if (!empty($options)) $input->add_options($options);
         return $input->render($name, $value);
     }
     
@@ -114,6 +117,11 @@ class SField
     }
     
     protected function get_input_attrs()
+    {
+        return array();
+    }
+    
+    protected function get_input_options()
     {
         return array();
     }
@@ -391,7 +399,9 @@ class SChoiceField extends SField
     protected $choices;
     protected $input = 'SSelect';
     protected $default_options = array(
-        'choices' => array()
+        'choices' => array(),
+        'include_blank' => false,
+        'include_prompt' => false
     );
     protected $default_error_messages = array(
         'invalid_choice'   => 'Select a valid choice.'

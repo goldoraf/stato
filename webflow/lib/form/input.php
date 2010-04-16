@@ -3,17 +3,24 @@
 abstract class SInput
 {
     protected $attrs;
+    protected $options;
     protected $type = null;
     protected $is_hidden = false;
     
-    public function __construct(array $attrs = array())
+    public function __construct(array $attrs = array(), array $options = array())
     {
         $this->attrs = $attrs;
+        $this->options = $options;
     }
     
     public function add_attrs(array $attrs)
     {
         $this->attrs = array_merge($this->attrs, $attrs);
+    }
+    
+    public function add_options(array $options)
+    {
+        $this->options = array_merge($this->options, $options);
     }
     
     public function is_hidden()
@@ -35,7 +42,7 @@ abstract class SInput
         foreach($attrs as $key => $value) {
             if ($value !== null && $value !== false) {
                 if ($value === true) $set[] = $key.'="'.$key.'"';
-                else $set[] = $key.'="'.$value.'"';
+                else $set[] = $key.'="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"';
             }
         }
         return implode(" ", $set);
@@ -70,9 +77,10 @@ class SFileInput extends SInput
 
 class STextarea extends SInput
 {
-    public function __construct(array $attrs = array())
+    public function __construct(array $attrs = array(), array $options = array())
     {
         $this->attrs = array_merge(array('cols' => 40, 'rows' => 10), $attrs);
+        $this->options = $options;
     }
     
     public function render($name, $value = null, array $attrs = array())
@@ -87,19 +95,16 @@ class SDateInput extends STextInput
 {
     protected $format = 'Y-m-d';
     
-    public function __construct(array $attrs = array())
-    {
-        if (array_key_exists('format', $attrs)) {
-            $this->format = $attrs['format'];
-            unset($attrs['format']);
-        }
-        parent::__construct($attrs);
-    }
-    
     public function render($name, $value = null, array $attrs = array())
     {
-        if ($value instanceof DateTime) $value = $value->format($this->format);
+        if ($value instanceof DateTime) $value = $value->format($this->get_format());
         return parent::render($name, $value, $attrs);
+    }
+    
+    protected function get_format()
+    {
+        if (array_key_exists('format', $this->options)) return $this->options['format'];
+        return $this->format;
     }
 }
 
@@ -122,15 +127,6 @@ class SSelect extends SInput
 {
     protected $choices = array();
     
-    public function __construct(array $attrs = array())
-    {
-        if (array_key_exists('choices', $attrs)) {
-            $this->set_choices($attrs['choices']);
-            unset($attrs['choices']);
-        }
-        parent::__construct($attrs);
-    }
-    
     public function set_choices(array $choices)
     {
         $this->choices = $choices;
@@ -146,6 +142,12 @@ class SSelect extends SInput
     protected function render_options($set, $selected = null)
     {
         $str = '';
+        
+        if (array_key_exists('include_prompt', $this->options) && !empty($this->options['include_prompt']))
+            $str.= '<option value="">'.$this->options['include_prompt'].'</option>';
+        elseif (array_key_exists('include_blank', $this->options) && $this->options['include_blank'] === true)
+            $str.= '<option value=""></option>';
+        
         $non_assoc = (key($set) === 0);
         if (!is_array($selected)) $selected = array($selected);
         foreach ($set as $value => $lib) {

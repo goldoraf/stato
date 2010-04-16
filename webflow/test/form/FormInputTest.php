@@ -16,6 +16,12 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<input type="text" name="title" />', $i->render('title'));
     }
     
+    public function test_text_input_with_quoted_value()
+    {
+        $i = new STextInput();
+        $this->assertEquals('<input type="text" name="title" value="Jack &quot;Bull&quot; O&#039;Connor" />', $i->render('title', 'Jack "Bull" O\'Connor'));
+    }
+    
     public function test_render_text_input_with_attrs()
     {
         $i = new STextInput();
@@ -64,7 +70,7 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_text_date_input_with_format()
     {
-        $i = new SDateInput(array('format' => 'd/m/Y'));
+        $i = new SDateInput(array(), array('format' => 'd/m/Y'));
         $this->assertEquals('<input type="text" name="birthday" value="27/03/2009" />', 
                             $i->render('birthday', new DateTime('2009-03-27')));
     }
@@ -106,7 +112,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_select()
     {
-        $s = new SSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SSelect();
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<select name="service">
             <option value="Marketing">Marketing</option>
@@ -119,7 +126,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_select_with_selected_option()
     {
-        $s = new SSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SSelect();
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<select name="service">
             <option value="Marketing" selected="selected">Marketing</option>
@@ -130,9 +138,40 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
         );
     }
     
+    public function test_select_with_include_blank_option()
+    {
+        $s = new SSelect(array(), array('include_blank' => true));
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
+        $this->assertDomEquals(
+            '<select name="service">
+            <option value=""></option>
+            <option value="Marketing">Marketing</option>
+            <option value="IT">IT</option>
+            <option value="Commercial">Commercial</option>
+            </select>',
+            $s->render('service')
+        );
+    }
+    
+    public function test_select_with_include_prompt_option()
+    {
+        $s = new SSelect(array(), array('include_prompt' => 'Plz make a choice'));
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
+        $this->assertDomEquals(
+            '<select name="service">
+            <option value="">Plz make a choice</option>
+            <option value="Marketing">Marketing</option>
+            <option value="IT">IT</option>
+            <option value="Commercial">Commercial</option>
+            </select>',
+            $s->render('service')
+        );
+    }
+    
     public function test_select_with_associative_array()
     {
-        $s = new SSelect(array('choices' => array(1=>'Marketing', 2=>'IT', 3=>'Commercial')));
+        $s = new SSelect();
+        $s->set_choices(array(1=>'Marketing', 2=>'IT', 3=>'Commercial'));
         $this->assertDomEquals(
             '<select name="service">
             <option value="1" selected="selected">Marketing</option>
@@ -145,10 +184,11 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_select_with_multidimensional_array()
     {
-        $s = new SSelect(array('choices' => array(
+        $s = new SSelect();
+        $s->set_choices(array(
             'languages' => array('PHP', 'Python', 'Ruby'),
             'os' => array('Linux', 'MacOS', 'Windows')
-        )));
+        ));
         $this->assertDomEquals(
             '<select name="skills">
             <optgroup label="languages">
@@ -168,7 +208,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_multiple_select()
     {
-        $s = new SMultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SMultipleSelect();
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<select multiple="multiple" name="service[]">
             <option value="Marketing" selected="selected">Marketing</option>
@@ -181,7 +222,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_multiple_select_should_add_square_brackets_to_name_attr()
     {
-        $s = new SMultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SMultipleSelect();
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<select multiple="multiple" name="service[]">
             <option value="Marketing" selected="selected">Marketing</option>
@@ -194,7 +236,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_multiple_select_with_multiple_choices()
     {
-        $s = new SMultipleSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SMultipleSelect();
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<select multiple="multiple" name="service[]">
             <option value="Marketing" selected="selected">Marketing</option>
@@ -207,7 +250,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_radio_select()
     {
-        $s = new SRadioSelect(array('choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SRadioSelect();
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<ul>
             <li><label><input type="radio" name="service" value="Marketing" />Marketing</label></li>
@@ -220,7 +264,8 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_radio_select_with_id_option()
     {
-        $s = new SRadioSelect(array('id' => 'foo_service', 'choices' => array('Marketing', 'IT', 'Commercial')));
+        $s = new SRadioSelect(array('id' => 'foo_service'));
+        $s->set_choices(array('Marketing', 'IT', 'Commercial'));
         $this->assertDomEquals(
             '<ul>
             <li><label for="foo_service_1"><input type="radio" name="service" id="foo_service_1" value="Marketing" />Marketing</label></li>
@@ -233,10 +278,11 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_radio_select_with_associative_array()
     {
-        $s = new SRadioSelect(array('choices' => array(
+        $s = new SRadioSelect();
+        $s->set_choices(array(
             'languages' => array('PHP', 'Python', 'Ruby'),
             'os' => array('Linux', 'MacOS', 'Windows')
-        )));
+        ));
         $this->assertDomEquals(
             '<ul>
             <li>languages</li>
@@ -258,10 +304,11 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     
     public function test_radio_select_with_associative_array_and_id_option()
     {
-        $s = new SRadioSelect(array('id' => 'foo_skill', 'choices' => array(
+        $s = new SRadioSelect(array('id' => 'foo_skill'));
+        $s->set_choices(array(
             'languages' => array('PHP', 'Python', 'Ruby'),
             'os' => array('Linux', 'MacOS', 'Windows')
-        )));
+        ));
         $this->assertDomEquals(
             '<ul>
             <li>languages</li>

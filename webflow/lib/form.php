@@ -40,6 +40,9 @@ class SForm implements Iterator
     public $errors;
     public $cleaned_data = array();
     
+    public $required_css_class = 'required';
+    public $error_css_class = 'error';
+    
     protected $data;
     protected $files;
     protected $multipart = false;
@@ -139,10 +142,23 @@ class SForm implements Iterator
         return $this->multipart;
     }
     
-    public function render($tag = 'p')
+    public function render()
     {
-        $open_tag = '<'.$tag.'>';
-        $close_tag = '</'.$tag.'>';
+        return $this->render_as_p();
+    }
+    
+    public function render_as_p()
+    {
+        return $this->get_html_output('render_p_row');
+    }
+    
+    public function render_as_table()
+    {
+        return $this->get_html_output('render_table_row');
+    }
+    
+    private function get_html_output($row_render_method)
+    {
         $html = array();
         $hidden_fields = array();
         foreach ($this->list_fields() as $name) {
@@ -151,12 +167,27 @@ class SForm implements Iterator
             if ($bf->is_hidden) {
                 $hidden_fields[] = $bf->render();
             } else {
-                $err = (!$bf->error) ? '' : '<span class="error">'.$bf->error.'</span>';
-                $html[] = $open_tag.$bf->label_tag.$bf->render().$err.$close_tag;
+                $label = $bf->label_tag;
+                $field = $bf->render();
+                $help  = $bf->help_text;
+                $error = (!$bf->error) ? '' : "<span class=\"error\">{$bf->error}</span>\n";
+                $css   = empty($bf->css_classes) ? '' : ' class="'.implode(' ', $bf->css_classes).'"';
+                
+                $html[] = $this->$row_render_method($label, $field, $help, $error, $css);
             }
         }
         if (!empty($hidden_fields)) $html[] = implode("\n", $hidden_fields);
         return implode("\n", $html);
+    }
+    
+    private function render_p_row($label, $field, $help, $error, $css)
+    {
+        return "{$error}<p{$css}>{$label}{$field}{$help}</p>";
+    }
+    
+    private function render_table_row($label, $field, $help, $error, $css)
+    {
+        return "<tr{$css}><th>{$label}</th><td>{$error}{$field}{$help}</td></tr>";
     }
     
     public function get_cleaned_data()
@@ -255,6 +286,7 @@ class SBoundField
     public $error;
     public $help_text;
     public $is_hidden;
+    public $css_classes;
     
     protected $form;
     protected $field;
@@ -273,6 +305,10 @@ class SBoundField
         $this->error = (isset($this->form->errors[$name])) ? $this->form->errors[$name] : false;
         $this->help_text = $this->field->help_text;
         $this->is_hidden = $this->field->get_input()->is_hidden();
+        $this->css_classes = array();
+        
+        if ($this->field->is_required()) $this->css_classes[] = $this->form->required_css_class;
+        if ($this->error !== false) $this->css_classes[] = $this->form->error_css_class;
     }
     
     public function __toString()
@@ -289,6 +325,20 @@ class SBoundField
             $value = $this->form->get_cleaned_value($this->name);
         }
         return $this->field->render($this->html_name, $value, array('id' => $this->id));
+    }
+    
+    public function render_in($tag, $tag_options)
+    {
+        if (!array_key_exists('class', $tag_options))
+            $tag_options['class'] = $this->css_classes;
+        else {
+            if (is_array($tag_options['class']))
+                $tag_options['class'] = array_merge($this->css_classes, $tag_options['class']);
+            elseif (count($this->css_classes) != 0)
+                $tag_options['class'].= ' '.implode(' ', $this->css_classes);
+        }
+        $tag_attributes = tag_options($tag_options);
+        return "<{$tag}{$tag_attributes}>{$this->label_tag}".$this->render()."{$this->help_text}</{$tag}>\n";
     }
     
     protected function get_label()

@@ -113,7 +113,8 @@ EOT;
         $html = <<<EOT
 <p><label for="title">Title</label><input type="text" name="title" id="title" /></p>
 <p><label for="body">Body</label><textarea name="body" cols="40" rows="10" id="body"></textarea></p>
-<p><label for="author">Author</label><input type="text" name="author" id="author" /><span class="error">This field is required.</span></p>
+<span class="error">This field is required.</span>
+<p class="required error"><label for="author">Author</label><input type="text" name="author" id="author" /></p>
 EOT;
         $this->form->author = new SCharField(array('required' => true));
         $this->form->is_valid(array());
