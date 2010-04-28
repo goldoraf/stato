@@ -42,14 +42,19 @@ class Pgsql implements IDialect
 
     public function getTableNames(Connection $connection)
     {
+        $result = $connection->execute('SELECT table_name FROM information_schema.tables WHERE table_schema=\'public\' AND table_type=\'BASE TABLE\';');
+        $result->setFetchMode(PDO::FETCH_COLUMN, 0);
+        return $result->fetchAll();
     }
 
     public function createDatabase($dbName)
     {
+        return "CREATE DATABASE $dbName";
     }
     
     public function dropDatabase($dbName)
     {
+        return "DROP DATABASE IF EXISTS $dbName";
     }
 
     public function reflectTable(Connection $connection, $tableName)
@@ -62,10 +67,12 @@ class Pgsql implements IDialect
 
     public function truncateTable($tableName)
     {
+        return "TRUNCATE TABLE {$tableName}";
     }
 
     public function dropTable($tableName)
     {
+        return "DROP TABLE {$tableName}";
     }
 
     public function addColumn($tableName, Column $column)
@@ -82,5 +89,8 @@ class Pgsql implements IDialect
 
     private function reflectColumnType($sqlColumn)
     {
+        if (!isset(self::$columnTypes[$sqlColumn]))
+            throw new UnknownColumnType($sqlColumn);
+        return self::$columnTypes[$sqlColumn];
     }
 }
