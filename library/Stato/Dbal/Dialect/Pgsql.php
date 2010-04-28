@@ -20,10 +20,24 @@ class Pgsql implements IDialect
 
     public function getDsn(array $params)
     {
+        if (isset($params['dsn'])) return $params['dsn'];
+        
+        $parts = array();
+        if (isset($params['unix_socket']))
+            $parts[] = "unix_socket={$params['unix_socket']}";
+        else {
+            if (!isset($params['host'])) throw new Exception('No host provided');
+            $parts[] = "host={$params['host']}";
+            if (isset($params['port'])) $parts[] = "port={$params['port']}";
+        }
+        if (!isset($params['dbname'])) throw new Exception('No db name provided');
+        $parts[] = "dbname={$params['dbname']}";
+        return 'pgsql:'.implode(';', $parts);
     }
     
     public function getDriverOptions()
     {
+        return array();
     }
 
     public function getTableNames(Connection $connection)
