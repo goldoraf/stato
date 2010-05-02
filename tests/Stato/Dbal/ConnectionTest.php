@@ -33,11 +33,11 @@ class ConnectionTest extends PHPUnit_Framework_TestCase
     
     public function testResultIteration()
     {
-        $res = $this->connection->execute('SELECT 1');
+        $res = $this->connection->execute('SELECT 1 AS testval');
         $values = array();
         foreach ($res as $row) $values[] = $row;
         $this->assertEquals(1, count($values));
-        $this->assertEquals(array(1 => 1), $values[0]);
+        $this->assertEquals(array('testval' => 1), $values[0]);
     }
     
     public function testCreateAndReflectTable()
