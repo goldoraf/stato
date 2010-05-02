@@ -148,6 +148,7 @@ class SSelect extends SInput
         elseif (array_key_exists('include_blank', $this->options) && $this->options['include_blank'] === true)
             $str.= '<option value=""></option>';
         
+        reset($set);
         $non_assoc = (key($set) === 0);
         if (!is_array($selected)) $selected = array($selected);
         foreach ($set as $value => $lib) {
