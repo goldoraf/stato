@@ -11,9 +11,71 @@ use \PDO;
 class Pgsql implements IDialect
 {
     private static $columnTypes = array(
+        'bigint'            => Column::INTEGER,
+        'int8'              => Column::INTEGER, //alias de 'bigint'
+        'bigserial8'        => Column::INTEGER, //alias de 'bigint'
+        'serial8'           => Column::INTEGER, //alias de 'bigint'
+        //'bit',
+        //'bit varying',
+        //'varbit',
+        'boolean'           => Column::BOOLEAN,
+        'bool'              => Column::BOOLEAN, //alias de 'boolean'
+        //'box',
+        //'bytea',
+        'character varying' => Column::STRING,
+        'varchar'           => Column::STRING,  //alias de 'character varying'
+        'character'         => Column::STRING,
+        'char'              => Column::STRING,  //alias de 'character'
+        //'cidr',
+        //'circle',
+        'date'              => Column::DATE,
+        'double precision'  => Column::FLOAT,
+        'float8'            => Column::FLOAT,   //alias de 'double precision'
+        //'inet',
+        'integer'           => Column::INTEGER,
+        'int'               => Column::INTEGER, //alias de 'integer'
+        'int4'              => Column::INTEGER, //alias de 'integer'
+        //'interval',
+        //'line',
+        //'lseg',
+        //'macaddr',
+        //'money',
+        'numeric'           => Column::FLOAT,
+        'decimal'           => Column::FLOAT,   //alias de 'numeric'
+        //'path',
+        //'point',
+        //'polygon',
+        'real'              => Column::FLOAT,
+        'float4'            => Column::FLOAT,   //alias de 'real'
+        'smallint'          => Column::INTEGER,
+        'int2'              => Column::INTEGER, //alias de 'smallint'
+        'serial'            => Column::INTEGER,
+        'serial4'           => Column::INTEGER, //alias de 'serial'
+        'text'              => Column::TEXT,
+        //'time without time zone',
+        //'time',
+        //'time with time zone',
+        //'timetz',
+        'timestamp without time zone' => Column::TIMESTAMP,
+        'timestamp'                   => Column::TIMESTAMP, //alias de 'timestamp without time zone'
+        'timestamp with time zone'    => Column::TIMESTAMP,
+        'timestamptz'                 => Column::TIMESTAMP, //alias de 'timestamp with time zone'
+        //'tsquery',
+        //'tsvector',
+        //'txid_snapshot',
+        //'uuid',
+        //'xml',
     );
 
     private static $nativeTypes = array(
+        Column::STRING    => array('type' => 'character varying', 'length' => 255),
+        Column::TEXT      => array('type' => 'text'),
+        Column::FLOAT     => array('type' => 'real'),
+        Column::DATETIME  => array('type' => 'timestamp without time zone'),
+        Column::DATE      => array('type' => 'date'),
+        Column::TIMESTAMP => array('type' => 'timestamp without time zone'),
+        Column::INTEGER   => array('type' => 'bigint'),
+        Column::BOOLEAN   => array('type' => 'boolean')
     );
 
     private $name = 'pgsql';
