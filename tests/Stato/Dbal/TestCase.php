@@ -24,7 +24,13 @@ class TestCase extends PHPUnit_Extensions_Database_TestCase
         $this->connection = TestEnv::getDbConnection();
         parent::setup();
     }
-    
+
+    public function tearDown()
+    {
+        $this->connection->close();
+        parent::tearDown();
+    }
+
     protected function getConnection()
     {
         return $this->createDefaultDBConnection($this->connection->getPDOConnection(), $this->connection->getDatabase());

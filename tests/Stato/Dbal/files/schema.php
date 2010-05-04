@@ -49,7 +49,7 @@ return array(
         new Column('company_id', Column::INTEGER),
     )),
     'articles' => new Table('articles', array(
-        new Column('id', Column::INTEGER, array('length' => 11, 'nullable' => false, 'primary_key' => true, 'auto_increment' => true)),
+        new Column('id', Column::INTEGER, array('nullable' => false, 'primary_key' => true, 'auto_increment' => true)),
         new Column('title', Column::STRING, array('length' => 50)),
         new Column('body', Column::TEXT),
         new Column('published', Column::BOOLEAN),
@@ -57,7 +57,7 @@ return array(
         new Column('price', Column::FLOAT),
     )),
     'events' => new Table('events', array(
-        new Column('id', Column::INTEGER, array('length' => 11, 'nullable' => false, 'primary_key' => true, 'auto_increment' => true)),
+        new Column('id', Column::INTEGER, array('nullable' => false, 'primary_key' => true, 'auto_increment' => true)),
         new Column('title', Column::STRING, array('length' => 50)),
         
     )),

@@ -52,8 +52,12 @@ class TestEnv
     public static function createTestDatabase()
     {
         $config = self::getDbConfig();
-        
-        $tmpConn = new Dbal\Connection($config);
+
+        $tmpConf = $config;
+        $tmpConf['dbname'] = null;
+        $tmpConf['dsn'] = $tmpConf['driver'].':host='.$tmpConf['host'];
+
+        $tmpConn = new Dbal\Connection($tmpConf);
         $tmpConn->dropDatabase($config['dbname']);
         $tmpConn->createDatabase($config['dbname']);
         $tmpConn->close();
@@ -63,6 +67,7 @@ class TestEnv
         foreach (self::getDbSchema() as $table) {
             $conn->createTable($table);
         }
+        $conn->close();
     }
     
     public static function emptyTestDatabase()
