@@ -54,11 +54,11 @@ class DispatcherTest extends \PHPUnit_Extensions_OutputTestCase
     public function testDispatchWithPlugins()
     {
         $this->request->setRequestUri('/app/index.php/foo');
-	$this->dispatcher->plugins[] = new \FooPlugin();
+        $this->dispatcher->plugins[] = new \FooPlugin();
         $this->dispatcher->plugins[] = new \BarPlugin();
         $this->dispatcher->dispatch($this->request, $this->response);
-	$this->assertEquals('Foo', $this->request->params['preRouting']);
-	$this->assertEquals('Bar', $this->request->params['postRouting']);
-	$this->assertEquals(array('Foo', 'Bar'), $this->request->params['preDispatch']);
+        $this->assertEquals('Foo', $this->request->params['preRouting']);
+        $this->assertEquals('Bar', $this->request->params['postRouting']);
+        $this->assertEquals(array('Foo', 'Bar'), $this->request->params['preDispatch']);
     }
 }
