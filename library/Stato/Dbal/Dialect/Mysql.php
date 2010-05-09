@@ -6,7 +6,7 @@ use Stato\Dbal\Table;
 use Stato\Dbal\Column;
 use Stato\Dbal\Connection;
 
-use \PDO;
+use \PDO, \Exception;
 
 class Mysql implements IDialect
 {
