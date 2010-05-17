@@ -341,6 +341,11 @@ class SBoundField
         return "<{$tag}{$tag_attributes}>{$this->label_tag}".$this->render()."{$this->help_text}</{$tag}>\n";
     }
     
+    public function get_id()
+    {
+        return $this->id;
+    }
+    
     protected function get_label()
     {
         $label = __($this->name);
