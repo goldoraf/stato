@@ -13,6 +13,7 @@ class STable
     
     public function add_primary_key($name, $type = SColumn::PK, $options = array())
     {
+        $options = array_merge(array('pk' => true, 'null' => false), $options);
         $this->add_column($name, $type, $options);
     }
     
@@ -24,6 +25,7 @@ class STable
             if (isset($options['limit']))   $column->limit   = $options['limit'];
             if (isset($options['default'])) $column->default = $options['default'];
             if (isset($options['null']))    $column->null    = $options['null'];
+            if (isset($options['pk']))      $column->pk      = $options['pk'];
         }
         else $column = $name;
         

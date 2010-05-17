@@ -17,14 +17,16 @@ class SColumn
     public $limit   = null;
     public $default = null;
     public $null    = true;
+    public $pk      = false;
     
-    public function __construct($name, $type, $default = null, $limit = null, $null = true)
+    public function __construct($name, $type, $default = null, $limit = null, $null = true, $pk = false)
     {
         $this->name    = $name;
         $this->type    = $type;
         $this->limit   = $limit;
         $this->default = $default;
         $this->null    = $null;
+        $this->pk      = $pk;
     }
     
     public function typecast($owner, $data)
@@ -74,7 +76,7 @@ class SColumn
         $db = SActiveRecord::connection();
         $sql = $db->quote_column_name($this->name).' '.$db->type_to_sql($this->type, array('limit' => $this->limit));
         $sql = $db->add_column_options($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
-        if ($this->type === self::PK) $sql.= ' PRIMARY KEY';
+        if ($this->pk) $sql.= ' PRIMARY KEY';
         return $sql;
     }
 }
