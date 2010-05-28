@@ -137,6 +137,13 @@ class SForm implements Iterator
         return $hidden;
     }
     
+    public function render_hidden_fields()
+    {
+        $html = array();
+        foreach ($this->hidden_fields() as $f) $html[] = $f->render();
+        return implode("\n", $html);
+    }
+    
     public function is_bound()
     {
         return $this->is_bound;
