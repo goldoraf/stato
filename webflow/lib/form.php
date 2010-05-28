@@ -18,7 +18,7 @@ class SFormErrors extends ArrayObject
             if ($k == SForm::FORM_WIDE_ERRORS) {
                 $html.= "<li>$v</li>\n";
             } else {
-                $id = (is_null($this->prefix)) ? $k : $this->prefix.'_'.$k;
+                $id = $this->get_id($k);
                 $k = SInflection::humanize($k);
                 $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
             }
@@ -30,6 +30,11 @@ class SFormErrors extends ArrayObject
     public function set_prefix($prefix)
     {
         $this->prefix = $prefix;
+    }
+    
+    private function get_id($key)
+    {
+        return is_null($this->prefix) ? $key : implode('_', (array) $this->prefix).'_'.$key;
     }
 }
 
@@ -257,7 +262,7 @@ class SForm implements Iterator
     
     /**
      * Hook for doing any extra form-wide cleaning after every field been 
-     * cleaned. Any Stato_From_ValidationError raised by this method will not be 
+     * cleaned. Any SValidationError raised by this method will not be 
      * associated with a particular field.
      */
     protected function clean()
@@ -298,8 +303,8 @@ class SBoundField
         $this->form = $form;
         $this->field = $field;
         $this->name = $name;
-        $this->id = (is_null($prefix = $this->form->get_prefix())) ? $this->name : "{$prefix}_{$name}";
-        $this->html_name = (is_null($prefix = $this->form->get_prefix())) ? $this->name : "{$prefix}[{$name}]";
+        $this->id = $this->get_id();
+        $this->html_name = $this->get_html_name();
         $this->label = (is_null($this->field->label)) ? $this->get_label() : $this->field->label;
         $this->label_tag = $this->get_label_tag();
         $this->error = (isset($this->form->errors[$name])) ? $this->form->errors[$name] : false;
@@ -341,9 +346,20 @@ class SBoundField
         return "<{$tag}{$tag_attributes}>{$this->label_tag}".$this->render()."{$this->help_text}</{$tag}>\n";
     }
     
-    public function get_id()
+    protected function get_id()
     {
-        return $this->id;
+        return is_null($prefix = $this->form->get_prefix()) ? $this->name : implode('_', (array) $prefix).'_'.$this->name;
+    }
+    
+    protected function get_html_name()
+    {
+        if (is_null($prefix = $this->form->get_prefix())) return $this->name;
+        if (is_array($prefix)) {
+            $name = array_shift($prefix);
+            foreach ($prefix as $p) $name.= is_numeric($p) ? '[]' : "[$p]";
+            return "{$name}[{$this->name}]";
+        }
+        return "{$prefix}[{$this->name}]";
     }
     
     protected function get_label()

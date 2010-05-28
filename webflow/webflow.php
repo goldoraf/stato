@@ -22,5 +22,6 @@ require('lib/form.php');
 require('lib/form/input.php');
 require('lib/form/field.php');
 require('lib/form/form_wizard.php');
+require('lib/form/form_set.php');
 require('lib/form/active_record_form.php');
 ?>
