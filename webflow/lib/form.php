@@ -9,18 +9,36 @@ interface SIFieldDecorator
 
 class SFormErrors extends ArrayObject
 {
+    const FORM_WIDE_ERRORS = '_all_';
+    
     protected $prefix = null;
+    protected $labels = array();
+    
+    public function add_error($field, $error, $label = null)
+    {
+        $this[$field] = $error;
+        $this->labels[$field] = $label;
+    }
+    
+    public function add_general_error($error)
+    {
+        $this[self::FORM_WIDE_ERRORS] = $error;
+    }
     
     public function __toString()
     {
         $html = "<ul class=\"errorlist\">\n";
         foreach ($this as $k => $v) {
-            if ($k == SForm::FORM_WIDE_ERRORS) {
+            if ($k == self::FORM_WIDE_ERRORS) {
                 $html.= "<li>$v</li>\n";
             } else {
                 $id = $this->get_id($k);
-                $k = SInflection::humanize($k);
-                $html.= "<li><label for=\"$id\">$k</label> - $v</li>\n";
+                if (!array_key_exists($k, $this->labels) || is_null($this->labels[$k])) {
+                    $label = $this->get_label($k);
+                } else {
+                    $label = $this->labels[$k];
+                }
+                $html.= "<li><label for=\"$id\">$label</label>$v</li>\n";
             }
         }
         $html.= "</ul>";
@@ -36,12 +54,17 @@ class SFormErrors extends ArrayObject
     {
         return is_null($this->prefix) ? $key : implode('_', (array) $this->prefix).'_'.$key;
     }
+    
+    private function get_label($key)
+    {
+        $label = __($key);
+        if ($label == $key) $label = SInflection::humanize($key);
+        return $label;
+    }
 }
 
 class SForm implements Iterator
 {
-    const FORM_WIDE_ERRORS = '_all_';
-    
     public $errors;
     public $cleaned_data = array();
     
@@ -253,7 +276,7 @@ class SForm implements Iterator
                     $this->cleaned_data[$name] = $value;
                 }
             } catch (SValidationError $e) {
-                $this->errors[$name] = _f($e->get_message(), $e->get_args());
+                $this->errors->add_error($name, _f($e->get_message(), $e->get_args()), $field->label);
                 $this->cleaned_data[$name] = $e->get_cleaned_value();
             }
         }
@@ -261,7 +284,7 @@ class SForm implements Iterator
         try {
             $this->clean();
         } catch (SValidationError $e) {
-            $this->errors[self::FORM_WIDE_ERRORS] = $e->get_message();
+            $this->errors->add_general_error($e->get_message());
         }
         
         return count($this->errors) === 0;
