@@ -65,28 +65,28 @@ class SFormInputTest extends PHPUnit_Framework_TestCase
     {
         $i = new SDateInput();
         $this->assertEquals('<input type="text" name="birthday" value="2009-03-27" />', 
-                            $i->render('birthday', new DateTime('2009-03-27')));
+                            $i->render('birthday', new SDate(2009, 03, 27)));
     }
     
     public function test_text_date_input_with_format()
     {
-        $i = new SDateInput(array(), array('format' => 'd/m/Y'));
+        $i = new SDateInput(array(), array('format' => '%d/%m/%Y'));
         $this->assertEquals('<input type="text" name="birthday" value="27/03/2009" />', 
-                            $i->render('birthday', new DateTime('2009-03-27')));
+                            $i->render('birthday', new SDate(2009, 03, 27)));
     }
     
     public function test_text_date_time_input()
     {
         $i = new SDateTimeInput();
         $this->assertEquals('<input type="text" name="event" value="2009-03-27 16:00:00" />', 
-                            $i->render('event', new DateTime('2009-03-27 16:00:00')));
+                            $i->render('event', new SDateTime(2009, 03, 27, 16, 0, 0)));
     }
     
     public function test_text_time_input()
     {
         $i = new STimeInput();
         $this->assertEquals('<input type="text" name="schedule" value="16:00:00" />', 
-                            $i->render('schedule', new DateTime('2009-03-27 16:00:00')));
+                            $i->render('schedule', new SDateTime(2009, 03, 27, 16, 0, 0)));
     }
     
     public function test_checkbox_input()

@@ -218,10 +218,16 @@ class SFormFieldTest extends PHPUnit_Framework_TestCase
         $f->clean('3.99');
     }
     
+    public function test_date_field()
+    {
+        $f = new SDateField();
+        $this->assertEquals(new SDate(2009, 03, 28), $f->clean('2009-03-28'));
+    }
+    
     public function test_date_time_field()
     {
         $f = new SDateTimeField();
-        $this->assertEquals(new DateTime('2009-03-28'), $f->clean('2009-03-28'));
+        $this->assertEquals(new SDateTime(2009, 03, 28, 16, 0, 0), $f->clean('2009-03-28 16:00:00'));
     }
     
     public function test_date_time_field_validation_error()

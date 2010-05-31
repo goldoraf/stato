@@ -268,14 +268,14 @@ class SFloatField extends SField
 }
 
 /**
- * Validates that the input can be converted to a DateTime object.
- * 
- * Consequently, accepted input formats are that of strtotime() PHP function, 
- * and the returned cleaned value is a DateTime object.
+ * Validates that the input can be converted to a SDate object.
  */
-class SDateTimeField extends SField
+class SDateField extends SField
 {
-    protected $input = 'SDateTimeInput';
+    protected $input = 'SDateInput';
+    protected $default_options = array(
+        'input_formats' => null
+    );
     protected $default_error_messages = array(
         'invalid'   => 'Enter a valid date.'
     );
@@ -285,12 +285,39 @@ class SDateTimeField extends SField
         $value = parent::clean($value);
         if ($this->is_empty($value)) return null;
         
-        if ($value instanceof DateTime) return $value;
+        if ($value instanceof SDate) return $value;
         try { 
             $value = filter_var($value, FILTER_SANITIZE_STRING);
-            // With PHP 5.3, we could use DateTime::createFromFormat()
-            // It will open new opportunities ;)
-            $value = new DateTime($value);
+            $value = SDate::parse($value, $this->options['input_formats']);
+        } catch (Exception $e) {
+            throw new SValidationError($this->error_messages['invalid'], array(), $value);
+        }
+        return $value;
+    }
+}
+
+/**
+ * Validates that the input can be converted to a SDateTime object.
+ */
+class SDateTimeField extends SField
+{
+    protected $input = 'SDateTimeInput';
+    protected $default_options = array(
+        'input_formats' => null
+    );
+    protected $default_error_messages = array(
+        'invalid'   => 'Enter a valid date.'
+    );
+    
+    public function clean($value)
+    {
+        $value = parent::clean($value);
+        if ($this->is_empty($value)) return null;
+        
+        if ($value instanceof SDateTime) return $value;
+        try { 
+            $value = filter_var($value, FILTER_SANITIZE_STRING);
+            $value = SDateTime::parse($value, $this->options['input_formats']);
         } catch (Exception $e) {
             throw new SValidationError($this->error_messages['invalid'], array(), $value);
         }

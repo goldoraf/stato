@@ -93,11 +93,11 @@ class STextarea extends SInput
 
 class SDateInput extends STextInput
 {
-    protected $format = 'Y-m-d';
+    protected $format = '%Y-%m-%d';
     
     public function render($name, $value = null, array $attrs = array())
     {
-        if ($value instanceof DateTime) $value = $value->format($this->get_format());
+        if ($value instanceof SDate || $value instanceof SDateTime) $value = $value->format($this->get_format());
         return parent::render($name, $value, $attrs);
     }
     
@@ -110,12 +110,12 @@ class SDateInput extends STextInput
 
 class SDateTimeInput extends SDateInput
 {
-    protected $format = 'Y-m-d H:i:s';
+    protected $format = '%Y-%m-%d %H:%M:%S';
 }
 
 class STimeInput extends SDateInput
 {
-    protected $format = 'H:i:s';
+    protected $format = '%H:%M:%S';
 }
 
 class SCheckboxInput extends SInput
