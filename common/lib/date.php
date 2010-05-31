@@ -8,11 +8,9 @@ class SDate
 {
     protected $attributes = array();
     
-    private static $regex = array
+    private static $formats = array
     (
-        'fr'  => '/^(?P<day>\d{1,2})\/(?P<month>\d{1,2})\/(?P<year>\d{4})$/',
-        'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$/',
-        'db'  => '/^(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})$/'
+        '%Y-%m-%d', '%Y%m%d', '%m/%d/%y', '%m/%d/%Y'
     );
     
     public function __construct($year, $month, $day)
@@ -68,10 +66,7 @@ class SDate
     
     public function to_iso8601()
     {
-        // PHP constant implies that the timezone offset is appended, and I don't know if it's
-        // compatible with XMLRPC rotocol
-        //return date(DATE_ISO8601, $this->ts());
-        return $this->sprintf('%04d%02d%02dT00:00:00');
+        return date(DATE_ISO8601, $this->ts());
     }
     
     public function to_rfc822()
@@ -113,14 +108,16 @@ class SDate
         return new SDate($today['year'], $today['mon'], $today['mday']);
     }
     
-    public static function parse($string)
+    public static function parse($string, array $user_formats = null)
     {
         if (is_array($string)) return self::from_array($string);
         
-        foreach (self::$regex as $regex)
+        $formats = is_null($user_formats) ? self::$formats : $user_formats;
+        foreach ($formats as $format)
         {
-            if (preg_match($regex, $string, $matches))
-                return new SDate($matches['year'], $matches['month'], $matches['day']);
+            $bits = strptime($string, $format);
+            if ($bits && empty($bits['unparsed']))
+                return new SDate(1900+$bits['tm_year'], $bits['tm_mon']+1, $bits['tm_mday']);
         }
         throw new SDateParsingException();
     }
@@ -162,10 +159,9 @@ class SDateTime extends SDate
 {
     protected $offset = 0;
     
-    private static $regex = array
+    private static $formats = array
     (
-        'iso' => '/^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2}) (?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/',
-        'iso8601' => '/^(?P<year>\d{4})(?P<month>\d{2})(?P<day>\d{2})T(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})$/'
+        '%Y-%m-%d %H:%M:%S', '%Y%m%dT%H:%M:%S', '%m/%d/%y %H:%M:%S', '%m/%d/%Y %H:%M:%S'
     );
     
     public function __construct($year, $month, $day, $hour = 0, $min = 0, $sec = 0, $offset = 0)
@@ -217,11 +213,6 @@ class SDateTime extends SDate
         return $this->sprintf('%04d-%02d-%02d %02d:%02d:%02d');
     }
     
-    public function to_iso8601()
-    {
-        return $this->sprintf('%04d%02d%02dT%02d:%02d:%02d');
-    }
-    
     public function sprintf($format)
     {
         return sprintf($format, $this->year, $this->month, 
@@ -252,13 +243,17 @@ class SDateTime extends SDate
         return self::now();
     }
     
-    public static function parse($string)
+    public static function parse($string, array $user_formats = null)
     {
-        foreach (self::$regex as $regex)
+        if (is_array($string)) return self::from_array($string);
+        
+        $formats = is_null($user_formats) ? self::$formats : $user_formats;
+        foreach ($formats as $format)
         {
-            if (preg_match($regex, $string, $matches))
-                return new SDateTime($matches['year'], $matches['month'], $matches['day'], 
-                                     $matches['hour'], $matches['min'], $matches['sec']);
+            $bits = strptime($string, $format);
+            if ($bits && empty($bits['unparsed']))
+                return new SDateTime(1900+$bits['tm_year'], $bits['tm_mon']+1, $bits['tm_mday'],
+                                     $bits['tm_hour'], $bits['tm_min'], $bits['tm_sec']);
         }
         throw new SDateParsingException();
     }

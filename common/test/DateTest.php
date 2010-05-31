@@ -59,6 +59,10 @@ class DateTest extends PHPUnit_Framework_TestCase
                            SDate::parse('1969-07-21'));
         $this->assertEquals(new SDate(1969, 7, 21),
                            SDate::parse('19690721'));
+        $this->assertEquals(new SDate(1969, 7, 21),
+                           SDate::parse('7/21/1969'));
+        $this->assertEquals(new SDate(1969, 7, 21),
+                           SDate::parse('7/21/69'));
         $this->assertEquals(new SDateTime(1969, 7, 21, 20, 35, 05),
                            SDateTime::parse('19690721T20:35:05'));
         $this->assertEquals(new SDateTime(1969, 7, 21, 20, 35, 05),
@@ -104,10 +108,10 @@ class DateTest extends PHPUnit_Framework_TestCase
     {
         $d = new SDate(1969, 7, 21);
         $this->assertEquals('1969-07-21', $d->__toString());
-        $this->assertEquals('19690721T00:00:00', $d->to_iso8601());
+        $this->assertEquals('1969-07-21T00:00:00+0100', $d->to_iso8601());
         $d = new SDateTime(1969, 7, 21, 20, 35, 05);
         $this->assertEquals('1969-07-21 20:35:05', $d->__toString());
-        $this->assertEquals('19690721T20:35:05', $d->to_iso8601());
+        $this->assertEquals('1969-07-21T20:35:05+0100', $d->to_iso8601());
     }
     
     public function test_localize()
