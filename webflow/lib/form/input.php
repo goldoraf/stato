@@ -143,10 +143,13 @@ class SSelect extends SInput
     {
         $str = '';
         
-        if (array_key_exists('include_prompt', $this->options) && !empty($this->options['include_prompt']))
+        if (array_key_exists('include_prompt', $this->options) && !empty($this->options['include_prompt'])) {
             $str.= '<option value="">'.$this->options['include_prompt'].'</option>';
-        elseif (array_key_exists('include_blank', $this->options) && $this->options['include_blank'] === true)
+            unset($this->options['include_prompt']);
+        } elseif (array_key_exists('include_blank', $this->options) && $this->options['include_blank'] === true) {
             $str.= '<option value=""></option>';
+            unset($this->options['include_blank']);
+        }
         
         reset($set);
         $non_assoc = (key($set) === 0);
