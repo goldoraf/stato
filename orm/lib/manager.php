@@ -74,7 +74,7 @@ class SManager
      */
     public function update_all($set, $condition)
     {
-        SActiveRecord::connection()->execute("UPDATE {$this->meta->table_name} SET {$set} WHERE {$condition}");
+        $this->get_connection()->execute("UPDATE {$this->meta->table_name} SET {$set} WHERE {$condition}");
     }
     
     /**
@@ -126,6 +126,11 @@ class SManager
     protected function get_query_set()
     {
         return new SQuerySet($this->meta);
+    }
+    
+    protected function get_connection()
+    {
+        return SActiveRecord::connection();
     }
 }
 

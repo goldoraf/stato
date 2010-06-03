@@ -106,6 +106,21 @@ class QuerySetTest extends ActiveTestCase
         $this->assertEquals(1, $emp->count());
     }
     
+    public function test_filter_by()
+    {
+        $companies = Company::$objects->filter_by(array('name' => 'Groupe W'));
+        $this->assertEquals("WHERE name = 'Groupe W'", $companies->sql_clause());
+        $this->assertEquals(1, $companies->count());
+        
+        $emp = Employe::$objects->filter_by(array('firstname' => 'John', 'lastname' => 'Doe'));
+        $this->assertEquals("WHERE (firstname = 'John' AND lastname = 'Doe')", $emp->sql_clause());
+        $this->assertEquals(1, $emp->count());
+        
+        $emp = Employe::$objects->filter_by(array('firstname' => 'John'))->filter_by(array('lastname' => 'Doe'));
+        $this->assertEquals("WHERE firstname = 'John' AND lastname = 'Doe'", $emp->sql_clause());
+        $this->assertEquals(1, $emp->count());
+    }
+    
     public function test_exclude()
     {
         $companies = Company::$objects->exclude("name = 'Groupe W'");

@@ -249,6 +249,16 @@ class SQuerySet implements Iterator, Countable
         return $this->filter_or_exclude(func_get_args(), true);
     }
     
+    public function filter_by(array $args)
+    {
+        return $this->filter_or_exclude_by($args);
+    }
+    
+    public function exclude_by(array $args)
+    {
+        return $this->filter_or_exclude_by($args, true);
+    }
+    
     /**
      * Allows the user to provide a custom SQL condition.   
      */
@@ -454,6 +464,18 @@ class SQuerySet implements Iterator, Countable
         $clone->filters[] = $condition;
         
         return $clone;
+    }
+    
+    protected function filter_or_exclude_by($args, $exclude = false)
+    {
+        $criterions = array();
+        $binds = array();
+        foreach ($args as $k => $v) {
+            $criterions[] = "{$k} = ?";
+            $binds[] = $v;
+        }
+        $criterions[] = $binds;
+        return $this->filter_or_exclude($criterions, $exclude);
     }
     
     protected function sql_joins()
