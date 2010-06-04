@@ -294,6 +294,17 @@ class SDateField extends SField
         }
         return $value;
     }
+    
+    public function render($name, $value = false, $html_attrs = array())
+    {
+        if ($value instanceof SDate) {
+            if (is_array($this->options['input_formats']))
+                $value = $value->format($this->options['input_formats'][0]);
+            else
+                $value = $value->__toString();
+        }
+        return parent::render($name, $value, $html_attrs);
+    }
 }
 
 /**
@@ -322,6 +333,17 @@ class SDateTimeField extends SField
             throw new SValidationError($this->error_messages['invalid'], array(), $value);
         }
         return $value;
+    }
+    
+    public function render($name, $value = false, $html_attrs = array())
+    {
+        if ($value instanceof SDateTime) {
+            if (is_array($this->options['input_formats']))
+                $value = $value->format($this->options['input_formats'][0]);
+            else
+                $value = $value->__toString();
+        }
+        return parent::render($name, $value, $html_attrs);
     }
 }
 
