@@ -40,14 +40,14 @@ class SBelongsToManager extends SAssociationManager
     
     protected function find_target()
     {
-        if ($this->owner[$this->meta->foreign_key] === null) return null;
+        if (!$this->is_fk_present()) return null;
         $qs = new SQuerySet($this->meta);
         return $qs->get($this->owner[$this->meta->foreign_key]);
     }
     
     protected function is_fk_present()
     {
-        if ($this->owner[$this->meta->foreign_key] === null) return false;
+        if ($this->owner[$this->meta->foreign_key] == null) return false;
         return true;
     }
 }
