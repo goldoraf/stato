@@ -159,6 +159,12 @@ class SSelect extends SInput
                 $str.= '<optgroup label="'.html_escape($value).'">'
                     .$this->render_options($lib, $selected).'</optgroup>';
             } else {
+                if (is_object($lib)) {
+                    if (method_exists($lib, '__repr'))
+                        $lib = $lib->__repr();
+                    else
+                        $lib = $lib->__toString();
+                }
                 if ($non_assoc) $value = $lib;
                 $str.= '<option value="'.html_escape($value).'"';
                 if (in_array($value, $selected)) $str.= ' selected="selected"';

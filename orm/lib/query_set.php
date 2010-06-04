@@ -160,15 +160,16 @@ class SQuerySet implements Iterator, Countable
     /**
      * Returns an array mapping each of the given IDs to the object with that ID.
      */
-    public function in_bulk($ids)
+    public function in_bulk(array $ids = null)
     {
-        if (!is_array($ids))
-            throw new Exception('in_bulk() must be provided with a list of IDs');
-        if (count($ids) == 0) return array();
-        
-        $clone = call_user_func_array(array($this, 'filter'), array($this->meta->identity_field.' IN ('.join(',', $ids).')'));
-        $clone->limit = null;
-        $clone->offset = null;
+        if (is_null($ids)) {
+            $clone = clone $this;
+        } else {
+            if (count($ids) == 0) return array();
+            $clone = call_user_func_array(array($this, 'filter'), array($this->meta->identity_field.' IN ('.join(',', $ids).')'));
+            $clone->limit = null;
+            $clone->offset = null;
+        }
         
         $set = array();
         foreach ($clone as $o) $set[$o->id] = $o;
