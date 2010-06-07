@@ -113,11 +113,9 @@ class SUrlRewriter
     
     private static function build_query_string($options)
     {
-        $string = '';
-        $elements = array();
-        foreach ($options as $key => $value) $elements[] = "{$key}={$value}";
-        if (!empty($elements)) $string.= '?'.implode('&', $elements);
-        return $string;
+        $string = http_build_query($options);
+        if (empty($string)) return '';
+        return '?'.$string;
     }
 }
 
