@@ -118,8 +118,14 @@ function options_from_collection_for_select($collection, $value_prop='id', $text
     $set = array();
     foreach ($collection as $entity)
     {
-        if ($text_prop === null) $set[$entity->__repr()] = $entity->$value_prop;
-        else $set[$entity->$text_prop] = $entity->$value_prop;
+        if ($text_prop === null) {
+            if (method_exists($entity, '__repr'))
+                $set[$entity->__repr()] = $entity->$value_prop;
+            else
+                $set[$entity->__toString()] = $entity->$value_prop;
+        } else {
+            $set[$entity->$text_prop] = $entity->$value_prop;
+        }
     }
     return options_for_select($set, $selected, false);
 }
