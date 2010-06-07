@@ -242,6 +242,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         foreach ($this->meta->attributes as $name => $attr) $this->values[$name] = $attr->default_value($this);
     }
     
+    public function has_attribute($name)
+    {
+        return array_key_exists($name, $this->meta->attributes);
+    }
+    
     /**
      * Sets all attributes at once. Used by <var>SQuerySet</var> class to instantiate records.
      */
