@@ -25,7 +25,7 @@ function end_form_tag()
 function text_field_tag($name, $value=Null, $options=array())
 {
     return tag('input', array_merge(array('type' => 'text', 'name' => $name, 
-                                          'id' => $name, 'value' => $value), $options));
+                                          'id' => name_to_id($name), 'value' => $value), $options));
 }
 
 function password_field_tag($name, $value=Null, $options=array())
@@ -50,7 +50,7 @@ function text_area_tag($name, $content=Null, $options=array())
         list($options['cols'], $options['rows']) = explode('x', $options['size']);
         unset($options['size']);
     }
-    return content_tag('textarea', $content, array_merge(array('name' => $name, 'id' => $name), $options));
+    return content_tag('textarea', $content, array_merge(array('name' => $name, 'id' => name_to_id($name)), $options));
 }
 
 function submit_tag($value='Ok', $options=array())
@@ -72,21 +72,26 @@ function image_submit_tag($source, $options=array())
 
 function select_tag($name, $options_block='', $options=array())
 {
-    return content_tag('select', $options_block, array_merge(array('name'=>$name, 'id'=>$name), $options));
+    return content_tag('select', $options_block, array_merge(array('name'=>$name, 'id'=>name_to_id($name)), $options));
 }
 
 function check_box_tag($name, $value="1", $checked=false, $options=array())
 {
-    $html_options = array_merge(array('type'=>'checkbox', 'name'=>$name, 'id'=>$name, 'value'=>$value), $options);
+    $html_options = array_merge(array('type'=>'checkbox', 'name'=>$name, 'id'=>name_to_id($name), 'value'=>$value), $options);
     if ($checked) $html_options['checked'] = "checked";
     return tag('input', $html_options);
 }
 
 function radio_button_tag($name, $value, $checked=false, $options=array())
 {
-    $html_options = array_merge(array('type'=>'radio', 'name'=>$name, 'id'=>$name, 'value'=>$value), $options);
+    $html_options = array_merge(array('type'=>'radio', 'name'=>$name, 'id'=>name_to_id($name), 'value'=>$value), $options);
     if ($checked) $html_options['checked'] = "checked";
     return tag('input', $html_options);
+}
+
+function name_to_id($name)
+{
+    return rtrim(str_replace(array('[',']'), '_', $name), '_');
 }
 
 ?>
