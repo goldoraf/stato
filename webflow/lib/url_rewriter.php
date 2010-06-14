@@ -91,6 +91,8 @@ class SUrlRewriter
         if (isset($options['trailing_slash'])) $url.= '/';
         if (isset($options['anchor'])) $url.= '#'.$options['anchor'];
         
+        if (!isset($options['escape']) || $options['escape'] == true) $url = htmlentities($url);
+        
         return $url;
     }
     
