@@ -694,4 +694,67 @@ class SFilledQuerySet extends SQuerySet
     }
 }
 
+class SRawQuerySet implements IteratorAggregate
+{
+    protected $sql;
+    protected $meta;
+    protected $params;
+    protected $conn;
+    protected $iter;
+    
+    public function __construct($sql, $meta, array $params = array())
+    {
+        $this->sql = $sql;
+        $this->meta = $meta;
+        $this->params = $params;
+        $this->conn = SActiveRecord::connection();
+    }
+    
+    public function __toString()
+    {
+        return $this->conn->sanitize_sql($this->sql, $this->params);
+    }
+    
+    public function getIterator()
+    {
+        if (!isset($this->iter)) $this->iter = new ArrayIterator($this->fetch_all());
+        return $this->iter;
+    }
+    
+    protected function fetch_all()
+    {
+        $rows  = $this->conn->select_all($this->__toString());
+        $records = array();
+        foreach ($rows as $row)
+            $records[] = $this->instanciate_record($row);
+        
+        return $records;
+    }
+    
+    /**
+     * Ripped from SQuerySet ; TODO : refactoring in STableMap class ?
+     */
+    protected function instanciate_record($row)
+    {
+       if (in_array($this->meta->inheritance_field, array_keys($this->meta->attributes)) && isset($row[$this->meta->inheritance_field])) 
+            $class = SInflection::camelize($row[$this->meta->inheritance_field]);
+        else
+            $class = $this->meta->class;
+        
+        $record = new $class();
+        $record->hydrate($row);
+        
+        if (count($this->meta->decorators) != 0)
+        {
+            // the @ is a dirty fix for a stupid notice added to "fix" http://bugs.php.net/bug.php?id=38146
+            foreach (@$this->meta->decorators as $decorator => $config)
+            {
+                $decorator_class = 'S'.SInflection::camelize($decorator).'Decorator';
+                $record = new $decorator_class($record, $config);
+            }
+        }
+        return $record;
+    }
+}
+
 ?>

@@ -225,5 +225,20 @@ class QuerySetTest extends ActiveTestCase
         Employe::$objects->filter("lastname = 'Doe'")->update(array('function' => 'expert'));
         $this->assertEquals('expert', Employe::$objects->get(1)->function);
     }
+    
+    public function test_raw()
+    {
+        $emps = Employe::$objects->raw('SELECT * FROM employes')->getIterator();
+        $this->assertTrue(count($emps) == 2);
+        $this->assertTrue($emps[0] instanceof Employe);
+        $this->assertTrue($emps[1] instanceof Employe);
+        $this->assertEquals('Doe', $emps[0]->lastname);
+        $this->assertEquals('Jones', $emps[1]->lastname);
+        $emps = Employe::$objects->raw('SELECT *, SUBSTRING(lastname, 1, 1) AS keychar, COUNT(*) AS count FROM employes GROUP BY keychar, lastname')->getIterator();
+        $this->assertTrue(count($emps) == 2);
+        $this->assertEquals('Doe', $emps[0]->lastname);
+        $this->assertEquals('D', $emps[0]['keychar']);
+        $this->assertEquals('1', $emps[0]['count']);
+    }
 }
 

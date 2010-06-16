@@ -42,6 +42,14 @@ class SManager
     }
     
     /**
+     * Returns a new <var>SRawQuerySet</var> instance which converts the results of raw SQL queries into SActiveRecord instances.   
+     */
+    public function raw($sql, array $params = array())
+    {
+        return new SRawQuerySet($sql, $this->meta, $params);
+    }
+    
+    /**
      * Instantiates and populates a new record.
      */
     public function build($attributes = null)
