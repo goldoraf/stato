@@ -448,6 +448,23 @@ class SActionController implements SIDispatchable, SIFilterable
         fpassthru($data);
     }
     
+    protected function send_file_headers($params = array())
+    {
+        $disposition = $params['disposition'];
+        if (isset($params['filename'])) $disposition.= '; filename='.$params['filename'];
+        $headers = array
+        (
+            'Content-Length'      => $params['length'],
+            'Content-Type'        => $params['type'],
+            'Content-Disposition' => $disposition,
+            'Content-Transfer-Encoding' => 'binary'
+        );
+        $this->response->headers = array_merge($this->response->headers, $headers);
+        // IE6 fix on opening downloaded files
+        /*if ($this->response->headers['Cache-Control'] == 'no-cache')
+            $this->response->headers['Cache-Control'] = 'private';*/
+    }
+    
     protected function cache_page($content = null, $options = array())
     {
         if (!self::$perform_caching) return;
@@ -565,23 +582,6 @@ class SActionController implements SIDispatchable, SIFilterable
     private function is_performed()
     {
         return ($this->performed_render || $this->performed_redirect);
-    }
-    
-    private function send_file_headers($params = array())
-    {
-        $disposition = $params['disposition'];
-        if (isset($params['filename'])) $disposition.= '; filename='.$params['filename'];
-        $headers = array
-        (
-            'Content-Length'      => $params['length'],
-            'Content-Type'        => $params['type'],
-            'Content-Disposition' => $disposition,
-            'Content-Transfer-Encoding' => 'binary'
-        );
-        $this->response->headers = array_merge($this->response->headers, $headers);
-        // IE6 fix on opening downloaded files
-        /*if ($this->response->headers['Cache-Control'] == 'no-cache')
-            $this->response->headers['Cache-Control'] = 'private';*/
     }
     
     private function page_cache_path($path)
