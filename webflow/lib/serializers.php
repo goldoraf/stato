@@ -85,7 +85,7 @@ class SJsonSerializer extends SAbstractSerializer
     private function implements_iterator($object)
     {
         $ref = new ReflectionObject($object);
-        return $ref->implementsInterface('Iterator');
+        return $ref->implementsInterface('Iterator') || $ref->implementsInterface('IteratorAggregate');
     }
 }
 
