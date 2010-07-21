@@ -199,7 +199,7 @@ function select_year($date, $options = array())
 
 function select_second($datetime, $options = array())
 {
-    $selected = (get_class($datetime) == 'SDateTime') ? $datetime->sec : $datetime;
+    $selected = ($datetime instanceof SDateTime) ? $datetime->sec : $datetime;
     $sec_options = numerical_options(0, 59, $selected);
     if (!isset($options['field_name'])) $options['field_name'] = 'sec';
     return select_html($options['field_name'], $sec_options, $options);
@@ -213,7 +213,7 @@ function select_second($datetime, $options = array())
  */
 function select_minute($datetime, $options = array())
 {
-    $selected = (get_class($datetime) == 'SDateTime') ? $datetime->min : $datetime;
+    $selected = ($datetime instanceof SDateTime) ? $datetime->min : $datetime;
     $step = (isset($options['minute_step'])) ? $options['minute_step'] : 1;
     $min_options = numerical_options(0, 59, $selected, $step);
     if (!isset($options['field_name'])) $options['field_name'] = 'min';
@@ -222,7 +222,7 @@ function select_minute($datetime, $options = array())
 
 function select_hour($datetime, $options = array())
 {
-    $selected = (get_class($datetime) == 'SDateTime') ? $datetime->hour : $datetime;
+    $selected = ($datetime instanceof SDateTime) ? $datetime->hour : $datetime;
     $hour_options = numerical_options(0, 23, $selected);
     if (!isset($options['field_name'])) $options['field_name'] = 'hour';
     return select_html($options['field_name'], $hour_options, $options);
@@ -274,7 +274,7 @@ function numerical_options($start, $end, $selected = Null, $step=1)
  */
 function is_date_type($date)
 {
-    return in_array(get_class($date), array('SDate', 'SDateTime'));
+    return $date instanceof SDate || $date instanceof SDateTime;
 }
 
 ?>
