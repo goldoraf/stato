@@ -404,11 +404,11 @@ class SActionController implements SIDispatchable, SIFilterable
         );
         $params = array_merge($defaults, $params);
         
-        if (!isset($params['length']) && !is_resource($data)) $params['length'] = strlen($data);
+        if (!isset($params['length']) && is_string($data)) $params['length'] = strlen($data);
         
         $this->send_file_headers($params);
         
-        if (is_resource($data))
+        if (!is_string($data)) // whe have to presume it's a resource, is_resource() seems broken in PHP 5.3...
             $this->send_streamed_data($data);
         else
             $this->render_text($data);
