@@ -139,13 +139,10 @@ class SMySqlAdapter extends SAbstractAdapter
         return in_array($name, $this->tables());
     }
     
-    public function create_table($name, $table_def, $options = null)
+    public function create_table($name, $table_def, $options = array())
     {
-        $sql = "CREATE TABLE $name (";
-        $sql.= $table_def->to_sql();
-        $sql.= ")";
-        if ($options !== null) $sql.= ' '.$options;
-        
+        $sql = "CREATE TABLE $name (".$table_def->to_sql().")";
+        $sql = $this->add_table_options($sql, $options);
         $this->execute($sql);
     }
     
@@ -240,6 +237,14 @@ class SMySqlAdapter extends SAbstractAdapter
             $sql.= ' DEFAULT '.$this->quote($options['default'], $type);
         if (isset($options['null']) && $options['null'] === false) $sql.= ' NOT NULL';
         if (isset($options['after'])) $sql.= ' AFTER '.$options['after'];
+        return $sql;
+    }
+    
+    public function add_table_options($sql, $options)
+    {
+        $defaults = array('engine' => 'InnoDB');
+        $options = array_merge($defaults, $options);
+        foreach ($options as $k => $v) $sql.= ' '.strtoupper($k).'='.$v;
         return $sql;
     }
     
