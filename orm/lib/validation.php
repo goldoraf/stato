@@ -186,11 +186,7 @@ class SValidation
     
     public static function is_email($data, $options = array())
     {
-        if (ereg("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", trim($data))) 
-        {
-            return True;
-        }
-        return False;
+        return filter_var($data, FILTER_VALIDATE_EMAIL) !== false;
     }
     
     public static function is_ip($data, $options = array())
