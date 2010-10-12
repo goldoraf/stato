@@ -61,18 +61,40 @@ class SManyToManyManager extends SManyAssociationManager
         }
     }
     
+    public function add_by_ids($ids)
+    {
+        $ids = array_diff($ids, $this->ids());
+        foreach ($ids as $id) $this->insert_record_by_id($id);
+    }
+    
+    public function delete_by_ids($ids)
+    {
+        $ids = array_intersect($ids, $this->ids());
+        foreach ($ids as $id) $this->delete_record_by_id($id);
+    }
+    
     protected function insert_record($record)
     {
         if ($record->id === null) $record->save();
+        $this->insert_record_by_id($record->id);
+    }
+    
+    protected function insert_record_by_id($record_id)
+    {
         $this->connection()->execute("INSERT INTO {$this->meta->join_table} 
-                                      SET {$this->meta->assoc_foreign_key} = '{$record->id}', 
+                                      SET {$this->meta->assoc_foreign_key} = '{$record_id}', 
                                       {$this->meta->foreign_key} = '{$this->owner->id}'");
     }
     
     protected function delete_record($record)
     {
+        $this->delete_record_by_id($record->id);
+    }
+    
+    protected function delete_record_by_id($record_id)
+    {
         $this->connection()->execute("DELETE FROM {$this->meta->join_table} 
-                                      WHERE {$this->meta->assoc_foreign_key} = '{$record->id}' 
+                                      WHERE {$this->meta->assoc_foreign_key} = '{$record_id}' 
                                       AND {$this->meta->foreign_key} = '{$this->owner->id}'");
     }
     
