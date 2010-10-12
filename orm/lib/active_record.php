@@ -137,7 +137,11 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
     
     public function to_array()
     {
-        return $this->values;
+        $values = array();
+        foreach ($this->meta->attributes as $name => $column)
+            if (!array_key_exists($name, $this->meta->relationships))
+                $values[$name] = $this->values[$name];
+        return $values;
     }
     
     public function dump()
