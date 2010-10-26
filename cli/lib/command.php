@@ -29,6 +29,10 @@ abstract class SCommand
     
     protected static function find_command_file($command_name)
     {
+        if (file_exists($command_file = STATO_APP_ROOT_PATH."/scripts/$command_name.php")) {
+            require $command_file;
+            return true;
+        }
         foreach (self::$packages as $package) {
             if (file_exists($command_file = STATO_CORE_PATH."/$package/script/$command_name.php")) {
                 require $command_file;
