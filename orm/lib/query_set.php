@@ -184,11 +184,9 @@ class SQuerySet implements Iterator, Countable
     public function count()
     {
         if ($this->cache !== null) return count($this->cache);
-        if (!empty($this->includes)) return count($this->to_array());
         
         $clone = clone $this;
         $clone->order_by = array();
-        $clone->includes = array();
         
         $offset = $clone->offset;
         $limit  = $clone->limit;
@@ -196,7 +194,11 @@ class SQuerySet implements Iterator, Countable
         $clone->offset = null;
         $clone->limit  = null;
         
-        $rs = $this->conn->select($clone->prepare_select('COUNT(*)'));
+        if (!empty($this->includes)) {
+            $rs = $this->conn->select('SELECT COUNT(*) FROM ('.$clone->prepare_select().') AS tbl');
+        } else {
+            $rs = $this->conn->select($clone->prepare_select('COUNT(*)'));
+        }
         $row = $this->conn->fetch($rs, false);
         $count = $row[0];
         
