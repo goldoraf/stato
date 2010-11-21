@@ -162,6 +162,12 @@ class SMySqlAdapter extends SAbstractAdapter
         $this->execute("TRUNCATE TABLE $name");
     }
     
+    public function column_exists($table_name, $column_name)
+    {
+        $columns = $this->query_columns($table_name);
+        return array_key_exists($column_name, $columns);
+    }
+    
     public function add_column($table_name, $column_name, $type, $options = array())
     {
         $sql = "ALTER TABLE $table_name ADD $column_name ".self::type_to_sql($type, $options);
