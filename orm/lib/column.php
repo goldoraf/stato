@@ -9,6 +9,7 @@ class SColumn
     const DATE      = 'date';
     const DATETIME  = 'datetime';
     const TIMESTAMP = 'timestamp';
+    const YEAR      = 'year';
     const FLOAT     = 'float';
     const TEXT      = 'text';
     

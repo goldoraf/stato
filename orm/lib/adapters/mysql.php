@@ -11,6 +11,7 @@ class SMySqlAdapter extends SAbstractAdapter
         SColumn::DATETIME  => array('name' => 'datetime'),
         SColumn::DATE      => array('name' => 'date'),
         SColumn::TIMESTAMP => array('name' => 'timestamp'),
+        SColumn::YEAR      => array('name' => 'year'),
         SColumn::INTEGER   => array('name' => 'int', 'limit' => 11),
         SColumn::BOOLEAN   => array('name' => 'tinyint', 'limit' => 1)
     );
@@ -154,6 +155,11 @@ class SMySqlAdapter extends SAbstractAdapter
     public function drop_table($name)
     {
         $this->execute("DROP TABLE $name");
+    }
+    
+    public function truncate_table($name)
+    {
+        $this->execute("TRUNCATE TABLE $name");
     }
     
     public function add_column($table_name, $column_name, $type, $options = array())
