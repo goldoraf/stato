@@ -420,9 +420,9 @@ class SRequestParams implements ArrayAccess
             case isset($this->params[$key]):
                 return $this->params[$key];
             case isset($_GET[$key]):
-                return $_GET[$key];
+                return (get_magic_quotes_gpc() === 1) ? $this->stripslashes($_GET[$key]) : $_GET[$key];
             case isset($_POST[$key]):
-                return $_POST[$key];
+                return (get_magic_quotes_gpc() === 1) ? $this->stripslashes($_POST[$key]) : $_POST[$key];
             default:
                 return null;
         }
@@ -436,6 +436,13 @@ class SRequestParams implements ArrayAccess
     public function offsetUnset($key)
     {
         if (array_key_exists($key, $this->params)) unset($this->params[$key]);
+    }
+    
+    private function stripslashes($value)
+    {
+        if (is_array($value)) foreach ($value as $k => $v) $value[$k] = $this->stripslashes($v);
+        else $value = stripslashes($value);
+        return $value;
     }
 }
 
