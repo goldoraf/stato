@@ -92,6 +92,7 @@ class SCsvIterator implements Iterator
     public function assign_fields($fields)
     {
         foreach ($fields as $k => $v) $this->fields[$k] = $v;
+        $this->config['has_fields_in_first_line'] = true;
     }
     
     public function current()
