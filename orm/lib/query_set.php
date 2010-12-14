@@ -475,7 +475,7 @@ class SQuerySet implements Iterator, Countable
         $binds = array();
         foreach ($args as $k => $v) {
             if (is_array($v)) {
-                $in = array_fill(0, count($v) -1, '?');
+                $in = array_fill(0, count($v), '?');
                 foreach ($v as $bind) $binds[] = $bind;
                 $criterions[] = "{$k} IN (".implode(',', $in).")";
             } else {
