@@ -474,8 +474,14 @@ class SQuerySet implements Iterator, Countable
         $criterions = array();
         $binds = array();
         foreach ($args as $k => $v) {
-            $criterions[] = "{$k} = ?";
-            $binds[] = $v;
+            if (is_array($v)) {
+                $in = array_fill(0, count($v) -1, '?');
+                foreach ($v as $bind) $binds[] = $bind;
+                $criterions[] = "{$k} IN (".implode(',', $in).")";
+            } else {
+                $criterions[] = "{$k} = ?";
+                $binds[] = $v;
+            }
         }
         $criterions[] = $binds;
         return $this->filter_or_exclude($criterions, $exclude);
