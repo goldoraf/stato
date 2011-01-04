@@ -134,12 +134,13 @@ class SField
 
 class SCharField extends SField
 {
+    protected $sanitize;
     protected $regex;
     protected $length;
     protected $min_length;
     protected $max_length;
     protected $default_options = array(
-        'length' => null, 'min_length' => null, 'max_length' => null, 'regex' => null
+        'sanitize' => true, 'length' => null, 'min_length' => null, 'max_length' => null, 'regex' => null
     );
     protected $default_error_messages = array(
         'length'     => 'Ensure this value has %d characters (it has %d).',
@@ -150,8 +151,8 @@ class SCharField extends SField
     public function __construct(array $options = array())
     {
         parent::__construct($options);
-        list($this->regex, $this->length, $this->min_length, $this->max_length)
-            = array($this->options['regex'], $this->options['length'], 
+        list($this->sanitize, $this->regex, $this->length, $this->min_length, $this->max_length)
+            = array($this->options['sanitize'], $this->options['regex'], $this->options['length'], 
                     $this->options['min_length'], $this->options['max_length']);
     }
     
@@ -160,7 +161,8 @@ class SCharField extends SField
         $value = parent::clean($value);
         if ($this->is_empty($value)) return '';
         
-        $value = filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+        if ($this->sanitize)
+            $value = filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
         
         if (!is_null($this->regex) && !filter_var($value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $this->regex))))
             throw new SValidationError($this->error_messages['invalid'], array(), $value);
