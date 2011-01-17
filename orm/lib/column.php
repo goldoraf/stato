@@ -11,6 +11,7 @@ class SColumn
     const TIMESTAMP = 'timestamp';
     const YEAR      = 'year';
     const FLOAT     = 'float';
+    const DECIMAL   = 'decimal';
     const TEXT      = 'text';
     
     public $name    = null;
@@ -19,8 +20,9 @@ class SColumn
     public $default = null;
     public $null    = true;
     public $pk      = false;
+    public $options = array();
     
-    public function __construct($name, $type, $default = null, $limit = null, $null = true, $pk = false)
+    public function __construct($name, $type, $default = null, $limit = null, $null = true, $pk = false, $options = array())
     {
         $this->name    = $name;
         $this->type    = $type;
@@ -28,6 +30,7 @@ class SColumn
         $this->default = $default;
         $this->null    = $null;
         $this->pk      = $pk;
+        $this->options = $options;
     }
     
     public function typecast($owner, $data)
@@ -39,6 +42,8 @@ class SColumn
             case self::INTEGER:
                 return (integer) $data;
             case self::FLOAT:
+                return (float) $data;
+            case self::DECIMAL:
                 return (float) $data;
             case self::DATETIME:
                 return $this->string_to_date_time($data);
@@ -75,7 +80,7 @@ class SColumn
     public function to_sql()
     {
         $db = SActiveRecord::connection();
-        $sql = $db->quote_column_name($this->name).' '.$db->type_to_sql($this->type, array('limit' => $this->limit));
+        $sql = $db->quote_column_name($this->name).' '.$db->type_to_sql($this->type, array_merge(array('limit' => $this->limit), $this->options));
         $sql = $db->add_column_options($sql, $this->type, array('null' => $this->null, 'default' => $this->default));
         if ($this->pk) $sql.= ' PRIMARY KEY';
         return $sql;

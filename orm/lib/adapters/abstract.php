@@ -158,7 +158,9 @@ abstract class SAbstractAdapter
             return SColumn::TIMESTAMP;
         elseif (preg_match('/date/i', $sql_type))
             return SColumn::DATE;
-        elseif (preg_match('/float|double|decimal|numeric/i', $sql_type))
+        elseif (preg_match('/float|double|numeric/i', $sql_type))
+            return SColumn::FLOAT;
+        elseif (preg_match('/decimal/i', $sql_type))
             return SColumn::FLOAT;
     }
 

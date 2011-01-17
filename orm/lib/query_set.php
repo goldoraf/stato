@@ -446,7 +446,7 @@ class SQuerySet implements Iterator, Countable
                 $field = $matches[2];
                 $cond  = $matches[3];
                 
-                $clone->joins[] = $this->association_join($assoc_meta);
+                $clone->add_join($this->association_join($assoc_meta));
                 $clone->filters[]  = "{$assoc_meta->table_name}.{$field}{$cond}";
                 
                 unset($args[$k]);
@@ -485,6 +485,11 @@ class SQuerySet implements Iterator, Countable
         }
         $criterions[] = $binds;
         return $this->filter_or_exclude($criterions, $exclude);
+    }
+    
+    protected function add_join($sql)
+    {
+        if (!array_search($sql, $this->joins)) $this->joins[] = $sql;
     }
     
     protected function sql_joins()

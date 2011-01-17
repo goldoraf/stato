@@ -8,6 +8,7 @@ class SMySqlAdapter extends SAbstractAdapter
         SColumn::STRING    => array('name' => 'varchar', 'limit' => 255),
         SColumn::TEXT      => array('name' => 'text'),
         SColumn::FLOAT     => array('name' => 'float'),
+        SColumn::DECIMAL   => array('name' => 'decimal'),
         SColumn::DATETIME  => array('name' => 'datetime'),
         SColumn::DATE      => array('name' => 'date'),
         SColumn::TIMESTAMP => array('name' => 'timestamp'),
@@ -39,7 +40,7 @@ class SMySqlAdapter extends SAbstractAdapter
     public function execute($sql, $name = null)
     {
         $start = microtime(true);
-        
+        //file_put_contents('/tmp/repair_doublons.sql', $sql.";\n", FILE_APPEND);
         $result = $this->conn->execute($sql);
         
         $time = microtime(true) - $start;
@@ -236,9 +237,17 @@ class SMySqlAdapter extends SAbstractAdapter
         if (!is_array($native)) $sql = $native;
         else
         {
-            if (!isset($options['limit']) && isset($native['limit'])) $options['limit'] = $native['limit'];
-            $sql = $native['name'];
-            if (isset($options['limit'])) $sql.= '('.$options['limit'].')';
+            if ($type == SColumn::DECIMAL)
+            {
+                $options = array_merge(array('precision' => 10, 'scale' => 0), $options);
+                $sql = $native['name'].'('.$options['precision'].','.$options['scale'].')';
+            }
+            else
+            {
+                if (!isset($options['limit']) && isset($native['limit'])) $options['limit'] = $native['limit'];
+                $sql = $native['name'];
+                if (isset($options['limit'])) $sql.= '('.$options['limit'].')';
+            }
         }
         return $sql;
     }

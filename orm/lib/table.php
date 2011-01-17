@@ -26,6 +26,7 @@ class STable
             if (isset($options['default'])) $column->default = $options['default'];
             if (isset($options['null']))    $column->null    = $options['null'];
             if (isset($options['pk']))      $column->pk      = $options['pk'];
+            $column->options = $options;
         }
         else $column = $name;
         
