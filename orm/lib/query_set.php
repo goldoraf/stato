@@ -330,8 +330,10 @@ class SQuerySet implements Iterator, Countable
     public function values()
     {
         $args = func_get_args();
+        if (count($args) == 1 && is_array($args[0])) $args = $args[0];
         $v = new SValuesQuerySet($this->meta);
         $v->filters  = $this->filters;
+        $v->joins    = $this->joins;
         $v->excludes = $this->excludes;
         $v->params   = $this->params;
         $v->order_by = $this->order_by;

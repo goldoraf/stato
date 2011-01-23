@@ -40,7 +40,7 @@ class SMySqlAdapter extends SAbstractAdapter
     public function execute($sql, $name = null)
     {
         $start = microtime(true);
-        //file_put_contents('/tmp/repair_doublons.sql', $sql.";\n", FILE_APPEND);
+        
         $result = $this->conn->execute($sql);
         
         $time = microtime(true) - $start;
