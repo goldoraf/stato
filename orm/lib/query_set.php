@@ -439,14 +439,17 @@ class SQuerySet implements Iterator, Countable
         {
             if (preg_match('/^([a-zA-Z_]+)\->([a-zA-Z_]+)(.*)/', $arg, $matches))
             {
-                if (!isset($this->meta->attributes[$matches[1]]))
-                    throw new Exception('Association '.$matches[1].' does not exist.');
+                $assoc_name = $matches[1];
+                if (!isset($this->meta->attributes[$assoc_name]))
+                    throw new Exception('Association '.$assoc_name.' does not exist.');
                 
-                $assoc_meta = $this->meta->attributes[$matches[1]]->meta;
+                $assoc_meta = $this->meta->attributes[$assoc_name]->meta;
                 $field = $matches[2];
                 $cond  = $matches[3];
                 
-                $clone->add_join($this->association_join($assoc_meta));
+                if (!in_array($assoc_name, $this->includes))
+                    $clone->add_join($this->association_join($assoc_meta));
+                    
                 $clone->filters[]  = "{$assoc_meta->table_name}.{$field}{$cond}";
                 
                 unset($args[$k]);
