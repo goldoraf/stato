@@ -341,12 +341,20 @@ class SActiveRecord extends SObservable implements ArrayAccess/*, SISerializable
         foreach($this->meta->relationships as $k => $v) 
             $this->$k->before_owner_delete();
         
+        $this->destroy();
+        
+        $this->set_state('after_delete');
+    }
+    
+    /**
+     * Deletes the record in the database, without executing any callbacks.              
+     */
+    public function destroy()
+    {
         if ($this->is_new_record()) return false;
         $sql = 'DELETE FROM '.$this->meta->table_name.
                ' WHERE '.$this->meta->identity_field.' = \''.$this->id.'\'';
         $this->conn()->update($sql);
-        
-        $this->set_state('after_delete');
     }
     
     /**

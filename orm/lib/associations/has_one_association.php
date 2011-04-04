@@ -13,8 +13,8 @@ class SHasOneMeta extends SAssociationMeta
         
         if (isset($options['dependent']))
         {
-            if (!in_array($options['dependent'], array('delete', 'nullify')))
-                throw new Exception("The 'dependent' option expects either 'delete' or 'nullify'");
+            if (!in_array($options['dependent'], array('delete', 'destroy', 'nullify')))
+                throw new Exception("The 'dependent' option expects either 'delete', 'destroy' or 'nullify'");
             
             $this->dependent = $options['dependent'];
         }
@@ -70,6 +70,9 @@ class SHasOneManager extends SAssociationManager
         {
             case 'delete':
                 $this->target->delete();
+                break;
+            case 'destroy':
+                $this->target->destroy();
                 break;
             case 'nullify':
                 $this->target[$this->meta->foreign_key] = null;
