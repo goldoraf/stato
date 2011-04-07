@@ -184,7 +184,7 @@ class QuerySetTest extends ActiveTestCase
         $this->assertEquals("WHERE name = 'Groupe W' ORDER BY name ASC", $companies->sql_clause());
         $companies = Company::$objects->filter("name = 'Groupe W'")->order_by('name', '-id');
         $this->assertEquals("WHERE name = 'Groupe W' ORDER BY name ASC, id DESC", $companies->sql_clause());
-        $companies = Company::$objects->filter("name = 'Groupe W'")->order_by('companies.name', 'companies.-id');
+        $companies = Company::$objects->filter("name = 'Groupe W'")->order_by('companies.name', '-companies.id');
         $this->assertEquals("WHERE name = 'Groupe W' ORDER BY companies.name ASC, companies.id DESC", $companies->sql_clause());
     }
     

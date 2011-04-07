@@ -522,10 +522,8 @@ class SQuerySet implements Iterator, Countable
         $orders = array();
         foreach ($this->order_by as $o)
         {
-            if (strpos($o, '.') !== false) list($table, $o) = explode('.', $o);
             if ($o{0} == '-') $order = substr($o, 1).' DESC';
             else $order = "$o ASC";
-            if (!empty($table)) $order = $table.'.'.$order;
             $orders[] = $order;
         }
         return 'ORDER BY '.implode(', ', $orders);
